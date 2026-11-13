@@ -20,17 +20,20 @@ def get_yahoo_price(symbol):
     except:
         return "N/A"
 
-# ৩. বিটকয়েনের দাম এবং গ্লোবাল মার্কেট ডেটা
+# ৩. বিটকয়েনের দাম, গ্লোবাল মার্কেট ডেটা এবং ২৪ ঘণ্টার ভলিউম
 def get_crypto_global_data():
     try:
-        btc_res = requests.get("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd").json()
+        btc_res = requests.get("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd&include_24hr_vol=true").json()
         btc_price = btc_res['bitcoin']['usd']
+        btc_vol = btc_res['bitcoin']['usd_24h_vol'] / 1e9 # বিলিয়ন ডলারে
+        
         global_res = requests.get("https://api.coingecko.com/api/v3/global").json()
-        total_mcap = global_res['data']['total_market_cap']['usd'] / 1e12
+        total_mcap = global_res['data']['total_market_cap']['usd'] / 1e12 # ট্রিলিয়ন ডলারে
         btc_dominance = global_res['data']['market_cap_percentage']['btc']
-        return btc_price, round(total_mcap, 2), round(btc_dominance, 1)
+        
+        return btc_price, round(total_mcap, 2), round(btc_dominance, 1), round(btc_vol, 1)
     except:
-        return 0, 0.0, 0.0
+        return 0, 0.0, 0.0, 0.0
 
 # ৪. সাইকেল স্টেজ
 def get_cycle_stage(fng, dxy):
@@ -67,11 +70,9 @@ def get_macro_insights(vix, spx, oil, gold):
 
     return insights
 
-# ৬. ইভেন্ট কাউন্টডাউন এবং ভোলাটিলিটি অ্যালার্ট (আপডেট করা হয়েছে)
+# ৬. ইভেন্ট কাউন্টডাউন এবং ভোলাটিলিটি অ্যালার্ট
 def get_event_alerts(fng, vix):
     today = datetime.date.today()
-    
-    # ভবিষ্যতের ইভেন্টের তারিখ (আপনি চাইলে এখানে পরিবর্তন করতে পারবেন)
     events = {
         "US CPI Data": datetime.date(2026, 11, 15), 
         "FOMC Meeting": datetime.date(2026, 12, 12),
@@ -81,18 +82,15 @@ def get_event_alerts(fng, vix):
     alerts = []
     for name, date in events.items():
         days_left = (date - today).days
-        # যদি ইভেন্ট ৭ দিনের মধ্যে থাকে
         if 0 <= days_left <= 7:
             if days_left <= 3:
                 alerts.append({"msg": f"🚨 সতর্কতা: {name} মাত্র {days_left} দিন বাকি! বাজার অস্থির হতে পারে। নতুন পজিশন নেওয়ার আগে ভাবুন।", "color": "bg-red-900/60 border-red-500 text-red-200"})
             else:
                 alerts.append({"msg": f"⚠️ মনে রাখবেন: {name} আগামী {days_left} দিনের মধ্যে।", "color": "bg-yellow-900/60 border-yellow-500 text-yellow-200"})
             
-    # ভোলাটিলিটি সতর্কতা (VIX > 20)
     if vix != "N/A" and vix > 20:
         alerts.append({"msg": f"📈 VIX বেড়েছে ({vix})। বাজারে ভোলাটিলিটি বেশি, সতর্ক থাকুন।", "color": "bg-orange-900/60 border-orange-500 text-orange-200"})
         
-    # চরম ভয়ের সতর্কতা
     if fng < 20:
         alerts.append({"msg": f"🩸 বাজারে চরম ভয় ({fng})। লং-টার্ম স্পট ট্রেডারদের জন্য এটি ধীরে ধীরে DCA করার সুযোগ হতে পারে।", "color": "bg-green-900/60 border-green-500 text-green-200"})
 
@@ -105,12 +103,20 @@ oil_val = get_yahoo_price("CL=F")
 vix_val = get_yahoo_price("%5EVIX")
 spx_val = get_yahoo_price("%5EGSPC")
 gold_val = get_yahoo_price("GC=F")
-btc_val, total_mcap_val, btc_dom_val = get_crypto_global_data()
+btc_val, total_mcap_val, btc_dom_val, btc_vol_val = get_crypto_global_data()
 
 cycle_text, cycle_color = get_cycle_stage(fng_val, dxy_val)
 macro_insights = get_macro_insights(vix_val, spx_val, oil_val, gold_val)
 alerts = get_event_alerts(fng_val, vix_val)
 current_date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
+
+# Altseason লজিক (BTC Dominance < 50% হলে Altseason)
+if btc_dom_val < 50:
+    alt_status = "ALT SEASON"
+    alt_color = "text-purple-400"
+else:
+    alt_status = "BTC SEASON"
+    alt_color = "text-orange-400"
 
 # HTML জেনারেশন
 html_content = f"""
@@ -127,7 +133,7 @@ html_content = f"""
         <h1 class="text-2xl font-bold mb-1 text-center text-blue-400">My Crypto Spot Dashboard</h1>
         <p class="text-center text-gray-400 mb-6 text-sm">Last Updated: {current_date} (UTC)</p>
 
-        <!-- Alert Section (নতুন) -->
+        <!-- Alert Section -->
 """
 
 if alerts:
@@ -149,23 +155,23 @@ else:
     """
 
 html_content += """
-        <!-- Top Summary Cards -->
+        <!-- Top Summary Cards (নতুন ৪টি ঘর) -->
         <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
-            <div class="bg-gray-800 p-3 rounded-lg border border-gray-700 text-center">
-                <p class="text-xs text-gray-400">BTC Price</p>
-                <p class="text-xl font-bold text-orange-400">$""" + f"{btc_val:,}" + """</p>
+            <div class="bg-gray-800 p-3 rounded-lg border border-gray-700 text-center flex flex-col justify-center">
+                <p class="text-xs text-gray-400">BTC Dominance</p>
+                <p class="text-xl font-bold text-orange-400">""" + f"{btc_dom_val}%" + """</p>
             </div>
-            <div class="bg-gray-800 p-3 rounded-lg border border-gray-700 text-center">
-                <p class="text-xs text-gray-400">Fear & Greed</p>
-                <p class="text-xl font-bold """ + f"{'text-green-500' if fng_val < 30 else 'text-red-500' if fng_val > 75 else 'text-yellow-500'}" + """">""" + f"{fng_val}" + """</p>
+            <div class="bg-gray-800 p-3 rounded-lg border border-gray-700 text-center flex flex-col justify-center">
+                <p class="text-xs text-gray-400">Total Market Cap</p>
+                <p class="text-xl font-bold text-blue-400">$""" + f"{total_mcap_val}T" + """</p>
             </div>
-            <div class="bg-gray-800 p-3 rounded-lg border border-gray-700 text-center">
-                <p class="text-xs text-gray-400">DXY</p>
-                <p class="text-xl font-bold """ + f"{'text-green-500' if dxy_val != 'N/A' and dxy_val < 105 else 'text-red-500' if dxy_val != 'N/A' else 'text-gray-500'}" + """">""" + f"{dxy_val}" + """</p>
+            <div class="bg-gray-800 p-3 rounded-lg border border-gray-700 text-center flex flex-col justify-center">
+                <p class="text-xs text-gray-400">Market Trend</p>
+                <p class="text-xl font-bold """ + f"{alt_color}" + """">""" + f"{alt_status}" + """</p>
             </div>
-            <div class="bg-gray-800 p-3 rounded-lg border border-gray-700 text-center">
-                <p class="text-xs text-gray-400">ETF Flow</p>
-                <p class="text-xl font-bold text-green-500">$50.5M</p>
+            <div class="bg-gray-800 p-3 rounded-lg border border-gray-700 text-center flex flex-col justify-center">
+                <p class="text-xs text-gray-400">BTC 24h Volume</p>
+                <p class="text-xl font-bold text-green-500">$""" + f"{btc_vol_val}B" + """</p>
             </div>
         </div>
 
@@ -214,20 +220,12 @@ html_content += """
                     </thead>
                     <tbody>
                         <tr class="border-b border-gray-700 hover:bg-gray-750">
-                            <td class="px-3 py-3 font-medium text-white">Price Structure</td>
+                            <td class="px-3 py-3 font-medium text-white">BTC Price</td>
                             <td class="px-3 py-3">
                                 <div class="font-semibold">$""" + f"{btc_val:,}" + """</div>
-                                <div class="text-xs text-gray-500">Holding above key support</div>
+                                <div class="text-xs text-gray-500">Spot Price</div>
                             </td>
-                            <td class="px-3 py-3 text-right font-bold text-yellow-500">NEUTRAL</td>
-                        </tr>
-                        <tr class="border-b border-gray-700 hover:bg-gray-750">
-                            <td class="px-3 py-3 font-medium text-white">ETF Flows</td>
-                            <td class="px-3 py-3">
-                                <div class="font-semibold">$50.5M</div>
-                                <div class="text-xs text-gray-500">Institutional Demand</div>
-                            </td>
-                            <td class="px-3 py-3 text-right font-bold text-green-500">BULLISH</td>
+                            <td class="px-3 py-3 text-right font-bold text-orange-400">TRACKING</td>
                         </tr>
                         <tr class="border-b border-gray-700 hover:bg-gray-750">
                             <td class="px-3 py-3 font-medium text-white">Market Sentiment</td>
@@ -250,7 +248,7 @@ html_content += """
             </div>
         </div>
 
-        <!-- Macro News Section (শুধু একবার থাকবে) -->
+        <!-- Macro News Section -->
         <div class="bg-gray-800 rounded-lg border border-gray-700 p-4 mb-6">
             <h2 class="text-lg font-bold text-gray-200 mb-4 text-center border-b border-gray-700 pb-2">MACRO & AI NEWS</h2>
             <ul class="space-y-3">
