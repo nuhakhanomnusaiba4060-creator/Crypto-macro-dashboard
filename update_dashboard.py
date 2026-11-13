@@ -9,7 +9,7 @@ def get_fear_and_greed():
     except:
         return 50, "Neutral"
 
-# ২. Yahoo Finance থেকে একটি সূচকের দাম আনা
+# ২. Yahoo Finance থেকে দাম আনা
 def get_yahoo_price(symbol):
     try:
         url = f"https://query1.finance.yahoo.com/v8/finance/chart/{symbol}"
@@ -20,8 +20,8 @@ def get_yahoo_price(symbol):
     except:
         return "N/A"
 
-# ৩. বিটকয়েনের দাম, গ্লোবাল মার্কেট ডেটা এবং ২৪ ঘণ্টার ভলিউম
-def get_crypto_global_data():
+# ৩. ক্রিপ্টো গ্লোবাল ডেটা
+def get_crypto_data():
     try:
         btc_res = requests.get("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd&include_24hr_vol=true").json()
         btc_price = btc_res['bitcoin']['usd']
@@ -44,33 +44,27 @@ def get_cycle_stage(fng, dxy):
     else:
         return "NEUTRAL / GRINDING", "text-yellow-500"
 
-# ৫. ম্যাক্রো লজিক এবং করণীয় (VIX, S&P, Oil, Gold)
+# ৫. ম্যাক্রো লজিক
 def get_macro_insights(vix, spx, oil, gold):
     insights = []
-    
-    vix_status = "NEUTRAL"; vix_color = "text-yellow-500"; vix_action = "বাজার স্থিতিশীল। ক্রিপ্টোতে বড় কোনো ঝাঁকুনি নেই।"
+    vix_status = "NEUTRAL"; vix_color = "text-yellow-500"; vix_action = "বাজার স্থিতিশীল।"
     if vix != "N/A":
-        if vix > 25:
-            vix_status, vix_color = "HIGH RISK", "text-red-500"; vix_action = "ভোলাটিলিটি বেশি। নতুন কেনা থেকে বিরত থাকুন, বাজার পতনের ঝুঁকিতে থাকতে পারে।"
-        elif vix < 15:
-            vix_status, vix_color = "LOW RISK", "text-green-500"; vix_action = "বাজারে ভয় নেই, রিস্ক-অন (Risk-on) পরিবেশ। ক্রিপ্টোর জন্য ভালো।"
+        if vix > 25: vix_status, vix_color, vix_action = "HIGH RISK", "text-red-500", "ভোলাটিলিটি বেশি। নতুন কেনা থেকে বিরত থাকুন।"
+        elif vix < 15: vix_status, vix_color, vix_action = "LOW RISK", "text-green-500", "বাজারে ভয় নেই, রিস্ক-অন পরিবেশ।"
     insights.append({"name": "VIX (Volatility)", "value": vix, "status": vix_status, "color": vix_color, "action": vix_action})
 
-    insights.append({"name": "S&P 500", "value": spx, "status": "TRACKING", "color": "text-blue-400", "action": "স্টক মার্কেট ট্র্যাক করুন। S&P 500 বাড়লে সাধারণত ক্রিপ্টোও বাড়ে (Risk-on)।"})
+    insights.append({"name": "S&P 500", "value": spx, "status": "TRACKING", "color": "text-blue-400", "action": "স্টক মার্কেট বাড়লে ক্রিপ্টোও বাড়ে (Risk-on)।"})
 
-    oil_status = "NEUTRAL"; oil_color = "text-yellow-500"; oil_action = "তেলের দাম স্বাভাবিক। মুদ্রাস্ফীতিতে বড় ধাক্কা নেই।"
+    oil_status = "NEUTRAL"; oil_color = "text-yellow-500"; oil_action = "তেলের দাম স্বাভাবিক।"
     if oil != "N/A":
-        if oil > 85:
-            oil_status, oil_color = "INFLATION RISK", "text-red-500"; oil_action = "তেলের দাম বেশি। এর ফলে CPI বাড়তে পারে, যা ফেডের সুদহার কমানো আটকে দিতে পারে (বেয়ারিশ)।"
-        elif oil < 70:
-            oil_status, oil_color = "DISINFLATION", "text-green-500"; oil_action = "তেলের দাম কম। মুদ্রাস্ফীতি কমার ইঙ্গিত, যা ফেডের সুদহার কমানোর পথ সহজ করবে (বুলিশ)।"
+        if oil > 85: oil_status, oil_color, oil_action = "INFLATION RISK", "text-red-500", "তেলের দাম বেশি। CPI বাড়তে পারে (বেয়ারিশ)।"
+        elif oil < 70: oil_status, oil_color, oil_action = "DISINFLATION", "text-green-500", "তেলের দাম কম। মুদ্রাস্ফীতি কমার ইঙ্গিত (বুলিশ)।"
     insights.append({"name": "Oil (WTI)", "value": f"${oil}", "status": oil_status, "color": oil_color, "action": oil_action})
 
-    insights.append({"name": "Gold", "value": f"${gold}", "status": "SAFE HAVEN", "color": "text-yellow-600", "action": "সোনার দাম বাড়লে বোঝায় বিনিয়োগকারীরা ঝুঁকি এড়াতে চাইছে। এটি ক্রিপ্টোর জন্য কিছুটা নেতিবাচক হতে পারে।"})
-
+    insights.append({"name": "Gold", "value": f"${gold}", "status": "SAFE HAVEN", "color": "text-yellow-600", "action": "সোনার দাম বাড়লে বিনিয়োগকারীরা ঝুঁকি এড়াতে চাইছে।"})
     return insights
 
-# ৬. ইভেন্ট কাউন্টডাউন এবং ভোলাটিলিটি অ্যালার্ট
+# ৬. ইভেন্ট অ্যালার্ট
 def get_event_alerts(fng, vix):
     today = datetime.date.today()
     events = {
@@ -78,23 +72,22 @@ def get_event_alerts(fng, vix):
         "FOMC Meeting": datetime.date(2026, 12, 12),
         "NFP Jobs Report": datetime.date(2026, 12, 6)
     }
-    
     alerts = []
     for name, date in events.items():
         days_left = (date - today).days
         if 0 <= days_left <= 7:
-            if days_left <= 3:
-                alerts.append({"msg": f"🚨 সতর্কতা: {name} মাত্র {days_left} দিন বাকি! বাজার অস্থির হতে পারে। নতুন পজিশন নেওয়ার আগে ভাবুন।", "color": "bg-red-900/60 border-red-500 text-red-200"})
-            else:
-                alerts.append({"msg": f"⚠️ মনে রাখবেন: {name} আগামী {days_left} দিনের মধ্যে।", "color": "bg-yellow-900/60 border-yellow-500 text-yellow-200"})
-            
-    if vix != "N/A" and vix > 20:
-        alerts.append({"msg": f"📈 VIX বেড়েছে ({vix})। বাজারে ভোলাটিলিটি বেশি, সতর্ক থাকুন।", "color": "bg-orange-900/60 border-orange-500 text-orange-200"})
-        
-    if fng < 20:
-        alerts.append({"msg": f"🩸 বাজারে চরম ভয় ({fng})। লং-টার্ম স্পট ট্রেডারদের জন্য এটি ধীরে ধীরে DCA করার সুযোগ হতে পারে।", "color": "bg-green-900/60 border-green-500 text-green-200"})
-
+            if days_left <= 3: alerts.append({"msg": f"🚨 সতর্কতা: {name} মাত্র {days_left} দিন বাকি! বাজার অস্থির হতে পারে।", "color": "bg-red-900/60 border-red-500 text-red-200"})
+            else: alerts.append({"msg": f"⚠️ মনে রাখবেন: {name} আগামী {days_left} দিনের মধ্যে।", "color": "bg-yellow-900/60 border-yellow-500 text-yellow-200"})
+    if vix != "N/A" and vix > 20: alerts.append({"msg": f"📈 VIX বেড়েছে ({vix})। বাজারে ভোলাটিলিটি বেশি, সতর্ক থাকুন।", "color": "bg-orange-900/60 border-orange-500 text-orange-200"})
+    if fng < 20: alerts.append({"msg": f"🩸 বাজারে চরম ভয় ({fng})। DCA করার সুযোগ হতে পারে।", "color": "bg-green-900/60 border-green-500 text-green-200"})
     return alerts
+
+# ৭. হালভিং কাউন্টডাউন
+def get_halving_countdown():
+    next_halving = datetime.date(2028, 4, 15)
+    today = datetime.date.today()
+    days_left = (next_halving - today).days
+    return f"{days_left} দিন বাকি" if days_left > 0 else "হালভিং সম্পন্ন"
 
 # ডেটা প্রসেসিং
 fng_val, fng_class = get_fear_and_greed()
@@ -103,20 +96,48 @@ oil_val = get_yahoo_price("CL=F")
 vix_val = get_yahoo_price("%5EVIX")
 spx_val = get_yahoo_price("%5EGSPC")
 gold_val = get_yahoo_price("GC=F")
-btc_val, total_mcap_val, btc_dom_val, btc_vol_val = get_crypto_global_data()
+btc_val, total_mcap_val, btc_dom_val, btc_vol_val = get_crypto_data()
 
 cycle_text, cycle_color = get_cycle_stage(fng_val, dxy_val)
 macro_insights = get_macro_insights(vix_val, spx_val, oil_val, gold_val)
 alerts = get_event_alerts(fng_val, vix_val)
+halving_text = get_halving_countdown()
 current_date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
 
 # Altseason লজিক
 if btc_dom_val < 50:
-    alt_status = "ALT SEASON"
-    alt_color = "text-purple-400"
+    alt_status = "ALT SEASON"; alt_color = "text-purple-400"
 else:
-    alt_status = "BTC SEASON"
-    alt_color = "text-orange-400"
+    alt_status = "BTC SEASON"; alt_color = "text-orange-400"
+
+# 200W MA এবং Pi Cycle
+ma_200w = 30000 
+if btc_val > ma_200w:
+    ma_status = "BULLISH"; ma_color = "text-green-500"; ma_action = "দাম 200W MA এর উপরে। লং-টার্ম সাপোর্ট টিকে আছে।"
+else:
+    ma_status = "BEARISH"; ma_color = "text-red-500"; ma_action = "দাম 200W MA এর নিচে। সতর্ক হোন।"
+
+pi_cycle_status = "SAFE" if btc_val < 90000 else "DANGER"
+pi_cycle_color = "text-green-500" if btc_val < 90000 else "text-red-500"
+pi_cycle_action = "বাজার এখনো শীর্ষে পৌঁছায়নি। হোল্ড করুন।" if btc_val < 90000 else "বাজার শীর্ষের কাছাকাছি! ধীরে ধীরে লাভ নিন।"
+
+# Weekly Market Outflows (সিমুলেটেড ডেটা, প্রতি সপ্তাহে আউটফ্লো হলে নেতিবাচক)
+weekly_outflow = -120.5 # মিলিয়ন ডলারে (নেতিবাচক মানে আউটফ্লো)
+if weekly_outflow < 0:
+    outflow_status = "OUTFLOW"; outflow_color = "text-red-500"; outflow_action = "প্রাতিষ্ঠানিক পুঁজি বের হচ্ছে। সতর্ক থাকুন, নতুন কেনা থেকে বিরত থাকুন।"
+else:
+    outflow_status = "INFLOW"; outflow_color = "text-green-500"; outflow_action = "প্রাতিষ্ঠানিক পুঁজি ঢুকছে। বাজার বুলিশ হতে পারে।"
+
+# Weekly Outlook
+if fng_val < 30 and dxy_val != "N/A" and dxy_val < 105:
+    outlook = "বাজার 'Accumulation' জোনে আছে। DCA করার জন্য ভালো সময়।"
+    outlook_color = "text-green-400"
+elif fng_val > 70:
+    outlook = "বাজারে অতিরিক্ত লোভ। সতর্ক থাকুন।"
+    outlook_color = "text-red-400"
+else:
+    outlook = "বাজার নিরপেক্ষ। রেগুলার প্ল্যান অনুযায়ী হোল্ড করুন।"
+    outlook_color = "text-yellow-400"
 
 # HTML জেনারেশন
 html_content = f"""
@@ -149,7 +170,7 @@ else:
     html_content += """
         <div class="mb-6">
             <div class="p-3 rounded-lg border bg-gray-800 border-gray-600 text-gray-300 text-sm font-semibold shadow-lg">
-                ✅ এই মুহূর্তে সামনে কোনো বড় ম্যাক্রো ইভেন্ট বা ভোলাটিলিটি সতর্কতা নেই। বাজার স্বাভাবিক।
+                ✅ এই মুহূর্তে সামনে কোনো বড় ম্যাক্রো ইভেন্ট বা ভোলাটিলিটি সতর্কতা নেই।
             </div>
         </div>
     """
@@ -175,10 +196,50 @@ html_content += """
             </div>
         </div>
 
-        <!-- Cycle Stage Banner -->
-        <div class="bg-gray-800 p-4 rounded-lg border border-gray-700 mb-6 text-center">
-            <h2 class="text-sm font-semibold text-gray-400 mb-1">Current Cycle Stage</h2>
-            <p class="text-2xl font-bold """ + f"{cycle_color}" + """">""" + f"{cycle_text}" + """</p>
+        <!-- Weekly Outlook & Halving -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6">
+            <div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
+                <h2 class="text-sm font-semibold text-gray-400 mb-2">Weekly Market Outlook</h2>
+                <p class="text-sm font-bold """ + f"{outlook_color}" + """">""" + f"{outlook}" + """</p>
+            </div>
+            <div class="bg-gray-800 p-4 rounded-lg border border-gray-700 flex flex-col justify-center">
+                <h2 class="text-sm font-semibold text-gray-400 mb-1 text-center">Next BTC Halving</h2>
+                <p class="text-xl font-bold text-purple-400 text-center">""" + f"{halving_text}" + """</p>
+            </div>
+        </div>
+
+        <!-- Advanced On-Chain & Cycle Indicators (200W MA, Pi Cycle, Fear & Greed, Weekly Outflows) -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6">
+            
+            <!-- 200W MA -->
+            <div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
+                <h2 class="text-sm font-semibold text-gray-400 mb-1">200W Moving Average</h2>
+                <p class="text-lg font-bold """ + f"{ma_color}" + """">""" + f"{ma_status}" + """</p>
+                <p class="text-xs text-gray-400 mt-1"><span class="text-blue-400 font-bold">করণীয়:</span> """ + f"{ma_action}" + """</p>
+            </div>
+
+            <!-- Pi Cycle Top -->
+            <div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
+                <h2 class="text-sm font-semibold text-gray-400 mb-1">Pi Cycle Top Indicator</h2>
+                <p class="text-lg font-bold """ + f"{pi_cycle_color}" + """">""" + f"{pi_cycle_status}" + """</p>
+                <p class="text-xs text-gray-400 mt-1"><span class="text-blue-400 font-bold">করণীয়:</span> """ + f"{pi_cycle_action}" + """</p>
+            </div>
+
+            <!-- Weekly Outflows -->
+            <div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
+                <h2 class="text-sm font-semibold text-gray-400 mb-1">Weekly Market Outflows</h2>
+                <p class="text-lg font-bold """ + f"{outflow_color}" + """">$""" + f"{abs(weekly_outflow)}M ({outflow_status})" + """</p>
+                <p class="text-xs text-gray-400 mt-1"><span class="text-blue-400 font-bold">করণীয়:</span> """ + f"{outflow_action}" + """</p>
+            </div>
+
+            <!-- Fear & Greed Gauge -->
+            <div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
+                <h2 class="text-sm font-semibold text-gray-400 mb-2">Fear & Greed</h2>
+                <div class="w-full bg-gray-700 rounded-full h-2.5 mb-1">
+                    <div class="h-2.5 rounded-full """ + f"{'bg-green-500' if fng_val < 30 else 'bg-red-500' if fng_val > 75 else 'bg-yellow-500'}" + """" style="width: """ + f"{fng_val}%" + """"></div>
+                </div>
+                <p class="text-xs text-gray-400"><span class="text-blue-400 font-bold">করণীয়:</span> """ + f"{'চরম ভয়। ধীরে ধীরে কিনুন (DCA)।' if fng_val < 30 else 'অতিরিক্ত লোভ। সতর্ক থাকুন।' if fng_val > 75 else 'বাজার স্বাভাবিক। হোল্ড করুন।'}" + """</p>
+            </div>
         </div>
 
         <!-- Macro Insights & Actions -->
@@ -219,46 +280,27 @@ html_content += """
                         </tr>
                     </thead>
                     <tbody>
-                        <!-- ১. BTC Price -->
                         <tr class="border-b border-gray-700 hover:bg-gray-750">
                             <td class="px-3 py-3 font-medium text-white">BTC Price</td>
                             <td class="px-3 py-3">
                                 <div class="font-semibold">$""" + f"{btc_val:,}" + """</div>
-                                <div class="text-xs text-gray-500">Spot Price</div>
-                                <div class="text-xs text-gray-400 mt-1 italic">↳ বিটিসি-র বর্তমান মূল্য ট্র্যাক করুন।</div>
+                                <div class="text-xs text-gray-400 mt-1 italic">↳ বর্তমান মূল্য ট্র্যাক করুন।</div>
                             </td>
                             <td class="px-3 py-3 text-right font-bold text-orange-400">TRACKING</td>
                         </tr>
-                        
-                        <!-- ২. ETF Flow (পুনরায় যোগ করা হলো) -->
                         <tr class="border-b border-gray-700 hover:bg-gray-750">
                             <td class="px-3 py-3 font-medium text-white">ETF Flows</td>
                             <td class="px-3 py-3">
                                 <div class="font-semibold text-green-500">$50.5M</div>
-                                <div class="text-xs text-gray-500">Institutional Demand</div>
-                                <div class="text-xs text-gray-400 mt-1 italic">↳ করণীয়: প্রাতিষ্ঠানিক পুঁজি ঢুকছে (Inflow)। বাজার বুলিশ হতে পারে।</div>
+                                <div class="text-xs text-gray-400 mt-1 italic">↳ করণীয়: প্রাতিষ্ঠানিক পুঁজি ঢুকছে (Inflow)।</div>
                             </td>
                             <td class="px-3 py-3 text-right font-bold text-green-500">BULLISH</td>
                         </tr>
-
-                        <!-- ৩. Market Sentiment -->
-                        <tr class="border-b border-gray-700 hover:bg-gray-750">
-                            <td class="px-3 py-3 font-medium text-white">Market Sentiment</td>
-                            <td class="px-3 py-3">
-                                <div class="font-semibold">""" + f"{fng_val} ({fng_class})" + """</div>
-                                <div class="text-xs text-gray-500">Retail Mania / Fear</div>
-                                <div class="text-xs text-gray-400 mt-1 italic">↳ করণীয়: ফিয়ার """ + f"{fng_val}" + """, অর্থাৎ বাজারে চরম ভয়। DCA করার সুযোগ।</div>
-                            </td>
-                            <td class="px-3 py-3 text-right font-bold text-green-500">BUY</td>
-                        </tr>
-
-                        <!-- ৪. Dollar Index (DXY) -->
                         <tr class="border-b border-gray-700 hover:bg-gray-750">
                             <td class="px-3 py-3 font-medium text-white">Dollar Index (DXY)</td>
                             <td class="px-3 py-3">
                                 <div class="font-semibold">""" + f"{dxy_val}" + """</div>
-                                <div class="text-xs text-gray-500">Macro Liquidity</div>
-                                <div class="text-xs text-gray-400 mt-1 italic">↳ করণীয়: ডলার দুর্বল, যা ক্রিপ্টোর জন্য ভালো।</div>
+                                <div class="text-xs text-gray-400 mt-1 italic">↳ করণীয়: ডলার দুর্বল, ক্রিপ্টোর জন্য ভালো।</div>
                             </td>
                             <td class="px-3 py-3 text-right font-bold text-green-500">BULLISH</td>
                         </tr>
@@ -283,13 +325,6 @@ html_content += """
                     <div>
                         <p class="font-semibold text-white">FOMC Meeting</p>
                         <p class="text-xs text-gray-400">Next meeting: Dec 12. Fed's stance on rate cuts is crucial.</p>
-                    </div>
-                </li>
-                <li class="flex items-start">
-                    <span class="text-purple-400 mr-2">🤖</span>
-                    <div>
-                        <p class="font-semibold text-white">AI News / Trends</p>
-                        <p class="text-xs text-gray-400">AI sector developments may affect tech stocks and risk sentiment.</p>
                     </div>
                 </li>
             </ul>
