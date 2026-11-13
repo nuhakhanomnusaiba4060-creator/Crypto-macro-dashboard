@@ -18,13 +18,21 @@ def get_dxy():
     except:
         return 104.50
 
-# ৩. বিটকয়েনের দাম
-def get_btc_price():
+# ৩. বিটকয়েনের দাম এবং গ্লোবাল মার্কেট ডেটা (CoinGecko)
+def get_crypto_global_data():
     try:
-        res = requests.get("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd").json()
-        return res['bitcoin']['usd']
+        # বিটকয়েনের দাম
+        btc_res = requests.get("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd").json()
+        btc_price = btc_res['bitcoin']['usd']
+        
+        # গ্লোবাল ডেটা (Total Market Cap, BTC Dominance)
+        global_res = requests.get("https://api.coingecko.com/api/v3/global").json()
+        total_mcap = global_res['data']['total_market_cap']['usd'] / 1e12 # ট্রিলিয়ন ডলারে
+        btc_dominance = global_res['data']['market_cap_percentage']['btc']
+        
+        return btc_price, round(total_mcap, 2), round(btc_dominance, 1)
     except:
-        return 0
+        return 0, 0.0, 0.0
 
 # ৪. সাইকেল স্টেজ নির্ধারণ (Cycle Stage)
 def get_cycle_stage(fng, dxy):
@@ -36,8 +44,7 @@ def get_cycle_stage(fng, dxy):
         return "NEUTRAL / GRINDING", "text-yellow-500"
 
 # ৫. সিগন্যাল টেবিলের ডেটা তৈরি
-def get_signals(fng, dxy, btc, etf_flow=50.5):
-    # লজিক: fng (sentiment), dxy (macro), etf (liquidity)
+def get_signals(fng, dxy, btc, total_mcap, btc_dom, etf_flow=50.5):
     signals = []
 
     # ১. Price Structure
@@ -46,7 +53,7 @@ def get_signals(fng, dxy, btc, etf_flow=50.5):
         "current": f"${btc:,}", "status": "NEUTRAL", "color": "text-yellow-500"
     })
 
-    # ২. ETF Flows (Inflow হলে Buy, Outflow হলে Sell)
+    # ২. ETF Flows
     etf_color = "text-green-500" if etf_flow > 0 else "text-red-500"
     etf_status = "BULLISH" if etf_flow > 0 else "BEARISH"
     signals.append({
@@ -54,7 +61,7 @@ def get_signals(fng, dxy, btc, etf_flow=50.5):
         "current": f"${etf_flow}M", "status": etf_status, "color": etf_color
     })
 
-    # ৩. Market Sentiment (Fear & Greed)
+    # ৩. Market Sentiment
     fng_color = "text-green-500" if fng < 30 else "text-red-500" if fng > 75 else "text-yellow-500"
     fng_status = "BUY" if fng < 30 else "SELL" if fng > 75 else "NEUTRAL"
     signals.append({
@@ -70,14 +77,33 @@ def get_signals(fng, dxy, btc, etf_flow=50.5):
         "current": f"{dxy}", "status": dxy_status, "color": dxy_color
     })
 
+    # ৫. Total Market Cap
+    signals.append({
+        "name": "Total Market Cap", "match": "Overall Crypto Health",
+        "current": f"${total_mcap}T", "status": "NEUTRAL", "color": "text-blue-400"
+    })
+
+    # ৬. Market Breadth (BTC Dominance)
+    if btc_dom > 55:
+        dom_status, dom_color = "BTC SEASON", "text-orange-500"
+    elif btc_dom < 50:
+        dom_status, dom_color = "ALT SEASON", "text-purple-400"
+    else:
+        dom_status, dom_color = "MIXED", "text-yellow-500"
+        
+    signals.append({
+        "name": "Market Breadth", "match": "BTC Dominance %",
+        "current": f"{btc_dom}%", "status": dom_status, "color": dom_color
+    })
+
     return signals
 
 # ডেটা প্রসেসিং
 fng_val, fng_class = get_fear_and_greed()
 dxy_val = get_dxy()
-btc_val = get_btc_price()
+btc_val, total_mcap_val, btc_dom_val = get_crypto_global_data()
 cycle_text, cycle_color = get_cycle_stage(fng_val, dxy_val)
-signals_data = get_signals(fng_val, dxy_val, btc_val)
+signals_data = get_signals(fng_val, dxy_val, btc_val, total_mcap_val, btc_dom_val)
 current_date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
 
 # HTML জেনারেশন
@@ -87,7 +113,7 @@ html_content = f"""
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crypto Dada Style Dashboard</title>
+    <title>Crypto Macro Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-900 text-white font-sans p-4">
@@ -122,7 +148,7 @@ html_content = f"""
         </div>
 
         <!-- Signal Table -->
-        <div class="bg-gray-800 rounded-lg border border-gray-700 overflow-hidden">
+        <div class="bg-gray-800 rounded-lg border border-gray-700 overflow-hidden mb-6">
             <div class="p-4 bg-gray-700/50 border-b border-gray-600">
                 <h2 class="text-lg font-bold text-gray-200 text-center">SIGNAL TABLE (CORE DASHBOARD)</h2>
             </div>
@@ -155,6 +181,21 @@ for sig in signals_data:
 html_content += """
                     </tbody>
                 </table>
+            </div>
+        </div>
+
+        <!-- Extra Market Measures (নতুন সেকশন) -->
+        <div class="bg-gray-800 rounded-lg border border-gray-700 p-4">
+            <h2 class="text-lg font-bold text-gray-200 mb-4 text-center border-b border-gray-700 pb-2">Extra Market Measures</h2>
+            <div class="grid grid-cols-2 gap-4">
+                <div class="text-center">
+                    <p class="text-xs text-gray-400 mb-1">Total Market Cap</p>
+                    <p class="text-xl font-bold text-blue-400">${total_mcap_val}T</p>
+                </div>
+                <div class="text-center">
+                    <p class="text-xs text-gray-400 mb-1">BTC Dominance</p>
+                    <p class="text-xl font-bold text-orange-400">{btc_dom_val}%</p>
+                </div>
             </div>
         </div>
         
