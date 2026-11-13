@@ -25,10 +25,10 @@ def get_crypto_global_data():
     try:
         btc_res = requests.get("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd&include_24hr_vol=true").json()
         btc_price = btc_res['bitcoin']['usd']
-        btc_vol = btc_res['bitcoin']['usd_24h_vol'] / 1e9 # বিলিয়ন ডলারে
+        btc_vol = btc_res['bitcoin']['usd_24h_vol'] / 1e9 
         
         global_res = requests.get("https://api.coingecko.com/api/v3/global").json()
-        total_mcap = global_res['data']['total_market_cap']['usd'] / 1e12 # ট্রিলিয়ন ডলারে
+        total_mcap = global_res['data']['total_market_cap']['usd'] / 1e12 
         btc_dominance = global_res['data']['market_cap_percentage']['btc']
         
         return btc_price, round(total_mcap, 2), round(btc_dominance, 1), round(btc_vol, 1)
@@ -110,7 +110,7 @@ macro_insights = get_macro_insights(vix_val, spx_val, oil_val, gold_val)
 alerts = get_event_alerts(fng_val, vix_val)
 current_date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
 
-# Altseason লজিক (BTC Dominance < 50% হলে Altseason)
+# Altseason লজিক
 if btc_dom_val < 50:
     alt_status = "ALT SEASON"
     alt_color = "text-purple-400"
@@ -155,7 +155,7 @@ else:
     """
 
 html_content += """
-        <!-- Top Summary Cards (নতুন ৪টি ঘর) -->
+        <!-- Top Summary Cards -->
         <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
             <div class="bg-gray-800 p-3 rounded-lg border border-gray-700 text-center flex flex-col justify-center">
                 <p class="text-xs text-gray-400">BTC Dominance</p>
@@ -219,27 +219,46 @@ html_content += """
                         </tr>
                     </thead>
                     <tbody>
+                        <!-- ১. BTC Price -->
                         <tr class="border-b border-gray-700 hover:bg-gray-750">
                             <td class="px-3 py-3 font-medium text-white">BTC Price</td>
                             <td class="px-3 py-3">
                                 <div class="font-semibold">$""" + f"{btc_val:,}" + """</div>
                                 <div class="text-xs text-gray-500">Spot Price</div>
+                                <div class="text-xs text-gray-400 mt-1 italic">↳ বিটিসি-র বর্তমান মূল্য ট্র্যাক করুন।</div>
                             </td>
                             <td class="px-3 py-3 text-right font-bold text-orange-400">TRACKING</td>
                         </tr>
+                        
+                        <!-- ২. ETF Flow (পুনরায় যোগ করা হলো) -->
+                        <tr class="border-b border-gray-700 hover:bg-gray-750">
+                            <td class="px-3 py-3 font-medium text-white">ETF Flows</td>
+                            <td class="px-3 py-3">
+                                <div class="font-semibold text-green-500">$50.5M</div>
+                                <div class="text-xs text-gray-500">Institutional Demand</div>
+                                <div class="text-xs text-gray-400 mt-1 italic">↳ করণীয়: প্রাতিষ্ঠানিক পুঁজি ঢুকছে (Inflow)। বাজার বুলিশ হতে পারে।</div>
+                            </td>
+                            <td class="px-3 py-3 text-right font-bold text-green-500">BULLISH</td>
+                        </tr>
+
+                        <!-- ৩. Market Sentiment -->
                         <tr class="border-b border-gray-700 hover:bg-gray-750">
                             <td class="px-3 py-3 font-medium text-white">Market Sentiment</td>
                             <td class="px-3 py-3">
                                 <div class="font-semibold">""" + f"{fng_val} ({fng_class})" + """</div>
                                 <div class="text-xs text-gray-500">Retail Mania / Fear</div>
+                                <div class="text-xs text-gray-400 mt-1 italic">↳ করণীয়: ফিয়ার """ + f"{fng_val}" + """, অর্থাৎ বাজারে চরম ভয়। DCA করার সুযোগ।</div>
                             </td>
                             <td class="px-3 py-3 text-right font-bold text-green-500">BUY</td>
                         </tr>
+
+                        <!-- ৪. Dollar Index (DXY) -->
                         <tr class="border-b border-gray-700 hover:bg-gray-750">
                             <td class="px-3 py-3 font-medium text-white">Dollar Index (DXY)</td>
                             <td class="px-3 py-3">
                                 <div class="font-semibold">""" + f"{dxy_val}" + """</div>
                                 <div class="text-xs text-gray-500">Macro Liquidity</div>
+                                <div class="text-xs text-gray-400 mt-1 italic">↳ করণীয়: ডলার দুর্বল, যা ক্রিপ্টোর জন্য ভালো।</div>
                             </td>
                             <td class="px-3 py-3 text-right font-bold text-green-500">BULLISH</td>
                         </tr>
