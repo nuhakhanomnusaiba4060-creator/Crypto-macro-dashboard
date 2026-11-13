@@ -16,6 +16,9 @@ def get_yahoo_price(symbol):
         headers = {'User-Agent': 'Mozilla/5.0'}
         res = requests.get(url, headers=headers).json()
         price = res['chart']['result'][0]['meta']['regularMarketPrice']
+        # TNX এর ক্ষেত্রে ভ্যালু ১০ দিয়ে ভাগ করতে হয় (যেমন: 42.5 -> 4.25)
+        if symbol == "%5ETNX":
+            return round(price / 10, 2)
         return round(price, 2)
     except:
         return "N/A"
@@ -76,7 +79,7 @@ def get_cycle_stage(fng, dxy):
         return "NEUTRAL / GRINDING", "text-yellow-500"
 
 # ৭. ম্যাক্রো লজিক
-def get_macro_insights(vix, spx, oil, gold):
+def get_macro_insights(vix, spx, oil, gold, yield_10y):
     insights = []
     vix_status = "NEUTRAL"; vix_color = "text-yellow-500"; vix_action = "বাজার স্থিতিশীল।"
     if vix != "N/A":
@@ -92,7 +95,14 @@ def get_macro_insights(vix, spx, oil, gold):
         elif oil < 70: oil_status, oil_color, oil_action = "DISINFLATION", "text-green-500", "তেলের দাম কম। মুদ্রাস্ফীতি কমার ইঙ্গিত (বুলিশ)।"
     insights.append({"name": "Oil (WTI)", "value": f"${oil}", "status": oil_status, "color": oil_color, "action": oil_action})
 
-    insights.append({"name": "Gold", "value": f"${gold}", "status": "SAFE HAVEN", "color": "text-yellow-600", "action": "সোনার দাম বাড়লে বিনিয়োগকারীরা ঝুঁকি এড়াতে চাইছে।"})
+    # 10Y Yield Logic (নতুন)
+    yield_status = "NEUTRAL"; yield_color = "text-yellow-500"; yield_action = "ইল্ড স্বাভাবিক।"
+    if yield_10y != "N/A":
+        if yield_10y > 5.0: yield_status, yield_color, yield_action = "HIGH YIELD", "text-red-500", "ইল্ড ৫% এর উপরে। বাজারে তারল্য সংকুচিত হচ্ছে, ক্রিপ্টোর জন্য নেতিবাচক।"
+        elif yield_10y < 4.5: yield_status, yield_color, yield_action = "LOW YIELD", "text-green-500", "ইল্ড ৪.৫% এর নিচে। বাজারে টাকা সহজলভ্য, ক্রিপ্টোর জন্য ইতিবাচক।"
+    insights.append({"name": "US 10Y Treasury Yield", "value": f"{yield_10y}%", "status": yield_status, "color": yield_color, "action": yield_action})
+
+    insights.append({"name": "Gold", "value": f"${gold}", "status": "SAFE HAVEN", "color": "text-yellow-600", "action": "সোনার দাম বাড়লে বিনিয়োগকারীরা ঝুঁকি এড়াতে চাইছে।"})
     return insights
 
 # ৮. ইভেন্ট অ্যালার্ট
@@ -126,13 +136,14 @@ dxy_val = get_yahoo_price("DX-Y.NYB")
 oil_val = get_yahoo_price("CL=F")
 vix_val = get_yahoo_price("%5EVIX")
 spx_val = get_yahoo_price("%5EGSPC")
+yield_10y = get_yahoo_price("%5ETNX") # নতুন: US 10Y Yield
 gold_val = get_yahoo_price("GC=F")
 btc_val, total_mcap_val, btc_dom_val, btc_vol_val, global_vol_val, stablecoin_mcap = get_crypto_global_data()
 funding_rate, open_interest = get_funding_and_oi()
 mvrv_z = get_mvrv_zscore(btc_val)
 
 cycle_text, cycle_color = get_cycle_stage(fng_val, dxy_val)
-macro_insights = get_macro_insights(vix_val, spx_val, oil_val, gold_val)
+macro_insights = get_macro_insights(vix_val, spx_val, oil_val, gold_val, yield_10y)
 alerts = get_event_alerts(fng_val, vix_val)
 halving_text = get_halving_countdown()
 current_date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
@@ -390,7 +401,7 @@ html_content += """
             </div>
         </div>
 
-        <!-- Macro News Section (MSCI News Added) -->
+        <!-- Macro News Section -->
         <div class="bg-gray-800 rounded-lg border border-gray-700 p-4 mb-6">
             <h2 class="text-lg font-bold text-gray-200 mb-4 text-center border-b border-gray-700 pb-2">MACRO & AI NEWS</h2>
             <ul class="space-y-4">
