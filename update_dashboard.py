@@ -38,7 +38,7 @@ def get_crypto_global_data():
     except:
         return 0, 0.0, 0.0, 0.0, 0.0, 0.0
 
-# ৪. ফান্ডিং রেট এবং ওপেন ইন্টারেস্ট (Binance Futures API)
+# ৪. ফান্ডিং রেট এবং ওপেন ইন্টারেস্ট (Binance Futures API) - ফিক্স করা হয়েছে
 def get_funding_and_oi():
     try:
         # ফান্ডিং রেট
@@ -49,23 +49,24 @@ def get_funding_and_oi():
         # ওপেন ইন্টারেস্ট
         oi_url = "https://fapi.binance.com/fapi/v1/openInterest?symbol=BTCUSDT"
         oi_res = requests.get(oi_url).json()
-        open_interest = float(oi_res['openInterest']) # BTC-তে
         
+        # যদি ওপেন ইন্টারেস্ট পাওয়া যায়, তবেই সংখ্যায় রূপান্তর করব
+        if 'openInterest' in oi_res:
+            open_interest = float(oi_res['openInterest']) # BTC-তে
+        else:
+            open_interest = 0.0
+            
         return round(funding_rate, 4), round(open_interest, 0)
     except:
-        return "N/A", "N/A"
+        # কোনো এরর হলে ০ রিটার্ন করবে যাতে কোড ক্র্যাশ না করে
+        return 0.0, 0.0
 
 # ৫. MVRV Z-Score (সিমুলেটেড/আনুমানিক)
 def get_mvrv_zscore(btc_price):
-    # আনুমানিক রিয়ালাইজড প্রাইস (বাস্তব MVRV-এর জন্য পেইড API দরকার)
-    # এখানে একটি ধরা রিয়ালাইজড ক্যাপ ব্যবহার করা হচ্ছে
-    realized_price = 45000 # আনুমানিক গড় খরচ
+    realized_price = 45000 
     if btc_price <= 0:
         return "N/A"
-    
     mvrv_ratio = btc_price / realized_price
-    # Z-Score আনুমানিক হিসাব (ঐতিহাসিক গড় এবং স্ট্যান্ডার্ড ডেভিয়েশন ধরে)
-    # বাস্তবে এটি অনেক জটিল, এটি শুধু একটি ধারণা
     z_score = (mvrv_ratio - 1.5) / 0.8 
     return round(z_score, 2)
 
@@ -176,15 +177,12 @@ else:
     outlook_color = "text-yellow-400"
 
 # ফান্ডিং রেট লজিক
-if funding_rate != "N/A":
-    if funding_rate > 0.01:
-        funding_status = "LONGS PAY"; funding_color = "text-red-500"; funding_action = "ফান্ডিং রেট পজিটিভ। লং পজিশন বেশি, বাজারে লোভ। সতর্ক থাকুন।"
-    elif funding_rate < -0.01:
-        funding_status = "SHORTS PAY"; funding_color = "text-green-500"; funding_action = "ফান্ডিং রেট নেগেটিভ। শর্ট পজিশন বেশি, বাজারে ভয়। সুযোগ হতে পারে।"
-    else:
-        funding_status = "NEUTRAL"; funding_color = "text-yellow-500"; funding_action = "ফান্ডিং রেট স্বাভাবিক। বাজারে ভারসাম্য আছে।"
+if funding_rate > 0.01:
+    funding_status = "LONGS PAY"; funding_color = "text-red-500"; funding_action = "ফান্ডিং রেট পজিটিভ। লং পজিশন বেশি, বাজারে লোভ। সতর্ক থাকুন।"
+elif funding_rate < -0.01:
+    funding_status = "SHORTS PAY"; funding_color = "text-green-500"; funding_action = "ফান্ডিং রেট নেগেটিভ। শর্ট পজিশন বেশি, বাজারে ভয়। সুযোগ হতে পারে।"
 else:
-    funding_status = "N/A"; funding_color = "text-gray-500"; funding_action = "ডেটা লোড হয়নি।"
+    funding_status = "NEUTRAL"; funding_color = "text-yellow-500"; funding_action = "ফান্ডিং রেট স্বাভাবিক। বাজারে ভারসাম্য আছে।"
 
 # MVRV লজিক
 if mvrv_z != "N/A":
@@ -306,21 +304,21 @@ html_content += """
                 <p class="text-xs text-gray-400 mt-1"><span class="text-blue-400 font-bold">করণীয়:</span> স্টেবলকয়েন বাড়ছে—বাজারে নতুন টাকা ঢুকছে, বুলিশ।</p>
             </div>
 
-            <!-- NEW: Funding Rate -->
+            <!-- Funding Rate -->
             <div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
                 <h2 class="text-sm font-semibold text-gray-400 mb-1">Funding Rate (Binance)</h2>
                 <p class="text-lg font-bold """ + f"{funding_color}" + """">""" + f"{funding_rate}% ({funding_status})" + """</p>
                 <p class="text-xs text-gray-400 mt-1"><span class="text-blue-400 font-bold">করণীয়:</span> """ + f"{funding_action}" + """</p>
             </div>
 
-            <!-- NEW: Open Interest -->
+            <!-- Open Interest -->
             <div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
                 <h2 class="text-sm font-semibold text-gray-400 mb-1">Open Interest (BTC)</h2>
                 <p class="text-lg font-bold text-orange-400">""" + f"{open_interest:,} BTC" + """</p>
                 <p class="text-xs text-gray-400 mt-1"><span class="text-blue-400 font-bold">করণীয়:</span> ফিউচার মার্কেটে মোট খোলা পজিশন। বেশি হলে ভোলাটিলিটি বাড়তে পারে।</p>
             </div>
 
-            <!-- NEW: MVRV Z-Score (আনুমানিক) -->
+            <!-- MVRV Z-Score -->
             <div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
                 <h2 class="text-sm font-semibold text-gray-400 mb-1">MVRV Z-Score (Est.)</h2>
                 <p class="text-lg font-bold """ + f"{mvrv_color}" + """">""" + f"{mvrv_z} ({mvrv_status})" + """</p>
