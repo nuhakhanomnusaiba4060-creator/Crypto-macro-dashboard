@@ -10,7 +10,7 @@
 <body class="bg-gray-900 text-white font-sans p-4">
     <div class="max-w-5xl mx-auto">
         <h1 class="text-2xl font-bold mb-1 text-center text-blue-400">My Crypto Spot Dashboard</h1>
-        <p class="text-center text-gray-400 mb-6 text-sm">Last Updated: 2026-11-13 12:54 (UTC)</p>
+        <p class="text-center text-gray-400 mb-6 text-sm">Last Updated: 2026-11-13 13:08 (UTC)</p>
 
         <!-- Alert Section -->
 <div class="mb-6 space-y-2">
@@ -18,7 +18,7 @@
                 🚨 সতর্কতা: US CPI Data মাত্র 2 দিন বাকি! বাজার অস্থির হতে পারে। নতুন পজিশন নেওয়ার আগে ভাবুন।
             </div>
         </div>
-        <!-- Top Summary Cards (নতুন ৪টি ঘর) -->
+        <!-- Top Summary Cards -->
         <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
             <div class="bg-gray-800 p-3 rounded-lg border border-gray-700 text-center flex flex-col justify-center">
                 <p class="text-xs text-gray-400">BTC Dominance</p>
@@ -26,7 +26,7 @@
             </div>
             <div class="bg-gray-800 p-3 rounded-lg border border-gray-700 text-center flex flex-col justify-center">
                 <p class="text-xs text-gray-400">Total Market Cap</p>
-                <p class="text-xl font-bold text-blue-400">$2.36T</p>
+                <p class="text-xl font-bold text-blue-400">$2.35T</p>
             </div>
             <div class="bg-gray-800 p-3 rounded-lg border border-gray-700 text-center flex flex-col justify-center">
                 <p class="text-xs text-gray-400">Market Trend</p>
@@ -34,7 +34,7 @@
             </div>
             <div class="bg-gray-800 p-3 rounded-lg border border-gray-700 text-center flex flex-col justify-center">
                 <p class="text-xs text-gray-400">BTC 24h Volume</p>
-                <p class="text-xl font-bold text-green-500">$45.8B</p>
+                <p class="text-xl font-bold text-green-500">$45.6B</p>
             </div>
         </div>
 
@@ -54,7 +54,7 @@
                 <div class="border-b border-gray-700 pb-3 last:border-0">
                     <div class="flex justify-between items-center mb-1">
                         <span class="font-semibold text-gray-300">VIX (Volatility)</span>
-                        <span class="font-bold text-yellow-500">18.3 (NEUTRAL)</span>
+                        <span class="font-bold text-yellow-500">18.4 (NEUTRAL)</span>
                     </div>
                     <p class="text-sm text-gray-400"><span class="text-blue-400 font-bold">করণীয়:</span> বাজার স্থিতিশীল। ক্রিপ্টোতে বড় কোনো ঝাঁকুনি নেই।</p>
                 </div>
@@ -70,7 +70,7 @@
                 <div class="border-b border-gray-700 pb-3 last:border-0">
                     <div class="flex justify-between items-center mb-1">
                         <span class="font-semibold text-gray-300">Oil (WTI)</span>
-                        <span class="font-bold text-red-500">$88.54 (INFLATION RISK)</span>
+                        <span class="font-bold text-red-500">$88.56 (INFLATION RISK)</span>
                     </div>
                     <p class="text-sm text-gray-400"><span class="text-blue-400 font-bold">করণীয়:</span> তেলের দাম বেশি। এর ফলে CPI বাড়তে পারে, যা ফেডের সুদহার কমানো আটকে দিতে পারে (বেয়ারিশ)।</p>
                 </div>
@@ -78,7 +78,7 @@
                 <div class="border-b border-gray-700 pb-3 last:border-0">
                     <div class="flex justify-between items-center mb-1">
                         <span class="font-semibold text-gray-300">Gold</span>
-                        <span class="font-bold text-yellow-600">$3893.7 (SAFE HAVEN)</span>
+                        <span class="font-bold text-yellow-600">$3892.1 (SAFE HAVEN)</span>
                     </div>
                     <p class="text-sm text-gray-400"><span class="text-blue-400 font-bold">করণীয়:</span> সোনার দাম বাড়লে বোঝায় বিনিয়োগকারীরা ঝুঁকি এড়াতে চাইছে। এটি ক্রিপ্টোর জন্য কিছুটা নেতিবাচক হতে পারে।</p>
                 </div>
@@ -101,27 +101,46 @@
                         </tr>
                     </thead>
                     <tbody>
+                        <!-- ১. BTC Price -->
                         <tr class="border-b border-gray-700 hover:bg-gray-750">
                             <td class="px-3 py-3 font-medium text-white">BTC Price</td>
                             <td class="px-3 py-3">
-                                <div class="font-semibold">$69,156</div>
+                                <div class="font-semibold">$69,195</div>
                                 <div class="text-xs text-gray-500">Spot Price</div>
+                                <div class="text-xs text-gray-400 mt-1 italic">↳ বিটিসি-র বর্তমান মূল্য ট্র্যাক করুন।</div>
                             </td>
                             <td class="px-3 py-3 text-right font-bold text-orange-400">TRACKING</td>
                         </tr>
+                        
+                        <!-- ২. ETF Flow (পুনরায় যোগ করা হলো) -->
+                        <tr class="border-b border-gray-700 hover:bg-gray-750">
+                            <td class="px-3 py-3 font-medium text-white">ETF Flows</td>
+                            <td class="px-3 py-3">
+                                <div class="font-semibold text-green-500">$50.5M</div>
+                                <div class="text-xs text-gray-500">Institutional Demand</div>
+                                <div class="text-xs text-gray-400 mt-1 italic">↳ করণীয়: প্রাতিষ্ঠানিক পুঁজি ঢুকছে (Inflow)। বাজার বুলিশ হতে পারে।</div>
+                            </td>
+                            <td class="px-3 py-3 text-right font-bold text-green-500">BULLISH</td>
+                        </tr>
+
+                        <!-- ৩. Market Sentiment -->
                         <tr class="border-b border-gray-700 hover:bg-gray-750">
                             <td class="px-3 py-3 font-medium text-white">Market Sentiment</td>
                             <td class="px-3 py-3">
                                 <div class="font-semibold">20 (Extreme Fear)</div>
                                 <div class="text-xs text-gray-500">Retail Mania / Fear</div>
+                                <div class="text-xs text-gray-400 mt-1 italic">↳ করণীয়: ফিয়ার 20, অর্থাৎ বাজারে চরম ভয়। DCA করার সুযোগ।</div>
                             </td>
                             <td class="px-3 py-3 text-right font-bold text-green-500">BUY</td>
                         </tr>
+
+                        <!-- ৪. Dollar Index (DXY) -->
                         <tr class="border-b border-gray-700 hover:bg-gray-750">
                             <td class="px-3 py-3 font-medium text-white">Dollar Index (DXY)</td>
                             <td class="px-3 py-3">
-                                <div class="font-semibold">103.25</div>
+                                <div class="font-semibold">103.26</div>
                                 <div class="text-xs text-gray-500">Macro Liquidity</div>
+                                <div class="text-xs text-gray-400 mt-1 italic">↳ করণীয়: ডলার দুর্বল, যা ক্রিপ্টোর জন্য ভালো।</div>
                             </td>
                             <td class="px-3 py-3 text-right font-bold text-green-500">BULLISH</td>
                         </tr>
