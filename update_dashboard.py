@@ -32,36 +32,32 @@ def get_crypto_global_data():
         btc_dominance = global_res['data']['market_cap_percentage']['btc']
         global_vol = global_res['data']['total_volume']['usd'] / 1e9
         
-        stablecoin_mcap = 160.5 # ডেমো
+        stablecoin_mcap = 160.5 
         
         return btc_price, round(total_mcap, 2), round(btc_dominance, 1), round(btc_vol, 1), round(global_vol, 1), stablecoin_mcap
     except:
         return 0, 0.0, 0.0, 0.0, 0.0, 0.0
 
-# ৪. ফান্ডিং রেট এবং ওপেন ইন্টারেস্ট (Binance Futures API) - ফিক্স করা হয়েছে
+# ৪. ফান্ডিং রেট এবং ওপেন ইন্টারেস্ট
 def get_funding_and_oi():
     try:
-        # ফান্ডিং রেট
         funding_url = "https://fapi.binance.com/fapi/v1/premiumIndex?symbol=BTCUSDT"
         funding_res = requests.get(funding_url).json()
-        funding_rate = float(funding_res['lastFundingRate']) * 100 # শতাংশে
+        funding_rate = float(funding_res['lastFundingRate']) * 100 
         
-        # ওপেন ইন্টারেস্ট
         oi_url = "https://fapi.binance.com/fapi/v1/openInterest?symbol=BTCUSDT"
         oi_res = requests.get(oi_url).json()
         
-        # যদি ওপেন ইন্টারেস্ট পাওয়া যায়, তবেই সংখ্যায় রূপান্তর করব
         if 'openInterest' in oi_res:
-            open_interest = float(oi_res['openInterest']) # BTC-তে
+            open_interest = float(oi_res['openInterest'])
         else:
             open_interest = 0.0
             
         return round(funding_rate, 4), round(open_interest, 0)
     except:
-        # কোনো এরর হলে ০ রিটার্ন করবে যাতে কোড ক্র্যাশ না করে
         return 0.0, 0.0
 
-# ৫. MVRV Z-Score (সিমুলেটেড/আনুমানিক)
+# ৫. MVRV Z-Score (আনুমানিক)
 def get_mvrv_zscore(btc_price):
     realized_price = 45000 
     if btc_price <= 0:
@@ -394,19 +390,33 @@ html_content += """
             </div>
         </div>
 
-        <!-- Macro News Section -->
+        <!-- Macro News Section (MSCI News Added) -->
         <div class="bg-gray-800 rounded-lg border border-gray-700 p-4 mb-6">
             <h2 class="text-lg font-bold text-gray-200 mb-4 text-center border-b border-gray-700 pb-2">MACRO & AI NEWS</h2>
-            <ul class="space-y-3">
+            <ul class="space-y-4">
+                
+                <!-- MSCI News -->
+                <li class="flex items-start bg-red-900/20 p-3 rounded-lg border border-red-800">
+                    <span class="text-red-400 mr-2 text-lg">🚨</span>
+                    <div>
+                        <p class="font-semibold text-white">MSCI Index Update</p>
+                        <p class="text-xs text-gray-300 mb-1">MSCI is planning to remove Strategy (MicroStrategy) from its US index.</p>
+                        <p class="text-xs text-red-300 font-semibold mt-1">করণীয়: প্রাতিষ্ঠানিক ফান্ডগুলো Strategy-এর শেয়ার বিক্রি করতে পারে, যা বিটকয়েনে নেতিবাচক প্রভাব ফেলতে পারে। সতর্ক থাকুন, বড় পজিশন নেওয়ার আগে ভাবুন।</p>
+                    </div>
+                </li>
+
+                <!-- CPI News -->
                 <li class="flex items-start">
-                    <span class="text-blue-400 mr-2">📌</span>
+                    <span class="text-blue-400 mr-2 mt-1">📌</span>
                     <div>
                         <p class="font-semibold text-white">CPI Data Release</p>
                         <p class="text-xs text-gray-400">Next release: Nov 15. Watch for lower inflation (Bullish for Crypto).</p>
                     </div>
                 </li>
+
+                <!-- FOMC News -->
                 <li class="flex items-start">
-                    <span class="text-yellow-400 mr-2">🏛️</span>
+                    <span class="text-yellow-400 mr-2 mt-1">🏛️</span>
                     <div>
                         <p class="font-semibold text-white">FOMC Meeting</p>
                         <p class="text-xs text-gray-400">Next meeting: Dec 12. Fed's stance on rate cuts is crucial.</p>
