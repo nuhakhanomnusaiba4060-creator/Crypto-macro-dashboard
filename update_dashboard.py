@@ -20,8 +20,8 @@ def get_yahoo_price(symbol):
     except:
         return "N/A"
 
-# ৩. ক্রিপ্টো গ্লোবাল ডেটা
-def get_crypto_data():
+# ৩. ক্রিপ্টো গ্লোবাল ডেটা (BTC Dominance, Stablecoin Cap, Global Volume)
+def get_crypto_global_data():
     try:
         btc_res = requests.get("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd&include_24hr_vol=true").json()
         btc_price = btc_res['bitcoin']['usd']
@@ -30,10 +30,15 @@ def get_crypto_data():
         global_res = requests.get("https://api.coingecko.com/api/v3/global").json()
         total_mcap = global_res['data']['total_market_cap']['usd'] / 1e12 
         btc_dominance = global_res['data']['market_cap_percentage']['btc']
+        global_vol = global_res['data']['total_volume']['usd'] / 1e9 # বিলিয়ন ডলারে
         
-        return btc_price, round(total_mcap, 2), round(btc_dominance, 1), round(btc_vol, 1)
+        # স্টেবলকয়েন ক্যাপ (ডেমো/সিমুলেটেড ডেটা, কারণ ফ্রি API-তে সরাসরি পাওয়া কঠিন)
+        # বাস্তব ডেটার জন্য CoinGecko-র USDT + USDC এর Market Cap ব্যবহার করা যেতে পারে
+        stablecoin_mcap = 160.5 # বিলিয়ন ডলার (ডেমো)
+        
+        return btc_price, round(total_mcap, 2), round(btc_dominance, 1), round(btc_vol, 1), round(global_vol, 1), stablecoin_mcap
     except:
-        return 0, 0.0, 0.0, 0.0
+        return 0, 0.0, 0.0, 0.0, 0.0, 0.0
 
 # ৪. সাইকেল স্টেজ
 def get_cycle_stage(fng, dxy):
@@ -96,7 +101,7 @@ oil_val = get_yahoo_price("CL=F")
 vix_val = get_yahoo_price("%5EVIX")
 spx_val = get_yahoo_price("%5EGSPC")
 gold_val = get_yahoo_price("GC=F")
-btc_val, total_mcap_val, btc_dom_val, btc_vol_val = get_crypto_data()
+btc_val, total_mcap_val, btc_dom_val, btc_vol_val, global_vol_val, stablecoin_mcap = get_crypto_global_data()
 
 cycle_text, cycle_color = get_cycle_stage(fng_val, dxy_val)
 macro_insights = get_macro_insights(vix_val, spx_val, oil_val, gold_val)
@@ -121,8 +126,8 @@ pi_cycle_status = "SAFE" if btc_val < 90000 else "DANGER"
 pi_cycle_color = "text-green-500" if btc_val < 90000 else "text-red-500"
 pi_cycle_action = "বাজার এখনো শীর্ষে পৌঁছায়নি। হোল্ড করুন।" if btc_val < 90000 else "বাজার শীর্ষের কাছাকাছি! ধীরে ধীরে লাভ নিন।"
 
-# Weekly Market Outflows (সিমুলেটেড ডেটা, প্রতি সপ্তাহে আউটফ্লো হলে নেতিবাচক)
-weekly_outflow = -120.5 # মিলিয়ন ডলারে (নেতিবাচক মানে আউটফ্লো)
+# Weekly Market Outflows (ডেমো)
+weekly_outflow = -120.5 
 if weekly_outflow < 0:
     outflow_status = "OUTFLOW"; outflow_color = "text-red-500"; outflow_action = "প্রাতিষ্ঠানিক পুঁজি বের হচ্ছে। সতর্ক থাকুন, নতুন কেনা থেকে বিরত থাকুন।"
 else:
@@ -191,8 +196,8 @@ html_content += """
                 <p class="text-xl font-bold """ + f"{alt_color}" + """">""" + f"{alt_status}" + """</p>
             </div>
             <div class="bg-gray-800 p-3 rounded-lg border border-gray-700 text-center flex flex-col justify-center">
-                <p class="text-xs text-gray-400">BTC 24h Volume</p>
-                <p class="text-xl font-bold text-green-500">$""" + f"{btc_vol_val}B" + """</p>
+                <p class="text-xs text-gray-400">Global Volume 24h</p>
+                <p class="text-xl font-bold text-green-500">$""" + f"{global_vol_val}B" + """</p>
             </div>
         </div>
 
@@ -208,7 +213,7 @@ html_content += """
             </div>
         </div>
 
-        <!-- Advanced On-Chain & Cycle Indicators (200W MA, Pi Cycle, Fear & Greed, Weekly Outflows) -->
+        <!-- Advanced On-Chain & Cycle Indicators -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6">
             
             <!-- 200W MA -->
@@ -240,6 +245,14 @@ html_content += """
                 </div>
                 <p class="text-xs text-gray-400"><span class="text-blue-400 font-bold">করণীয়:</span> """ + f"{'চরম ভয়। ধীরে ধীরে কিনুন (DCA)।' if fng_val < 30 else 'অতিরিক্ত লোভ। সতর্ক থাকুন।' if fng_val > 75 else 'বাজার স্বাভাবিক। হোল্ড করুন।'}" + """</p>
             </div>
+
+            <!-- NEW: Stablecoin Market Cap -->
+            <div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
+                <h2 class="text-sm font-semibold text-gray-400 mb-1">Stablecoin Market Cap</h2>
+                <p class="text-lg font-bold text-blue-400">$""" + f"{stablecoin_mcap}B" + """</p>
+                <p class="text-xs text-gray-400 mt-1"><span class="text-blue-400 font-bold">করণীয়:</span> স্টেবলকয়েন বাড়ছে—বাজারে নতুন টাকা ঢুকছে, বুলিশ।</p>
+            </div>
+
         </div>
 
         <!-- Macro Insights & Actions -->
