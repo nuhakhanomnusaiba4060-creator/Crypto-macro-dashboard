@@ -67,29 +67,34 @@ def get_macro_insights(vix, spx, oil, gold):
 
     return insights
 
-# ৬. ইভেন্ট কাউন্টডাউন এবং ভোলাটিলিটি অ্যালার্ট (নতুন)
+# ৬. ইভেন্ট কাউন্টডাউন এবং ভোলাটিলিটি অ্যালার্ট (আপডেট করা হয়েছে)
 def get_event_alerts(fng, vix):
     today = datetime.date.today()
-    # এখানে আপনি আপনার প্রয়োজন মতো ইভেন্টের তারিখ বসাতে পারেন (YYYY, MM, DD)
+    
+    # ভবিষ্যতের ইভেন্টের তারিখ (আপনি চাইলে এখানে পরিবর্তন করতে পারবেন)
     events = {
-        "US CPI Data": datetime.date(2024, 11, 15), 
-        "FOMC Meeting": datetime.date(2024, 12, 12),
-        "NFP Jobs Report": datetime.date(2024, 12, 6)
+        "US CPI Data": datetime.date(2026, 11, 15), 
+        "FOMC Meeting": datetime.date(2026, 12, 12),
+        "NFP Jobs Report": datetime.date(2026, 12, 6)
     }
     
     alerts = []
     for name, date in events.items():
         days_left = (date - today).days
-        if 0 <= days_left <= 3:
-            alerts.append({"name": name, "msg": f"সতর্কতা: {name} মাত্র {days_left} দিন বাকি! বাজার অস্থির হতে পারে।", "color": "bg-red-900/50 border-red-500 text-red-200"})
-        elif 4 <= days_left <= 7:
-            alerts.append({"name": name, "msg": f"মনে রাখবেন: {name} আগামী {days_left} দিনের মধ্যে।", "color": "bg-yellow-900/50 border-yellow-500 text-yellow-200"})
+        # যদি ইভেন্ট ৭ দিনের মধ্যে থাকে
+        if 0 <= days_left <= 7:
+            if days_left <= 3:
+                alerts.append({"msg": f"🚨 সতর্কতা: {name} মাত্র {days_left} দিন বাকি! বাজার অস্থির হতে পারে। নতুন পজিশন নেওয়ার আগে ভাবুন।", "color": "bg-red-900/60 border-red-500 text-red-200"})
+            else:
+                alerts.append({"msg": f"⚠️ মনে রাখবেন: {name} আগামী {days_left} দিনের মধ্যে।", "color": "bg-yellow-900/60 border-yellow-500 text-yellow-200"})
             
-    # ভোলাটিলিটি এবং ভয়ের ওপর ভিত্তি করে সতর্কতা
+    # ভোলাটিলিটি সতর্কতা (VIX > 20)
     if vix != "N/A" and vix > 20:
-        alerts.append({"name": "High Volatility", "msg": "VIX বেড়েছে (ভোলাটিলিটি বেশি)। বড় পজিশন নেওয়ার আগে ভাবুন।", "color": "bg-orange-900/50 border-orange-500 text-orange-200"})
+        alerts.append({"msg": f"📈 VIX বেড়েছে ({vix})। বাজারে ভোলাটিলিটি বেশি, সতর্ক থাকুন।", "color": "bg-orange-900/60 border-orange-500 text-orange-200"})
+        
+    # চরম ভয়ের সতর্কতা
     if fng < 20:
-        alerts.append({"name": "Extreme Fear", "msg": "বাজারে চরম ভয়। ধীরে ধীরে DCA করার ভালো সুযোগ হতে পারে।", "color": "bg-green-900/50 border-green-500 text-green-200"})
+        alerts.append({"msg": f"🩸 বাজারে চরম ভয় ({fng})। লং-টার্ম স্পট ট্রেডারদের জন্য এটি ধীরে ধীরে DCA করার সুযোগ হতে পারে।", "color": "bg-green-900/60 border-green-500 text-green-200"})
 
     return alerts
 
@@ -129,11 +134,19 @@ if alerts:
     html_content += """<div class="mb-6 space-y-2">"""
     for alert in alerts:
         html_content += f"""
-            <div class="p-3 rounded-lg border {alert['color']} text-sm font-semibold">
-                ⚠️ {alert['msg']}
+            <div class="p-3 rounded-lg border {alert['color']} text-sm font-semibold shadow-lg">
+                {alert['msg']}
             </div>
         """
     html_content += """</div>"""
+else:
+    html_content += """
+        <div class="mb-6">
+            <div class="p-3 rounded-lg border bg-gray-800 border-gray-600 text-gray-300 text-sm font-semibold shadow-lg">
+                ✅ এই মুহূর্তে সামনে কোনো বড় ম্যাক্রো ইভেন্ট বা ভোলাটিলিটি সতর্কতা নেই। বাজার স্বাভাবিক।
+            </div>
+        </div>
+    """
 
 html_content += """
         <!-- Top Summary Cards -->
@@ -237,7 +250,7 @@ html_content += """
             </div>
         </div>
 
-        <!-- Macro News Section -->
+        <!-- Macro News Section (শুধু একবার থাকবে) -->
         <div class="bg-gray-800 rounded-lg border border-gray-700 p-4 mb-6">
             <h2 class="text-lg font-bold text-gray-200 mb-4 text-center border-b border-gray-700 pb-2">MACRO & AI NEWS</h2>
             <ul class="space-y-3">
@@ -253,6 +266,13 @@ html_content += """
                     <div>
                         <p class="font-semibold text-white">FOMC Meeting</p>
                         <p class="text-xs text-gray-400">Next meeting: Dec 12. Fed's stance on rate cuts is crucial.</p>
+                    </div>
+                </li>
+                <li class="flex items-start">
+                    <span class="text-purple-400 mr-2">🤖</span>
+                    <div>
+                        <p class="font-semibold text-white">AI News / Trends</p>
+                        <p class="text-xs text-gray-400">AI sector developments may affect tech stocks and risk sentiment.</p>
                     </div>
                 </li>
             </ul>
