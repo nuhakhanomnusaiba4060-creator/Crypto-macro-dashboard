@@ -20,7 +20,7 @@ def get_yahoo_price(symbol):
     except:
         return "N/A"
 
-# ৩. ক্রিপ্টো গ্লোবাল ডেটা (BTC Dominance, Stablecoin Cap, Global Volume)
+# ৩. ক্রিপ্টো গ্লোবাল ডেটা
 def get_crypto_global_data():
     try:
         btc_res = requests.get("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd&include_24hr_vol=true").json()
@@ -30,17 +30,46 @@ def get_crypto_global_data():
         global_res = requests.get("https://api.coingecko.com/api/v3/global").json()
         total_mcap = global_res['data']['total_market_cap']['usd'] / 1e12 
         btc_dominance = global_res['data']['market_cap_percentage']['btc']
-        global_vol = global_res['data']['total_volume']['usd'] / 1e9 # বিলিয়ন ডলারে
+        global_vol = global_res['data']['total_volume']['usd'] / 1e9
         
-        # স্টেবলকয়েন ক্যাপ (ডেমো/সিমুলেটেড ডেটা, কারণ ফ্রি API-তে সরাসরি পাওয়া কঠিন)
-        # বাস্তব ডেটার জন্য CoinGecko-র USDT + USDC এর Market Cap ব্যবহার করা যেতে পারে
-        stablecoin_mcap = 160.5 # বিলিয়ন ডলার (ডেমো)
+        stablecoin_mcap = 160.5 # ডেমো
         
         return btc_price, round(total_mcap, 2), round(btc_dominance, 1), round(btc_vol, 1), round(global_vol, 1), stablecoin_mcap
     except:
         return 0, 0.0, 0.0, 0.0, 0.0, 0.0
 
-# ৪. সাইকেল স্টেজ
+# ৪. ফান্ডিং রেট এবং ওপেন ইন্টারেস্ট (Binance Futures API)
+def get_funding_and_oi():
+    try:
+        # ফান্ডিং রেট
+        funding_url = "https://fapi.binance.com/fapi/v1/premiumIndex?symbol=BTCUSDT"
+        funding_res = requests.get(funding_url).json()
+        funding_rate = float(funding_res['lastFundingRate']) * 100 # শতাংশে
+        
+        # ওপেন ইন্টারেস্ট
+        oi_url = "https://fapi.binance.com/fapi/v1/openInterest?symbol=BTCUSDT"
+        oi_res = requests.get(oi_url).json()
+        open_interest = float(oi_res['openInterest']) # BTC-তে
+        
+        return round(funding_rate, 4), round(open_interest, 0)
+    except:
+        return "N/A", "N/A"
+
+# ৫. MVRV Z-Score (সিমুলেটেড/আনুমানিক)
+def get_mvrv_zscore(btc_price):
+    # আনুমানিক রিয়ালাইজড প্রাইস (বাস্তব MVRV-এর জন্য পেইড API দরকার)
+    # এখানে একটি ধরা রিয়ালাইজড ক্যাপ ব্যবহার করা হচ্ছে
+    realized_price = 45000 # আনুমানিক গড় খরচ
+    if btc_price <= 0:
+        return "N/A"
+    
+    mvrv_ratio = btc_price / realized_price
+    # Z-Score আনুমানিক হিসাব (ঐতিহাসিক গড় এবং স্ট্যান্ডার্ড ডেভিয়েশন ধরে)
+    # বাস্তবে এটি অনেক জটিল, এটি শুধু একটি ধারণা
+    z_score = (mvrv_ratio - 1.5) / 0.8 
+    return round(z_score, 2)
+
+# ৬. সাইকেল স্টেজ
 def get_cycle_stage(fng, dxy):
     if fng < 30 and dxy != "N/A" and dxy < 105:
         return "ACCUMULATION (Buy Zone)", "text-green-500"
@@ -49,7 +78,7 @@ def get_cycle_stage(fng, dxy):
     else:
         return "NEUTRAL / GRINDING", "text-yellow-500"
 
-# ৫. ম্যাক্রো লজিক
+# ৭. ম্যাক্রো লজিক
 def get_macro_insights(vix, spx, oil, gold):
     insights = []
     vix_status = "NEUTRAL"; vix_color = "text-yellow-500"; vix_action = "বাজার স্থিতিশীল।"
@@ -69,7 +98,7 @@ def get_macro_insights(vix, spx, oil, gold):
     insights.append({"name": "Gold", "value": f"${gold}", "status": "SAFE HAVEN", "color": "text-yellow-600", "action": "সোনার দাম বাড়লে বিনিয়োগকারীরা ঝুঁকি এড়াতে চাইছে।"})
     return insights
 
-# ৬. ইভেন্ট অ্যালার্ট
+# ৮. ইভেন্ট অ্যালার্ট
 def get_event_alerts(fng, vix):
     today = datetime.date.today()
     events = {
@@ -87,7 +116,7 @@ def get_event_alerts(fng, vix):
     if fng < 20: alerts.append({"msg": f"🩸 বাজারে চরম ভয় ({fng})। DCA করার সুযোগ হতে পারে।", "color": "bg-green-900/60 border-green-500 text-green-200"})
     return alerts
 
-# ৭. হালভিং কাউন্টডাউন
+# ৯. হালভিং কাউন্টডাউন
 def get_halving_countdown():
     next_halving = datetime.date(2028, 4, 15)
     today = datetime.date.today()
@@ -102,6 +131,8 @@ vix_val = get_yahoo_price("%5EVIX")
 spx_val = get_yahoo_price("%5EGSPC")
 gold_val = get_yahoo_price("GC=F")
 btc_val, total_mcap_val, btc_dom_val, btc_vol_val, global_vol_val, stablecoin_mcap = get_crypto_global_data()
+funding_rate, open_interest = get_funding_and_oi()
+mvrv_z = get_mvrv_zscore(btc_val)
 
 cycle_text, cycle_color = get_cycle_stage(fng_val, dxy_val)
 macro_insights = get_macro_insights(vix_val, spx_val, oil_val, gold_val)
@@ -129,7 +160,7 @@ pi_cycle_action = "বাজার এখনো শীর্ষে পৌঁছ�
 # Weekly Market Outflows (ডেমো)
 weekly_outflow = -120.5 
 if weekly_outflow < 0:
-    outflow_status = "OUTFLOW"; outflow_color = "text-red-500"; outflow_action = "প্রাতিষ্ঠানিক পুঁজি বের হচ্ছে। সতর্ক থাকুন, নতুন কেনা থেকে বিরত থাকুন।"
+    outflow_status = "OUTFLOW"; outflow_color = "text-red-500"; outflow_action = "প্রাতিষ্ঠানিক পুঁজি বের হচ্ছে। সতর্ক থাকুন।"
 else:
     outflow_status = "INFLOW"; outflow_color = "text-green-500"; outflow_action = "প্রাতিষ্ঠানিক পুঁজি ঢুকছে। বাজার বুলিশ হতে পারে।"
 
@@ -143,6 +174,28 @@ elif fng_val > 70:
 else:
     outlook = "বাজার নিরপেক্ষ। রেগুলার প্ল্যান অনুযায়ী হোল্ড করুন।"
     outlook_color = "text-yellow-400"
+
+# ফান্ডিং রেট লজিক
+if funding_rate != "N/A":
+    if funding_rate > 0.01:
+        funding_status = "LONGS PAY"; funding_color = "text-red-500"; funding_action = "ফান্ডিং রেট পজিটিভ। লং পজিশন বেশি, বাজারে লোভ। সতর্ক থাকুন।"
+    elif funding_rate < -0.01:
+        funding_status = "SHORTS PAY"; funding_color = "text-green-500"; funding_action = "ফান্ডিং রেট নেগেটিভ। শর্ট পজিশন বেশি, বাজারে ভয়। সুযোগ হতে পারে।"
+    else:
+        funding_status = "NEUTRAL"; funding_color = "text-yellow-500"; funding_action = "ফান্ডিং রেট স্বাভাবিক। বাজারে ভারসাম্য আছে।"
+else:
+    funding_status = "N/A"; funding_color = "text-gray-500"; funding_action = "ডেটা লোড হয়নি।"
+
+# MVRV লজিক
+if mvrv_z != "N/A":
+    if mvrv_z > 3.5:
+        mvrv_status = "EXTREME HIGH"; mvrv_color = "text-red-500"; mvrv_action = "MVRV非常高। বাজার শীর্ষের কাছাকাছি, সতর্ক থাকুন।"
+    elif mvrv_z < 0:
+        mvrv_status = "DEEP VALUE"; mvrv_color = "text-green-500"; mvrv_action = "MVRV কম। বাজার কম মূল্যায়িত, DCA করার সুযোগ।"
+    else:
+        mvrv_status = "NEUTRAL"; mvrv_color = "text-yellow-500"; mvrv_action = "MVRV স্বাভাবিক। বাজার ভারসাম্যে আছে।"
+else:
+    mvrv_status = "N/A"; mvrv_color = "text-gray-500"; mvrv_action = "ডেটা লোড হয়নি।"
 
 # HTML জেনারেশন
 html_content = f"""
@@ -175,7 +228,7 @@ else:
     html_content += """
         <div class="mb-6">
             <div class="p-3 rounded-lg border bg-gray-800 border-gray-600 text-gray-300 text-sm font-semibold shadow-lg">
-                ✅ এই মুহূর্তে সামনে কোনো বড় ম্যাক্রো ইভেন্ট বা ভোলাটিলিটি সতর্কতা নেই।
+                ✅ এই মুহূর্তে সামনে কোনো বড় ম্যাক্রো ইভেন্ট বা ভোলাটিলিটি সতর্কতা নেই।
             </div>
         </div>
     """
@@ -220,21 +273,21 @@ html_content += """
             <div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
                 <h2 class="text-sm font-semibold text-gray-400 mb-1">200W Moving Average</h2>
                 <p class="text-lg font-bold """ + f"{ma_color}" + """">""" + f"{ma_status}" + """</p>
-                <p class="text-xs text-gray-400 mt-1"><span class="text-blue-400 font-bold">করণীয়:</span> """ + f"{ma_action}" + """</p>
+                <p class="text-xs text-gray-400 mt-1"><span class="text-blue-400 font-bold">করণীয়:</span> """ + f"{ma_action}" + """</p>
             </div>
 
             <!-- Pi Cycle Top -->
             <div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
                 <h2 class="text-sm font-semibold text-gray-400 mb-1">Pi Cycle Top Indicator</h2>
                 <p class="text-lg font-bold """ + f"{pi_cycle_color}" + """">""" + f"{pi_cycle_status}" + """</p>
-                <p class="text-xs text-gray-400 mt-1"><span class="text-blue-400 font-bold">করণীয়:</span> """ + f"{pi_cycle_action}" + """</p>
+                <p class="text-xs text-gray-400 mt-1"><span class="text-blue-400 font-bold">করণীয়:</span> """ + f"{pi_cycle_action}" + """</p>
             </div>
 
             <!-- Weekly Outflows -->
             <div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
                 <h2 class="text-sm font-semibold text-gray-400 mb-1">Weekly Market Outflows</h2>
                 <p class="text-lg font-bold """ + f"{outflow_color}" + """">$""" + f"{abs(weekly_outflow)}M ({outflow_status})" + """</p>
-                <p class="text-xs text-gray-400 mt-1"><span class="text-blue-400 font-bold">করণীয়:</span> """ + f"{outflow_action}" + """</p>
+                <p class="text-xs text-gray-400 mt-1"><span class="text-blue-400 font-bold">করণীয়:</span> """ + f"{outflow_action}" + """</p>
             </div>
 
             <!-- Fear & Greed Gauge -->
@@ -243,14 +296,35 @@ html_content += """
                 <div class="w-full bg-gray-700 rounded-full h-2.5 mb-1">
                     <div class="h-2.5 rounded-full """ + f"{'bg-green-500' if fng_val < 30 else 'bg-red-500' if fng_val > 75 else 'bg-yellow-500'}" + """" style="width: """ + f"{fng_val}%" + """"></div>
                 </div>
-                <p class="text-xs text-gray-400"><span class="text-blue-400 font-bold">করণীয়:</span> """ + f"{'চরম ভয়। ধীরে ধীরে কিনুন (DCA)।' if fng_val < 30 else 'অতিরিক্ত লোভ। সতর্ক থাকুন।' if fng_val > 75 else 'বাজার স্বাভাবিক। হোল্ড করুন।'}" + """</p>
+                <p class="text-xs text-gray-400"><span class="text-blue-400 font-bold">করণীয়:</span> """ + f"{'চরম ভয়। ধীরে ধীরে কিনুন (DCA)।' if fng_val < 30 else 'অতিরিক্ত লোভ। সতর্ক থাকুন।' if fng_val > 75 else 'বাজার স্বাভাবিক। হোল্ড করুন।'}" + """</p>
             </div>
 
-            <!-- NEW: Stablecoin Market Cap -->
+            <!-- Stablecoin Market Cap -->
             <div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
                 <h2 class="text-sm font-semibold text-gray-400 mb-1">Stablecoin Market Cap</h2>
                 <p class="text-lg font-bold text-blue-400">$""" + f"{stablecoin_mcap}B" + """</p>
-                <p class="text-xs text-gray-400 mt-1"><span class="text-blue-400 font-bold">করণীয়:</span> স্টেবলকয়েন বাড়ছে—বাজারে নতুন টাকা ঢুকছে, বুলিশ।</p>
+                <p class="text-xs text-gray-400 mt-1"><span class="text-blue-400 font-bold">করণীয়:</span> স্টেবলকয়েন বাড়ছে—বাজারে নতুন টাকা ঢুকছে, বুলিশ।</p>
+            </div>
+
+            <!-- NEW: Funding Rate -->
+            <div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
+                <h2 class="text-sm font-semibold text-gray-400 mb-1">Funding Rate (Binance)</h2>
+                <p class="text-lg font-bold """ + f"{funding_color}" + """">""" + f"{funding_rate}% ({funding_status})" + """</p>
+                <p class="text-xs text-gray-400 mt-1"><span class="text-blue-400 font-bold">করণীয়:</span> """ + f"{funding_action}" + """</p>
+            </div>
+
+            <!-- NEW: Open Interest -->
+            <div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
+                <h2 class="text-sm font-semibold text-gray-400 mb-1">Open Interest (BTC)</h2>
+                <p class="text-lg font-bold text-orange-400">""" + f"{open_interest:,} BTC" + """</p>
+                <p class="text-xs text-gray-400 mt-1"><span class="text-blue-400 font-bold">করণীয়:</span> ফিউচার মার্কেটে মোট খোলা পজিশন। বেশি হলে ভোলাটিলিটি বাড়তে পারে।</p>
+            </div>
+
+            <!-- NEW: MVRV Z-Score (আনুমানিক) -->
+            <div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
+                <h2 class="text-sm font-semibold text-gray-400 mb-1">MVRV Z-Score (Est.)</h2>
+                <p class="text-lg font-bold """ + f"{mvrv_color}" + """">""" + f"{mvrv_z} ({mvrv_status})" + """</p>
+                <p class="text-xs text-gray-400 mt-1"><span class="text-blue-400 font-bold">করণীয়:</span> """ + f"{mvrv_action}" + """</p>
             </div>
 
         </div>
@@ -270,7 +344,7 @@ for macro in macro_insights:
                         <span class="font-semibold text-gray-300">{macro['name']}</span>
                         <span class="font-bold {macro['color']}">{macro['value']} ({macro['status']})</span>
                     </div>
-                    <p class="text-sm text-gray-400"><span class="text-blue-400 font-bold">করণীয়:</span> {macro['action']}</p>
+                    <p class="text-sm text-gray-400"><span class="text-blue-400 font-bold">করণীয়:</span> {macro['action']}</p>
                 </div>
 """
 
@@ -305,7 +379,7 @@ html_content += """
                             <td class="px-3 py-3 font-medium text-white">ETF Flows</td>
                             <td class="px-3 py-3">
                                 <div class="font-semibold text-green-500">$50.5M</div>
-                                <div class="text-xs text-gray-400 mt-1 italic">↳ করণীয়: প্রাতিষ্ঠানিক পুঁজি ঢুকছে (Inflow)।</div>
+                                <div class="text-xs text-gray-400 mt-1 italic">↳ করণীয়: প্রাতিষ্ঠানিক পুঁজি ঢুকছে (Inflow)।</div>
                             </td>
                             <td class="px-3 py-3 text-right font-bold text-green-500">BULLISH</td>
                         </tr>
@@ -313,7 +387,7 @@ html_content += """
                             <td class="px-3 py-3 font-medium text-white">Dollar Index (DXY)</td>
                             <td class="px-3 py-3">
                                 <div class="font-semibold">""" + f"{dxy_val}" + """</div>
-                                <div class="text-xs text-gray-400 mt-1 italic">↳ করণীয়: ডলার দুর্বল, ক্রিপ্টোর জন্য ভালো।</div>
+                                <div class="text-xs text-gray-400 mt-1 italic">↳ করণীয়: ডলার দুর্বল, ক্রিপ্টোর জন্য ভালো।</div>
                             </td>
                             <td class="px-3 py-3 text-right font-bold text-green-500">BULLISH</td>
                         </tr>
