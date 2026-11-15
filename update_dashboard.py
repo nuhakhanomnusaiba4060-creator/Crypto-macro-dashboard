@@ -82,51 +82,43 @@ def get_cycle_stage(fng, dxy):
 def get_macro_insights(vix, spx, oil, gold, yield_10y, dxy):
     insights = []
     
-    # DXY
     dxy_status = "NEUTRAL"; dxy_color = "text-yellow-500"; dxy_action = "ডলার ইনডেক্স স্বাভাবিক।"
     if dxy != "N/A":
         if dxy > 105: dxy_status, dxy_color, dxy_action = "BEARISH", "text-red-500", "ডলার শক্তিশালী, ক্রিপ্টোর জন্য খারাপ।"
         elif dxy < 100: dxy_status, dxy_color, dxy_action = "BULLISH", "text-green-500", "ডলার দুর্বল, ক্রিপ্টোর জন্য ভালো।"
     insights.append({"name": "Dollar Index (DXY)", "value": dxy, "status": dxy_status, "color": dxy_color, "action": dxy_action})
 
-    # VIX
     vix_status = "NEUTRAL"; vix_color = "text-yellow-500"; vix_action = "বাজার স্থিতিশীল।"
     if vix != "N/A":
         if vix > 25: vix_status, vix_color, vix_action = "HIGH RISK", "text-red-500", "ভোলাটিলিটি বেশি। নতুন কেনা থেকে বিরত থাকুন।"
         elif vix < 15: vix_status, vix_color, vix_action = "LOW RISK", "text-green-500", "বাজারে ভয় নেই, রিস্ক-অন পরিবেশ।"
     insights.append({"name": "VIX (Volatility)", "value": vix, "status": vix_status, "color": vix_color, "action": vix_action})
 
-    # S&P 500
     insights.append({"name": "S&P 500", "value": spx, "status": "TRACKING", "color": "text-blue-400", "action": "স্টক মার্কেট বাড়লে ক্রিপ্টোও বাড়ে (Risk-on)।"})
 
-    # Oil
     oil_status = "NEUTRAL"; oil_color = "text-yellow-500"; oil_action = "তেলের দাম স্বাভাবিক।"
     if oil != "N/A":
         if oil > 85: oil_status, oil_color, oil_action = "INFLATION RISK", "text-red-500", "তেলের দাম বেশি। CPI বাড়তে পারে (বেয়ারিশ)।"
         elif oil < 70: oil_status, oil_color, oil_action = "DISINFLATION", "text-green-500", "তেলের দাম কম। মুদ্রাস্ফীতি কমার ইঙ্গিত (বুলিশ)।"
     insights.append({"name": "Oil (WTI)", "value": f"${oil}", "status": oil_status, "color": oil_color, "action": oil_action})
 
-    # US 10Y Yield
     yield_status = "NEUTRAL"; yield_color = "text-yellow-500"; yield_action = "ইল্ড স্বাভাবিক।"
     if yield_10y != "N/A":
         if yield_10y > 5.0: yield_status, yield_color, yield_action = "HIGH YIELD", "text-red-500", "ইল্ড ৫% এর উপরে। বাজারে তারল্য সংকুচিত হচ্ছে, ক্রিপ্টোর জন্য নেতিবাচক।"
         elif yield_10y < 4.5: yield_status, yield_color, yield_action = "LOW YIELD", "text-green-500", "ইল্ড ৪.৫% এর নিচে। বাজারে টাকা সহজলভ্য, ক্রিপ্টোর জন্য ইতিবাচক।"
     insights.append({"name": "US 10Y Treasury Yield", "value": f"{yield_10y}%", "status": yield_status, "color": yield_color, "action": yield_action})
 
-    # Gold
     insights.append({"name": "Gold", "value": f"${gold}", "status": "SAFE HAVEN", "color": "text-yellow-600", "action": "সোনার দাম বাড়লে বিনিয়োগকারীরা ঝুঁকি এড়াতে চাইছে।"})
     
     return insights
 
-# ৮. ইভেন্ট অ্যালার্ট (শুধু VIX এবং Fear & Greed থাকবে)
+# ৮. ইভেন্ট অ্যালার্ট
 def get_event_alerts(fng, vix):
     alerts = []
     if vix != "N/A" and vix > 20: 
         alerts.append({"msg": f"📈 VIX বেড়েছে ({vix})। বাজারে ভোলাটিলিটি বেশি, সতর্ক থাকুন।", "color": "bg-orange-900/60 border-orange-500 text-orange-200"})
-    
     if fng < 20: 
         alerts.append({"msg": f"🩸 বাজারে চরম ভয় ({fng})। DCA করার সুযোগ হতে পারে।", "color": "bg-green-900/60 border-green-500 text-green-200"})
-    
     return alerts
 
 # ৯. হালভিং কাউন্টডাউন
@@ -274,6 +266,13 @@ html_content += f"""
                 <p class="text-xs text-gray-400">Global Volume 24h</p>
                 <p class="text-xl font-bold text-green-500">${global_vol_val}B</p>
             </div>
+        </div>
+
+        <!-- Cycle Stage Banner (Re-added) -->
+        <div class="bg-gray-800 p-4 rounded-lg border border-gray-700 mb-6 text-center">
+            <h2 class="text-sm font-semibold text-gray-400 mb-1">Current Cycle Stage</h2>
+            <p class="text-2xl font-bold {cycle_color}">{cycle_text}</p>
+            <p class="text-xs text-gray-400 mt-2 bg-gray-900 p-2 rounded"><span class="text-blue-400 font-bold">করণীয়:</span> {'বাজার Accumulation জোনে। ধীরে ধীরে কেনার (DCA) জন্য ভালো সময়।' if 'ACCUMULATION' in cycle_text else 'বাজার Distribution জোনে। সতর্ক থাকুন, লাভ নেওয়ার কথা ভাবুন।' if 'DISTRIBUTION' in cycle_text else 'বাজার নিরপেক্ষ। রেগুলার প্ল্যান অনুযায়ী হোল্ড করুন।'}</p>
         </div>
 
         <!-- Live TradingView Chart -->
