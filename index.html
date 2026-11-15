@@ -16,8 +16,8 @@
 </head>
 <body class="bg-gray-900 text-white font-sans p-4">
     <div class="max-w-5xl mx-auto">
-        <h1 class="text-2xl font-bold mb-1 text-center text-blue-400">My Crypto Spot Dashboard</h1>
-        <p class="text-center text-gray-400 mb-6 text-sm">Last Updated: 2026-11-15 17:54 (UTC)</p>
+        <h1 class="text-2xl font-bold mb-1 text-center text-blue-400">My Crypto Spot Dashboard (Live Data)</h1>
+        <p class="text-center text-gray-400 mb-6 text-sm">Last Updated: 2026-11-15 18:52 (UTC)</p>
 
         <!-- Alert Section -->
 <div class="mb-6 space-y-2"><div class="p-3 rounded-lg border bg-green-900/60 border-green-500 text-green-200 text-sm font-semibold shadow-lg">🩸 বাজারে চরম ভয় (10)। DCA করার সুযোগ হতে পারে।</div></div>
@@ -29,7 +29,7 @@
             </div>
             <div class="bg-gray-800 p-3 rounded-lg border border-gray-700 text-center flex flex-col justify-center">
                 <p class="text-xs text-gray-400">Total Market Cap</p>
-                <p class="text-xl font-bold text-blue-400">$2.18T</p>
+                <p class="text-xl font-bold text-blue-400">$2.19T</p>
             </div>
             <div class="bg-gray-800 p-3 rounded-lg border border-gray-700 text-center flex flex-col justify-center">
                 <p class="text-xs text-gray-400">Market Trend</p>
@@ -37,11 +37,11 @@
             </div>
             <div class="bg-gray-800 p-3 rounded-lg border border-gray-700 text-center flex flex-col justify-center">
                 <p class="text-xs text-gray-400">Global Volume 24h</p>
-                <p class="text-xl font-bold text-green-500">$109.4B</p>
+                <p class="text-xl font-bold text-green-500">$108.8B</p>
             </div>
         </div>
 
-        <!-- Cycle Stage Banner (Re-added) -->
+        <!-- Cycle Stage Banner -->
         <div class="bg-gray-800 p-4 rounded-lg border border-gray-700 mb-6 text-center">
             <h2 class="text-sm font-semibold text-gray-400 mb-1">Current Cycle Stage</h2>
             <p class="text-2xl font-bold text-green-500">ACCUMULATION (Buy Zone)</p>
@@ -65,9 +65,8 @@
             </div>
         </div>
 
-        <!-- Dominance Pie Chart & ETF Bar Chart -->
+        <!-- Dominance Pie Chart & Technicals -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-            <!-- BTC & ETH Dominance -->
             <div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
                 <h2 class="text-sm font-semibold text-gray-400 mb-2">Market Dominance</h2>
                 <div class="flex items-center justify-between">
@@ -79,60 +78,59 @@
                     </div>
                 </div>
             </div>
-            <!-- ETF Tracker Bar Chart (Demo Data) -->
+
             <div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
-                <h2 class="text-sm font-semibold text-gray-400 mb-2">ETF Flows (Last 7 Days)</h2>
-                <canvas id="etfChart" height="100"></canvas>
-                <p class="text-xs text-gray-400 mt-2"><span class="text-blue-400 font-bold">করণীয়:</span> লাল বার মানে আউটফ্লো। সতর্ক থাকুন।</p>
+                <h2 class="text-sm font-semibold text-gray-400 mb-2">Technical Indicators (Live)</h2>
+                <div class="flex justify-between items-center mb-3">
+                    <span class="text-sm">RSI (14):</span>
+                    <span class="font-bold text-yellow-500">50</span>
+                </div>
+                <div class="flex justify-between items-center mb-3">
+                    <span class="text-sm">MACD:</span>
+                    <span class="font-bold text-red-500">0</span>
+                </div>
+                <p class="text-xs text-gray-400 mt-2 bg-gray-900 p-2 rounded"><span class="text-blue-400 font-bold">করণীয়:</span> RSI ৩০-এর নিচে = কেনার সুযোগ, ৭০-এর উপরে = বিক্রির সুযোগ। MACD পজিটিভ = বুলিশ।</p>
             </div>
         </div>
 
-        <!-- Advanced Technical Indicators (RSI, MACD, 200W MA, Pi Cycle) -->
+        <!-- Advanced Indicators -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-            
-            <!-- RSI Chart & Action -->
             <div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
                 <div class="flex justify-between items-center mb-2">
-                    <h2 class="text-sm font-semibold text-gray-400">Average RSI (14)</h2>
-                    <span class="text-xs font-bold px-2 py-1 rounded bg-green-900 text-green-400">35.48 (Weak)</span>
-                </div>
-                <div class="h-32"><canvas id="rsiChart"></canvas></div>
-                <p class="text-xs text-gray-400 mt-2 bg-gray-900 p-2 rounded"><span class="text-blue-400 font-bold">করণীয়:</span> RSI ৩০ এর নিচে থাকলে বাজার কম মূল্যায়িত (কেনার সুযোগ), ৭০ এর উপরে থাকলে অতিরিক্ত মূল্যায়িত (বিক্রির সুযোগ)।</p>
-            </div>
-
-            <!-- MACD Chart & Action -->
-            <div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
-                <div class="flex justify-between items-center mb-2">
-                    <h2 class="text-sm font-semibold text-gray-400">MACD</h2>
-                    <span class="text-xs font-bold px-2 py-1 rounded bg-red-900 text-red-400">-0.46 (Negative)</span>
-                </div>
-                <div class="h-32"><canvas id="macdChart"></canvas></div>
-                <p class="text-xs text-gray-400 mt-2 bg-gray-900 p-2 rounded"><span class="text-blue-400 font-bold">করণীয়:</span> MACD লাইন সিগন্যাল লাইনের উপরে থাকলে বুলিশ (কেনা), নিচে থাকলে বেয়ারিশ (বেচা)।</p>
-            </div>
-
-            <!-- 200W MA Chart & Action -->
-            <div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
-                <div class="flex justify-between items-center mb-2">
-                    <h2 class="text-sm font-semibold text-gray-400">200W Moving Average</h2>
+                    <h2 class="text-sm font-semibold text-gray-400">200W Moving Average (Live)</h2>
                     <span class="text-xs font-bold px-2 py-1 rounded bg-green-900 text-green-500">BULLISH</span>
                 </div>
-                <div class="h-32"><canvas id="ma200Chart"></canvas></div>
+                <p class="text-2xl font-bold text-white mb-2">$0</p>
                 <p class="text-xs text-gray-400 mt-2 bg-gray-900 p-2 rounded"><span class="text-blue-400 font-bold">করণীয়:</span> দাম 200W MA এর উপরে। লং-টার্ম সাপোর্ট টিকে আছে।</p>
             </div>
 
-            <!-- Pi Cycle Top Chart & Action -->
             <div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
                 <div class="flex justify-between items-center mb-2">
-                    <h2 class="text-sm font-semibold text-gray-400">Pi Cycle Top</h2>
-                    <span class="text-xs font-bold px-2 py-1 rounded bg-green-900 text-green-500">SAFE</span>
+                    <h2 class="text-sm font-semibold text-gray-400">Funding Rate (Binance)</h2>
+                    <span class="text-xs font-bold px-2 py-1 rounded bg-yellow-900 text-yellow-500">0.0% (NEUTRAL)</span>
                 </div>
-                <div class="h-32"><canvas id="piCycleChart"></canvas></div>
-                <p class="text-xs text-gray-400 mt-2 bg-gray-900 p-2 rounded"><span class="text-blue-400 font-bold">করণীয়:</span> বাজার এখনো শীর্ষে পৌঁছায়নি। হোল্ড করুন।</p>
+                <p class="text-xs text-gray-400 mt-2 bg-gray-900 p-2 rounded"><span class="text-blue-400 font-bold">করণীয়:</span> ফান্ডিং রেট স্বাভাবিক। বাজারে ভারসাম্য আছে।</p>
             </div>
 
+            <div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
+                <div class="flex justify-between items-center mb-2">
+                    <h2 class="text-sm font-semibold text-gray-400">Open Interest (BTC)</h2>
+                    <span class="text-xs font-bold px-2 py-1 rounded bg-orange-900 text-orange-400">0.0 BTC</span>
+                </div>
+                <p class="text-xs text-gray-400 mt-2 bg-gray-900 p-2 rounded"><span class="text-blue-400 font-bold">করণীয়:</span> ফিউচার মার্কেটে মোট খোলা পজিশন। বেশি হলে ভোলাটিলিটি বাড়তে পারে।</p>
+            </div>
+            
+            <div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
+                <div class="flex justify-between items-center mb-2">
+                    <h2 class="text-sm font-semibold text-gray-400">Halving Countdown</h2>
+                    <span class="text-xs font-bold px-2 py-1 rounded bg-purple-900 text-purple-400">লং-টার্ম</span>
+                </div>
+                <p class="text-xl font-bold text-purple-400 mb-2">517 দিন বাকি</p>
+                <p class="text-xs text-gray-400 mt-2 bg-gray-900 p-2 rounded"><span class="text-blue-400 font-bold">করণীয়:</span> হালভিং যত কাছে আসবে, বাজার তত বুলিশ হতে পারে। ধৈর্য ধরে হোল্ড করুন।</p>
+            </div>
         </div>
 
-        <!-- Macro Insights & Actions (CMC Style Cards with DXY) -->
+        <!-- Macro Insights & Actions -->
         <div class="bg-gray-800 rounded-lg border border-gray-700 p-4 mb-6">
             <h2 class="text-lg font-bold text-gray-200 mb-4 text-center border-b border-gray-700 pb-2">MACRO INDICATORS & ACTIONS</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -163,10 +161,10 @@
 
                 <div class="bg-gray-900 p-3 rounded-lg border border-gray-700">
                     <div class="flex justify-between items-center mb-1">
-                        <span class="text-sm font-semibold text-gray-300">Oil (WTI)</span>
-                        <span class="text-xs font-bold px-2 py-1 rounded bg-red-900 text-red-500">$88.56</span>
+                        <span class="text-sm font-semibold text-gray-300">Brent Crude Oil</span>
+                        <span class="text-xs font-bold px-2 py-1 rounded bg-red-900 text-red-500">$95.84</span>
                     </div>
-                    <p class="text-xs text-gray-400 mt-2"><span class="text-blue-400 font-bold">করণীয়:</span> তেলের দাম বেশি। CPI বাড়তে পারে (বেয়ারিশ)।</p>
+                    <p class="text-xs text-gray-400 mt-2"><span class="text-blue-400 font-bold">করণীয়:</span> ব্রেন্ট অয়েলের দাম বেশি। CPI বাড়তে পারে (বেয়ারিশ)।</p>
                 </div>
 
                 <div class="bg-gray-900 p-3 rounded-lg border border-gray-700">
@@ -206,18 +204,18 @@
                         <tr class="border-b border-gray-700 hover:bg-gray-750">
                             <td class="px-3 py-3 font-medium text-white">BTC Price</td>
                             <td class="px-3 py-3">
-                                <div class="font-semibold">$64,494</div>
+                                <div class="font-semibold">$64,586</div>
                                 <div class="text-xs text-gray-400 mt-1 italic">↳ করণীয়: বর্তমান মূল্য ট্র্যাক করুন।</div>
                             </td>
-                            <td class="px-3 py-3 text-right font-bold text-orange-400">TRACKING</td>
+                            <td class="px-3 py-3 text-right font-bold text-orange-400">LIVE</td>
                         </tr>
                         <tr class="border-b border-gray-700 hover:bg-gray-750">
-                            <td class="px-3 py-3 font-medium text-white">ETF Flows</td>
+                            <td class="px-3 py-3 font-medium text-white">Funding Rate</td>
                             <td class="px-3 py-3">
-                                <div class="font-semibold text-green-500">$50.5M</div>
-                                <div class="text-xs text-gray-400 mt-1 italic">↳ করণীয়: প্রাতিষ্ঠানিক পুঁজি ঢুকছে (Inflow)।</div>
+                                <div class="font-semibold text-yellow-500">0.0%</div>
+                                <div class="text-xs text-gray-400 mt-1 italic">↳ করণীয়: ফান্ডিং রেট স্বাভাবিক। বাজারে ভারসাম্য আছে।</div>
                             </td>
-                            <td class="px-3 py-3 text-right font-bold text-green-500">BULLISH</td>
+                            <td class="px-3 py-3 text-right font-bold text-yellow-500">NEUTRAL</td>
                         </tr>
                     </tbody>
                 </table>
@@ -228,28 +226,14 @@
         <div class="bg-gray-800 rounded-lg border border-gray-700 p-4 mb-6">
             <h2 class="text-lg font-bold text-gray-200 mb-4 text-center border-b border-gray-700 pb-2">MACRO & AI NEWS</h2>
             <ul class="space-y-4">
-                
-                <!-- Stablecoin News -->
-                <li class="flex items-start bg-red-900/20 p-3 rounded-lg border border-red-800">
-                    <span class="text-red-400 mr-2 text-lg">🩸</span>
+                <li class="flex items-start bg-yellow-900/20 p-3 rounded-lg border border-yellow-800">
+                    <span class="text-yellow-400 mr-2 text-lg">⚖️</span>
                     <div>
-                        <p class="font-semibold text-white">Stablecoin Supply Shrinks Fast</p>
-                        <p class="text-xs text-gray-300 mb-1">Stablecoin supply has dropped by $17.1B in the last 30 days, the fastest decline since June 2022.</p>
-                        <p class="text-xs text-red-300 font-semibold mt-1">করণীয়: বাজারে নগদ টাকা (তারল্য) কমছে। বড় কেনা থেকে বিরত থাকুন এবং ধৈর্য ধরে DCA করুন।</p>
+                        <p class="font-semibold text-white">Exchange Netflow Alert</p>
+                        <p class="text-xs text-gray-300 mb-1">বড় এক্সচেঞ্জগুলোতে বিটকয়েনের প্রবাহ (Netflow) পর্যবেক্ষণ করুন।</p>
+                        <p class="text-xs text-yellow-300 font-semibold mt-1">করণীয়: এক্সচেঞ্জে বিটকয়েন কমলে (আউটফ্লো) বুলিশ, আর বাড়লে (ইনফ্লো) সতর্ক হোন।</p>
                     </div>
                 </li>
-
-                <!-- MSCI News -->
-                <li class="flex items-start bg-red-900/20 p-3 rounded-lg border border-red-800">
-                    <span class="text-red-400 mr-2 text-lg">🚨</span>
-                    <div>
-                        <p class="font-semibold text-white">MSCI Index Update</p>
-                        <p class="text-xs text-gray-300 mb-1">MSCI is planning to remove Strategy (MicroStrategy) from its US index.</p>
-                        <p class="text-xs text-red-300 font-semibold mt-1">করণীয়: প্রাতিষ্ঠানিক ফান্ডগুলো Strategy-এর শেয়ার বিক্রি করতে পারে, যা বিটকয়েনে নেতিবাচক প্রভাব ফেলতে পারে। সতর্ক থাকুন, বড় পজিশন নেওয়ার আগে ভাবুন।</p>
-                    </div>
-                </li>
-
-                <!-- CPI News -->
                 <li class="flex items-start">
                     <span class="text-blue-400 mr-2 mt-1">📌</span>
                     <div>
@@ -258,72 +242,21 @@
                         <p class="text-xs text-gray-400 mt-1"><span class="text-blue-400 font-bold">করণীয়:</span> সতর্ক থাকুন, ডেটা প্রকাশের সময় বাজারে বড় ওঠানামা হতে পারে।</p>
                     </div>
                 </li>
-
-                <!-- FOMC News -->
-                <li class="flex items-start">
-                    <span class="text-yellow-400 mr-2 mt-1">🏛️</span>
-                    <div>
-                        <p class="font-semibold text-white">FOMC Meeting</p>
-                        <p class="text-xs text-gray-400">Next meeting: Check Economic Calendar. Fed's stance on rate cuts is crucial.</p>
-                        <p class="text-xs text-gray-400 mt-1"><span class="text-blue-400 font-bold">করণীয়:</span> ফেডের সিদ্ধান্তের আগে নতুন বড় পজিশন নেওয়া থেকে বিরত থাকুন।</p>
-                    </div>
-                </li>
             </ul>
         </div>
         
         <div class="mt-6 text-center text-xs text-gray-500">
-            Built for Long-Term Spot Trading. Keep patience.
+            Built for Long-Term Spot Trading. Live data only.
         </div>
     </div>
 
     <!-- Chart.js Scripts -->
     <script>
-        // Dominance Pie Chart
         const ctxDom = document.getElementById('dominanceChart').getContext('2d');
         new Chart(ctxDom, {
             type: 'doughnut',
             data: { labels: ['BTC', 'ETH', 'Others'], datasets: [{ data: [59.3, 10.1, 30.6], backgroundColor: ['#f97316', '#3b82f6', '#4b5563'], borderWidth: 0 }] },
             options: { cutout: '70%', plugins: { legend: { display: false } } }
-        });
-
-        // ETF Bar Chart
-        const ctxEtf = document.getElementById('etfChart').getContext('2d');
-        new Chart(ctxEtf, {
-            type: 'bar',
-            data: { labels: ['D1', 'D2', 'D3', 'D4', 'D5', 'D6', 'Today'], datasets: [{ data: [120, -50, 200, -180, 80, 150, -120], backgroundColor: ['#10b981', '#ef4444', '#10b981', '#ef4444', '#10b981', '#10b981', '#ef4444'], borderRadius: 4 }] },
-            options: { plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { display: false } } }
-        });
-
-        // RSI Chart
-        const ctxRsi = document.getElementById('rsiChart').getContext('2d');
-        new Chart(ctxRsi, {
-            type: 'line',
-            data: { labels: ['1','2','3','4','5','6','7'], datasets: [{ data: [45, 42, 38, 35, 30, 32, 35.48], borderColor: '#10b981', borderWidth: 2, tension: 0.4, pointRadius: 0 }] },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { display: false, min: 0, max: 100 } } }
-        });
-
-        // MACD Chart
-        const ctxMacd = document.getElementById('macdChart').getContext('2d');
-        new Chart(ctxMacd, {
-            type: 'bar',
-            data: { labels: ['1','2','3','4','5','6','7'], datasets: [{ data: [10, 5, -5, -15, -25, -10, -0.46], backgroundColor: ['#10b981', '#10b981', '#ef4444', '#ef4444', '#ef4444', '#ef4444', '#ef4444'] }] },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { display: false } } }
-        });
-
-        // 200W MA Chart
-        const ctxMa = document.getElementById('ma200Chart').getContext('2d');
-        new Chart(ctxMa, {
-            type: 'line',
-            data: { labels: ['1','2','3','4','5','6','7'], datasets: [{ label: 'Price', data: [25000, 28000, 29000, 31000, 33000, 35000, 64494], borderColor: '#f97316', borderWidth: 2, tension: 0.4, pointRadius: 0 }, { label: '200W MA', data: [30000, 30000, 30000, 30000, 30000, 30000, 30000], borderColor: '#3b82f6', borderWidth: 2, borderDash: [5, 5], pointRadius: 0 }] },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { display: false } } }
-        });
-
-        // Pi Cycle Chart
-        const ctxPi = document.getElementById('piCycleChart').getContext('2d');
-        new Chart(ctxPi, {
-            type: 'line',
-            data: { labels: ['1','2','3','4','5','6','7'], datasets: [{ data: [40000, 45000, 50000, 55000, 60000, 70000, 64494], borderColor: '#8b5cf6', borderWidth: 2, tension: 0.4, pointRadius: 0 }] },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { display: false } } }
         });
     </script>
 </body>
