@@ -310,9 +310,34 @@ html_content += f"""
             </div>
         </div>
 
+        <!-- NEW: Live TradingView Chart -->
+        <div class="bg-gray-800 rounded-lg border border-gray-700 p-2 mb-6">
+            <h2 class="text-sm font-semibold text-gray-400 px-2 mb-2">Live Market Cap Chart (BTC)</h2>
+            <div class="tradingview-widget-container" style="height:250px; width:100%;">
+                <div id="tradingview_chart"></div>
+                <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+                <script type="text/javascript">
+                new TradingView.widget({{
+                  "width": "100%",
+                  "height": 250,
+                  "symbol": "BINANCE:BTCUSDT",
+                  "interval": "60",
+                  "timezone": "Etc/UTC",
+                  "theme": "dark",
+                  "style": "1",
+                  "locale": "en",
+                  "toolbar_bg": "#f1f3f6",
+                  "enable_publishing": false,
+                  "hide_side_toolbar": true,
+                  "allow_symbol_change": false,
+                  "container_id": "tradingview_chart"
+                }});
+                </script>
+            </div>
+        </div>
+
         <!-- CMC Style Visual Cards (RSI/MACD, Liquidations, Altseason) -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
-            
             <!-- RSI & MACD -->
             <div class="bg-gray-800 p-4 rounded-lg border border-gray-700 flex flex-col justify-between">
                 <div>
@@ -330,23 +355,20 @@ html_content += f"""
                     </div>
                 </div>
             </div>
-
             <!-- Liquidations -->
             <div class="bg-gray-800 p-4 rounded-lg border border-gray-700 md:col-span-2">
                 <h2 class="text-xs font-semibold text-gray-400 mb-2 flex items-center gap-1">Liquidations <span class="text-gray-500">ⓘ</span></h2>
                 <p class="text-2xl font-bold mb-3">${round(long_liq + short_liq, 2)}B</p>
-                
                 <div class="w-full flex h-2 rounded-full overflow-hidden mb-2">
                     <div class="bg-green-500" style="width: {liq_ratio}%;"></div>
                     <div class="bg-red-500" style="width: {100 - liq_ratio}%;"></div>
                 </div>
-                
                 <div class="flex justify-between text-xs font-semibold">
                     <span class="text-green-500">Long ${long_liq}B</span>
                     <span class="text-red-500">Short ${short_liq}B</span>
                 </div>
+                <p class="text-xs text-gray-400 mt-2 bg-gray-900 p-2 rounded"><span class="text-blue-400 font-bold">করণীয়:</span> লিকুইডেশন বেশি হলে বাজার অস্থির। সতর্ক থাকুন।</p>
             </div>
-
             <!-- Altcoin Season Index -->
             <div class="bg-gray-800 p-4 rounded-lg border border-gray-700 md:col-span-3">
                 <div class="flex justify-between items-center mb-2">
@@ -361,25 +383,12 @@ html_content += f"""
                     <span>Bitcoin</span>
                     <span>Altcoin</span>
                 </div>
+                <p class="text-xs text-gray-400 mt-2 bg-gray-900 p-2 rounded"><span class="text-blue-400 font-bold">করণীয়:</span> ৪২/১০০ মানে বাজার বিটকয়েন সিজনে আছে। অল্টকয়েনে বিনিয়োগে সতর্ক থাকুন।</p>
             </div>
         </div>
 
-        <!-- Weekly Outlook & Halving -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6">
-            <div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
-                <h2 class="text-sm font-semibold text-gray-400 mb-2">Weekly Market Outlook</h2>
-                <p class="text-sm font-bold {outlook_color}">{outlook}</p>
-                <p class="text-xs text-gray-400 mt-2 bg-gray-900 p-2 rounded"><span class="text-blue-400 font-bold">করণীয়:</span> এই সপ্তাহে বাজারের অবস্থা বুঝে আপনার DCA প্ল্যান চালিয়ে যান।</p>
-            </div>
-            <div class="bg-gray-800 p-4 rounded-lg border border-gray-700 flex flex-col justify-center">
-                <h2 class="text-sm font-semibold text-gray-400 mb-1 text-center">Next BTC Halving</h2>
-                <p class="text-xl font-bold text-purple-400 text-center mb-2">{halving_text}</p>
-                <p class="text-xs text-gray-400 text-center bg-gray-900 p-2 rounded"><span class="text-blue-400 font-bold">করণীয়:</span> হালভিং যত কাছে আসবে, বাজার তত বুলিশ হতে পারে। ধৈর্য ধরে হোল্ড করুন।</p>
-            </div>
-        </div>
-
-        <!-- Advanced On-Chain & Cycle Indicators (CMC Style) -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6">
+        <!-- Advanced On-Chain & Cycle Indicators (Grid Cards) -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
             
             <!-- 200W MA -->
             <div class="bg-gray-800 p-4 rounded-lg border border-gray-700 flex flex-col justify-between">
@@ -397,7 +406,7 @@ html_content += f"""
             <div class="bg-gray-800 p-4 rounded-lg border border-gray-700 flex flex-col justify-between">
                 <div>
                     <div class="flex justify-between items-center mb-2">
-                        <h2 class="text-sm font-semibold text-gray-400">Pi Cycle Top Indicator</h2>
+                        <h2 class="text-sm font-semibold text-gray-400">Pi Cycle Top</h2>
                         <span class="text-xs font-bold px-2 py-1 rounded {pi_cycle_color.replace('text', 'bg').replace('500', '900')} {pi_cycle_color}">{pi_cycle_status}</span>
                     </div>
                     <p class="text-sm text-gray-300 mb-2">সাইকেল টপ (বিক্রির সময়) বোঝার সূচক।</p>
@@ -420,19 +429,16 @@ html_content += f"""
             <!-- Fear & Greed Gauge -->
             <div class="bg-gray-800 p-4 rounded-lg border border-gray-700 flex flex-col items-center justify-between">
                 <h2 class="text-sm font-semibold text-gray-400 mb-2">Fear & Greed Index</h2>
-                
                 <div class="gauge-container">
                     <div class="gauge-background"></div>
                     <div class="gauge-needle"></div>
                     <div class="gauge-center-circle"></div>
                 </div>
-                
                 <div class="text-center mt-2 w-full">
                     <p class="text-2xl font-bold {'text-green-500' if fng_val < 30 else 'text-red-500' if fng_val > 75 else 'text-yellow-500'}">{fng_val} - {fng_class}</p>
                     <p class="text-xs text-gray-400 mt-2 bg-gray-900 p-2 rounded"><span class="text-blue-400 font-bold">করণীয়:</span> {'চরম ভয়। ধীরে ধীরে কিনুন (DCA)।' if fng_val < 30 else 'অতিরিক্ত লোভ। সতর্ক থাকুন।' if fng_val > 75 else 'বাজার স্বাভাবিক। হোল্ড করুন।'}</p>
                 </div>
             </div>
-
         </div>
 
         <!-- Macro Insights & Actions (CMC Style Cards) -->
@@ -504,7 +510,6 @@ html_content += f"""
         <div class="bg-gray-800 rounded-lg border border-gray-700 p-4 mb-6">
             <h2 class="text-lg font-bold text-gray-200 mb-4 text-center border-b border-gray-700 pb-2">MACRO & AI NEWS</h2>
             <ul class="space-y-4">
-                
                 <li class="flex items-start bg-red-900/20 p-3 rounded-lg border border-red-800">
                     <span class="text-red-400 mr-2 text-lg">🚨</span>
                     <div>
@@ -513,7 +518,6 @@ html_content += f"""
                         <p class="text-xs text-red-300 font-semibold mt-1">করণীয়: প্রাতিষ্ঠানিক ফান্ডগুলো Strategy-এর শেয়ার বিক্রি করতে পারে, যা বিটকয়েনে নেতিবাচক প্রভাব ফেলতে পারে। সতর্ক থাকুন, বড় পজিশন নেওয়ার আগে ভাবুন।</p>
                     </div>
                 </li>
-
                 <li class="flex items-start">
                     <span class="text-blue-400 mr-2 mt-1">📌</span>
                     <div>
@@ -522,7 +526,6 @@ html_content += f"""
                         <p class="text-xs text-gray-400 mt-1"><span class="text-blue-400 font-bold">করণীয়:</span> সতর্ক থাকুন, ডেটা প্রকাশের সময় বাজারে বড় ওঠানামা হতে পারে।</p>
                     </div>
                 </li>
-
                 <li class="flex items-start">
                     <span class="text-yellow-400 mr-2 mt-1">🏛️</span>
                     <div>
