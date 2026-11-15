@@ -289,24 +289,24 @@ else:
         </div>
     """
 
-html_content += """
+html_content += f"""
         <!-- Top Summary Cards -->
         <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
             <div class="bg-gray-800 p-3 rounded-lg border border-gray-700 text-center flex flex-col justify-center">
                 <p class="text-xs text-gray-400">BTC Dominance</p>
-                <p class="text-xl font-bold text-orange-400">""" + f"{btc_dom_val}%" + """</p>
+                <p class="text-xl font-bold text-orange-400">{btc_dom_val}%</p>
             </div>
             <div class="bg-gray-800 p-3 rounded-lg border border-gray-700 text-center flex flex-col justify-center">
                 <p class="text-xs text-gray-400">Total Market Cap</p>
-                <p class="text-xl font-bold text-blue-400">$""" + f"{total_mcap_val}T" + """</p>
+                <p class="text-xl font-bold text-blue-400">${total_mcap_val}T</p>
             </div>
             <div class="bg-gray-800 p-3 rounded-lg border border-gray-700 text-center flex flex-col justify-center">
                 <p class="text-xs text-gray-400">Market Trend</p>
-                <p class="text-xl font-bold """ + f"{alt_color}" + """">""" + f"{alt_status}" + """</p>
+                <p class="text-xl font-bold {alt_color}">{alt_status}</p>
             </div>
             <div class="bg-gray-800 p-3 rounded-lg border border-gray-700 text-center flex flex-col justify-center">
                 <p class="text-xs text-gray-400">Global Volume 24h</p>
-                <p class="text-xl font-bold text-green-500">$""" + f"{global_vol_val}B" + """</p>
+                <p class="text-xl font-bold text-green-500">${global_vol_val}B</p>
             </div>
         </div>
 
@@ -318,14 +318,14 @@ html_content += """
                 <div>
                     <h2 class="text-xs font-semibold text-gray-400 mb-2">Average RSI</h2>
                     <div class="flex items-end justify-between mb-2">
-                        <p class="text-3xl font-bold">""" + f"{avg_rsi}" + """</p>
-                        <span class="text-xs font-semibold px-2 py-1 rounded """ + f"{'bg-green-900 text-green-400' if avg_rsi < 40 else 'bg-red-900 text-red-400'}" + """">""" + f"{'Weak' if avg_rsi < 40 else 'Strong'}" + """</span>
+                        <p class="text-3xl font-bold">{avg_rsi}</p>
+                        <span class="text-xs font-semibold px-2 py-1 rounded {'bg-green-900 text-green-400' if avg_rsi < 40 else 'bg-red-900 text-red-400'}">{'Weak' if avg_rsi < 40 else 'Strong'}</span>
                     </div>
                 </div>
                 <div class="mt-3">
                     <h2 class="text-xs font-semibold text-gray-400 mb-1">MACD</h2>
                     <div class="flex items-center justify-between">
-                        <p class="text-xl font-bold">""" + f"{macd_val}" + """</p>
+                        <p class="text-xl font-bold">{macd_val}</p>
                         <span class="text-xs font-semibold px-2 py-1 rounded bg-red-900 text-red-400">Negative</span>
                     </div>
                 </div>
@@ -334,17 +334,17 @@ html_content += """
             <!-- Liquidations -->
             <div class="bg-gray-800 p-4 rounded-lg border border-gray-700 md:col-span-2">
                 <h2 class="text-xs font-semibold text-gray-400 mb-2 flex items-center gap-1">Liquidations <span class="text-gray-500">ⓘ</span></h2>
-                <p class="text-2xl font-bold mb-3">$""" + f"{round(long_liq + short_liq, 2)}B" + """</p>
+                <p class="text-2xl font-bold mb-3">${round(long_liq + short_liq, 2)}B</p>
                 
                 <!-- Liquidation Bar -->
                 <div class="w-full flex h-2 rounded-full overflow-hidden mb-2">
-                    <div class="bg-green-500" style="width: """ + f"{liq_ratio}%" + """;"></div>
-                    <div class="bg-red-500" style="width: """ + f"{100 - liq_ratio}%" + """;"></div>
+                    <div class="bg-green-500" style="width: {liq_ratio}%;"></div>
+                    <div class="bg-red-500" style="width: {100 - liq_ratio}%;"></div>
                 </div>
                 
                 <div class="flex justify-between text-xs font-semibold">
-                    <span class="text-green-500">Long $""" + f"{long_liq}B" + """</span>
-                    <span class="text-red-500">Short $""" + f"{short_liq}B" + """</span>
+                    <span class="text-green-500">Long ${long_liq}B</span>
+                    <span class="text-red-500">Short ${short_liq}B</span>
                 </div>
             </div>
 
@@ -352,12 +352,12 @@ html_content += """
             <div class="bg-gray-800 p-4 rounded-lg border border-gray-700 md:col-span-3">
                 <div class="flex justify-between items-center mb-2">
                     <h2 class="text-xs font-semibold text-gray-400">Altcoin Season Index</h2>
-                    <span class="text-xl font-bold">""" + f"{altcoin_index}/100" + """</span>
+                    <span class="text-xl font-bold">{altcoin_index}/100</span>
                 </div>
                 <!-- Altseason Slider -->
                 <div class="w-full bg-gray-700 h-2 rounded-full relative">
                     <div class="absolute top-0 left-0 h-2 rounded-full bg-gradient-to-r from-orange-500 via-yellow-500 to-blue-500 w-full"></div>
-                    <div class="absolute top-1/2 -translate-y-1/2 w-4 h-4 bg-white rounded-full border-2 border-gray-900 shadow" style="left: calc(""" + f"{altcoin_index}%" + """ - 8px);"></div>
+                    <div class="absolute top-1/2 -translate-y-1/2 w-4 h-4 bg-white rounded-full border-2 border-gray-900 shadow" style="left: calc({altcoin_index}% - 8px);"></div>
                 </div>
                 <div class="flex justify-between text-xs text-gray-400 mt-2 font-semibold">
                     <span>Bitcoin</span>
@@ -370,11 +370,11 @@ html_content += """
         <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6">
             <div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
                 <h2 class="text-sm font-semibold text-gray-400 mb-2">Weekly Market Outlook</h2>
-                <p class="text-sm font-bold """ + f"{outlook_color}" + """">""" + f"{outlook}" + """</p>
+                <p class="text-sm font-bold {outlook_color}">{outlook}</p>
             </div>
             <div class="bg-gray-800 p-4 rounded-lg border border-gray-700 flex flex-col justify-center">
                 <h2 class="text-sm font-semibold text-gray-400 mb-1 text-center">Next BTC Halving</h2>
-                <p class="text-xl font-bold text-purple-400 text-center">""" + f"{halving_text}" + """</p>
+                <p class="text-xl font-bold text-purple-400 text-center">{halving_text}</p>
             </div>
         </div>
 
@@ -384,22 +384,22 @@ html_content += """
             <!-- 200W MA -->
             <div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
                 <h2 class="text-sm font-semibold text-gray-400 mb-1">200W Moving Average</h2>
-                <p class="text-lg font-bold """ + f"{ma_color}" + """">""" + f"{ma_status}" + """</p>
-                <p class="text-xs text-gray-400 mt-1"><span class="text-blue-400 font-bold">করণীয়:</span> """ + f"{ma_action}" + """</p>
+                <p class="text-lg font-bold {ma_color}">{ma_status}</p>
+                <p class="text-xs text-gray-400 mt-1"><span class="text-blue-400 font-bold">করণীয়:</span> {ma_action}</p>
             </div>
 
             <!-- Pi Cycle Top -->
             <div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
                 <h2 class="text-sm font-semibold text-gray-400 mb-1">Pi Cycle Top Indicator</h2>
-                <p class="text-lg font-bold """ + f"{pi_cycle_color}" + """">""" + f"{pi_cycle_status}" + """</p>
-                <p class="text-xs text-gray-400 mt-1"><span class="text-blue-400 font-bold">করণীয়:</span> """ + f"{pi_cycle_action}" + """</p>
+                <p class="text-lg font-bold {pi_cycle_color}">{pi_cycle_status}</p>
+                <p class="text-xs text-gray-400 mt-1"><span class="text-blue-400 font-bold">করণীয়:</span> {pi_cycle_action}</p>
             </div>
 
             <!-- Weekly Outflows -->
             <div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
                 <h2 class="text-sm font-semibold text-gray-400 mb-1">Weekly Market Outflows</h2>
-                <p class="text-lg font-bold """ + f"{outflow_color}" + """">$""" + f"{abs(weekly_outflow)}M ({outflow_status})" + """</p>
-                <p class="text-xs text-gray-400 mt-1"><span class="text-blue-400 font-bold">করণীয়:</span> """ + f"{outflow_action}" + """</p>
+                <p class="text-lg font-bold {outflow_color}">${abs(weekly_outflow)}M ({outflow_status})</p>
+                <p class="text-xs text-gray-400 mt-1"><span class="text-blue-400 font-bold">করণীয়:</span> {outflow_action}</p>
             </div>
 
             <!-- Fear & Greed Gauge -->
@@ -413,9 +413,9 @@ html_content += """
                 </div>
                 
                 <div class="text-center mt-2">
-                    <p class="text-2xl font-bold """ + f"{'text-green-500' if fng_val < 30 else 'text-red-500' if fng_val > 75 else 'text-yellow-500'}" + """">""" + f"{fng_val}" + """</p>
-                    <p class="text-xs text-gray-400 mb-1">""" + f"{fng_class}" + """</p>
-                    <p class="text-xs text-gray-400 mt-2 px-2 py-1 bg-gray-900 rounded border border-gray-700"><span class="text-blue-400 font-bold">করণীয়:</span> """ + f"{'চরম ভয়। ধীরে ধীরে কিনুন (DCA)।' if fng_val < 30 else 'অতিরিক্ত লোভ। সতর্ক থাকুন।' if fng_val > 75 else 'বাজার স্বাভাবিক। হোল্ড করুন।'}" + """</p>
+                    <p class="text-2xl font-bold {'text-green-500' if fng_val < 30 else 'text-red-500' if fng_val > 75 else 'text-yellow-500'}">{fng_val}</p>
+                    <p class="text-xs text-gray-400 mb-1">{fng_class}</p>
+                    <p class="text-xs text-gray-400 mt-2 px-2 py-1 bg-gray-900 rounded border border-gray-700"><span class="text-blue-400 font-bold">করণীয়:</span> {'চরম ভয়। ধীরে ধীরে কিনুন (DCA)।' if fng_val < 30 else 'অতিরিক্ত লোভ। সতর্ক থাকুন।' if fng_val > 75 else 'বাজার স্বাভাবিক। হোল্ড করুন।'}</p>
                 </div>
             </div>
 
@@ -440,7 +440,7 @@ for macro in macro_insights:
                 </div>
 """
 
-html_content += """
+html_content += f"""
             </div>
         </div>
 
@@ -462,7 +462,7 @@ html_content += """
                         <tr class="border-b border-gray-700 hover:bg-gray-750">
                             <td class="px-3 py-3 font-medium text-white">BTC Price</td>
                             <td class="px-3 py-3">
-                                <div class="font-semibold">$""" + f"{btc_val:,}" + """</div>
+                                <div class="font-semibold">${btc_val:,}</div>
                                 <div class="text-xs text-gray-400 mt-1 italic">↳ বর্তমান মূল্য ট্র্যাক করুন।</div>
                             </td>
                             <td class="px-3 py-3 text-right font-bold text-orange-400">TRACKING</td>
@@ -478,7 +478,7 @@ html_content += """
                         <tr class="border-b border-gray-700 hover:bg-gray-750">
                             <td class="px-3 py-3 font-medium text-white">Dollar Index (DXY)</td>
                             <td class="px-3 py-3">
-                                <div class="font-semibold">""" + f"{dxy_val}" + """</div>
+                                <div class="font-semibold">{dxy_val}</div>
                                 <div class="text-xs text-gray-400 mt-1 italic">↳ করণীয়: ডলার দুর্বল, ক্রিপ্টোর জন্য ভালো।</div>
                             </td>
                             <td class="px-3 py-3 text-right font-bold text-green-500">BULLISH</td>
@@ -513,4 +513,25 @@ html_content += """
                 </li>
 
                 <!-- FOMC News -->
-                <li class="flex
+                <li class="flex items-start">
+                    <span class="text-yellow-400 mr-2 mt-1">🏛️</span>
+                    <div>
+                        <p class="font-semibold text-white">FOMC Meeting</p>
+                        <p class="text-xs text-gray-400">Next meeting: Dec 12. Fed's stance on rate cuts is crucial.</p>
+                    </div>
+                </li>
+            </ul>
+        </div>
+        
+        <div class="mt-6 text-center text-xs text-gray-500">
+            Built for Long-Term Spot Trading. Keep patience.
+        </div>
+    </div>
+</body>
+</html>
+"""
+
+with open("index.html", "w", encoding="utf-8") as file:
+    file.write(html_content)
+
+print("Dashboard updated successfully! index.html created.")
