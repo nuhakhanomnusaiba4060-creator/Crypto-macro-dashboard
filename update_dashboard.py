@@ -310,7 +310,7 @@ html_content += f"""
             </div>
         </div>
 
-        <!-- NEW: CMC Style Visual Cards (RSI/MACD, Liquidations, Altseason) -->
+        <!-- CMC Style Visual Cards (RSI/MACD, Liquidations, Altseason) -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
             
             <!-- RSI & MACD -->
@@ -336,7 +336,6 @@ html_content += f"""
                 <h2 class="text-xs font-semibold text-gray-400 mb-2 flex items-center gap-1">Liquidations <span class="text-gray-500">ⓘ</span></h2>
                 <p class="text-2xl font-bold mb-3">${round(long_liq + short_liq, 2)}B</p>
                 
-                <!-- Liquidation Bar -->
                 <div class="w-full flex h-2 rounded-full overflow-hidden mb-2">
                     <div class="bg-green-500" style="width: {liq_ratio}%;"></div>
                     <div class="bg-red-500" style="width: {100 - liq_ratio}%;"></div>
@@ -354,7 +353,6 @@ html_content += f"""
                     <h2 class="text-xs font-semibold text-gray-400">Altcoin Season Index</h2>
                     <span class="text-xl font-bold">{altcoin_index}/100</span>
                 </div>
-                <!-- Altseason Slider -->
                 <div class="w-full bg-gray-700 h-2 rounded-full relative">
                     <div class="absolute top-0 left-0 h-2 rounded-full bg-gradient-to-r from-orange-500 via-yellow-500 to-blue-500 w-full"></div>
                     <div class="absolute top-1/2 -translate-y-1/2 w-4 h-4 bg-white rounded-full border-2 border-gray-900 shadow" style="left: calc({altcoin_index}% - 8px);"></div>
@@ -371,35 +369,52 @@ html_content += f"""
             <div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
                 <h2 class="text-sm font-semibold text-gray-400 mb-2">Weekly Market Outlook</h2>
                 <p class="text-sm font-bold {outlook_color}">{outlook}</p>
+                <p class="text-xs text-gray-400 mt-2 bg-gray-900 p-2 rounded"><span class="text-blue-400 font-bold">করণীয়:</span> এই সপ্তাহে বাজারের অবস্থা বুঝে আপনার DCA প্ল্যান চালিয়ে যান।</p>
             </div>
             <div class="bg-gray-800 p-4 rounded-lg border border-gray-700 flex flex-col justify-center">
                 <h2 class="text-sm font-semibold text-gray-400 mb-1 text-center">Next BTC Halving</h2>
-                <p class="text-xl font-bold text-purple-400 text-center">{halving_text}</p>
+                <p class="text-xl font-bold text-purple-400 text-center mb-2">{halving_text}</p>
+                <p class="text-xs text-gray-400 text-center bg-gray-900 p-2 rounded"><span class="text-blue-400 font-bold">করণীয়:</span> হালভিং যত কাছে আসবে, বাজার তত বুলিশ হতে পারে। ধৈর্য ধরে হোল্ড করুন।</p>
             </div>
         </div>
 
-        <!-- Advanced On-Chain & Cycle Indicators -->
+        <!-- Advanced On-Chain & Cycle Indicators (CMC Style) -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6">
             
             <!-- 200W MA -->
-            <div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
-                <h2 class="text-sm font-semibold text-gray-400 mb-1">200W Moving Average</h2>
-                <p class="text-lg font-bold {ma_color}">{ma_status}</p>
-                <p class="text-xs text-gray-400 mt-1"><span class="text-blue-400 font-bold">করণীয়:</span> {ma_action}</p>
+            <div class="bg-gray-800 p-4 rounded-lg border border-gray-700 flex flex-col justify-between">
+                <div>
+                    <div class="flex justify-between items-center mb-2">
+                        <h2 class="text-sm font-semibold text-gray-400">200W Moving Average</h2>
+                        <span class="text-xs font-bold px-2 py-1 rounded {ma_color.replace('text', 'bg').replace('500', '900')} {ma_color}">{ma_status}</span>
+                    </div>
+                    <p class="text-2xl font-bold text-white mb-2">${ma_200w:,}</p>
+                </div>
+                <p class="text-xs text-gray-400 mt-2 bg-gray-900 p-2 rounded"><span class="text-blue-400 font-bold">করণীয়:</span> {ma_action}</p>
             </div>
 
             <!-- Pi Cycle Top -->
-            <div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
-                <h2 class="text-sm font-semibold text-gray-400 mb-1">Pi Cycle Top Indicator</h2>
-                <p class="text-lg font-bold {pi_cycle_color}">{pi_cycle_status}</p>
-                <p class="text-xs text-gray-400 mt-1"><span class="text-blue-400 font-bold">করণীয়:</span> {pi_cycle_action}</p>
+            <div class="bg-gray-800 p-4 rounded-lg border border-gray-700 flex flex-col justify-between">
+                <div>
+                    <div class="flex justify-between items-center mb-2">
+                        <h2 class="text-sm font-semibold text-gray-400">Pi Cycle Top Indicator</h2>
+                        <span class="text-xs font-bold px-2 py-1 rounded {pi_cycle_color.replace('text', 'bg').replace('500', '900')} {pi_cycle_color}">{pi_cycle_status}</span>
+                    </div>
+                    <p class="text-sm text-gray-300 mb-2">সাইকেল টপ (বিক্রির সময়) বোঝার সূচক।</p>
+                </div>
+                <p class="text-xs text-gray-400 mt-2 bg-gray-900 p-2 rounded"><span class="text-blue-400 font-bold">করণীয়:</span> {pi_cycle_action}</p>
             </div>
 
             <!-- Weekly Outflows -->
-            <div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
-                <h2 class="text-sm font-semibold text-gray-400 mb-1">Weekly Market Outflows</h2>
-                <p class="text-lg font-bold {outflow_color}">${abs(weekly_outflow)}M ({outflow_status})</p>
-                <p class="text-xs text-gray-400 mt-1"><span class="text-blue-400 font-bold">করণীয়:</span> {outflow_action}</p>
+            <div class="bg-gray-800 p-4 rounded-lg border border-gray-700 flex flex-col justify-between">
+                <div>
+                    <div class="flex justify-between items-center mb-2">
+                        <h2 class="text-sm font-semibold text-gray-400">Weekly ETF Outflows</h2>
+                        <span class="text-xs font-bold px-2 py-1 rounded {outflow_color.replace('text', 'bg').replace('500', '900')} {outflow_color}">{outflow_status}</span>
+                    </div>
+                    <p class="text-2xl font-bold {outflow_color} mb-2">${abs(weekly_outflow)}M</p>
+                </div>
+                <p class="text-xs text-gray-400 mt-2 bg-gray-900 p-2 rounded"><span class="text-blue-400 font-bold">করণীয়:</span> {outflow_action}</p>
             </div>
 
             <!-- Fear & Greed Gauge -->
@@ -412,31 +427,28 @@ html_content += f"""
                     <div class="gauge-center-circle"></div>
                 </div>
                 
-                <div class="text-center mt-2">
-                    <p class="text-2xl font-bold {'text-green-500' if fng_val < 30 else 'text-red-500' if fng_val > 75 else 'text-yellow-500'}">{fng_val}</p>
-                    <p class="text-xs text-gray-400 mb-1">{fng_class}</p>
-                    <p class="text-xs text-gray-400 mt-2 px-2 py-1 bg-gray-900 rounded border border-gray-700"><span class="text-blue-400 font-bold">করণীয়:</span> {'চরম ভয়। ধীরে ধীরে কিনুন (DCA)।' if fng_val < 30 else 'অতিরিক্ত লোভ। সতর্ক থাকুন।' if fng_val > 75 else 'বাজার স্বাভাবিক। হোল্ড করুন।'}</p>
+                <div class="text-center mt-2 w-full">
+                    <p class="text-2xl font-bold {'text-green-500' if fng_val < 30 else 'text-red-500' if fng_val > 75 else 'text-yellow-500'}">{fng_val} - {fng_class}</p>
+                    <p class="text-xs text-gray-400 mt-2 bg-gray-900 p-2 rounded"><span class="text-blue-400 font-bold">করণীয়:</span> {'চরম ভয়। ধীরে ধীরে কিনুন (DCA)।' if fng_val < 30 else 'অতিরিক্ত লোভ। সতর্ক থাকুন।' if fng_val > 75 else 'বাজার স্বাভাবিক। হোল্ড করুন।'}</p>
                 </div>
             </div>
 
         </div>
 
-        <!-- Macro Insights & Actions -->
-        <div class="bg-gray-800 rounded-lg border border-gray-700 overflow-hidden mb-6">
-            <div class="p-4 bg-gray-700/50 border-b border-gray-600">
-                <h2 class="text-lg font-bold text-gray-200 text-center">MACRO INDICATORS & ACTIONS</h2>
-            </div>
-            <div class="p-4 space-y-4">
+        <!-- Macro Insights & Actions (CMC Style Cards) -->
+        <div class="bg-gray-800 rounded-lg border border-gray-700 p-4 mb-6">
+            <h2 class="text-lg font-bold text-gray-200 mb-4 text-center border-b border-gray-700 pb-2">MACRO INDICATORS & ACTIONS</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 """
 
 for macro in macro_insights:
     html_content += f"""
-                <div class="border-b border-gray-700 pb-3 last:border-0">
+                <div class="bg-gray-900 p-3 rounded-lg border border-gray-700">
                     <div class="flex justify-between items-center mb-1">
-                        <span class="font-semibold text-gray-300">{macro['name']}</span>
-                        <span class="font-bold {macro['color']}">{macro['value']} ({macro['status']})</span>
+                        <span class="text-sm font-semibold text-gray-300">{macro['name']}</span>
+                        <span class="text-xs font-bold px-2 py-1 rounded {macro['color'].replace('text', 'bg').replace('500', '900').replace('600', '900').replace('400', '900')} {macro['color']}">{macro['value']}</span>
                     </div>
-                    <p class="text-sm text-gray-400"><span class="text-blue-400 font-bold">করণীয়:</span> {macro['action']}</p>
+                    <p class="text-xs text-gray-400 mt-2"><span class="text-blue-400 font-bold">করণীয়:</span> {macro['action']}</p>
                 </div>
 """
 
@@ -463,7 +475,7 @@ html_content += f"""
                             <td class="px-3 py-3 font-medium text-white">BTC Price</td>
                             <td class="px-3 py-3">
                                 <div class="font-semibold">${btc_val:,}</div>
-                                <div class="text-xs text-gray-400 mt-1 italic">↳ বর্তমান মূল্য ট্র্যাক করুন।</div>
+                                <div class="text-xs text-gray-400 mt-1 italic">↳ করণীয়: বর্তমান মূল্য ট্র্যাক করুন।</div>
                             </td>
                             <td class="px-3 py-3 text-right font-bold text-orange-400">TRACKING</td>
                         </tr>
@@ -493,7 +505,6 @@ html_content += f"""
             <h2 class="text-lg font-bold text-gray-200 mb-4 text-center border-b border-gray-700 pb-2">MACRO & AI NEWS</h2>
             <ul class="space-y-4">
                 
-                <!-- MSCI News -->
                 <li class="flex items-start bg-red-900/20 p-3 rounded-lg border border-red-800">
                     <span class="text-red-400 mr-2 text-lg">🚨</span>
                     <div>
@@ -503,35 +514,6 @@ html_content += f"""
                     </div>
                 </li>
 
-                <!-- CPI News -->
                 <li class="flex items-start">
                     <span class="text-blue-400 mr-2 mt-1">📌</span>
-                    <div>
-                        <p class="font-semibold text-white">CPI Data Release</p>
-                        <p class="text-xs text-gray-400">Next release: Nov 15. Watch for lower inflation (Bullish for Crypto).</p>
-                    </div>
-                </li>
-
-                <!-- FOMC News -->
-                <li class="flex items-start">
-                    <span class="text-yellow-400 mr-2 mt-1">🏛️</span>
-                    <div>
-                        <p class="font-semibold text-white">FOMC Meeting</p>
-                        <p class="text-xs text-gray-400">Next meeting: Dec 12. Fed's stance on rate cuts is crucial.</p>
-                    </div>
-                </li>
-            </ul>
-        </div>
-        
-        <div class="mt-6 text-center text-xs text-gray-500">
-            Built for Long-Term Spot Trading. Keep patience.
-        </div>
-    </div>
-</body>
-</html>
-"""
-
-with open("index.html", "w", encoding="utf-8") as file:
-    file.write(html_content)
-
-print("Dashboard updated successfully! index.html created.")
+                    <div
