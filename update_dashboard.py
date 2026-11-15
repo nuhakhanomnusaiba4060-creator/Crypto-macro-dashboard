@@ -200,6 +200,14 @@ if mvrv_z != "N/A":
 else:
     mvrv_status = "N/A"; mvrv_color = "text-gray-500"; mvrv_action = "ডেটা লোড হয়নি।"
 
+# নতুন ভিজ্যুয়াল ডেটা (সিমুলেটেড)
+avg_rsi = 35.48
+macd_val = -0.46
+long_liq = 1.73
+short_liq = 0.25
+liq_ratio = (long_liq / (long_liq + short_liq)) * 100
+altcoin_index = 42
+
 # HTML জেনারেশন
 html_content = f"""
 <!DOCTYPE html>
@@ -302,6 +310,62 @@ html_content += """
             </div>
         </div>
 
+        <!-- NEW: CMC Style Visual Cards (RSI/MACD, Liquidations, Altseason) -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
+            
+            <!-- RSI & MACD -->
+            <div class="bg-gray-800 p-4 rounded-lg border border-gray-700 flex flex-col justify-between">
+                <div>
+                    <h2 class="text-xs font-semibold text-gray-400 mb-2">Average RSI</h2>
+                    <div class="flex items-end justify-between mb-2">
+                        <p class="text-3xl font-bold">""" + f"{avg_rsi}" + """</p>
+                        <span class="text-xs font-semibold px-2 py-1 rounded """ + f"{'bg-green-900 text-green-400' if avg_rsi < 40 else 'bg-red-900 text-red-400'}" + """">""" + f"{'Weak' if avg_rsi < 40 else 'Strong'}" + """</span>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <h2 class="text-xs font-semibold text-gray-400 mb-1">MACD</h2>
+                    <div class="flex items-center justify-between">
+                        <p class="text-xl font-bold">""" + f"{macd_val}" + """</p>
+                        <span class="text-xs font-semibold px-2 py-1 rounded bg-red-900 text-red-400">Negative</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Liquidations -->
+            <div class="bg-gray-800 p-4 rounded-lg border border-gray-700 md:col-span-2">
+                <h2 class="text-xs font-semibold text-gray-400 mb-2 flex items-center gap-1">Liquidations <span class="text-gray-500">ⓘ</span></h2>
+                <p class="text-2xl font-bold mb-3">$""" + f"{round(long_liq + short_liq, 2)}B" + """</p>
+                
+                <!-- Liquidation Bar -->
+                <div class="w-full flex h-2 rounded-full overflow-hidden mb-2">
+                    <div class="bg-green-500" style="width: """ + f"{liq_ratio}%" + """;"></div>
+                    <div class="bg-red-500" style="width: """ + f"{100 - liq_ratio}%" + """;"></div>
+                </div>
+                
+                <div class="flex justify-between text-xs font-semibold">
+                    <span class="text-green-500">Long $""" + f"{long_liq}B" + """</span>
+                    <span class="text-red-500">Short $""" + f"{short_liq}B" + """</span>
+                </div>
+            </div>
+
+            <!-- Altcoin Season Index -->
+            <div class="bg-gray-800 p-4 rounded-lg border border-gray-700 md:col-span-3">
+                <div class="flex justify-between items-center mb-2">
+                    <h2 class="text-xs font-semibold text-gray-400">Altcoin Season Index</h2>
+                    <span class="text-xl font-bold">""" + f"{altcoin_index}/100" + """</span>
+                </div>
+                <!-- Altseason Slider -->
+                <div class="w-full bg-gray-700 h-2 rounded-full relative">
+                    <div class="absolute top-0 left-0 h-2 rounded-full bg-gradient-to-r from-orange-500 via-yellow-500 to-blue-500 w-full"></div>
+                    <div class="absolute top-1/2 -translate-y-1/2 w-4 h-4 bg-white rounded-full border-2 border-gray-900 shadow" style="left: calc(""" + f"{altcoin_index}%" + """ - 8px);"></div>
+                </div>
+                <div class="flex justify-between text-xs text-gray-400 mt-2 font-semibold">
+                    <span>Bitcoin</span>
+                    <span>Altcoin</span>
+                </div>
+            </div>
+        </div>
+
         <!-- Weekly Outlook & Halving -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6">
             <div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
@@ -338,7 +402,7 @@ html_content += """
                 <p class="text-xs text-gray-400 mt-1"><span class="text-blue-400 font-bold">করণীয়:</span> """ + f"{outflow_action}" + """</p>
             </div>
 
-            <!-- Fear & Greed Gauge (নতুন ডিজাইন) -->
+            <!-- Fear & Greed Gauge -->
             <div class="bg-gray-800 p-4 rounded-lg border border-gray-700 flex flex-col items-center justify-between">
                 <h2 class="text-sm font-semibold text-gray-400 mb-2">Fear & Greed Index</h2>
                 
@@ -449,25 +513,4 @@ html_content += """
                 </li>
 
                 <!-- FOMC News -->
-                <li class="flex items-start">
-                    <span class="text-yellow-400 mr-2 mt-1">🏛️</span>
-                    <div>
-                        <p class="font-semibold text-white">FOMC Meeting</p>
-                        <p class="text-xs text-gray-400">Next meeting: Dec 12. Fed's stance on rate cuts is crucial.</p>
-                    </div>
-                </li>
-            </ul>
-        </div>
-        
-        <div class="mt-6 text-center text-xs text-gray-500">
-            Built for Long-Term Spot Trading. Keep patience.
-        </div>
-    </div>
-</body>
-</html>
-"""
-
-with open("index.html", "w", encoding="utf-8") as file:
-    file.write(html_content)
-
-print("Dashboard updated successfully! index.html created.")
+                <li class="flex
