@@ -516,4 +516,33 @@ html_content += f"""
 
                 <li class="flex items-start">
                     <span class="text-blue-400 mr-2 mt-1">📌</span>
-                    <div
+                    <div>
+                        <p class="font-semibold text-white">CPI Data Release</p>
+                        <p class="text-xs text-gray-400">Next release: Nov 15. Watch for lower inflation (Bullish for Crypto).</p>
+                        <p class="text-xs text-gray-400 mt-1"><span class="text-blue-400 font-bold">করণীয়:</span> সতর্ক থাকুন, ডেটা প্রকাশের সময় বাজারে বড় ওঠানামা হতে পারে।</p>
+                    </div>
+                </li>
+
+                <li class="flex items-start">
+                    <span class="text-yellow-400 mr-2 mt-1">🏛️</span>
+                    <div>
+                        <p class="font-semibold text-white">FOMC Meeting</p>
+                        <p class="text-xs text-gray-400">Next meeting: Dec 12. Fed's stance on rate cuts is crucial.</p>
+                        <p class="text-xs text-gray-400 mt-1"><span class="text-blue-400 font-bold">করণীয়:</span> ফেডের সিদ্ধান্তের আগে নতুন বড় পজিশন নেওয়া থেকে বিরত থাকুন।</p>
+                    </div>
+                </li>
+            </ul>
+        </div>
+        
+        <div class="mt-6 text-center text-xs text-gray-500">
+            Built for Long-Term Spot Trading. Keep patience.
+        </div>
+    </div>
+</body>
+</html>
+"""
+
+with open("index.html", "w", encoding="utf-8") as file:
+    file.write(html_content)
+
+print("Dashboard updated successfully! index.html created.")
