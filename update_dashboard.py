@@ -32,13 +32,14 @@ def get_crypto_global_data():
         global_res = requests.get("https://api.coingecko.com/api/v3/global").json()
         total_mcap = global_res['data']['total_market_cap']['usd'] / 1e12 
         btc_dominance = global_res['data']['market_cap_percentage']['btc']
+        eth_dominance = global_res['data']['market_cap_percentage']['eth']
         global_vol = global_res['data']['total_volume']['usd'] / 1e9
         
         stablecoin_mcap = 160.5 
         
-        return btc_price, round(total_mcap, 2), round(btc_dominance, 1), round(btc_vol, 1), round(global_vol, 1), stablecoin_mcap
+        return btc_price, round(total_mcap, 2), round(btc_dominance, 1), round(eth_dominance, 1), round(btc_vol, 1), round(global_vol, 1), stablecoin_mcap
     except:
-        return 0, 0.0, 0.0, 0.0, 0.0, 0.0
+        return 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0
 
 # ৪. ফান্ডিং রেট এবং ওপেন ইন্টারেস্ট
 def get_funding_and_oi():
@@ -136,7 +137,7 @@ vix_val = get_yahoo_price("%5EVIX")
 spx_val = get_yahoo_price("%5EGSPC")
 yield_10y = get_yahoo_price("%5ETNX")
 gold_val = get_yahoo_price("GC=F")
-btc_val, total_mcap_val, btc_dom_val, btc_vol_val, global_vol_val, stablecoin_mcap = get_crypto_global_data()
+btc_val, total_mcap_val, btc_dom_val, eth_dom_val, btc_vol_val, global_vol_val, stablecoin_mcap = get_crypto_global_data()
 funding_rate, open_interest = get_funding_and_oi()
 mvrv_z = get_mvrv_zscore(btc_val)
 
@@ -217,6 +218,7 @@ html_content = f"""
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Crypto Macro Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         /* Semi-circle Gauge CSS */
         .gauge-container {{
@@ -310,9 +312,9 @@ html_content += f"""
             </div>
         </div>
 
-        <!-- NEW: Live TradingView Chart -->
+        <!-- Live TradingView Chart -->
         <div class="bg-gray-800 rounded-lg border border-gray-700 p-2 mb-6">
-            <h2 class="text-sm font-semibold text-gray-400 px-2 mb-2">Live Market Cap Chart (BTC)</h2>
+            <h2 class="text-sm font-semibold text-gray-400 px-2 mb-2">Live Market Chart (BTC)</h2>
             <div class="tradingview-widget-container" style="height:250px; width:100%;">
                 <div id="tradingview_chart"></div>
                 <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
@@ -333,6 +335,31 @@ html_content += f"""
                   "container_id": "tradingview_chart"
                 }});
                 </script>
+            </div>
+        </div>
+
+        <!-- Dominance Pie Chart & ETF Bar Chart -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            <!-- BTC & ETH Dominance -->
+            <div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
+                <h2 class="text-sm font-semibold text-gray-400 mb-2">Market Dominance</h2>
+                <div class="flex items-center justify-between">
+                    <div class="w-1/2">
+                        <canvas id="dominanceChart"></canvas>
+                    </div>
+                    <div class="w-1/2 pl-4">
+                        <div class="flex items-center mb-2"><span class="w-3 h-3 bg-orange-500 rounded-full mr-2"></span><span class="text-sm font-semibold">BTC: {btc_dom_val}%</span></div>
+                        <div class="flex items-center"><span class="w-3 h-3 bg-blue-500 rounded-full mr-2"></span><span class="text-sm font-semibold">ETH: {eth_dom_val}%</span></div>
+                        <p class="text-xs text-gray-400 mt-3"><span class="text-blue-400 font-bold">করণীয়:</span> BTC ডমিনেন্স বেশি মানে বাজার বিটকয়েন সিজনে আছে।</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ETF Tracker Bar Chart (Demo Data) -->
+            <div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
+                <h2 class="text-sm font-semibold text-gray-400 mb-2">ETF Flows (Last 7 Days)</h2>
+                <canvas id="etfChart" height="100"></canvas>
+                <p class="text-xs text-gray-400 mt-2"><span class="text-blue-400 font-bold">করণীয়:</span> লাল বার মানে আউটফ্লো। সতর্ক থাকুন।</p>
             </div>
         </div>
 
@@ -541,6 +568,46 @@ html_content += f"""
             Built for Long-Term Spot Trading. Keep patience.
         </div>
     </div>
+
+    <!-- Chart.js Scripts for Pie and Bar Charts -->
+    <script>
+        // Dominance Pie Chart
+        const ctxDom = document.getElementById('dominanceChart').getContext('2d');
+        new Chart(ctxDom, {{
+            type: 'doughnut',
+            data: {{
+                labels: ['BTC', 'ETH', 'Others'],
+                datasets: [{{
+                    data: [{btc_dom_val}, {eth_dom_val}, {100 - btc_dom_val - eth_dom_val}],
+                    backgroundColor: ['#f97316', '#3b82f6', '#4b5563'],
+                    borderWidth: 0
+                }}]
+            }},
+            options: {{
+                cutout: '70%',
+                plugins: {{ legend: {{ display: false }} }}
+            }}
+        }});
+
+        // ETF Bar Chart (Demo Data)
+        const ctxEtf = document.getElementById('etfChart').getContext('2d');
+        new Chart(ctxEtf, {{
+            type: 'bar',
+            data: {{
+                labels: ['Day 1', 'Day 2', 'Day 3', 'Day 4', 'Day 5', 'Day 6', 'Today'],
+                datasets: [{{
+                    label: 'ETF Flow (M$)',
+                    data: [120, -50, 200, -180, 80, 150, -120],
+                    backgroundColor: ['#10b981', '#ef4444', '#10b981', '#ef4444', '#10b981', '#10b981', '#ef4444'],
+                    borderRadius: 4
+                }}]
+            }},
+            options: {{
+                plugins: {{ legend: {{ display: false }} }},
+                scales: {{ x: {{ display: false }}, y: {{ display: false }} }}
+            }}
+        }});
+    </script>
 </body>
 </html>
 """
