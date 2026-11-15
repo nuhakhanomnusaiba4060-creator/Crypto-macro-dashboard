@@ -16,7 +16,6 @@ def get_yahoo_price(symbol):
         headers = {'User-Agent': 'Mozilla/5.0'}
         res = requests.get(url, headers=headers).json()
         price = res['chart']['result'][0]['meta']['regularMarketPrice']
-        # TNX এর ক্ষেত্রে ভ্যালু ১০ দিয়ে ভাগ করতে হয় (যেমন: 42.5 -> 4.25)
         if symbol == "%5ETNX":
             return round(price / 10, 2)
         return round(price, 2)
@@ -95,7 +94,6 @@ def get_macro_insights(vix, spx, oil, gold, yield_10y):
         elif oil < 70: oil_status, oil_color, oil_action = "DISINFLATION", "text-green-500", "তেলের দাম কম। মুদ্রাস্ফীতি কমার ইঙ্গিত (বুলিশ)।"
     insights.append({"name": "Oil (WTI)", "value": f"${oil}", "status": oil_status, "color": oil_color, "action": oil_action})
 
-    # 10Y Yield Logic (নতুন)
     yield_status = "NEUTRAL"; yield_color = "text-yellow-500"; yield_action = "ইল্ড স্বাভাবিক।"
     if yield_10y != "N/A":
         if yield_10y > 5.0: yield_status, yield_color, yield_action = "HIGH YIELD", "text-red-500", "ইল্ড ৫% এর উপরে। বাজারে তারল্য সংকুচিত হচ্ছে, ক্রিপ্টোর জন্য নেতিবাচক।"
@@ -136,7 +134,7 @@ dxy_val = get_yahoo_price("DX-Y.NYB")
 oil_val = get_yahoo_price("CL=F")
 vix_val = get_yahoo_price("%5EVIX")
 spx_val = get_yahoo_price("%5EGSPC")
-yield_10y = get_yahoo_price("%5ETNX") # নতুন: US 10Y Yield
+yield_10y = get_yahoo_price("%5ETNX")
 gold_val = get_yahoo_price("GC=F")
 btc_val, total_mcap_val, btc_dom_val, btc_vol_val, global_vol_val, stablecoin_mcap = get_crypto_global_data()
 funding_rate, open_interest = get_funding_and_oi()
@@ -211,6 +209,51 @@ html_content = f"""
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Crypto Macro Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Semi-circle Gauge CSS */
+        .gauge-container {{
+            position: relative;
+            width: 160px;
+            height: 80px;
+            overflow: hidden;
+            margin: 0 auto;
+        }}
+        .gauge-background {{
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 160px;
+            height: 160px;
+            border-radius: 50%;
+            background: conic-gradient(from 270deg, #ef4444 0%, #f59e0b 25%, #10b981 50%, #10b981 75%, #ef4444 100%);
+            mask: radial-gradient(circle at 50% 100%, transparent 55px, black 56px);
+            -webkit-mask: radial-gradient(circle at 50% 100%, transparent 55px, black 56px);
+        }}
+        .gauge-needle {{
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 4px;
+            height: 60px;
+            background-color: white;
+            transform-origin: bottom center;
+            transform: rotate({-90 + (fng_val * 1.8)}deg);
+            transition: transform 1s ease-out;
+            border-radius: 4px 4px 0 0;
+            z-index: 10;
+        }}
+        .gauge-center-circle {{
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 20px;
+            background-color: white;
+            border-radius: 50%;
+            z-index: 11;
+        }}
+    </style>
 </head>
 <body class="bg-gray-900 text-white font-sans p-4">
     <div class="max-w-5xl mx-auto">
@@ -295,41 +338,21 @@ html_content += """
                 <p class="text-xs text-gray-400 mt-1"><span class="text-blue-400 font-bold">করণীয়:</span> """ + f"{outflow_action}" + """</p>
             </div>
 
-            <!-- Fear & Greed Gauge -->
-            <div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
-                <h2 class="text-sm font-semibold text-gray-400 mb-2">Fear & Greed</h2>
-                <div class="w-full bg-gray-700 rounded-full h-2.5 mb-1">
-                    <div class="h-2.5 rounded-full """ + f"{'bg-green-500' if fng_val < 30 else 'bg-red-500' if fng_val > 75 else 'bg-yellow-500'}" + """" style="width: """ + f"{fng_val}%" + """"></div>
+            <!-- Fear & Greed Gauge (নতুন ডিজাইন) -->
+            <div class="bg-gray-800 p-4 rounded-lg border border-gray-700 flex flex-col items-center justify-between">
+                <h2 class="text-sm font-semibold text-gray-400 mb-2">Fear & Greed Index</h2>
+                
+                <div class="gauge-container">
+                    <div class="gauge-background"></div>
+                    <div class="gauge-needle"></div>
+                    <div class="gauge-center-circle"></div>
                 </div>
-                <p class="text-xs text-gray-400"><span class="text-blue-400 font-bold">করণীয়:</span> """ + f"{'চরম ভয়। ধীরে ধীরে কিনুন (DCA)।' if fng_val < 30 else 'অতিরিক্ত লোভ। সতর্ক থাকুন।' if fng_val > 75 else 'বাজার স্বাভাবিক। হোল্ড করুন।'}" + """</p>
-            </div>
-
-            <!-- Stablecoin Market Cap -->
-            <div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
-                <h2 class="text-sm font-semibold text-gray-400 mb-1">Stablecoin Market Cap</h2>
-                <p class="text-lg font-bold text-blue-400">$""" + f"{stablecoin_mcap}B" + """</p>
-                <p class="text-xs text-gray-400 mt-1"><span class="text-blue-400 font-bold">করণীয়:</span> স্টেবলকয়েন বাড়ছে—বাজারে নতুন টাকা ঢুকছে, বুলিশ।</p>
-            </div>
-
-            <!-- Funding Rate -->
-            <div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
-                <h2 class="text-sm font-semibold text-gray-400 mb-1">Funding Rate (Binance)</h2>
-                <p class="text-lg font-bold """ + f"{funding_color}" + """">""" + f"{funding_rate}% ({funding_status})" + """</p>
-                <p class="text-xs text-gray-400 mt-1"><span class="text-blue-400 font-bold">করণীয়:</span> """ + f"{funding_action}" + """</p>
-            </div>
-
-            <!-- Open Interest -->
-            <div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
-                <h2 class="text-sm font-semibold text-gray-400 mb-1">Open Interest (BTC)</h2>
-                <p class="text-lg font-bold text-orange-400">""" + f"{open_interest:,} BTC" + """</p>
-                <p class="text-xs text-gray-400 mt-1"><span class="text-blue-400 font-bold">করণীয়:</span> ফিউচার মার্কেটে মোট খোলা পজিশন। বেশি হলে ভোলাটিলিটি বাড়তে পারে।</p>
-            </div>
-
-            <!-- MVRV Z-Score -->
-            <div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
-                <h2 class="text-sm font-semibold text-gray-400 mb-1">MVRV Z-Score (Est.)</h2>
-                <p class="text-lg font-bold """ + f"{mvrv_color}" + """">""" + f"{mvrv_z} ({mvrv_status})" + """</p>
-                <p class="text-xs text-gray-400 mt-1"><span class="text-blue-400 font-bold">করণীয়:</span> """ + f"{mvrv_action}" + """</p>
+                
+                <div class="text-center mt-2">
+                    <p class="text-2xl font-bold """ + f"{'text-green-500' if fng_val < 30 else 'text-red-500' if fng_val > 75 else 'text-yellow-500'}" + """">""" + f"{fng_val}" + """</p>
+                    <p class="text-xs text-gray-400 mb-1">""" + f"{fng_class}" + """</p>
+                    <p class="text-xs text-gray-400 mt-2 px-2 py-1 bg-gray-900 rounded border border-gray-700"><span class="text-blue-400 font-bold">করণীয়:</span> """ + f"{'চরম ভয়। ধীরে ধীরে কিনুন (DCA)।' if fng_val < 30 else 'অতিরিক্ত লোভ। সতর্ক থাকুন।' if fng_val > 75 else 'বাজার স্বাভাবিক। হোল্ড করুন।'}" + """</p>
+                </div>
             </div>
 
         </div>
