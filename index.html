@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Crypto Macro Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         /* Semi-circle Gauge CSS */
         .gauge-container {
@@ -55,7 +56,7 @@
 <body class="bg-gray-900 text-white font-sans p-4">
     <div class="max-w-5xl mx-auto">
         <h1 class="text-2xl font-bold mb-1 text-center text-blue-400">My Crypto Spot Dashboard</h1>
-        <p class="text-center text-gray-400 mb-6 text-sm">Last Updated: 2026-11-15 08:21 (UTC)</p>
+        <p class="text-center text-gray-400 mb-6 text-sm">Last Updated: 2026-11-15 08:46 (UTC)</p>
 
         <!-- Alert Section -->
 <div class="mb-6 space-y-2">
@@ -71,11 +72,11 @@
         <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
             <div class="bg-gray-800 p-3 rounded-lg border border-gray-700 text-center flex flex-col justify-center">
                 <p class="text-xs text-gray-400">BTC Dominance</p>
-                <p class="text-xl font-bold text-orange-400">58.5%</p>
+                <p class="text-xl font-bold text-orange-400">58.7%</p>
             </div>
             <div class="bg-gray-800 p-3 rounded-lg border border-gray-700 text-center flex flex-col justify-center">
                 <p class="text-xs text-gray-400">Total Market Cap</p>
-                <p class="text-xl font-bold text-blue-400">$2.19T</p>
+                <p class="text-xl font-bold text-blue-400">$2.21T</p>
             </div>
             <div class="bg-gray-800 p-3 rounded-lg border border-gray-700 text-center flex flex-col justify-center">
                 <p class="text-xs text-gray-400">Market Trend</p>
@@ -83,13 +84,13 @@
             </div>
             <div class="bg-gray-800 p-3 rounded-lg border border-gray-700 text-center flex flex-col justify-center">
                 <p class="text-xs text-gray-400">Global Volume 24h</p>
-                <p class="text-xl font-bold text-green-500">$117.0B</p>
+                <p class="text-xl font-bold text-green-500">$119.2B</p>
             </div>
         </div>
 
-        <!-- NEW: Live TradingView Chart -->
+        <!-- Live TradingView Chart -->
         <div class="bg-gray-800 rounded-lg border border-gray-700 p-2 mb-6">
-            <h2 class="text-sm font-semibold text-gray-400 px-2 mb-2">Live Market Cap Chart (BTC)</h2>
+            <h2 class="text-sm font-semibold text-gray-400 px-2 mb-2">Live Market Chart (BTC)</h2>
             <div class="tradingview-widget-container" style="height:250px; width:100%;">
                 <div id="tradingview_chart"></div>
                 <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
@@ -110,6 +111,31 @@
                   "container_id": "tradingview_chart"
                 });
                 </script>
+            </div>
+        </div>
+
+        <!-- Dominance Pie Chart & ETF Bar Chart -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            <!-- BTC & ETH Dominance -->
+            <div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
+                <h2 class="text-sm font-semibold text-gray-400 mb-2">Market Dominance</h2>
+                <div class="flex items-center justify-between">
+                    <div class="w-1/2">
+                        <canvas id="dominanceChart"></canvas>
+                    </div>
+                    <div class="w-1/2 pl-4">
+                        <div class="flex items-center mb-2"><span class="w-3 h-3 bg-orange-500 rounded-full mr-2"></span><span class="text-sm font-semibold">BTC: 58.7%</span></div>
+                        <div class="flex items-center"><span class="w-3 h-3 bg-blue-500 rounded-full mr-2"></span><span class="text-sm font-semibold">ETH: 9.9%</span></div>
+                        <p class="text-xs text-gray-400 mt-3"><span class="text-blue-400 font-bold">করণীয়:</span> BTC ডমিনেন্স বেশি মানে বাজার বিটকয়েন সিজনে আছে।</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ETF Tracker Bar Chart (Demo Data) -->
+            <div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
+                <h2 class="text-sm font-semibold text-gray-400 mb-2">ETF Flows (Last 7 Days)</h2>
+                <canvas id="etfChart" height="100"></canvas>
+                <p class="text-xs text-gray-400 mt-2"><span class="text-blue-400 font-bold">করণীয়:</span> লাল বার মানে আউটফ্লো। সতর্ক থাকুন।</p>
             </div>
         </div>
 
@@ -284,7 +310,7 @@
                         <tr class="border-b border-gray-700 hover:bg-gray-750">
                             <td class="px-3 py-3 font-medium text-white">BTC Price</td>
                             <td class="px-3 py-3">
-                                <div class="font-semibold">$63,913</div>
+                                <div class="font-semibold">$64,729</div>
                                 <div class="text-xs text-gray-400 mt-1 italic">↳ করণীয়: বর্তমান মূল্য ট্র্যাক করুন।</div>
                             </td>
                             <td class="px-3 py-3 text-right font-bold text-orange-400">TRACKING</td>
@@ -345,5 +371,45 @@
             Built for Long-Term Spot Trading. Keep patience.
         </div>
     </div>
+
+    <!-- Chart.js Scripts for Pie and Bar Charts -->
+    <script>
+        // Dominance Pie Chart
+        const ctxDom = document.getElementById('dominanceChart').getContext('2d');
+        new Chart(ctxDom, {
+            type: 'doughnut',
+            data: {
+                labels: ['BTC', 'ETH', 'Others'],
+                datasets: [{
+                    data: [58.7, 9.9, 31.4],
+                    backgroundColor: ['#f97316', '#3b82f6', '#4b5563'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                cutout: '70%',
+                plugins: { legend: { display: false } }
+            }
+        });
+
+        // ETF Bar Chart (Demo Data)
+        const ctxEtf = document.getElementById('etfChart').getContext('2d');
+        new Chart(ctxEtf, {
+            type: 'bar',
+            data: {
+                labels: ['Day 1', 'Day 2', 'Day 3', 'Day 4', 'Day 5', 'Day 6', 'Today'],
+                datasets: [{
+                    label: 'ETF Flow (M$)',
+                    data: [120, -50, 200, -180, 80, 150, -120],
+                    backgroundColor: ['#10b981', '#ef4444', '#10b981', '#ef4444', '#10b981', '#10b981', '#ef4444'],
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                plugins: { legend: { display: false } },
+                scales: { x: { display: false }, y: { display: false } }
+            }
+        });
+    </script>
 </body>
 </html>
