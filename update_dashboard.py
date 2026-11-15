@@ -118,22 +118,15 @@ def get_macro_insights(vix, spx, oil, gold, yield_10y, dxy):
     
     return insights
 
-# ৮. ইভেন্ট অ্যালার্ট
+# ৮. ইভেন্ট অ্যালার্ট (শুধু VIX এবং Fear & Greed থাকবে)
 def get_event_alerts(fng, vix):
-    today = datetime.date.today()
-    events = {
-        "US CPI Data": datetime.date(2026, 11, 15), 
-        "FOMC Meeting": datetime.date(2026, 12, 12),
-        "NFP Jobs Report": datetime.date(2026, 12, 6)
-    }
     alerts = []
-    for name, date in events.items():
-        days_left = (date - today).days
-        if 0 <= days_left <= 7:
-            if days_left <= 3: alerts.append({"msg": f"🚨 সতর্কতা: {name} মাত্র {days_left} দিন বাকি! বাজার অস্থির হতে পারে।", "color": "bg-red-900/60 border-red-500 text-red-200"})
-            else: alerts.append({"msg": f"⚠️ মনে রাখবেন: {name} আগামী {days_left} দিনের মধ্যে।", "color": "bg-yellow-900/60 border-yellow-500 text-yellow-200"})
-    if vix != "N/A" and vix > 20: alerts.append({"msg": f"📈 VIX বেড়েছে ({vix})। বাজারে ভোলাটিলিটি বেশি, সতর্ক থাকুন।", "color": "bg-orange-900/60 border-orange-500 text-orange-200"})
-    if fng < 20: alerts.append({"msg": f"🩸 বাজারে চরম ভয় ({fng})। DCA করার সুযোগ হতে পারে।", "color": "bg-green-900/60 border-green-500 text-green-200"})
+    if vix != "N/A" and vix > 20: 
+        alerts.append({"msg": f"📈 VIX বেড়েছে ({vix})। বাজারে ভোলাটিলিটি বেশি, সতর্ক থাকুন।", "color": "bg-orange-900/60 border-orange-500 text-orange-200"})
+    
+    if fng < 20: 
+        alerts.append({"msg": f"🩸 বাজারে চরম ভয় ({fng})। DCA করার সুযোগ হতে পারে।", "color": "bg-green-900/60 border-green-500 text-green-200"})
+    
     return alerts
 
 # ৯. হালভিং কাউন্টডাউন
@@ -424,12 +417,12 @@ html_content += f"""
             </div>
         </div>
 
-        <!-- Macro News Section (With Stablecoin News) -->
+        <!-- Macro News Section -->
         <div class="bg-gray-800 rounded-lg border border-gray-700 p-4 mb-6">
             <h2 class="text-lg font-bold text-gray-200 mb-4 text-center border-b border-gray-700 pb-2">MACRO & AI NEWS</h2>
             <ul class="space-y-4">
                 
-                <!-- Stablecoin News (New) -->
+                <!-- Stablecoin News -->
                 <li class="flex items-start bg-red-900/20 p-3 rounded-lg border border-red-800">
                     <span class="text-red-400 mr-2 text-lg">🩸</span>
                     <div>
@@ -454,7 +447,7 @@ html_content += f"""
                     <span class="text-blue-400 mr-2 mt-1">📌</span>
                     <div>
                         <p class="font-semibold text-white">CPI Data Release</p>
-                        <p class="text-xs text-gray-400">Next release: Nov 15. Watch for lower inflation (Bullish for Crypto).</p>
+                        <p class="text-xs text-gray-400">Next release: Watch for lower inflation (Bullish for Crypto).</p>
                         <p class="text-xs text-gray-400 mt-1"><span class="text-blue-400 font-bold">করণীয়:</span> সতর্ক থাকুন, ডেটা প্রকাশের সময় বাজারে বড় ওঠানামা হতে পারে।</p>
                     </div>
                 </li>
@@ -464,7 +457,7 @@ html_content += f"""
                     <span class="text-yellow-400 mr-2 mt-1">🏛️</span>
                     <div>
                         <p class="font-semibold text-white">FOMC Meeting</p>
-                        <p class="text-xs text-gray-400">Next meeting: Dec 12. Fed's stance on rate cuts is crucial.</p>
+                        <p class="text-xs text-gray-400">Next meeting: Check Economic Calendar. Fed's stance on rate cuts is crucial.</p>
                         <p class="text-xs text-gray-400 mt-1"><span class="text-blue-400 font-bold">করণীয়:</span> ফেডের সিদ্ধান্তের আগে নতুন বড় পজিশন নেওয়া থেকে বিরত থাকুন।</p>
                     </div>
                 </li>
