@@ -79,29 +79,43 @@ def get_cycle_stage(fng, dxy):
         return "NEUTRAL / GRINDING", "text-yellow-500"
 
 # ৭. ম্যাক্রো লজিক
-def get_macro_insights(vix, spx, oil, gold, yield_10y):
+def get_macro_insights(vix, spx, oil, gold, yield_10y, dxy):
     insights = []
+    
+    # DXY
+    dxy_status = "NEUTRAL"; dxy_color = "text-yellow-500"; dxy_action = "ডলার ইনডেক্স স্বাভাবিক।"
+    if dxy != "N/A":
+        if dxy > 105: dxy_status, dxy_color, dxy_action = "BEARISH", "text-red-500", "ডলার শক্তিশালী, ক্রিপ্টোর জন্য খারাপ।"
+        elif dxy < 100: dxy_status, dxy_color, dxy_action = "BULLISH", "text-green-500", "ডলার দুর্বল, ক্রিপ্টোর জন্য ভালো।"
+    insights.append({"name": "Dollar Index (DXY)", "value": dxy, "status": dxy_status, "color": dxy_color, "action": dxy_action})
+
+    # VIX
     vix_status = "NEUTRAL"; vix_color = "text-yellow-500"; vix_action = "বাজার স্থিতিশীল।"
     if vix != "N/A":
         if vix > 25: vix_status, vix_color, vix_action = "HIGH RISK", "text-red-500", "ভোলাটিলিটি বেশি। নতুন কেনা থেকে বিরত থাকুন।"
         elif vix < 15: vix_status, vix_color, vix_action = "LOW RISK", "text-green-500", "বাজারে ভয় নেই, রিস্ক-অন পরিবেশ।"
     insights.append({"name": "VIX (Volatility)", "value": vix, "status": vix_status, "color": vix_color, "action": vix_action})
 
+    # S&P 500
     insights.append({"name": "S&P 500", "value": spx, "status": "TRACKING", "color": "text-blue-400", "action": "স্টক মার্কেট বাড়লে ক্রিপ্টোও বাড়ে (Risk-on)।"})
 
+    # Oil
     oil_status = "NEUTRAL"; oil_color = "text-yellow-500"; oil_action = "তেলের দাম স্বাভাবিক।"
     if oil != "N/A":
         if oil > 85: oil_status, oil_color, oil_action = "INFLATION RISK", "text-red-500", "তেলের দাম বেশি। CPI বাড়তে পারে (বেয়ারিশ)।"
         elif oil < 70: oil_status, oil_color, oil_action = "DISINFLATION", "text-green-500", "তেলের দাম কম। মুদ্রাস্ফীতি কমার ইঙ্গিত (বুলিশ)।"
     insights.append({"name": "Oil (WTI)", "value": f"${oil}", "status": oil_status, "color": oil_color, "action": oil_action})
 
+    # US 10Y Yield
     yield_status = "NEUTRAL"; yield_color = "text-yellow-500"; yield_action = "ইল্ড স্বাভাবিক।"
     if yield_10y != "N/A":
         if yield_10y > 5.0: yield_status, yield_color, yield_action = "HIGH YIELD", "text-red-500", "ইল্ড ৫% এর উপরে। বাজারে তারল্য সংকুচিত হচ্ছে, ক্রিপ্টোর জন্য নেতিবাচক।"
         elif yield_10y < 4.5: yield_status, yield_color, yield_action = "LOW YIELD", "text-green-500", "ইল্ড ৪.৫% এর নিচে। বাজারে টাকা সহজলভ্য, ক্রিপ্টোর জন্য ইতিবাচক।"
     insights.append({"name": "US 10Y Treasury Yield", "value": f"{yield_10y}%", "status": yield_status, "color": yield_color, "action": yield_action})
 
+    # Gold
     insights.append({"name": "Gold", "value": f"${gold}", "status": "SAFE HAVEN", "color": "text-yellow-600", "action": "সোনার দাম বাড়লে বিনিয়োগকারীরা ঝুঁকি এড়াতে চাইছে।"})
+    
     return insights
 
 # ৮. ইভেন্ট অ্যালার্ট
@@ -142,7 +156,7 @@ funding_rate, open_interest = get_funding_and_oi()
 mvrv_z = get_mvrv_zscore(btc_val)
 
 cycle_text, cycle_color = get_cycle_stage(fng_val, dxy_val)
-macro_insights = get_macro_insights(vix_val, spx_val, oil_val, gold_val, yield_10y)
+macro_insights = get_macro_insights(vix_val, spx_val, oil_val, gold_val, yield_10y, dxy_val)
 alerts = get_event_alerts(fng_val, vix_val)
 halving_text = get_halving_countdown()
 current_date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
@@ -220,49 +234,10 @@ html_content = f"""
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        /* Semi-circle Gauge CSS */
-        .gauge-container {{
-            position: relative;
-            width: 160px;
-            height: 80px;
-            overflow: hidden;
-            margin: 0 auto;
-        }}
-        .gauge-background {{
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 160px;
-            height: 160px;
-            border-radius: 50%;
-            background: conic-gradient(from 270deg, #ef4444 0%, #f59e0b 25%, #10b981 50%, #10b981 75%, #ef4444 100%);
-            mask: radial-gradient(circle at 50% 100%, transparent 55px, black 56px);
-            -webkit-mask: radial-gradient(circle at 50% 100%, transparent 55px, black 56px);
-        }}
-        .gauge-needle {{
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            width: 4px;
-            height: 60px;
-            background-color: white;
-            transform-origin: bottom center;
-            transform: rotate({-90 + (fng_val * 1.8)}deg);
-            transition: transform 1s ease-out;
-            border-radius: 4px 4px 0 0;
-            z-index: 10;
-        }}
-        .gauge-center-circle {{
-            position: absolute;
-            bottom: -10px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 20px;
-            height: 20px;
-            background-color: white;
-            border-radius: 50%;
-            z-index: 11;
-        }}
+        .gauge-container {{ position: relative; width: 160px; height: 80px; overflow: hidden; margin: 0 auto; }}
+        .gauge-background {{ position: absolute; top: 0; left: 0; width: 160px; height: 160px; border-radius: 50%; background: conic-gradient(from 270deg, #ef4444 0%, #f59e0b 25%, #10b981 50%, #10b981 75%, #ef4444 100%); mask: radial-gradient(circle at 50% 100%, transparent 55px, black 56px); -webkit-mask: radial-gradient(circle at 50% 100%, transparent 55px, black 56px); }}
+        .gauge-needle {{ position: absolute; bottom: 0; left: 50%; width: 4px; height: 60px; background-color: white; transform-origin: bottom center; transform: rotate({-90 + (fng_val * 1.8)}deg); transition: transform 1s ease-out; border-radius: 4px 4px 0 0; z-index: 10; }}
+        .gauge-center-circle {{ position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%); width: 20px; height: 20px; background-color: white; border-radius: 50%; z-index: 11; }}
     </style>
 </head>
 <body class="bg-gray-900 text-white font-sans p-4">
@@ -276,11 +251,7 @@ html_content = f"""
 if alerts:
     html_content += """<div class="mb-6 space-y-2">"""
     for alert in alerts:
-        html_content += f"""
-            <div class="p-3 rounded-lg border {alert['color']} text-sm font-semibold shadow-lg">
-                {alert['msg']}
-            </div>
-        """
+        html_content += f"""<div class="p-3 rounded-lg border {alert['color']} text-sm font-semibold shadow-lg">{alert['msg']}</div>"""
     html_content += """</div>"""
 else:
     html_content += """
@@ -320,19 +291,10 @@ html_content += f"""
                 <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
                 <script type="text/javascript">
                 new TradingView.widget({{
-                  "width": "100%",
-                  "height": 250,
-                  "symbol": "BINANCE:BTCUSDT",
-                  "interval": "60",
-                  "timezone": "Etc/UTC",
-                  "theme": "dark",
-                  "style": "1",
-                  "locale": "en",
-                  "toolbar_bg": "#f1f3f6",
-                  "enable_publishing": false,
-                  "hide_side_toolbar": true,
-                  "allow_symbol_change": false,
-                  "container_id": "tradingview_chart"
+                  "width": "100%", "height": 250, "symbol": "BINANCE:BTCUSDT", "interval": "60",
+                  "timezone": "Etc/UTC", "theme": "dark", "style": "1", "locale": "en",
+                  "toolbar_bg": "#f1f3f6", "enable_publishing": false, "hide_side_toolbar": true,
+                  "allow_symbol_change": false, "container_id": "tradingview_chart"
                 }});
                 </script>
             </div>
@@ -344,9 +306,7 @@ html_content += f"""
             <div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
                 <h2 class="text-sm font-semibold text-gray-400 mb-2">Market Dominance</h2>
                 <div class="flex items-center justify-between">
-                    <div class="w-1/2">
-                        <canvas id="dominanceChart"></canvas>
-                    </div>
+                    <div class="w-1/2"><canvas id="dominanceChart"></canvas></div>
                     <div class="w-1/2 pl-4">
                         <div class="flex items-center mb-2"><span class="w-3 h-3 bg-orange-500 rounded-full mr-2"></span><span class="text-sm font-semibold">BTC: {btc_dom_val}%</span></div>
                         <div class="flex items-center"><span class="w-3 h-3 bg-blue-500 rounded-full mr-2"></span><span class="text-sm font-semibold">ETH: {eth_dom_val}%</span></div>
@@ -354,7 +314,6 @@ html_content += f"""
                     </div>
                 </div>
             </div>
-
             <!-- ETF Tracker Bar Chart (Demo Data) -->
             <div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
                 <h2 class="text-sm font-semibold text-gray-400 mb-2">ETF Flows (Last 7 Days)</h2>
@@ -363,112 +322,52 @@ html_content += f"""
             </div>
         </div>
 
-        <!-- CMC Style Visual Cards (RSI/MACD, Liquidations, Altseason) -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
-            <!-- RSI & MACD -->
-            <div class="bg-gray-800 p-4 rounded-lg border border-gray-700 flex flex-col justify-between">
-                <div>
-                    <h2 class="text-xs font-semibold text-gray-400 mb-2">Average RSI</h2>
-                    <div class="flex items-end justify-between mb-2">
-                        <p class="text-3xl font-bold">{avg_rsi}</p>
-                        <span class="text-xs font-semibold px-2 py-1 rounded {'bg-green-900 text-green-400' if avg_rsi < 40 else 'bg-red-900 text-red-400'}">{'Weak' if avg_rsi < 40 else 'Strong'}</span>
-                    </div>
-                </div>
-                <div class="mt-3">
-                    <h2 class="text-xs font-semibold text-gray-400 mb-1">MACD</h2>
-                    <div class="flex items-center justify-between">
-                        <p class="text-xl font-bold">{macd_val}</p>
-                        <span class="text-xs font-semibold px-2 py-1 rounded bg-red-900 text-red-400">Negative</span>
-                    </div>
-                </div>
-            </div>
-            <!-- Liquidations -->
-            <div class="bg-gray-800 p-4 rounded-lg border border-gray-700 md:col-span-2">
-                <h2 class="text-xs font-semibold text-gray-400 mb-2 flex items-center gap-1">Liquidations <span class="text-gray-500">ⓘ</span></h2>
-                <p class="text-2xl font-bold mb-3">${round(long_liq + short_liq, 2)}B</p>
-                <div class="w-full flex h-2 rounded-full overflow-hidden mb-2">
-                    <div class="bg-green-500" style="width: {liq_ratio}%;"></div>
-                    <div class="bg-red-500" style="width: {100 - liq_ratio}%;"></div>
-                </div>
-                <div class="flex justify-between text-xs font-semibold">
-                    <span class="text-green-500">Long ${long_liq}B</span>
-                    <span class="text-red-500">Short ${short_liq}B</span>
-                </div>
-                <p class="text-xs text-gray-400 mt-2 bg-gray-900 p-2 rounded"><span class="text-blue-400 font-bold">করণীয়:</span> লিকুইডেশন বেশি হলে বাজার অস্থির। সতর্ক থাকুন।</p>
-            </div>
-            <!-- Altcoin Season Index -->
-            <div class="bg-gray-800 p-4 rounded-lg border border-gray-700 md:col-span-3">
-                <div class="flex justify-between items-center mb-2">
-                    <h2 class="text-xs font-semibold text-gray-400">Altcoin Season Index</h2>
-                    <span class="text-xl font-bold">{altcoin_index}/100</span>
-                </div>
-                <div class="w-full bg-gray-700 h-2 rounded-full relative">
-                    <div class="absolute top-0 left-0 h-2 rounded-full bg-gradient-to-r from-orange-500 via-yellow-500 to-blue-500 w-full"></div>
-                    <div class="absolute top-1/2 -translate-y-1/2 w-4 h-4 bg-white rounded-full border-2 border-gray-900 shadow" style="left: calc({altcoin_index}% - 8px);"></div>
-                </div>
-                <div class="flex justify-between text-xs text-gray-400 mt-2 font-semibold">
-                    <span>Bitcoin</span>
-                    <span>Altcoin</span>
-                </div>
-                <p class="text-xs text-gray-400 mt-2 bg-gray-900 p-2 rounded"><span class="text-blue-400 font-bold">করণীয়:</span> ৪২/১০০ মানে বাজার বিটকয়েন সিজনে আছে। অল্টকয়েনে বিনিয়োগে সতর্ক থাকুন।</p>
-            </div>
-        </div>
-
-        <!-- Advanced On-Chain & Cycle Indicators (Grid Cards) -->
+        <!-- Advanced Technical Indicators (RSI, MACD, 200W MA, Pi Cycle) -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
             
-            <!-- 200W MA -->
-            <div class="bg-gray-800 p-4 rounded-lg border border-gray-700 flex flex-col justify-between">
-                <div>
-                    <div class="flex justify-between items-center mb-2">
-                        <h2 class="text-sm font-semibold text-gray-400">200W Moving Average</h2>
-                        <span class="text-xs font-bold px-2 py-1 rounded {ma_color.replace('text', 'bg').replace('500', '900')} {ma_color}">{ma_status}</span>
-                    </div>
-                    <p class="text-2xl font-bold text-white mb-2">${ma_200w:,}</p>
+            <!-- RSI Chart & Action -->
+            <div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
+                <div class="flex justify-between items-center mb-2">
+                    <h2 class="text-sm font-semibold text-gray-400">Average RSI (14)</h2>
+                    <span class="text-xs font-bold px-2 py-1 rounded {'bg-green-900 text-green-400' if avg_rsi < 40 else 'bg-red-900 text-red-400'}">{avg_rsi} ({'Weak' if avg_rsi < 40 else 'Strong'})</span>
                 </div>
+                <div class="h-32"><canvas id="rsiChart"></canvas></div>
+                <p class="text-xs text-gray-400 mt-2 bg-gray-900 p-2 rounded"><span class="text-blue-400 font-bold">করণীয়:</span> RSI ৩০ এর নিচে থাকলে বাজার কম মূল্যায়িত (কেনার সুযোগ), ৭০ এর উপরে থাকলে অতিরিক্ত মূল্যায়িত (বিক্রির সুযোগ)।</p>
+            </div>
+
+            <!-- MACD Chart & Action -->
+            <div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
+                <div class="flex justify-between items-center mb-2">
+                    <h2 class="text-sm font-semibold text-gray-400">MACD</h2>
+                    <span class="text-xs font-bold px-2 py-1 rounded bg-red-900 text-red-400">{macd_val} (Negative)</span>
+                </div>
+                <div class="h-32"><canvas id="macdChart"></canvas></div>
+                <p class="text-xs text-gray-400 mt-2 bg-gray-900 p-2 rounded"><span class="text-blue-400 font-bold">করণীয়:</span> MACD লাইন সিগন্যাল লাইনের উপরে থাকলে বুলিশ (কেনা), নিচে থাকলে বেয়ারিশ (বেচা)।</p>
+            </div>
+
+            <!-- 200W MA Chart & Action -->
+            <div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
+                <div class="flex justify-between items-center mb-2">
+                    <h2 class="text-sm font-semibold text-gray-400">200W Moving Average</h2>
+                    <span class="text-xs font-bold px-2 py-1 rounded {ma_color.replace('text', 'bg').replace('500', '900')} {ma_color}">{ma_status}</span>
+                </div>
+                <div class="h-32"><canvas id="ma200Chart"></canvas></div>
                 <p class="text-xs text-gray-400 mt-2 bg-gray-900 p-2 rounded"><span class="text-blue-400 font-bold">করণীয়:</span> {ma_action}</p>
             </div>
 
-            <!-- Pi Cycle Top -->
-            <div class="bg-gray-800 p-4 rounded-lg border border-gray-700 flex flex-col justify-between">
-                <div>
-                    <div class="flex justify-between items-center mb-2">
-                        <h2 class="text-sm font-semibold text-gray-400">Pi Cycle Top</h2>
-                        <span class="text-xs font-bold px-2 py-1 rounded {pi_cycle_color.replace('text', 'bg').replace('500', '900')} {pi_cycle_color}">{pi_cycle_status}</span>
-                    </div>
-                    <p class="text-sm text-gray-300 mb-2">সাইকেল টপ (বিক্রির সময়) বোঝার সূচক।</p>
+            <!-- Pi Cycle Top Chart & Action -->
+            <div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
+                <div class="flex justify-between items-center mb-2">
+                    <h2 class="text-sm font-semibold text-gray-400">Pi Cycle Top</h2>
+                    <span class="text-xs font-bold px-2 py-1 rounded {pi_cycle_color.replace('text', 'bg').replace('500', '900')} {pi_cycle_color}">{pi_cycle_status}</span>
                 </div>
+                <div class="h-32"><canvas id="piCycleChart"></canvas></div>
                 <p class="text-xs text-gray-400 mt-2 bg-gray-900 p-2 rounded"><span class="text-blue-400 font-bold">করণীয়:</span> {pi_cycle_action}</p>
             </div>
 
-            <!-- Weekly Outflows -->
-            <div class="bg-gray-800 p-4 rounded-lg border border-gray-700 flex flex-col justify-between">
-                <div>
-                    <div class="flex justify-between items-center mb-2">
-                        <h2 class="text-sm font-semibold text-gray-400">Weekly ETF Outflows</h2>
-                        <span class="text-xs font-bold px-2 py-1 rounded {outflow_color.replace('text', 'bg').replace('500', '900')} {outflow_color}">{outflow_status}</span>
-                    </div>
-                    <p class="text-2xl font-bold {outflow_color} mb-2">${abs(weekly_outflow)}M</p>
-                </div>
-                <p class="text-xs text-gray-400 mt-2 bg-gray-900 p-2 rounded"><span class="text-blue-400 font-bold">করণীয়:</span> {outflow_action}</p>
-            </div>
-
-            <!-- Fear & Greed Gauge -->
-            <div class="bg-gray-800 p-4 rounded-lg border border-gray-700 flex flex-col items-center justify-between">
-                <h2 class="text-sm font-semibold text-gray-400 mb-2">Fear & Greed Index</h2>
-                <div class="gauge-container">
-                    <div class="gauge-background"></div>
-                    <div class="gauge-needle"></div>
-                    <div class="gauge-center-circle"></div>
-                </div>
-                <div class="text-center mt-2 w-full">
-                    <p class="text-2xl font-bold {'text-green-500' if fng_val < 30 else 'text-red-500' if fng_val > 75 else 'text-yellow-500'}">{fng_val} - {fng_class}</p>
-                    <p class="text-xs text-gray-400 mt-2 bg-gray-900 p-2 rounded"><span class="text-blue-400 font-bold">করণীয়:</span> {'চরম ভয়। ধীরে ধীরে কিনুন (DCA)।' if fng_val < 30 else 'অতিরিক্ত লোভ। সতর্ক থাকুন।' if fng_val > 75 else 'বাজার স্বাভাবিক। হোল্ড করুন।'}</p>
-                </div>
-            </div>
         </div>
 
-        <!-- Macro Insights & Actions (CMC Style Cards) -->
+        <!-- Macro Insights & Actions (CMC Style Cards with DXY) -->
         <div class="bg-gray-800 rounded-lg border border-gray-700 p-4 mb-6">
             <h2 class="text-lg font-bold text-gray-200 mb-4 text-center border-b border-gray-700 pb-2">MACRO INDICATORS & ACTIONS</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -520,14 +419,6 @@ html_content += f"""
                             </td>
                             <td class="px-3 py-3 text-right font-bold text-green-500">BULLISH</td>
                         </tr>
-                        <tr class="border-b border-gray-700 hover:bg-gray-750">
-                            <td class="px-3 py-3 font-medium text-white">Dollar Index (DXY)</td>
-                            <td class="px-3 py-3">
-                                <div class="font-semibold">{dxy_val}</div>
-                                <div class="text-xs text-gray-400 mt-1 italic">↳ করণীয়: ডলার দুর্বল, ক্রিপ্টোর জন্য ভালো।</div>
-                            </td>
-                            <td class="px-3 py-3 text-right font-bold text-green-500">BULLISH</td>
-                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -569,43 +460,54 @@ html_content += f"""
         </div>
     </div>
 
-    <!-- Chart.js Scripts for Pie and Bar Charts -->
+    <!-- Chart.js Scripts -->
     <script>
         // Dominance Pie Chart
         const ctxDom = document.getElementById('dominanceChart').getContext('2d');
         new Chart(ctxDom, {{
             type: 'doughnut',
-            data: {{
-                labels: ['BTC', 'ETH', 'Others'],
-                datasets: [{{
-                    data: [{btc_dom_val}, {eth_dom_val}, {100 - btc_dom_val - eth_dom_val}],
-                    backgroundColor: ['#f97316', '#3b82f6', '#4b5563'],
-                    borderWidth: 0
-                }}]
-            }},
-            options: {{
-                cutout: '70%',
-                plugins: {{ legend: {{ display: false }} }}
-            }}
+            data: {{ labels: ['BTC', 'ETH', 'Others'], datasets: [{{ data: [{btc_dom_val}, {eth_dom_val}, {100 - btc_dom_val - eth_dom_val}], backgroundColor: ['#f97316', '#3b82f6', '#4b5563'], borderWidth: 0 }}] }},
+            options: {{ cutout: '70%', plugins: {{ legend: {{ display: false }} }} }}
         }});
 
-        // ETF Bar Chart (Demo Data)
+        // ETF Bar Chart
         const ctxEtf = document.getElementById('etfChart').getContext('2d');
         new Chart(ctxEtf, {{
             type: 'bar',
-            data: {{
-                labels: ['Day 1', 'Day 2', 'Day 3', 'Day 4', 'Day 5', 'Day 6', 'Today'],
-                datasets: [{{
-                    label: 'ETF Flow (M$)',
-                    data: [120, -50, 200, -180, 80, 150, -120],
-                    backgroundColor: ['#10b981', '#ef4444', '#10b981', '#ef4444', '#10b981', '#10b981', '#ef4444'],
-                    borderRadius: 4
-                }}]
-            }},
-            options: {{
-                plugins: {{ legend: {{ display: false }} }},
-                scales: {{ x: {{ display: false }}, y: {{ display: false }} }}
-            }}
+            data: {{ labels: ['D1', 'D2', 'D3', 'D4', 'D5', 'D6', 'Today'], datasets: [{{ data: [120, -50, 200, -180, 80, 150, -120], backgroundColor: ['#10b981', '#ef4444', '#10b981', '#ef4444', '#10b981', '#10b981', '#ef4444'], borderRadius: 4 }}] }},
+            options: {{ plugins: {{ legend: {{ display: false }} }}, scales: {{ x: {{ display: false }}, y: {{ display: false }} }} }}
+        }});
+
+        // RSI Chart
+        const ctxRsi = document.getElementById('rsiChart').getContext('2d');
+        new Chart(ctxRsi, {{
+            type: 'line',
+            data: {{ labels: ['1','2','3','4','5','6','7'], datasets: [{{ data: [45, 42, 38, 35, 30, 32, {avg_rsi}], borderColor: '#10b981', borderWidth: 2, tension: 0.4, pointRadius: 0 }}] }},
+            options: {{ responsive: true, maintainAspectRatio: false, plugins: {{ legend: {{ display: false }} }}, scales: {{ x: {{ display: false }}, y: {{ display: false, min: 0, max: 100 }} }} }}
+        }});
+
+        // MACD Chart
+        const ctxMacd = document.getElementById('macdChart').getContext('2d');
+        new Chart(ctxMacd, {{
+            type: 'bar',
+            data: {{ labels: ['1','2','3','4','5','6','7'], datasets: [{{ data: [10, 5, -5, -15, -25, -10, {macd_val}], backgroundColor: ['#10b981', '#10b981', '#ef4444', '#ef4444', '#ef4444', '#ef4444', '#ef4444'] }}] }},
+            options: {{ responsive: true, maintainAspectRatio: false, plugins: {{ legend: {{ display: false }} }}, scales: {{ x: {{ display: false }}, y: {{ display: false }} }} }}
+        }});
+
+        // 200W MA Chart
+        const ctxMa = document.getElementById('ma200Chart').getContext('2d');
+        new Chart(ctxMa, {{
+            type: 'line',
+            data: {{ labels: ['1','2','3','4','5','6','7'], datasets: [{{ label: 'Price', data: [25000, 28000, 29000, 31000, 33000, 35000, {btc_val}], borderColor: '#f97316', borderWidth: 2, tension: 0.4, pointRadius: 0 }}, {{ label: '200W MA', data: [{ma_200w}, {ma_200w}, {ma_200w}, {ma_200w}, {ma_200w}, {ma_200w}, {ma_200w}], borderColor: '#3b82f6', borderWidth: 2, borderDash: [5, 5], pointRadius: 0 }}] }},
+            options: {{ responsive: true, maintainAspectRatio: false, plugins: {{ legend: {{ display: false }} }}, scales: {{ x: {{ display: false }}, y: {{ display: false }} }} }}
+        }});
+
+        // Pi Cycle Chart
+        const ctxPi = document.getElementById('piCycleChart').getContext('2d');
+        new Chart(ctxPi, {{
+            type: 'line',
+            data: {{ labels: ['1','2','3','4','5','6','7'], datasets: [{{ data: [40000, 45000, 50000, 55000, 60000, 70000, {btc_val}], borderColor: '#8b5cf6', borderWidth: 2, tension: 0.4, pointRadius: 0 }}] }},
+            options: {{ responsive: true, maintainAspectRatio: false, plugins: {{ legend: {{ display: false }} }}, scales: {{ x: {{ display: false }}, y: {{ display: false }} }} }}
         }});
     </script>
 </body>
