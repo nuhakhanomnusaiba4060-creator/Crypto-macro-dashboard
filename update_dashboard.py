@@ -424,10 +424,22 @@ html_content += f"""
             </div>
         </div>
 
-        <!-- Macro News Section -->
+        <!-- Macro News Section (With Stablecoin News) -->
         <div class="bg-gray-800 rounded-lg border border-gray-700 p-4 mb-6">
             <h2 class="text-lg font-bold text-gray-200 mb-4 text-center border-b border-gray-700 pb-2">MACRO & AI NEWS</h2>
             <ul class="space-y-4">
+                
+                <!-- Stablecoin News (New) -->
+                <li class="flex items-start bg-red-900/20 p-3 rounded-lg border border-red-800">
+                    <span class="text-red-400 mr-2 text-lg">🩸</span>
+                    <div>
+                        <p class="font-semibold text-white">Stablecoin Supply Shrinks Fast</p>
+                        <p class="text-xs text-gray-300 mb-1">Stablecoin supply has dropped by $17.1B in the last 30 days, the fastest decline since June 2022.</p>
+                        <p class="text-xs text-red-300 font-semibold mt-1">করণীয়: বাজারে নগদ টাকা (তারল্য) কমছে। বড় কেনা থেকে বিরত থাকুন এবং ধৈর্য ধরে DCA করুন।</p>
+                    </div>
+                </li>
+
+                <!-- MSCI News -->
                 <li class="flex items-start bg-red-900/20 p-3 rounded-lg border border-red-800">
                     <span class="text-red-400 mr-2 text-lg">🚨</span>
                     <div>
@@ -436,6 +448,8 @@ html_content += f"""
                         <p class="text-xs text-red-300 font-semibold mt-1">করণীয়: প্রাতিষ্ঠানিক ফান্ডগুলো Strategy-এর শেয়ার বিক্রি করতে পারে, যা বিটকয়েনে নেতিবাচক প্রভাব ফেলতে পারে। সতর্ক থাকুন, বড় পজিশন নেওয়ার আগে ভাবুন।</p>
                     </div>
                 </li>
+
+                <!-- CPI News -->
                 <li class="flex items-start">
                     <span class="text-blue-400 mr-2 mt-1">📌</span>
                     <div>
@@ -444,6 +458,8 @@ html_content += f"""
                         <p class="text-xs text-gray-400 mt-1"><span class="text-blue-400 font-bold">করণীয়:</span> সতর্ক থাকুন, ডেটা প্রকাশের সময় বাজারে বড় ওঠানামা হতে পারে।</p>
                     </div>
                 </li>
+
+                <!-- FOMC News -->
                 <li class="flex items-start">
                     <span class="text-yellow-400 mr-2 mt-1">🏛️</span>
                     <div>
