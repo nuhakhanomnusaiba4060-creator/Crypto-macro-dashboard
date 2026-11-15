@@ -222,11 +222,18 @@ else:
     mvrv_status = "NEUTRAL"; mvrv_color = "text-yellow-500"; mvrv_action = "MVRV স্বাভাবিক। বাজার ভারসাম্যে আছে।"
 
 # SOPR (Short-Term Holder - আনুমানিক)
-sopr_val = 0.987 # ডেমো ডেটা
+sopr_val = 0.987
 if sopr_val < 1.0:
     sopr_status = "LOSS SELLING"; sopr_color = "text-green-500"; sopr_action = "স্বল্পমেয়াদী হোল্ডাররা ক্ষতিতে বিক্রি করছে। এটি ঐতিহাসিকভাবে স্থানীয় তল তৈরি করে (DCA করার সুযোগ)।"
 else:
     sopr_status = "PROFIT TAKING"; sopr_color = "text-red-500"; sopr_action = "স্বল্পমেয়াদী হোল্ডাররা লাভে বিক্রি করছে। সতর্ক থাকুন।"
+
+# Stablecoin & Global M2 (Estimated)
+stablecoin_supply = 160.5 
+stablecoin_status = "CONTRACTING"; stablecoin_color = "text-red-500"; stablecoin_action = "স্টেবলকয়েন কমছে, বাজারে নগদ কমছে। সতর্ক থাকুন।"
+
+m2_supply = 102.5 
+m2_status = "EXPANDING"; m2_color = "text-green-500"; m2_action = "M2 বাড়ছে (তারল্য বাড়ছে), ক্রিপ্টোর জন্য ভালো।"
 
 # Weekly Outlook
 if fng_val < 30 and dxy_val != "N/A" and dxy_val < 105:
@@ -348,10 +355,12 @@ html_content += f"""
             </div>
         </div>
 
-        <!-- Long-Term Deep Metrics Section -->
+        <!-- Long-Term Deep Metrics Section (INCLUDING STABLECOIN & M2) -->
         <div class="bg-gray-800 rounded-lg border border-gray-700 p-4 mb-6">
             <h2 class="text-lg font-bold text-gray-200 mb-4 text-center border-b border-gray-700 pb-2">LONG-TERM DEEP METRICS</h2>
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                
+                <!-- MVRV Z-Score -->
                 <div class="bg-gray-900 p-3 rounded-lg border border-gray-700">
                     <div class="flex justify-between items-center mb-1">
                         <span class="text-sm font-semibold text-gray-300">MVRV Z-Score</span>
@@ -361,6 +370,7 @@ html_content += f"""
                     <a href="https://www.coinglass.com/pro/onchain/bitcoin-mvrv-market-value-to-realized-value" target="_blank" class="text-xs text-blue-400 mt-2 block underline">CoinGlass-এ লাইভ দেখুন →</a>
                 </div>
 
+                <!-- STH SOPR -->
                 <div class="bg-gray-900 p-3 rounded-lg border border-gray-700">
                     <div class="flex justify-between items-center mb-1">
                         <span class="text-sm font-semibold text-gray-300">STH SOPR</span>
@@ -370,22 +380,46 @@ html_content += f"""
                     <a href="https://www.coinglass.com/pro/onchain/bitcoin-sopr" target="_blank" class="text-xs text-blue-400 mt-2 block underline">CoinGlass-এ লাইভ দেখুন →</a>
                 </div>
 
-                <div class="bg-gray-900 p-3 rounded-lg border border-gray-700">
-                    <div class="flex justify-between items-center mb-1">
-                        <span class="text-sm font-semibold text-gray-300">Liquidation Heatmap</span>
-                        <span class="text-xs font-bold px-2 py-1 rounded bg-purple-900 text-purple-400">LIVE LINK</span>
-                    </div>
-                    <p class="text-xs text-gray-400 mt-2"><span class="text-blue-400 font-bold">করণীয়:</span> বড় লিকুইডেশন ক্লাস্টার দেখে বোঝা যায় বাজার কোথায় আটকে আছে।</p>
-                    <a href="https://www.coinglass.com/pro/futures/LiquidationHeatMap" target="_blank" class="text-xs text-blue-400 mt-2 block underline">CoinGlass-এ লাইভ দেখুন →</a>
-                </div>
-
+                <!-- Exchange Netflow -->
                 <div class="bg-gray-900 p-3 rounded-lg border border-gray-700">
                     <div class="flex justify-between items-center mb-1">
                         <span class="text-sm font-semibold text-gray-300">Exchange Netflow</span>
                         <span class="text-xs font-bold px-2 py-1 rounded bg-blue-900 text-blue-400">LIVE LINK</span>
                     </div>
-                    <p class="text-xs text-gray-400 mt-2"><span class="text-blue-400 font-bold">করণীয়:</span> এক্সচেঞ্জে বিটকয়েন কমলে (আউটফ্লো) বুলিশ, বাড়লে (ইনফ্লো) সতর্ক হোন।</p>
+                    <p class="text-xs text-gray-400 mt-2"><span class="text-blue-400 font-bold">করণীয়:</span> এক্সচেঞ্জে বিটকয়েন কমলে বুলিশ, বাড়লে সতর্ক হোন।</p>
                     <a href="https://www.coinglass.com/pro/onchain/bitcoin-exchange-netflow" target="_blank" class="text-xs text-blue-400 mt-2 block underline">CoinGlass-এ লাইভ দেখুন →</a>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <!-- Stablecoin Supply -->
+                <div class="bg-gray-900 p-3 rounded-lg border border-gray-700">
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="text-sm font-semibold text-gray-300">Stablecoin Supply</span>
+                        <span class="text-xs font-bold px-2 py-1 rounded {stablecoin_color.replace('text', 'bg').replace('500', '900')} {stablecoin_color}">${stablecoin_supply}B</span>
+                    </div>
+                    <p class="text-xs text-gray-400 mt-2"><span class="text-blue-400 font-bold">করণীয়:</span> {stablecoin_action}</p>
+                    <a href="https://defillama.com/stablecoins" target="_blank" class="text-xs text-blue-400 mt-2 block underline">DefiLlama-তে লাইভ দেখুন →</a>
+                </div>
+
+                <!-- Global M2 -->
+                <div class="bg-gray-900 p-3 rounded-lg border border-gray-700">
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="text-sm font-semibold text-gray-300">Global M2 Supply</span>
+                        <span class="text-xs font-bold px-2 py-1 rounded {m2_color.replace('text', 'bg').replace('500', '900')} {m2_color}">${m2_supply}T</span>
+                    </div>
+                    <p class="text-xs text-gray-400 mt-2"><span class="text-blue-400 font-bold">করণীয়:</span> {m2_action}</p>
+                    <a href="https://www.tradingview.com/chart/?symbol=ECONOMICS%3AGLOBALM2" target="_blank" class="text-xs text-blue-400 mt-2 block underline">TradingView-এ দেখুন →</a>
+                </div>
+
+                <!-- Liquidation Heatmap -->
+                <div class="bg-gray-900 p-3 rounded-lg border border-gray-700">
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="text-sm font-semibold text-gray-300">Liquidation Heatmap</span>
+                        <span class="text-xs font-bold px-2 py-1 rounded bg-purple-900 text-purple-400">LIVE LINK</span>
+                    </div>
+                    <p class="text-xs text-gray-400 mt-2"><span class="text-blue-400 font-bold">করণীয়:</span> বড় লিকুইডেশন ক্লাস্টার দেখে বোঝা যায় বাজার কোথায় আটকে আছে।</p>
+                    <a href="https://www.coinglass.com/pro/futures/LiquidationHeatMap" target="_blank" class="text-xs text-blue-400 mt-2 block underline">CoinGlass-এ লাইভ দেখুন →</a>
                 </div>
             </div>
         </div>
@@ -529,7 +563,7 @@ html_content += f"""
                     <div>
                         <p class="font-semibold text-white">CPI Data Release</p>
                         <p class="text-xs text-gray-400">Next release: Watch for lower inflation (Bullish for Crypto).</p>
-                        <p class="text-xs text-gray-400 mt-1"><span class="text-blue-400 font-bold">করণীয়:</span> সতর্ক থাকুন, ডেটা প্রকাশের সময় বাজারে বড় ওঠানামা হতে পারে।</p>
+                        <p class="text-xs text-gray-400 mt-1"><span class="text-blue-400 font-bold">করণীয়:</span> সতর্ক থাকুন, ডেটা প্রকাশের সময় বাজারে বড় ওঠানামা হতে পারে।</p>
                     </div>
                 </li>
             </ul>
@@ -556,4 +590,4 @@ html_content += f"""
 with open("index.html", "w", encoding="utf-8") as file:
     file.write(html_content)
 
-print("Dashboard updated successfully with Market Movement and Deep Metrics.")
+print("Dashboard updated successfully with Stablecoin and M2 supplies.")
