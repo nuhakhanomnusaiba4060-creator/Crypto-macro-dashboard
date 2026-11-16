@@ -2,105 +2,118 @@ import requests
 import datetime
 import numpy as np
 
+# --- API Helper Functions ---
+def safe_request(url, headers=None):
+    try:
+        res = requests.get(url, headers=headers, timeout=10)
+        if res.status_code == 200:
+            return res.json()
+    except Exception as e:
+        print(f"Error fetching {url}: {e}")
+    return None
+
 # ১. ফিয়ার অ্যান্ড গ্রিড ডেটা
 def get_fear_and_greed():
-    try:
-        res = requests.get("https://api.alternative.me/fng/").json()
-        return int(res['data'][0]['value']), res['data'][0]['value_classification']
-    except:
-        return 50, "Neutral"
+    data = safe_request("https://api.alternative.me/fng/")
+    if data and 'data' in data:
+        return int(data['data'][0]['value']), data['data'][0]['value_classification']
+    return 50, "Neutral"
 
 # ২. Yahoo Finance থেকে দাম আনা
 def get_yahoo_price(symbol):
-    try:
-        url = f"https://query1.finance.yahoo.com/v8/finance/chart/{symbol}"
-        headers = {'User-Agent': 'Mozilla/5.0'}
-        res = requests.get(url, headers=headers).json()
-        price = res['chart']['result'][0]['meta']['regularMarketPrice']
-        if symbol == "%5ETNX":
-            return round(price / 10, 2)
-        return round(price, 2)
-    except:
-        return "N/A"
+    url = f"https://query1.finance.yahoo.com/v8/finance/chart/{symbol}"
+    headers = {'User-Agent': 'Mozilla/5.0'}
+    data = safe_request(url, headers=headers)
+    if data:
+        try:
+            price = data['chart']['result'][0]['meta']['regularMarketPrice']
+            if symbol == "%5ETNX":
+                return round(price / 10, 2)
+            return round(price, 2)
+        except:
+            pass
+    return "N/A"
 
 # ৩. ক্রিপ্টো গ্লোবাল ডেটা
 def get_crypto_global_data():
-    try:
-        btc_res = requests.get("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd&include_24hr_vol=true").json()
-        btc_price = btc_res['bitcoin']['usd']
-        btc_vol = btc_res['bitcoin']['usd_24h_vol'] / 1e9 
-        
-        global_res = requests.get("https://api.coingecko.com/api/v3/global").json()
-        total_mcap = global_res['data']['total_market_cap']['usd'] / 1e12 
-        btc_dominance = global_res['data']['market_cap_percentage']['btc']
-        eth_dominance = global_res['data']['market_cap_percentage']['eth']
-        global_vol = global_res['data']['total_volume']['usd'] / 1e9
-        
-        return btc_price, round(total_mcap, 2), round(btc_dominance, 1), round(eth_dominance, 1), round(btc_vol, 1), round(global_vol, 1)
-    except:
-        return 0, 0.0, 0.0, 0.0, 0.0, 0.0
+    btc_res = safe_request("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd&include_24hr_vol=true")
+    global_res = safe_request("https://api.coingecko.com/api/v3/global")
+    
+    if btc_res and global_res:
+        try:
+            btc_price = btc_res['bitcoin']['usd']
+            btc_vol = btc_res['bitcoin']['usd_24h_vol'] / 1e9 
+            total_mcap = global_res['data']['total_market_cap']['usd'] / 1e12 
+            btc_dominance = global_res['data']['market_cap_percentage']['btc']
+            eth_dominance = global_res['data']['market_cap_percentage']['eth']
+            global_vol = global_res['data']['total_volume']['usd'] / 1e9
+            return btc_price, round(total_mcap, 2), round(btc_dominance, 1), round(eth_dominance, 1), round(btc_vol, 1), round(global_vol, 1)
+        except:
+            pass
+    return 0, 0.0, 0.0, 0.0, 0.0, 0.0
 
 # ৪. ফান্ডিং রেট এবং ওপেন ইন্টারেস্ট
 def get_funding_and_oi():
-    try:
-        funding_url = "https://fapi.binance.com/fapi/v1/premiumIndex?symbol=BTCUSDT"
-        funding_res = requests.get(funding_url).json()
-        funding_rate = float(funding_res['lastFundingRate']) * 100 
+    funding_data = safe_request("https://fapi.binance.com/fapi/v1/premiumIndex?symbol=BTCUSDT")
+    oi_data = safe_request("https://fapi.binance.com/fapi/v1/openInterest?symbol=BTCUSDT")
+    
+    funding_rate = 0.0
+    open_interest = 0.0
+    
+    if funding_data:
+        try:
+            funding_rate = float(funding_data['lastFundingRate']) * 100 
+        except: pass
         
-        oi_url = "https://fapi.binance.com/fapi/v1/openInterest?symbol=BTCUSDT"
-        oi_res = requests.get(oi_url).json()
-        
-        if 'openInterest' in oi_res:
-            open_interest = float(oi_res['openInterest'])
-        else:
-            open_interest = 0.0
+    if oi_data:
+        try:
+            open_interest = float(oi_data['openInterest'])
+        except: pass
             
-        return round(funding_rate, 4), round(open_interest, 0)
-    except:
-        return 0.0, 0.0
+    return round(funding_rate, 4), round(open_interest, 0)
 
 # ৫. লং/শর্ট রেশিও এবং টেকার রেশিও
 def get_market_sentiment():
-    try:
-        ls_url = "https://fapi.binance.com/futures/data/globalLongShortAccountRatio?symbol=BTCUSDT&period=1h&limit=1"
-        ls_res = requests.get(ls_url).json()
-        ls_ratio = float(ls_res[0]['longShortRatio']) if ls_res else 0.0
+    ls_data = safe_request("https://fapi.binance.com/futures/data/globalLongShortAccountRatio?symbol=BTCUSDT&period=1h&limit=1")
+    taker_data = safe_request("https://fapi.binance.com/futures/data/takerlongshortRatio?symbol=BTCUSDT&period=1h&limit=1")
+    
+    ls_ratio = 0.0
+    taker_ratio = 0.0
+    
+    if ls_data and len(ls_data) > 0:
+        try: ls_ratio = float(ls_data[0]['longShortRatio'])
+        except: pass
+            
+    if taker_data and len(taker_data) > 0:
+        try: taker_ratio = float(taker_data[0]['buySellRatio'])
+        except: pass
         
-        taker_url = "https://fapi.binance.com/futures/data/takerlongshortRatio?symbol=BTCUSDT&period=1h&limit=1"
-        taker_res = requests.get(taker_url).json()
-        taker_ratio = float(taker_res[0]['buySellRatio']) if taker_res else 0.0
-        
-        return round(ls_ratio, 2), round(taker_ratio, 2)
-    except:
-        return 0.0, 0.0
+    return round(ls_ratio, 2), round(taker_ratio, 2)
 
 # ৬. টেকনিক্যাল সূচক (RSI, MACD, 200W MA)
 def get_technical_indicators():
-    try:
-        url = "https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=1400&interval=daily"
-        res = requests.get(url).json()
-        prices = [p[1] for p in res['prices']]
-        
-        if len(prices) < 200:
-            return 50, 0, 0
+    url = "https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=1400&interval=daily"
+    data = safe_request(url)
+    
+    if data and 'prices' in data:
+        prices = [p[1] for p in data['prices']]
+        if len(prices) >= 200:
+            ma_200w = sum(prices[-1400:]) / 1400 if len(prices) >= 1400 else sum(prices) / len(prices)
+            
+            deltas = np.diff(prices[-15:])
+            gains = deltas[deltas > 0].sum() / 14 if len(deltas[deltas > 0]) > 0 else 0
+            losses = -deltas[deltas < 0].sum() / 14 if len(deltas[deltas < 0]) > 0 else 0
+            rs = gains / losses if losses != 0 else 100
+            rsi = 100 - (100 / (1 + rs))
+            
+            ema_12 = sum(prices[-12:]) / 12
+            ema_26 = sum(prices[-26:]) / 26
+            macd_line = ema_12 - ema_26
+            
+            return round(rsi, 1), round(macd_line, 2), round(ma_200w, 0)
+    return 50, 0, 0
 
-        ma_200w = sum(prices[-1400:]) / 1400 if len(prices) >= 1400 else sum(prices) / len(prices)
-        
-        deltas = np.diff(prices[-15:])
-        gains = deltas[deltas > 0].sum() / 14 if len(deltas[deltas > 0]) > 0 else 0
-        losses = -deltas[deltas < 0].sum() / 14 if len(deltas[deltas < 0]) > 0 else 0
-        rs = gains / losses if losses != 0 else 100
-        rsi = 100 - (100 / (1 + rs))
-        
-        ema_12 = sum(prices[-12:]) / 12
-        ema_26 = sum(prices[-26:]) / 26
-        macd_line = ema_12 - ema_26
-        
-        return round(rsi, 1), round(macd_line, 2), round(ma_200w, 0)
-    except:
-        return 50, 0, 0
-
-# ৭. সাইকেল স্টেজ
+# --- Logic Functions ---
 def get_cycle_stage(fng, dxy):
     if fng < 30 and dxy != "N/A" and dxy < 105:
         return "ACCUMULATION (Buy Zone)", "text-green-500"
@@ -109,7 +122,6 @@ def get_cycle_stage(fng, dxy):
     else:
         return "NEUTRAL / GRINDING", "text-yellow-500"
 
-# ৮. ম্যাক্রো লজিক
 def get_macro_insights(vix, spx, brent_oil, gold, yield_10y, dxy):
     insights = []
     dxy_status = "NEUTRAL"; dxy_color = "text-yellow-500"; dxy_action = "ডলার ইনডেক্স স্বাভাবিক।"
@@ -141,7 +153,6 @@ def get_macro_insights(vix, spx, brent_oil, gold, yield_10y, dxy):
     insights.append({"name": "Gold", "value": f"${gold}", "status": "SAFE HAVEN", "color": "text-yellow-600", "action": "সোনার দাম বাড়লে বিনিয়োগকারীরা ঝুঁকি এড়াতে চাইছে।"})
     return insights
 
-# ৯. ইভেন্ট অ্যালার্ট
 def get_event_alerts(fng, vix):
     alerts = []
     if vix != "N/A" and vix > 20: 
@@ -150,14 +161,13 @@ def get_event_alerts(fng, vix):
         alerts.append({"msg": f"🩸 বাজারে চরম ভয় ({fng})। DCA করার সুযোগ হতে পারে।", "color": "bg-green-900/60 border-green-500 text-green-200"})
     return alerts
 
-# ১০. হালভিং কাউন্টডাউন
 def get_halving_countdown():
     next_halving = datetime.date(2028, 4, 15)
     today = datetime.date.today()
     days_left = (next_halving - today).days
     return f"{days_left} দিন বাকি" if days_left > 0 else "হালভিং সম্পন্ন"
 
-# ডেটা প্রসেসিং
+# --- Data Processing ---
 fng_val, fng_class = get_fear_and_greed()
 dxy_val = get_yahoo_price("DX-Y.NYB")
 brent_oil_val = get_yahoo_price("BZ=F")
@@ -176,19 +186,16 @@ alerts = get_event_alerts(fng_val, vix_val)
 halving_text = get_halving_countdown()
 current_date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
 
-# Altseason লজিক
 if btc_dom_val < 50:
     alt_status = "ALT SEASON"; alt_color = "text-purple-400"
 else:
     alt_status = "BTC SEASON"; alt_color = "text-orange-400"
 
-# 200W MA স্ট্যাটাস
-if btc_val > ma_200w_val:
+if btc_val > ma_200w_val and ma_200w_val != 0:
     ma_status = "BULLISH"; ma_color = "text-green-500"; ma_action = "দাম 200W MA এর উপরে। লং-টার্ম সাপোর্ট টিকে আছে।"
 else:
     ma_status = "BEARISH"; ma_color = "text-red-500"; ma_action = "দাম 200W MA এর নিচে। সতর্ক হোন।"
 
-# ফান্ডিং রেট লজিক
 if funding_rate > 0.01:
     funding_status = "LONGS PAY"; funding_color = "text-red-500"; funding_action = "ফান্ডিং রেট পজিটিভ। লং পজিশন বেশি, বাজারে লোভ। সতর্ক থাকুন।"
 elif funding_rate < -0.01:
@@ -196,24 +203,21 @@ elif funding_rate < -0.01:
 else:
     funding_status = "NEUTRAL"; funding_color = "text-yellow-500"; funding_action = "ফান্ডিং রেট স্বাভাবিক। বাজারে ভারসাম্য আছে।"
 
-# লং/শর্ট রেশিও লজিক
 if ls_ratio > 2.0:
     ls_status = "LONG HEAVY"; ls_color = "text-red-500"; ls_action = "ট্রেডাররা অতিরিক্ত লং পজিশনে। শর্ট স্কুইজের ঝুঁকি আছে।"
-elif ls_ratio < 0.5:
+elif ls_ratio < 0.5 and ls_ratio > 0:
     ls_status = "SHORT HEAVY"; ls_color = "text-green-500"; ls_action = "ট্রেডাররা অতিরিক্ত শর্ট পজিশনে। লং স্কুইজের সম্ভাবনা।"
 else:
-    ls_status = "BALANCED"; ls_color = "text-yellow-500"; ls_action = "লং/শর্ট ভারসাম্যপূর্ণ।"
+    ls_status = "BALANCED"; ls_color = "text-yellow-500"; ls_action = "লং/শর্ট ভারসাম্যপূর্ণ বা ডেটা লোড হচ্ছে।"
 
-# টেকার রেশিও লজিক
 if taker_ratio > 1.2:
     taker_status = "BUYERS AGGRESSIVE"; taker_color = "text-green-500"; taker_action = "আগ্রাসী ক্রেতা বেশি। বুলিশ মুভমেন্ট হতে পারে।"
-elif taker_ratio < 0.8:
+elif taker_ratio < 0.8 and taker_ratio > 0:
     taker_status = "SELLERS AGGRESSIVE"; taker_color = "text-red-500"; taker_action = "আগ্রাসী বিক্রেতা বেশি। বেয়ারিশ মুভমেন্ট হতে পারে।"
 else:
-    taker_status = "NEUTRAL"; taker_color = "text-yellow-500"; taker_action = "ক্রেতা-বিক্রেতা ভারসাম্যপূর্ণ।"
+    taker_status = "NEUTRAL"; taker_color = "text-yellow-500"; taker_action = "ক্রেতা-বিক্রেতা ভারসাম্যপূর্ণ বা ডেটা লোড হচ্ছে।"
 
-# Deep Metrics
-mvrv_z = round((btc_val / 45000 - 1.5) / 0.8, 2)
+mvrv_z = round((btc_val / 45000 - 1.5) / 0.8, 2) if btc_val > 0 else 0
 if mvrv_z > 3.5:
     mvrv_status = "EXTREME HIGH"; mvrv_color = "text-red-500"; mvrv_action = "MVRV非常高। বাজার শীর্ষের কাছাকাছি, সতর্ক থাকুন।"
 elif mvrv_z < 0:
@@ -222,10 +226,7 @@ else:
     mvrv_status = "NEUTRAL"; mvrv_color = "text-yellow-500"; mvrv_action = "MVRV স্বাভাবিক। বাজার ভারসাম্যে আছে।"
 
 sopr_val = 0.987
-if sopr_val < 1.0:
-    sopr_status = "LOSS SELLING"; sopr_color = "text-green-500"; sopr_action = "স্বল্পমেয়াদী হোল্ডাররা ক্ষতিতে বিক্রি করছে। DCA করার সুযোগ।"
-else:
-    sopr_status = "PROFIT TAKING"; sopr_color = "text-red-500"; sopr_action = "স্বল্পমেয়াদী হোল্ডাররা লাভে বিক্রি করছে। সতর্ক থাকুন।"
+sopr_status = "LOSS SELLING"; sopr_color = "text-green-500"; sopr_action = "স্বল্পমেয়াদী হোল্ডাররা ক্ষতিতে বিক্রি করছে। DCA করার সুযোগ।"
 
 stablecoin_supply = 160.5 
 stablecoin_status = "CONTRACTING"; stablecoin_color = "text-red-500"; stablecoin_action = "স্টেবলকয়েন কমছে, বাজারে নগদ কমছে। সতর্ক থাকুন।"
@@ -233,7 +234,6 @@ stablecoin_status = "CONTRACTING"; stablecoin_color = "text-red-500"; stablecoin
 m2_supply = 102.5 
 m2_status = "EXPANDING"; m2_color = "text-green-500"; m2_action = "M2 বাড়ছে (তারল্য বাড়ছে), ক্রিপ্টোর জন্য ভালো।"
 
-# Weekly Outlook
 if fng_val < 30 and dxy_val != "N/A" and dxy_val < 105:
     outlook = "বাজার 'Accumulation' জোনে আছে। DCA করার জন্য ভালো সময়।"
     outlook_color = "text-green-400"
@@ -244,7 +244,7 @@ else:
     outlook = "বাজার নিরপেক্ষ। রেগুলার প্ল্যান অনুযায়ী হোল্ড করুন।"
     outlook_color = "text-yellow-400"
 
-# HTML জেনারেশন
+# --- HTML Generation ---
 html_content = f"""
 <!DOCTYPE html>
 <html lang="en">
@@ -584,4 +584,4 @@ html_content += f"""
 with open("index.html", "w", encoding="utf-8") as file:
     file.write(html_content)
 
-print("Dashboard updated successfully with Live Chart and Pie Chart.")
+print("Dashboard updated successfully with robust APIs.")
