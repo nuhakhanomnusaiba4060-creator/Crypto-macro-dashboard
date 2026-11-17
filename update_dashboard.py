@@ -8,18 +8,18 @@ def safe_request(url, headers=None):
         res = requests.get(url, headers=headers, timeout=10)
         if res.status_code == 200:
             return res.json()
-    except Exception as e:
-        print(f"Error fetching {url}: {e}")
+    except:
+        pass
     return None
 
-# ১. ফিয়ার অ্যান্ড গ্রিড ডেটা
+# ১. ফিয়ার অ্যান্ড গ্রিড
 def get_fear_and_greed():
     data = safe_request("https://api.alternative.me/fng/")
     if data and 'data' in data:
         return int(data['data'][0]['value']), data['data'][0]['value_classification']
     return 50, "Neutral"
 
-# ২. Yahoo Finance থেকে দাম আনা
+# ২. Yahoo Finance থেকে দাম
 def get_yahoo_price(symbol):
     url = f"https://query1.finance.yahoo.com/v8/finance/chart/{symbol}"
     headers = {'User-Agent': 'Mozilla/5.0'}
@@ -27,18 +27,15 @@ def get_yahoo_price(symbol):
     if data:
         try:
             price = data['chart']['result'][0]['meta']['regularMarketPrice']
-            if symbol == "%5ETNX":
-                return round(price / 10, 2)
+            if symbol == "%5ETNX": return round(price / 10, 2)
             return round(price, 2)
-        except:
-            pass
+        except: pass
     return "N/A"
 
 # ৩. ক্রিপ্টো গ্লোবাল ডেটা
 def get_crypto_global_data():
     btc_res = safe_request("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd&include_24hr_vol=true")
     global_res = safe_request("https://api.coingecko.com/api/v3/global")
-    
     if btc_res and global_res:
         try:
             btc_price = btc_res['bitcoin']['usd']
@@ -48,79 +45,62 @@ def get_crypto_global_data():
             eth_dominance = global_res['data']['market_cap_percentage']['eth']
             global_vol = global_res['data']['total_volume']['usd'] / 1e9
             return btc_price, round(total_mcap, 2), round(btc_dominance, 1), round(eth_dominance, 1), round(btc_vol, 1), round(global_vol, 1)
-        except:
-            pass
+        except: pass
     return 0, 0.0, 0.0, 0.0, 0.0, 0.0
 
-# ৪. ফান্ডিং রেট এবং ওপেন ইন্টারেস্ট
+# ৪. ফান্ডিং এবং OI
 def get_funding_and_oi():
     funding_data = safe_request("https://fapi.binance.com/fapi/v1/premiumIndex?symbol=BTCUSDT")
     oi_data = safe_request("https://fapi.binance.com/fapi/v1/openInterest?symbol=BTCUSDT")
-    
-    funding_rate = 0.0
-    open_interest = 0.0
-    
+    fr, oi = 0.0, 0.0
     if funding_data:
-        try:
-            funding_rate = float(funding_data['lastFundingRate']) * 100 
+        try: fr = float(funding_data['lastFundingRate']) * 100 
         except: pass
-        
     if oi_data:
-        try:
-            open_interest = float(oi_data['openInterest'])
+        try: oi = float(oi_data['openInterest'])
         except: pass
-            
-    return round(funding_rate, 4), round(open_interest, 0)
+    return round(fr, 4), round(oi, 0)
 
-# ৫. লং/শর্ট রেশিও এবং টেকার রেশিও
+# ৫. লং/শর্ট এবং টেকার
 def get_market_sentiment():
     ls_data = safe_request("https://fapi.binance.com/futures/data/globalLongShortAccountRatio?symbol=BTCUSDT&period=1h&limit=1")
     taker_data = safe_request("https://fapi.binance.com/futures/data/takerlongshortRatio?symbol=BTCUSDT&period=1h&limit=1")
-    
-    ls_ratio = 0.0
-    taker_ratio = 0.0
-    
+    ls, tk = 0.0, 0.0
     if ls_data and len(ls_data) > 0:
-        try: ls_ratio = float(ls_data[0]['longShortRatio'])
+        try: ls = float(ls_data[0]['longShortRatio'])
         except: pass
-            
     if taker_data and len(taker_data) > 0:
-        try: taker_ratio = float(taker_data[0]['buySellRatio'])
+        try: tk = float(taker_data[0]['buySellRatio'])
         except: pass
-        
-    return round(ls_ratio, 2), round(taker_ratio, 2)
+    return round(ls, 2), round(tk, 2)
 
 # ৬. টেকনিক্যাল সূচক (RSI, MACD, 200W MA)
 def get_technical_indicators():
     url = "https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=1400&interval=daily"
     data = safe_request(url)
-    
     if data and 'prices' in data:
         prices = [p[1] for p in data['prices']]
         if len(prices) >= 200:
             ma_200w = sum(prices[-1400:]) / 1400 if len(prices) >= 1400 else sum(prices) / len(prices)
-            
             deltas = np.diff(prices[-15:])
             gains = deltas[deltas > 0].sum() / 14 if len(deltas[deltas > 0]) > 0 else 0
             losses = -deltas[deltas < 0].sum() / 14 if len(deltas[deltas < 0]) > 0 else 0
             rs = gains / losses if losses != 0 else 100
             rsi = 100 - (100 / (1 + rs))
-            
             ema_12 = sum(prices[-12:]) / 12
             ema_26 = sum(prices[-26:]) / 26
             macd_line = ema_12 - ema_26
-            
             return round(rsi, 1), round(macd_line, 2), round(ma_200w, 0)
     return 50, 0, 0
 
 # --- Logic Functions ---
 def get_cycle_stage(fng, dxy):
     if fng < 30 and dxy != "N/A" and dxy < 105:
-        return "ACCUMULATION (Buy Zone)", "text-green-500"
+        return "ACCUMULATION (Buy Zone)", "text-green-500", "বাজার Accumulation জোনে। ধীরে ধীরে কেনার (DCA) জন্য ভালো সময়।"
     elif fng > 70:
-        return "MARKUP / DISTRIBUTION (Caution)", "text-red-500"
+        return "MARKUP / DISTRIBUTION (Caution)", "text-red-500", "বাজার Distribution জোনে। সতর্ক থাকুন, লাভ নেওয়ার কথা ভাবুন।"
     else:
-        return "NEUTRAL / GRINDING", "text-yellow-500"
+        return "NEUTRAL / GRINDING", "text-yellow-500", "বাজার নিরপেক্ষ। রেগুলার প্ল্যান অনুযায়ী হোল্ড করুন।"
 
 def get_macro_insights(vix, spx, brent_oil, gold, yield_10y, dxy):
     insights = []
@@ -180,7 +160,7 @@ funding_rate, open_interest = get_funding_and_oi()
 ls_ratio, taker_ratio = get_market_sentiment()
 rsi_val, macd_val, ma_200w_val = get_technical_indicators()
 
-cycle_text, cycle_color = get_cycle_stage(fng_val, dxy_val)
+cycle_text, cycle_color, cycle_action = get_cycle_stage(fng_val, dxy_val)
 macro_insights = get_macro_insights(vix_val, spx_val, brent_oil_val, gold_val, yield_10y, dxy_val)
 alerts = get_event_alerts(fng_val, vix_val)
 halving_text = get_halving_countdown()
@@ -314,24 +294,82 @@ html_content += f"""
             <div class="bg-gray-800 p-4 rounded-lg border border-gray-700 text-center">
                 <h2 class="text-sm font-semibold text-gray-400 mb-1">Current Cycle Stage</h2>
                 <p class="text-lg font-bold {cycle_color}">{cycle_text}</p>
-                <p class="text-xs text-gray-400 mt-2 bg-gray-900 p-2 rounded"><span class="text-blue-400 font-bold">করণীয়:</span> {'বাজার Accumulation জোনে। ধীরে ধীরে কেনার (DCA) জন্য ভালো সময়।' if 'ACCUMULATION' in cycle_text else 'বাজার Distribution জোনে। সতর্ক থাকুন, লাভ নেওয়ার কথা ভাবুন।' if 'DISTRIBUTION' in cycle_text else 'বাজার নিরপেক্ষ। রেগুলার প্ল্যান অনুযায়ী হোল্ড করুন।'}</p>
+                <p class="text-xs text-gray-400 mt-2 bg-gray-900 p-2 rounded"><span class="text-blue-400 font-bold">করণীয়:</span> {cycle_action}</p>
             </div>
         </div>
 
-        <!-- Live TradingView Chart -->
-        <div class="bg-gray-800 rounded-lg border border-gray-700 p-2 mb-6">
-            <h2 class="text-sm font-semibold text-gray-400 px-2 mb-2">Live Market Chart (BTC)</h2>
-            <div class="tradingview-widget-container" style="height:250px; width:100%;">
-                <div id="tradingview_chart"></div>
-                <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
-                <script type="text/javascript">
-                new TradingView.widget({{
-                  "width": "100%", "height": 250, "symbol": "BINANCE:BTCUSDT", "interval": "60",
-                  "timezone": "Etc/UTC", "theme": "dark", "style": "1", "locale": "en",
-                  "toolbar_bg": "#f1f3f6", "enable_publishing": false, "hide_side_toolbar": true,
-                  "allow_symbol_change": false, "container_id": "tradingview_chart"
-                }});
-                </script>
+        <!-- Live TradingView Charts (BTC, ETH, DXY, Brent, Gold, S&P500) -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            <!-- BTC Chart -->
+            <div class="bg-gray-800 rounded-lg border border-gray-700 p-2">
+                <h2 class="text-sm font-semibold text-gray-400 px-2 mb-2">BTC/USDT Live Chart</h2>
+                <div class="tradingview-widget-container" style="height:250px; width:100%;">
+                    <div id="tradingview_btc"></div>
+                    <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+                    <script type="text/javascript">
+                    new TradingView.widget({{ "width": "100%", "height": 250, "symbol": "BINANCE:BTCUSDT", "interval": "60", "timezone": "Etc/UTC", "theme": "dark", "style": "1", "locale": "en", "enable_publishing": false, "hide_side_toolbar": true, "container_id": "tradingview_btc" }});
+                    </script>
+                </div>
+            </div>
+            
+            <!-- ETH Chart -->
+            <div class="bg-gray-800 rounded-lg border border-gray-700 p-2">
+                <h2 class="text-sm font-semibold text-gray-400 px-2 mb-2">ETH/USDT Live Chart</h2>
+                <div class="tradingview-widget-container" style="height:250px; width:100%;">
+                    <div id="tradingview_eth"></div>
+                    <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+                    <script type="text/javascript">
+                    new TradingView.widget({{ "width": "100%", "height": 250, "symbol": "BINANCE:ETHUSDT", "interval": "60", "timezone": "Etc/UTC", "theme": "dark", "style": "1", "locale": "en", "enable_publishing": false, "hide_side_toolbar": true, "container_id": "tradingview_eth" }});
+                    </script>
+                </div>
+            </div>
+
+            <!-- DXY Chart -->
+            <div class="bg-gray-800 rounded-lg border border-gray-700 p-2">
+                <h2 class="text-sm font-semibold text-gray-400 px-2 mb-2">DXY (Dollar Index) Live Chart</h2>
+                <div class="tradingview-widget-container" style="height:250px; width:100%;">
+                    <div id="tradingview_dxy"></div>
+                    <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+                    <script type="text/javascript">
+                    new TradingView.widget({{ "width": "100%", "height": 250, "symbol": "TVC:DXY", "interval": "60", "timezone": "Etc/UTC", "theme": "dark", "style": "1", "locale": "en", "enable_publishing": false, "hide_side_toolbar": true, "container_id": "tradingview_dxy" }});
+                    </script>
+                </div>
+            </div>
+
+            <!-- Gold Chart -->
+            <div class="bg-gray-800 rounded-lg border border-gray-700 p-2">
+                <h2 class="text-sm font-semibold text-gray-400 px-2 mb-2">Gold (XAUUSD) Live Chart</h2>
+                <div class="tradingview-widget-container" style="height:250px; width:100%;">
+                    <div id="tradingview_gold"></div>
+                    <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+                    <script type="text/javascript">
+                    new TradingView.widget({{ "width": "100%", "height": 250, "symbol": "OANDA:XAUUSD", "interval": "60", "timezone": "Etc/UTC", "theme": "dark", "style": "1", "locale": "en", "enable_publishing": false, "hide_side_toolbar": true, "container_id": "tradingview_gold" }});
+                    </script>
+                </div>
+            </div>
+
+            <!-- Brent Oil Chart -->
+            <div class="bg-gray-800 rounded-lg border border-gray-700 p-2">
+                <h2 class="text-sm font-semibold text-gray-400 px-2 mb-2">Brent Oil Live Chart</h2>
+                <div class="tradingview-widget-container" style="height:250px; width:100%;">
+                    <div id="tradingview_brent"></div>
+                    <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+                    <script type="text/javascript">
+                    new TradingView.widget({{ "width": "100%", "height": 250, "symbol": "TVC:UKOIL", "interval": "60", "timezone": "Etc/UTC", "theme": "dark", "style": "1", "locale": "en", "enable_publishing": false, "hide_side_toolbar": true, "container_id": "tradingview_brent" }});
+                    </script>
+                </div>
+            </div>
+
+            <!-- S&P 500 Chart -->
+            <div class="bg-gray-800 rounded-lg border border-gray-700 p-2">
+                <h2 class="text-sm font-semibold text-gray-400 px-2 mb-2">S&P 500 Live Chart</h2>
+                <div class="tradingview-widget-container" style="height:250px; width:100%;">
+                    <div id="tradingview_spx"></div>
+                    <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+                    <script type="text/javascript">
+                    new TradingView.widget({{ "width": "100%", "height": 250, "symbol": "SP:SPX", "interval": "60", "timezone": "Etc/UTC", "theme": "dark", "style": "1", "locale": "en", "enable_publishing": false, "hide_side_toolbar": true, "container_id": "tradingview_spx" }});
+                    </script>
+                </div>
             </div>
         </div>
 
@@ -350,6 +388,7 @@ html_content += f"""
                 </div>
             </div>
 
+            <!-- Technical Indicators -->
             <div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
                 <h2 class="text-sm font-semibold text-gray-400 mb-2">Technical Indicators (Live)</h2>
                 <div class="flex justify-between items-center mb-3">
@@ -364,7 +403,7 @@ html_content += f"""
             </div>
         </div>
 
-        <!-- Market Movement Indicators -->
+        <!-- Market Movement Indicators (Long/Short & Taker) -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
             <div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
                 <div class="flex justify-between items-center mb-2">
@@ -379,6 +418,47 @@ html_content += f"""
                     <span class="text-xs font-bold px-2 py-1 rounded {taker_color.replace('text', 'bg').replace('500', '900')} {taker_color}">{taker_ratio} ({taker_status})</span>
                 </div>
                 <p class="text-xs text-gray-400 mt-2 bg-gray-900 p-2 rounded"><span class="text-blue-400 font-bold">করণীয়:</span> {taker_action}</p>
+            </div>
+        </div>
+
+        <!-- Advanced On-Chain Indicators -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            <!-- 200W MA -->
+            <div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
+                <div class="flex justify-between items-center mb-2">
+                    <h2 class="text-sm font-semibold text-gray-400">200W Moving Average (Live)</h2>
+                    <span class="text-xs font-bold px-2 py-1 rounded {ma_color.replace('text', 'bg').replace('500', '900')} {ma_color}">{ma_status}</span>
+                </div>
+                <p class="text-2xl font-bold text-white mb-2">${ma_200w_val:,.0f}</p>
+                <p class="text-xs text-gray-400 mt-2 bg-gray-900 p-2 rounded"><span class="text-blue-400 font-bold">করণীয়:</span> {ma_action}</p>
+            </div>
+
+            <!-- Funding Rate -->
+            <div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
+                <div class="flex justify-between items-center mb-2">
+                    <h2 class="text-sm font-semibold text-gray-400">Funding Rate (Binance)</h2>
+                    <span class="text-xs font-bold px-2 py-1 rounded {funding_color.replace('text', 'bg').replace('500', '900')} {funding_color}">{funding_rate}% ({funding_status})</span>
+                </div>
+                <p class="text-xs text-gray-400 mt-2 bg-gray-900 p-2 rounded"><span class="text-blue-400 font-bold">করণীয়:</span> {funding_action}</p>
+            </div>
+
+            <!-- Open Interest -->
+            <div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
+                <div class="flex justify-between items-center mb-2">
+                    <h2 class="text-sm font-semibold text-gray-400">Open Interest (BTC)</h2>
+                    <span class="text-xs font-bold px-2 py-1 rounded bg-orange-900 text-orange-400">{open_interest:,} BTC</span>
+                </div>
+                <p class="text-xs text-gray-400 mt-2 bg-gray-900 p-2 rounded"><span class="text-blue-400 font-bold">করণীয়:</span> ফিউচার মার্কেটে মোট খোলা পজিশন। বেশি হলে ভোলাটিলিটি বাড়তে পারে।</p>
+            </div>
+            
+            <!-- Halving Countdown -->
+            <div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
+                <div class="flex justify-between items-center mb-2">
+                    <h2 class="text-sm font-semibold text-gray-400">Halving Countdown</h2>
+                    <span class="text-xs font-bold px-2 py-1 rounded bg-purple-900 text-purple-400">লং-টার্ম</span>
+                </div>
+                <p class="text-xl font-bold text-purple-400 mb-2">{halving_text}</p>
+                <p class="text-xs text-gray-400 mt-2 bg-gray-900 p-2 rounded"><span class="text-blue-400 font-bold">করণীয়:</span> হালভিং যত কাছে আসবে, বাজার তত বুলিশ হতে পারে। ধৈর্য ধরে হোল্ড করুন।</p>
             </div>
         </div>
 
@@ -443,43 +523,6 @@ html_content += f"""
                     <p class="text-xs text-gray-400 mt-2"><span class="text-blue-400 font-bold">করণীয়:</span> বড় লিকুইডেশন ক্লাস্টার দেখে বোঝা যায় বাজার কোথায় আটকে আছে।</p>
                     <a href="https://www.coinglass.com/pro/futures/LiquidationHeatMap" target="_blank" class="text-xs text-blue-400 mt-2 block underline">CoinGlass-এ লাইভ দেখুন →</a>
                 </div>
-            </div>
-        </div>
-
-        <!-- Advanced Indicators -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-            <div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
-                <div class="flex justify-between items-center mb-2">
-                    <h2 class="text-sm font-semibold text-gray-400">200W Moving Average (Live)</h2>
-                    <span class="text-xs font-bold px-2 py-1 rounded {ma_color.replace('text', 'bg').replace('500', '900')} {ma_color}">{ma_status}</span>
-                </div>
-                <p class="text-2xl font-bold text-white mb-2">${ma_200w_val:,.0f}</p>
-                <p class="text-xs text-gray-400 mt-2 bg-gray-900 p-2 rounded"><span class="text-blue-400 font-bold">করণীয়:</span> {ma_action}</p>
-            </div>
-
-            <div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
-                <div class="flex justify-between items-center mb-2">
-                    <h2 class="text-sm font-semibold text-gray-400">Funding Rate (Binance)</h2>
-                    <span class="text-xs font-bold px-2 py-1 rounded {funding_color.replace('text', 'bg').replace('500', '900')} {funding_color}">{funding_rate}% ({funding_status})</span>
-                </div>
-                <p class="text-xs text-gray-400 mt-2 bg-gray-900 p-2 rounded"><span class="text-blue-400 font-bold">করণীয়:</span> {funding_action}</p>
-            </div>
-
-            <div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
-                <div class="flex justify-between items-center mb-2">
-                    <h2 class="text-sm font-semibold text-gray-400">Open Interest (BTC)</h2>
-                    <span class="text-xs font-bold px-2 py-1 rounded bg-orange-900 text-orange-400">{open_interest:,} BTC</span>
-                </div>
-                <p class="text-xs text-gray-400 mt-2 bg-gray-900 p-2 rounded"><span class="text-blue-400 font-bold">করণীয়:</span> ফিউচার মার্কেটে মোট খোলা পজিশন। বেশি হলে ভোলাটিলিটি বাড়তে পারে।</p>
-            </div>
-            
-            <div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
-                <div class="flex justify-between items-center mb-2">
-                    <h2 class="text-sm font-semibold text-gray-400">Halving Countdown</h2>
-                    <span class="text-xs font-bold px-2 py-1 rounded bg-purple-900 text-purple-400">লং-টার্ম</span>
-                </div>
-                <p class="text-xl font-bold text-purple-400 mb-2">{halving_text}</p>
-                <p class="text-xs text-gray-400 mt-2 bg-gray-900 p-2 rounded"><span class="text-blue-400 font-bold">করণীয়:</span> হালভিং যত কাছে আসবে, বাজার তত বুলিশ হতে পারে। ধৈর্য ধরে হোল্ড করুন।</p>
             </div>
         </div>
 
@@ -584,4 +627,4 @@ html_content += f"""
 with open("index.html", "w", encoding="utf-8") as file:
     file.write(html_content)
 
-print("Dashboard updated successfully with robust APIs.")
+print("Dashboard updated successfully with multiple live charts and link indicators.")
