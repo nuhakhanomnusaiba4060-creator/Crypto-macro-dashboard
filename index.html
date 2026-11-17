@@ -2,300 +2,413 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crypto Macro Dashboard</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        .gauge-container { position: relative; width: 160px; height: 80px; overflow: hidden; margin: 0 auto; }
-        .gauge-background { position: absolute; top: 0; left: 0; width: 160px; height: 160px; border-radius: 50%; background: conic-gradient(from 270deg, #ef4444 0%, #f59e0b 25%, #10b981 50%, #10b981 75%, #ef4444 100%); mask: radial-gradient(circle at 50% 100%, transparent 55px, black 56px); -webkit-mask: radial-gradient(circle at 50% 100%, transparent 55px, black 56px); }
-        .gauge-needle { position: absolute; bottom: 0; left: 50%; width: 4px; height: 60px; background-color: white; transform-origin: bottom center; transform: rotate(-68.4deg); transition: transform 1s ease-out; border-radius: 4px 4px 0 0; z-index: 10; }
-        .gauge-center-circle { position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%); width: 20px; height: 20px; background-color: white; border-radius: 50%; z-index: 11; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#080d16">
+<title>Crypto Macro Intelligence Dashboard</title>
+
+<style>
+:root {
+  --bg:#080d16;
+  --panel:#101927;
+  --border:#233248;
+  --text:#e8eef7;
+  --muted:#8d9bb0;
+  --green:#22c98a;
+  --red:#ff5d68;
+  --yellow:#f4c65e;
+  --blue:#55a8ff;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;background:var(--bg);color:var(--text);
+  font-family:Arial,Helvetica,sans-serif;
+}
+header{
+  padding:22px 5%;border-bottom:1px solid var(--border);
+  background:#0b1320;display:flex;justify-content:space-between;
+  align-items:center;gap:15px;flex-wrap:wrap;
+}
+.brand{font-size:21px;font-weight:800}
+.brand span{color:var(--green)}
+.subtitle,.status{font-size:12px;color:var(--muted);margin-top:6px}
+main{max-width:1500px;margin:auto;padding:24px 5% 50px}
+.section-title{
+  font-size:16px;font-weight:700;margin:28px 0 14px;
+}
+.grid{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));
+  gap:13px;
+}
+.card{
+  background:var(--panel);border:1px solid var(--border);
+  border-radius:12px;padding:17px;min-width:0;
+}
+.card h3{
+  margin:0 0 12px;font-size:12px;color:var(--muted);
+  font-weight:600;text-transform:uppercase;letter-spacing:.5px;
+}
+.value{font-size:23px;font-weight:800;overflow-wrap:anywhere}
+.small{font-size:12px;color:var(--muted);margin-top:8px}
+.green{color:var(--green)}
+.red{color:var(--red)}
+.yellow{color:var(--yellow)}
+.blue{color:var(--blue)}
+.decision{
+  border:1px solid var(--border);border-radius:14px;
+  background:#142238;padding:22px;margin-bottom:18px;
+}
+.decision-label{font-size:12px;color:var(--muted)}
+.decision-value{font-size:30px;font-weight:900;margin:9px 0}
+.report-grid{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
+  gap:13px;
+}
+.report{
+  background:var(--panel);border:1px solid var(--border);
+  border-radius:12px;padding:17px;line-height:1.65;
+  white-space:pre-wrap;overflow-wrap:anywhere;
+}
+.report h3{font-size:13px;margin:0 0 10px;color:var(--blue)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{padding:12px 10px;border-bottom:1px solid var(--border);text-align:left}
+th{color:var(--muted)}
+.table-wrap{overflow-x:auto;background:var(--panel);border:1px solid var(--border);border-radius:12px}
+.alert{
+  padding:13px 15px;border-radius:9px;margin:9px 0;
+  background:#251d20;border:1px solid #58313a;color:#ffb6bc;
+  font-size:13px;line-height:1.5;
+}
+.notice{
+  padding:13px 15px;border-radius:9px;margin:9px 0;
+  background:#172333;border:1px solid var(--border);
+  color:var(--muted);font-size:12px;line-height:1.6;
+}
+footer{
+  border-top:1px solid var(--border);padding:22px 5%;
+  color:var(--muted);font-size:11px;text-align:center;
+}
+button{
+  background:#1b2c43;border:1px solid var(--border);
+  color:var(--text);padding:9px 13px;border-radius:8px;
+  cursor:pointer;margin-top:9px;
+}
+@media(max-width:600px){
+  main{padding:16px 4% 35px}
+  header{padding:17px 4%}
+  .value{font-size:20px}
+  .decision-value{font-size:25px}
+}
+</style>
 </head>
-<body class="bg-gray-900 text-white font-sans p-4">
-    <div class="max-w-5xl mx-auto">
-        <h1 class="text-2xl font-bold mb-1 text-center text-blue-400">My Crypto Spot Dashboard</h1>
-        <p class="text-center text-gray-400 mb-6 text-sm">Last Updated: 2026-11-17 01:03 (UTC)</p>
 
-        <!-- Alert Section -->
-<div class="mb-6 space-y-2"><div class="p-3 rounded-lg border bg-orange-900/60 border-orange-500 text-orange-200 text-sm font-semibold shadow-lg">📈 VIX বেড়েছে (22.91)। বাজারে ভোলাটিলিটি বেশি, সতর্ক থাকুন।</div><div class="p-3 rounded-lg border bg-green-900/60 border-green-500 text-green-200 text-sm font-semibold shadow-lg">🩸 বাজারে চরম ভয় (12)। DCA করার সুযোগ হতে পারে।</div></div>
-        <!-- Top Summary Cards -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
-            <div class="bg-gray-800 p-3 rounded-lg border border-gray-700 text-center flex flex-col justify-center">
-                <p class="text-xs text-gray-400">BTC Dominance</p>
-                <p class="text-xl font-bold text-orange-400">58.6%</p>
-            </div>
-            <div class="bg-gray-800 p-3 rounded-lg border border-gray-700 text-center flex flex-col justify-center">
-                <p class="text-xs text-gray-400">Total Market Cap</p>
-                <p class="text-xl font-bold text-blue-400">$2.21T</p>
-            </div>
-            <div class="bg-gray-800 p-3 rounded-lg border border-gray-700 text-center flex flex-col justify-center">
-                <p class="text-xs text-gray-400">Market Trend</p>
-                <p class="text-xl font-bold text-orange-400">BTC SEASON</p>
-            </div>
-            <div class="bg-gray-800 p-3 rounded-lg border border-gray-700 text-center flex flex-col justify-center">
-                <p class="text-xs text-gray-400">Global Volume 24h</p>
-                <p class="text-xl font-bold text-green-500">$75.5B</p>
-            </div>
-        </div>
+<body>
+<header>
+  <div>
+    <div class="brand">CRYPTO <span>MACRO</span> INTELLIGENCE</div>
+    <div class="subtitle">Global Market • Macro Economy • Risk Intelligence</div>
+  </div>
+  <div>
+    <div class="status" id="connection">Connecting...</div>
+    <div class="status" id="updated">Last check: --</div>
+    <button onclick="loadDashboard()">Refresh Data</button>
+  </div>
+</header>
 
-        <!-- Weekly Outlook & Cycle Stage -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-            <div class="bg-gray-800 p-4 rounded-lg border border-gray-700 text-center">
-                <h2 class="text-sm font-semibold text-gray-400 mb-1">Weekly Market Outlook</h2>
-                <p class="text-lg font-bold text-green-400">বাজার 'Accumulation' জোনে আছে। DCA করার জন্য ভালো সময়।</p>
-                <p class="text-xs text-gray-400 mt-2 bg-gray-900 p-2 rounded"><span class="text-blue-400 font-bold">করণীয়:</span> বাজারের পরিস্থিতি বুঝে আপনার DCA প্ল্যান চালিয়ে যান।</p>
-            </div>
-            <div class="bg-gray-800 p-4 rounded-lg border border-gray-700 text-center">
-                <h2 class="text-sm font-semibold text-gray-400 mb-1">Current Cycle Stage</h2>
-                <p class="text-lg font-bold text-green-500">ACCUMULATION (Buy Zone)</p>
-                <p class="text-xs text-gray-400 mt-2 bg-gray-900 p-2 rounded"><span class="text-blue-400 font-bold">করণীয়:</span> বাজার Accumulation জোনে। ধীরে ধীরে কেনার (DCA) জন্য ভালো সময়।</p>
-            </div>
-        </div>
+<main>
+<div id="mainAlert"></div>
 
-        <!-- BTC Chart & Order Book Link -->
-        <div class="grid grid-cols-1 gap-4 mb-6">
-            <div class="bg-gray-800 rounded-lg border border-gray-700 p-2">
-                <h2 class="text-sm font-semibold text-gray-400 px-2 mb-2">BTC/USDT Live Chart</h2>
-                <div class="tradingview-widget-container" style="height:300px; width:100%;">
-                    <div id="tradingview_btc"></div>
-                    <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
-                    <script type="text/javascript">
-                    new TradingView.widget({ "width": "100%", "height": 300, "symbol": "BINANCE:BTCUSDT", "interval": "60", "timezone": "Etc/UTC", "theme": "dark", "style": "1", "locale": "en", "enable_publishing": false, "hide_side_toolbar": true, "container_id": "tradingview_btc" });
-                    </script>
-                </div>
-            </div>
+<div class="section-title">GLOBAL CRYPTO MARKET</div>
+<div class="grid">
+  <div class="card"><h3>Total Market Cap</h3><div class="value" id="marketCap">--</div></div>
+  <div class="card"><h3>24H Trading Volume</h3><div class="value" id="volume">--</div></div>
+  <div class="card"><h3>BTC Dominance</h3><div class="value" id="btcDom">--</div></div>
+  <div class="card"><h3>ETH Dominance</h3><div class="value" id="ethDom">--</div></div>
+  <div class="card"><h3>Fear & Greed</h3><div class="value" id="fearGreed">--</div><div class="small" id="fearLabel">--</div></div>
+</div>
 
-            <div class="bg-gray-800 rounded-lg border border-gray-700 p-4 text-center">
-                <h2 class="text-lg font-bold text-gray-200 mb-2">Live Buying/Selling Pressure (Order Book)</h2>
-                <p class="text-sm text-gray-400 mb-4">বাজারে ক্রেতা নাকি বিক্রেতা বেশি, তা লাইভ দেখতে নিচের লিংকে ক্লিক করুন।</p>
-                <a href="https://www.coinglass.com/pro/futures/OrderBook" target="_blank" class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg transition duration-300">
-                    Open Live Order Book Imbalance →
-                </a>
-            </div>
-        </div>
+<div class="section-title">OVERALL MARKET DECISION</div>
+<div class="decision">
+  <div class="decision-label">Decision Engine Output</div>
+  <div class="decision-value" id="decision">WAIT</div>
+  <div class="small" id="regime">Market regime: Unknown</div>
+  <div class="small" id="decisionQuality">Data quality: Unknown</div>
+</div>
 
-        <!-- Macro Indicators & Links (Replacing live zeros) -->
-        <div class="bg-gray-800 rounded-lg border border-gray-700 p-4 mb-6">
-            <h2 class="text-lg font-bold text-gray-200 mb-4 text-center border-b border-gray-700 pb-2">MACRO INDICATORS & ACTIONS</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<div class="section-title">BITCOIN & ETHEREUM TECHNICAL ANALYSIS</div>
+<div class="grid">
+  <div class="card"><h3>BTC Price</h3><div class="value" id="btcPrice">--</div><div class="small" id="btcChange">24H: --</div></div>
+  <div class="card"><h3>BTC RSI (14)</h3><div class="value" id="btcRsi">--</div><div class="small" id="btcRsiText">--</div></div>
+  <div class="card"><h3>BTC ADX (14)</h3><div class="value" id="btcAdx">--</div></div>
+  <div class="card"><h3>ETH Price</h3><div class="value" id="ethPrice">--</div><div class="small" id="ethChange">24H: --</div></div>
+  <div class="card"><h3>ETH RSI (14)</h3><div class="value" id="ethRsi">--</div><div class="small" id="ethRsiText">--</div></div>
+  <div class="card"><h3>BTC Support / Resistance</h3><div class="value" id="btcLevels">--</div></div>
+</div>
 
-                <div class="bg-gray-900 p-3 rounded-lg border border-gray-700">
-                    <div class="flex justify-between items-center mb-1">
-                        <span class="text-sm font-semibold text-gray-300">Dollar Index (DXY)</span>
-                        <span class="text-xs font-bold px-2 py-1 rounded bg-yellow-900 text-yellow-500">103.59</span>
-                    </div>
-                    <p class="text-xs text-gray-400 mt-2"><span class="text-blue-400 font-bold">করণীয়:</span> ডলার ইনডেক্স স্বাভাবিক।</p>
-                    <a href="https://www.tradingview.com/chart/?symbol=TVC%3ADXY" target="_blank" class="text-xs text-blue-400 mt-2 block underline font-semibold">TradingView-এ লাইভ চার্ট দেখুন →</a>
-                </div>
+<div class="section-title">MOVING AVERAGES & MOMENTUM</div>
+<div class="table-wrap">
+<table>
+<thead><tr><th>Indicator</th><th>BTC</th><th>ETH</th></tr></thead>
+<tbody>
+<tr><td>MA20</td><td id="btcMA20">--</td><td id="ethMA20">--</td></tr>
+<tr><td>MA50</td><td id="btcMA50">--</td><td id="ethMA50">--</td></tr>
+<tr><td>MA200</td><td id="btcMA200">--</td><td id="ethMA200">--</td></tr>
+<tr><td>MACD Histogram</td><td id="btcMACD">--</td><td id="ethMACD">--</td></tr>
+<tr><td>20D Support</td><td id="btcSupport">--</td><td id="ethSupport">--</td></tr>
+<tr><td>20D Resistance</td><td id="btcResistance">--</td><td id="ethResistance">--</td></tr>
+</tbody>
+</table>
+</div>
 
-                <div class="bg-gray-900 p-3 rounded-lg border border-gray-700">
-                    <div class="flex justify-between items-center mb-1">
-                        <span class="text-sm font-semibold text-gray-300">VIX (Volatility)</span>
-                        <span class="text-xs font-bold px-2 py-1 rounded bg-yellow-900 text-yellow-500">22.91</span>
-                    </div>
-                    <p class="text-xs text-gray-400 mt-2"><span class="text-blue-400 font-bold">করণীয়:</span> বাজার স্থিতিশীল।</p>
-                    <a href="https://www.tradingview.com/chart/?symbol=TVC%3AVIX" target="_blank" class="text-xs text-blue-400 mt-2 block underline font-semibold">TradingView-এ লাইভ চার্ট দেখুন →</a>
-                </div>
+<div class="section-title">MACRO ECONOMIC INTELLIGENCE</div>
+<div class="grid">
+  <div class="card"><h3>CPI YoY</h3><div class="value" id="cpi">--</div></div>
+  <div class="card"><h3>Core CPI YoY</h3><div class="value" id="coreCpi">--</div></div>
+  <div class="card"><h3>PCE YoY</h3><div class="value" id="pce">--</div></div>
+  <div class="card"><h3>Core PCE YoY</h3><div class="value" id="corePce">--</div></div>
+  <div class="card"><h3>Fed Funds Rate</h3><div class="value" id="fedRate">--</div></div>
+  <div class="card"><h3>Unemployment</h3><div class="value" id="unemployment">--</div></div>
+  <div class="card"><h3>VIX</h3><div class="value" id="vix">--</div></div>
+  <div class="card"><h3>US 10Y Yield</h3><div class="value" id="yield10">--</div></div>
+  <div class="card"><h3>US 2Y Yield</h3><div class="value" id="yield2">--</div></div>
+  <div class="card"><h3>10Y - 2Y Spread</h3><div class="value" id="spread">--</div><div class="small" id="curveStatus">--</div></div>
+  <div class="card"><h3>Net Liquidity</h3><div class="value" id="liquidity">--</div><div class="small" id="liquidityTrend">--</div></div>
+  <div class="card"><h3>WTI Oil</h3><div class="value" id="oil">--</div></div>
+</div>
 
-                <div class="bg-gray-900 p-3 rounded-lg border border-gray-700">
-                    <div class="flex justify-between items-center mb-1">
-                        <span class="text-sm font-semibold text-gray-300">S&P 500</span>
-                        <span class="text-xs font-bold px-2 py-1 rounded bg-blue-900 text-blue-400">7416.59</span>
-                    </div>
-                    <p class="text-xs text-gray-400 mt-2"><span class="text-blue-400 font-bold">করণীয়:</span> স্টক মার্কেট বাড়লে ক্রিপ্টোও বাড়ে (Risk-on)।</p>
-                    <a href="https://www.tradingview.com/chart/?symbol=SP%3ASPX" target="_blank" class="text-xs text-blue-400 mt-2 block underline font-semibold">TradingView-এ লাইভ চার্ট দেখুন →</a>
-                </div>
+<div class="section-title">DECISION REPORT</div>
+<div class="report-grid">
+  <div class="report"><h3>DATA</h3><div id="reportData">Waiting...</div></div>
+  <div class="report"><h3>ANALYSIS</h3><div id="reportAnalysis">Waiting...</div></div>
+  <div class="report"><h3>DECISION</h3><div id="reportDecision">Waiting...</div></div>
+  <div class="report"><h3>ACTION</h3><div id="reportAction">Waiting...</div></div>
+  <div class="report"><h3>RISK</h3><div id="reportRisk">Waiting...</div></div>
+</div>
 
-                <div class="bg-gray-900 p-3 rounded-lg border border-gray-700">
-                    <div class="flex justify-between items-center mb-1">
-                        <span class="text-sm font-semibold text-gray-300">Brent Crude Oil</span>
-                        <span class="text-xs font-bold px-2 py-1 rounded bg-red-900 text-red-500">$91.96</span>
-                    </div>
-                    <p class="text-xs text-gray-400 mt-2"><span class="text-blue-400 font-bold">করণীয়:</span> ব্রেন্ট অয়েলের দাম বেশি। CPI বাড়তে পারে (বেয়ারিশ)।</p>
-                    <a href="https://www.tradingview.com/chart/?symbol=TVC%3AUKOIL" target="_blank" class="text-xs text-blue-400 mt-2 block underline font-semibold">TradingView-এ লাইভ চার্ট দেখুন →</a>
-                </div>
+<div class="section-title">DATA QUALITY & WARNINGS</div>
+<div class="card">
+  <div id="qualitySummary">Waiting for data...</div>
+  <div id="warnings"></div>
+</div>
 
-                <div class="bg-gray-900 p-3 rounded-lg border border-gray-700">
-                    <div class="flex justify-between items-center mb-1">
-                        <span class="text-sm font-semibold text-gray-300">US 10Y Treasury Yield</span>
-                        <span class="text-xs font-bold px-2 py-1 rounded bg-green-900 text-green-500">0.51%</span>
-                    </div>
-                    <p class="text-xs text-gray-400 mt-2"><span class="text-blue-400 font-bold">করণীয়:</span> ইল্ড ৪.৫% এর নিচে। বাজারে টাকা সহজলভ্য, ক্রিপ্টোর জন্য ইতিবাচক।</p>
-                    <a href="https://www.tradingview.com/chart/?symbol=TVC%3AUS10Y" target="_blank" class="text-xs text-blue-400 mt-2 block underline font-semibold">TradingView-এ লাইভ চার্ট দেখুন →</a>
-                </div>
+<div class="notice">
+This dashboard is a market intelligence tool, not a guarantee of returns.
+Missing, stale or unavailable data must never be interpreted as zero or neutral.
+Technical indicators are not standalone buy or sell signals.
+Spot-market analysis only. No futures or margin recommendations.
+</div>
+</main>
 
-                <div class="bg-gray-900 p-3 rounded-lg border border-gray-700">
-                    <div class="flex justify-between items-center mb-1">
-                        <span class="text-sm font-semibold text-gray-300">Gold</span>
-                        <span class="text-xs font-bold px-2 py-1 rounded bg-yellow-900 text-yellow-600">$3857.0</span>
-                    </div>
-                    <p class="text-xs text-gray-400 mt-2"><span class="text-blue-400 font-bold">করণীয়:</span> সোনার দাম বাড়লে বিনিয়োগকারীরা ঝুঁকি এড়াতে চাইছে।</p>
-                    <a href="https://www.tradingview.com/chart/?symbol=OANDA%3AXAUUSD" target="_blank" class="text-xs text-blue-400 mt-2 block underline font-semibold">TradingView-এ লাইভ চার্ট দেখুন →</a>
-                </div>
+<footer>
+CRYPTO MACRO INTELLIGENCE • Data sources and timestamps should be checked before decisions.
+<br>Dashboard refreshes automatically every 5 minutes.
+</footer>
 
-            </div>
-        </div>
+<script>
+const $ = id => document.getElementById(id);
 
-        <!-- Advanced On-Chain Indicators (Replacing live zeros) -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-            <!-- 200W MA Link -->
-            <div class="bg-gray-800 p-4 rounded-lg border border-gray-700 flex flex-col justify-between">
-                <div>
-                    <h2 class="text-sm font-semibold text-gray-400 mb-2">200W Moving Average</h2>
-                    <p class="text-xs text-gray-400 mt-2 bg-gray-900 p-2 rounded"><span class="text-blue-400 font-bold">করণীয়:</span> 200W MA এর উপরে থাকলে বুলিশ, নিচে নামলে সতর্ক হোন।</p>
-                </div>
-                <a href="https://www.tradingview.com/chart/?symbol=BINANCE%3ABTCUSDT" target="_blank" class="text-sm text-blue-400 mt-3 block underline font-semibold">TradingView-এ 200W MA দেখুন →</a>
-            </div>
+function get(obj,path){
+  return path.split(".").reduce((v,k)=>v==null?undefined:v[k],obj);
+}
 
-            <!-- Funding Rate Link -->
-            <div class="bg-gray-800 p-4 rounded-lg border border-gray-700 flex flex-col justify-between">
-                <div>
-                    <h2 class="text-sm font-semibold text-gray-400 mb-2">Funding Rate</h2>
-                    <p class="text-xs text-gray-400 mt-2 bg-gray-900 p-2 rounded"><span class="text-blue-400 font-bold">করণীয়:</span> ফান্ডিং রেট পজিটিভ হলে বাজারে লোভ (সতর্ক), নেগেটিভ হলে ভয় (সুযোগ)।</p>
-                </div>
-                <a href="https://www.coinglass.com/FundingRate" target="_blank" class="text-sm text-blue-400 mt-3 block underline font-semibold">CoinGlass-এ লাইভ দেখুন →</a>
-            </div>
+function num(v){
+  if(v===null || v===undefined || v==="") return null;
+  if(typeof v==="object" && "value" in v){
+    const status=String(v.status||"").toUpperCase();
+    if(status && !["OK","SUCCESS","AVAILABLE","FRESH"].includes(status)) return null;
+    v=v.value;
+  }
+  const n=Number(v);
+  return Number.isFinite(n)?n:null;
+}
 
-            <!-- Open Interest Link -->
-            <div class="bg-gray-800 p-4 rounded-lg border border-gray-700 flex flex-col justify-between">
-                <div>
-                    <h2 class="text-sm font-semibold text-gray-400 mb-2">Open Interest (OI)</h2>
-                    <p class="text-xs text-gray-400 mt-2 bg-gray-900 p-2 rounded"><span class="text-blue-400 font-bold">করণীয়:</span> OI বেশি হলে বাজারে অস্থিরতা বাড়তে পারে।</p>
-                </div>
-                <a href="https://www.coinglass.com/OpenInterest" target="_blank" class="text-sm text-blue-400 mt-3 block underline font-semibold">CoinGlass-এ লাইভ দেখুন →</a>
-            </div>
+function val(obj,path){return num(get(obj,path));}
 
-            <!-- Halving Countdown -->
-            <div class="bg-gray-800 p-4 rounded-lg border border-gray-700 flex flex-col justify-between">
-                <div>
-                    <h2 class="text-sm font-semibold text-gray-400 mb-1">Halving Countdown</h2>
-                    <p class="text-xl font-bold text-purple-400 mb-2">515 দিন বাকি</p>
-                    <p class="text-xs text-gray-400 mt-2 bg-gray-900 p-2 rounded"><span class="text-blue-400 font-bold">করণীয়:</span> হালভিং যত কাছে আসবে, বাজার তত বুলিশ হতে পারে। ধৈর্য ধরে হোল্ড করুন।</p>
-                </div>
-            </div>
-        </div>
+function fmt(v,d=2){
+  return v===null?"Unavailable":Number(v).toLocaleString("en-US",{maximumFractionDigits:d});
+}
 
-        <!-- Long-Term Deep Metrics Section -->
-        <div class="bg-gray-800 rounded-lg border border-gray-700 p-4 mb-6">
-            <h2 class="text-lg font-bold text-gray-200 mb-4 text-center border-b border-gray-700 pb-2">LONG-TERM DEEP METRICS</h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                <!-- MVRV -->
-                <div class="bg-gray-900 p-3 rounded-lg border border-gray-700">
-                    <div class="flex justify-between items-center mb-1">
-                        <span class="text-sm font-semibold text-gray-300">MVRV Z-Score</span>
-                        <span class="text-xs font-bold px-2 py-1 rounded bg-gray-700 text-gray-300">LIVE LINK</span>
-                    </div>
-                    <p class="text-xs text-gray-400 mt-2"><span class="text-blue-400 font-bold">করণীয়:</span> ৩.৫ এর উপরে গেলে সতর্ক হোন, ০ এর নিচে নামলে DCA করুন।</p>
-                    <a href="https://www.coinglass.com/pro/onchain/bitcoin-mvrv-market-value-to-realized-value" target="_blank" class="text-xs text-blue-400 mt-2 block underline font-semibold">CoinGlass-এ লাইভ দেখুন →</a>
-                </div>
-                <!-- SOPR -->
-                <div class="bg-gray-900 p-3 rounded-lg border border-gray-700">
-                    <div class="flex justify-between items-center mb-1">
-                        <span class="text-sm font-semibold text-gray-300">STH SOPR</span>
-                        <span class="text-xs font-bold px-2 py-1 rounded bg-gray-700 text-gray-300">LIVE LINK</span>
-                    </div>
-                    <p class="text-xs text-gray-400 mt-2"><span class="text-blue-400 font-bold">করণীয়:</span> ১.০ এর নিচে থাকলে বাজার কম মূল্যায়িত (DCA সুযোগ)।</p>
-                    <a href="https://www.coinglass.com/pro/onchain/bitcoin-sopr" target="_blank" class="text-xs text-blue-400 mt-2 block underline font-semibold">CoinGlass-এ লাইভ দেখুন →</a>
-                </div>
-                <!-- Netflow -->
-                <div class="bg-gray-900 p-3 rounded-lg border border-gray-700">
-                    <div class="flex justify-between items-center mb-1">
-                        <span class="text-sm font-semibold text-gray-300">Exchange Netflow</span>
-                        <span class="text-xs font-bold px-2 py-1 rounded bg-blue-900 text-blue-400">LIVE LINK</span>
-                    </div>
-                    <p class="text-xs text-gray-400 mt-2"><span class="text-blue-400 font-bold">করণীয়:</span> এক্সচেঞ্জে বিটকয়েন কমলে বুলিশ, বাড়লে সতর্ক হোন।</p>
-                    <a href="https://www.coinglass.com/pro/onchain/bitcoin-exchange-netflow" target="_blank" class="text-xs text-blue-400 mt-2 block underline font-semibold">CoinGlass-এ লাইভ দেখুন →</a>
-                </div>
-            </div>
-            
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <!-- Stablecoin -->
-                <div class="bg-gray-900 p-3 rounded-lg border border-gray-700">
-                    <div class="flex justify-between items-center mb-1">
-                        <span class="text-sm font-semibold text-gray-300">Stablecoin Supply</span>
-                        <span class="text-xs font-bold px-2 py-1 rounded bg-gray-700 text-gray-300">LIVE LINK</span>
-                    </div>
-                    <p class="text-xs text-gray-400 mt-2"><span class="text-blue-400 font-bold">করণীয়:</span> স্টেবলকয়েন বাড়লে (ইনফ্লো) বুলিশ, কমলে সতর্ক হোন।</p>
-                    <a href="https://defillama.com/stablecoins" target="_blank" class="text-xs text-blue-400 mt-2 block underline font-semibold">DefiLlama-তে লাইভ দেখুন →</a>
-                </div>
-                <!-- M2 -->
-                <div class="bg-gray-900 p-3 rounded-lg border border-gray-700">
-                    <div class="flex justify-between items-center mb-1">
-                        <span class="text-sm font-semibold text-gray-300">Global M2 Supply</span>
-                        <span class="text-xs font-bold px-2 py-1 rounded bg-gray-700 text-gray-300">LIVE LINK</span>
-                    </div>
-                    <p class="text-xs text-gray-400 mt-2"><span class="text-blue-400 font-bold">করণীয়:</span> M2 বাড়লে তারল্য বাড়ে, ক্রিপ্টোর জন্য ভালো।</p>
-                    <a href="https://www.tradingview.com/chart/?symbol=ECONOMICS%3AGLOBALM2" target="_blank" class="text-xs text-blue-400 mt-2 block underline font-semibold">TradingView-এ দেখুন →</a>
-                </div>
-                <!-- Liquidation Heatmap -->
-                <div class="bg-gray-900 p-3 rounded-lg border border-gray-700">
-                    <div class="flex justify-between items-center mb-1">
-                        <span class="text-sm font-semibold text-gray-300">Liquidation Heatmap</span>
-                        <span class="text-xs font-bold px-2 py-1 rounded bg-purple-900 text-purple-400">LIVE LINK</span>
-                    </div>
-                    <p class="text-xs text-gray-400 mt-2"><span class="text-blue-400 font-bold">করণীয়:</span> বড় লিকুইডেশন ক্লাস্টার দেখে বোঝা যায় বাজার কোথায় আটকে আছে।</p>
-                    <a href="https://www.coinglass.com/pro/futures/LiquidationHeatMap" target="_blank" class="text-xs text-blue-400 mt-2 block underline font-semibold">CoinGlass-এ লাইভ দেখুন →</a>
-                </div>
-            </div>
-        </div>
+function money(v){
+  if(v===null)return "Unavailable";
+  if(v>=1e12)return "$"+(v/1e12).toFixed(2)+"T";
+  if(v>=1e9)return "$"+(v/1e9).toFixed(2)+"B";
+  if(v>=1e6)return "$"+(v/1e6).toFixed(2)+"M";
+  return "$"+fmt(v);
+}
 
-        <!-- Signal Table -->
-        <div class="bg-gray-800 rounded-lg border border-gray-700 overflow-hidden mb-6">
-            <div class="p-4 bg-gray-700/50 border-b border-gray-600">
-                <h2 class="text-lg font-bold text-gray-200 text-center">CORE CRYPTO SIGNALS</h2>
-            </div>
-            <div class="overflow-x-auto">
-                <table class="w-full text-left text-sm text-gray-300">
-                    <thead class="text-xs text-gray-400 uppercase bg-gray-800 border-b border-gray-700">
-                        <tr>
-                            <th scope="col" class="px-3 py-3">Signal</th>
-                            <th scope="col" class="px-3 py-3">Current Read</th>
-                            <th scope="col" class="px-3 py-3 text-right">Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr class="border-b border-gray-700 hover:bg-gray-750">
-                            <td class="px-3 py-3 font-medium text-white">BTC Price</td>
-                            <td class="px-3 py-3">
-                                <div class="font-semibold">$64,582</div>
-                                <div class="text-xs text-gray-400 mt-1 italic">↳ করণীয়: বর্তমান মূল্য ট্র্যাক করুন।</div>
-                            </td>
-                            <td class="px-3 py-3 text-right font-bold text-orange-400">LIVE</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
+function put(id,v){$(id).textContent=v;}
 
-        <!-- Macro News Section -->
-        <div class="bg-gray-800 rounded-lg border border-gray-700 p-4 mb-6">
-            <h2 class="text-lg font-bold text-gray-200 mb-4 text-center border-b border-gray-700 pb-2">MACRO & AI NEWS</h2>
-            <ul class="space-y-4">
-                <li class="flex items-start bg-yellow-900/20 p-3 rounded-lg border border-yellow-800">
-                    <span class="text-yellow-400 mr-2 text-lg">⚖️</span>
-                    <div>
-                        <p class="font-semibold text-white">Exchange Netflow Alert</p>
-                        <p class="text-xs text-gray-300 mb-1">বড় এক্সচেঞ্জগুলোতে বিটকয়েনের প্রবাহ (Netflow) পর্যবেক্ষণ করুন।</p>
-                        <p class="text-xs text-yellow-300 font-semibold mt-1">করণীয়: এক্সচেঞ্জে বিটকয়েন কমলে (আউটফ্লো) বুলিশ, আর বাড়লে (ইনফ্লো) সতর্ক হোন।</p>
-                    </div>
-                </li>
-                <li class="flex items-start">
-                    <span class="text-blue-400 mr-2 mt-1">📌</span>
-                    <div>
-                        <p class="font-semibold text-white">CPI Data Release</p>
-                        <p class="text-xs text-gray-400">Next release: Watch for lower inflation (Bullish for Crypto).</p>
-                        <p class="text-xs text-gray-400 mt-1"><span class="text-blue-400 font-bold">করণীয়:</span> সতর্ক থাকুন, ডেটা প্রকাশের সময় বাজারে বড় ওঠানামা হতে পারে।</p>
-                    </div>
-                </li>
-            </ul>
-        </div>
-        
-        <div class="mt-6 text-center text-xs text-gray-500">
-            Built for Long-Term Spot Trading. Live data only.
-        </div>
-    </div>
+function show(id,v,suffix="",d=2){
+  put(id,v===null?"Unavailable":fmt(v,d)+suffix);
+}
+
+function safeText(v){
+  if(v===null || v===undefined)return "No verified report available.";
+  if(Array.isArray(v))return v.length?v.map(x=>"• "+String(x)).join("\n"):"None reported.";
+  if(typeof v==="object")return JSON.stringify(v,null,2);
+  return String(v);
+}
+
+function escapeHTML(s){
+  return String(s).replace(/[&<>"']/g,c=>({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  }[c]));
+}
+
+function technical(asset){
+  return asset?.indicators || {};
+}
+
+function loadTechnical(prefix,asset){
+  const i=technical(asset);
+  const price=val(asset,"price_usdt");
+  show(prefix+"MA20",val(i,"ma20"));
+  show(prefix+"MA50",val(i,"ma50"));
+  show(prefix+"MA200",val(i,"ma200"));
+  show(prefix+"MACD",val(i,"macd_histogram"));
+  show(prefix+"Support",val(i,"support_20d"));
+  show(prefix+"Resistance",val(i,"resistance_20d"));
+  show(prefix+"Rsi",val(i,"rsi14"));
+  show(prefix+"Adx",val(i,"adx14"));
+  return {price,rsi:val(i,"rsi14"),adx:val(i,"adx14"),indicators:i};
+}
+
+function loadDashboard(){
+  put("connection","Loading data...");
+  $("mainAlert").innerHTML="";
+
+  Promise.all([
+    fetch("data/market_data.json?ts="+Date.now(),{cache:"no-store"})
+      .then(r=>{if(!r.ok)throw Error("Market JSON HTTP "+r.status);return r.json()}),
+    fetch("data/macro_data.json?ts="+Date.now(),{cache:"no-store"})
+      .then(r=>{if(!r.ok)throw Error("Macro JSON HTTP "+r.status);return r.json()}),
+    fetch("data/decision_data.json?ts="+Date.now(),{cache:"no-store"})
+      .then(r=>{if(!r.ok)throw Error("Decision JSON HTTP "+r.status);return r.json()})
+  ]).then(([market,macro,decision])=>{
+    render(market,macro,decision);
+    put("connection","● Data connected");
+    $("connection").className="status green";
+    put("updated","Last check: "+new Date().toLocaleString());
+  }).catch(err=>{
+    put("connection","Data loading error");
+    $("connection").className="status red";
+    $("mainAlert").innerHTML=
+      '<div class="alert">Could not load JSON files: '+escapeHTML(err.message)+
+      '. Check GitHub Pages deployment and data file paths.</div>';
+  });
+}
+
+function render(market,macro,decision){
+  const gm=market?.global_market||{};
+
+  put("marketCap",money(val(gm,"total_market_cap_usd")));
+  put("volume",money(val(gm,"total_volume_24h_usd")));
+  show("btcDom",val(gm,"btc_dominance_pct"),"%");
+  show("ethDom",val(gm,"eth_dominance_pct"),"%");
+
+  const fg=market?.fear_greed||{};
+  show("fearGreed",num(fg.value),"/100",0);
+  put("fearLabel",fg.classification||"Unavailable");
+
+  const btc=market?.technical?.BTC||market?.technical?.bitcoin||{};
+  const eth=market?.technical?.ETH||market?.technical?.ethereum||{};
+  const bt=loadTechnical("btc",btc);
+  const et=loadTechnical("eth",eth);
+
+  show("btcPrice",bt.price===null?null:bt.price,"",2);
+  show("ethPrice",et.price===null?null:et.price,"",2);
+  if(bt.price!==null)put("btcPrice","$"+fmt(bt.price));
+  if(et.price!==null)put("ethPrice","$"+fmt(et.price));
+
+  const ba=market?.major_assets?.bitcoin||{};
+  const ea=market?.major_assets?.ethereum||{};
+  show("btcChange",val(ba,"change_24h_pct"),"%");
+  show("ethChange",val(ea,"change_24h_pct"),"%");
+
+  show("btcRsi",bt.rsi);
+  show("ethRsi",et.rsi);
+  show("btcAdx",bt.adx);
+
+  put("btcRsiText",bt.rsi===null?"Unavailable":
+    bt.rsi<30?"Oversold — not a buy signal":
+    bt.rsi>70?"Overbought — caution":"Middle range");
+
+  put("ethRsiText",et.rsi===null?"Unavailable":
+    et.rsi<30?"Oversold — not a buy signal":
+    et.rsi>70?"Overbought — caution":"Middle range");
+
+  const sup=val(bt.indicators,"support_20d");
+  const res=val(bt.indicators,"resistance_20d");
+  put("btcLevels",sup===null||res===null?"Unavailable":"$"+fmt(sup)+" / $"+fmt(res));
+
+  const m=macro?.metrics||{};
+  const inf=macro?.inflation||{};
+
+  show("cpi",num(inf.cpi?.yoy_percent),"%");
+  show("coreCpi",num(inf.core_cpi?.yoy_percent),"%");
+  show("pce",num(inf.pce?.yoy_percent),"%");
+  show("corePce",num(inf.core_pce?.yoy_percent),"%");
+
+  show("fedRate",val(m,"fed_funds_rate"),"%");
+  show("unemployment",val(m,"unemployment"),"%");
+  show("vix",val(m,"vix"));
+  show("yield10",val(m,"yield_10y"),"%");
+  show("yield2",val(m,"yield_2y"),"%");
+  show("spread",num(macro?.yield_curve?.spread),"%");
+  put("curveStatus",macro?.yield_curve?.trend||macro?.yield_curve?.status||"Unavailable");
+
+  const liq=macro?.liquidity||{};
+  const liquidity=num(liq.current);
+  show("liquidity",liquidity===null?null:liquidity/1000);
+  put("liquidityTrend",liq.trend||liq.status||"Unavailable");
+  show("oil",val(m,"oil"));
+
+  const od=decision?.overall_decision||{};
+  const d=od.DECISION||od.decision||decision?.decision||"WAIT";
+  put("decision",typeof d==="string"?d:safeText(d));
+
+  const regime=decision?.market_regime;
+  put("regime","Market regime: "+
+    (typeof regime==="string"?regime:regime?.label||regime?.name||"Unavailable"));
+
+  put("decisionQuality","Data quality: "+(decision?.data_quality?.status||"Unknown"));
+
+  put("reportData",safeText(od.DATA||od.data||decision?.DATA));
+  put("reportAnalysis",safeText(od.ANALYSIS||od.analysis||decision?.ANALYSIS));
+  put("reportDecision",safeText(od.DECISION||od.decision||decision?.DECISION));
+  put("reportAction",safeText(od.ACTION||od.action||decision?.ACTION));
+  put("reportRisk",safeText(od.RISK||od.risk||decision?.RISK));
+
+  const issues=[];
+  const dq=decision?.data_quality?.issues;
+  if(Array.isArray(dq))issues.push(...dq);
+  else if(dq)issues.push(String(dq));
+
+  const ms=macro?.summary||{};
+  if(Array.isArray(ms.critical_missing)&&ms.critical_missing.length)
+    issues.push("Critical macro data missing: "+ms.critical_missing.join(", "));
+  if(Array.isArray(ms.optional_unavailable)&&ms.optional_unavailable.length)
+    issues.push("Optional macro data unavailable: "+ms.optional_unavailable.join(", "));
+
+  put("qualitySummary",
+    "Macro quality: "+(ms.data_quality||"Unknown")+
+    " • Decision quality: "+(decision?.data_quality?.status||"Unknown")+
+    " • Market mode: "+(market?.update_mode||"Unknown"));
+
+  $("warnings").innerHTML=issues.length?
+    issues.map(x=>'<div class="alert">'+escapeHTML(x)+'</div>').join("") :
+    '<div class="notice">No additional warnings reported by the loaded data.</div>';
+
+  const quality=String(decision?.data_quality?.status||"").toUpperCase();
+  if(quality && !["GOOD","OK","HEALTHY"].includes(quality)){
+    $("mainAlert").innerHTML=
+      '<div class="alert">DATA QUALITY WARNING: '+escapeHTML(quality)+
+      '. Check missing or stale inputs before relying on the decision.</div>';
+  }
+}
+
+loadDashboard();
+setInterval(loadDashboard,5*60*1000);
+</script>
 </body>
 </html>
