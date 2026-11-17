@@ -1,0 +1,165 @@
+{
+  "schema_version": 1,
+  "engine": "Crypto Final Decision Engine",
+  "engine_version": "1.0.0",
+  "generated_at": "2026-11-17T21:37:20Z",
+  "status": "OK",
+  "data_quality": {
+    "macro": {
+      "name": "macro_data",
+      "timestamp": "2026-11-17T21:37:20Z",
+      "age_hours": 0.0,
+      "max_age_hours": 72,
+      "status": "FRESH"
+    },
+    "market": {
+      "name": "market_data",
+      "timestamp": "2026-11-17T21:36:55Z",
+      "age_hours": 0.01,
+      "max_age_hours": 36,
+      "status": "FRESH"
+    },
+    "btc_technical": {
+      "name": "BTC last closed daily candle",
+      "timestamp": "2026-11-16T23:59:59Z",
+      "age_hours": 21.62,
+      "max_age_hours": 60,
+      "status": "FRESH"
+    },
+    "eth_technical": {
+      "name": "ETH last closed daily candle",
+      "timestamp": "2026-11-16T23:59:59Z",
+      "age_hours": 21.62,
+      "max_age_hours": 60,
+      "status": "FRESH"
+    },
+    "issues": [
+      "Net Liquidity RRP mismatch: metrics.reverse_repo=0.351B, liquidity.components.reverse_repo=0.152B। Liquidity formula-এর aligned component আলাদা করে দেখানো হয়েছে।",
+      "Macro data quality GOOD_WITH_OPTIONAL_GAPS; optional Gold data unavailable।",
+      "Market data scheduled snapshot; realtime feed নয়।"
+    ]
+  },
+  "macro_analysis": {
+    "decision": "WAIT",
+    "risk_score": 2.0,
+    "support_score": 1.0,
+    "data_quality": "GOOD_WITH_OPTIONAL_GAPS",
+    "critical_series_available": 18,
+    "critical_series_count": 18,
+    "critical_missing": [],
+    "key_metrics": {
+      "cpi_yoy_percent": 4.081,
+      "core_pce_yoy_percent": 3.121,
+      "vix": 22.91,
+      "sp500_daily_change_percent": -1.9186,
+      "nasdaq_daily_change_percent": -2.4925,
+      "yield_10y_daily_change_pp": -0.03,
+      "net_liquidity_trend": "CONTRACTING"
+    },
+    "risk_flags": [
+      "CPI YoY উচ্চ; inflation pressure রয়েছে।",
+      "Core PCE YoY 3% বা তার বেশি।",
+      "VIX 20-এর ওপরে; equity volatility elevated।",
+      "S&P 500 ও Nasdaq উভয়ই সর্বশেষ session-এ 1.5% বা বেশি কমেছে।",
+      "US Net Liquidity proxy-এর trend CONTRACTING।"
+    ]
+  },
+  "crypto_market": {
+    "global_market_cap_usd": 2213839473043.603,
+    "global_volume_24h_usd": 78557615990.1511,
+    "btc_dominance_percent": 58.46327942954175,
+    "fear_greed": {
+      "value": 12.0,
+      "classification": "Extreme Fear",
+      "unit": "/100",
+      "source": "Alternative.me Fear & Greed API",
+      "source_updated_at": "2026-11-17T00:00:00Z",
+      "fetched_at": "2026-11-17T21:36:56Z",
+      "status": "OK",
+      "error": null
+    },
+    "btc": {
+      "symbol": "BTC",
+      "price_usdt": 64882.87,
+      "ma20": 74370.13350000001,
+      "ma50": 79451.98679999998,
+      "ma200": 72921.15399999997,
+      "rsi14": 23.709574976737414,
+      "macd": -3797.86204731997,
+      "macd_signal": -2652.78857506393,
+      "adx14": 34.128006814198905,
+      "volume_ratio_20d": 1.2307243183821446,
+      "support_20d": 62006.0,
+      "resistance_20d": 81971.0,
+      "bollinger_lower": 64571.78086899458,
+      "last_closed_candle_at": "2026-11-16T23:59:59Z",
+      "candle_count": 249,
+      "trend": "BEARISH",
+      "signals": [
+        "দাম MA20-এর নিচে।",
+        "MA20 < MA50; short/mid-term trend দুর্বল।",
+        "RSI 30-এর নিচে; oversold, কিন্তু reversal নিশ্চিত নয়।",
+        "MACD signal line-এর নিচে।",
+        "শেষ দিনের volume 20D average-এর তুলনায় বেশি।"
+      ],
+      "data_complete": true
+    },
+    "eth": {
+      "symbol": "ETH",
+      "price_usdt": 1820.67,
+      "ma20": 2140.300999999999,
+      "ma50": 2363.045,
+      "ma200": 2141.9128,
+      "rsi14": 25.52951238512955,
+      "macd": -145.7614696883736,
+      "macd_signal": -110.70759105150798,
+      "adx14": 34.59243370306835,
+      "volume_ratio_20d": 1.1119690268479172,
+      "support_20d": 1711.08,
+      "resistance_20d": 2450.0,
+      "bollinger_lower": 1779.505300862662,
+      "last_closed_candle_at": "2026-11-16T23:59:59Z",
+      "candle_count": 249,
+      "trend": "BEARISH",
+      "signals": [
+        "দাম MA20-এর নিচে।",
+        "MA20 < MA50; short/mid-term trend দুর্বল।",
+        "RSI 30-এর নিচে; oversold, কিন্তু reversal নিশ্চিত নয়।",
+        "MACD signal line-এর নিচে।"
+      ],
+      "data_complete": true
+    }
+  },
+  "final_decision": {
+    "decision": "WAIT",
+    "confidence_label": "RULE_BASED_NOT_PROBABILITY",
+    "reasons": [
+      "BTC daily trend bearish; oversold RSI একা buy signal নয়।",
+      "Fear & Greed Extreme Fear; এটি একা market bottom signal নয়।"
+    ],
+    "actions": [
+      "নতুন BUY/DCA এড়িয়ে চলুন। Daily trend recovery নিশ্চিত না হওয়া পর্যন্ত অপেক্ষা করুন।"
+    ],
+    "risk": [
+      "BTC RSI oversold; আরও পতন বা consolidation সম্ভব। Oversold মানেই reversal নয়।",
+      "BTC MA20 < MA50; short/mid-term trend দুর্বল।"
+    ],
+    "market_context": {
+      "fear_greed_value": 12.0,
+      "fear_greed_classification": "Extreme Fear",
+      "btc_dominance_percent": 58.46327942954175,
+      "total_market_cap_usd": 2213839473043.603,
+      "total_volume_24h_usd": 78557615990.1511
+    },
+    "important_note": "এটি সামগ্রিক market-regime guidance; ব্যক্তিগত portfolio holdings-এর coin-by-coin SELL signal নয়।"
+  },
+  "limitations": [
+    "Rule-based engine; calibrated probability নয়।",
+    "Macro decision একা crypto SELL signal নয়।",
+    "BTC/ETH technical data 1D closed candles; intraday reversal ধরার জন্য নয়।",
+    "ETF flows, crypto on-chain, whale flows, liquidation data ও derivatives positioning এখনো integrate করা হয়নি।",
+    "Coin-specific tokenomics, unlocks, fundamentals ও portfolio weight এই engine-এ নেই।",
+    "CoinGecko ও Binance price আলাদা source/time; source mismatch report করা হয়, auto-correct নয়।",
+    "FRED macro observations প্রকাশে বিলম্বিত হতে পারে।"
+  ]
+}
