@@ -1,63 +1,18 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "engine": "Crypto Macro Engine",
-  "engine_version": "1.0",
-  "fetched_at": "2026-11-17T19:18:37Z",
+  "engine_version": "1.1",
+  "fetched_at": "2026-11-17T19:27:33Z",
   "source": "Federal Reserve Economic Data (FRED)",
   "source_mode": "FRED CSV export",
   "summary": {
     "total_series": 22,
-    "ok": 18,
-    "stale": 3,
+    "ok": 21,
+    "stale": 0,
     "unavailable": 1,
     "data_quality": "GOOD"
   },
   "metrics": {
-    "unemployment": {
-      "key": "unemployment",
-      "name": "Unemployment Rate",
-      "value": 4.1,
-      "unit": "%",
-      "observation_date": "2026-10-01",
-      "previous_value": 4.2,
-      "previous_date": "2026-09-01",
-      "change": -0.1,
-      "change_percent": -2.381,
-      "source": "FRED CSV",
-      "fetched_at": "2026-11-17T19:18:30Z",
-      "status": "OK",
-      "error": null
-    },
-    "core_pce": {
-      "key": "core_pce",
-      "name": "Core PCE Price Index",
-      "value": 130.902,
-      "unit": "index",
-      "observation_date": "2026-09-01",
-      "previous_value": 130.489,
-      "previous_date": "2026-08-01",
-      "change": 0.413,
-      "change_percent": 0.3165,
-      "source": "FRED CSV",
-      "fetched_at": "2026-11-17T19:18:31Z",
-      "status": "STALE",
-      "error": "Observation is stale"
-    },
-    "pce": {
-      "key": "pce",
-      "name": "PCE Price Index",
-      "value": 132.257,
-      "unit": "index",
-      "observation_date": "2026-09-01",
-      "previous_value": 131.611,
-      "previous_date": "2026-08-01",
-      "change": 0.646,
-      "change_percent": 0.4908,
-      "source": "FRED CSV",
-      "fetched_at": "2026-11-17T19:18:31Z",
-      "status": "STALE",
-      "error": "Observation is stale"
-    },
     "core_cpi": {
       "key": "core_cpi",
       "name": "Core CPI",
@@ -68,23 +23,8 @@
       "previous_date": "2026-09-01",
       "change": 1.004,
       "change_percent": 0.2963,
-      "source": "FRED CSV",
-      "fetched_at": "2026-11-17T19:18:31Z",
-      "status": "OK",
-      "error": null
-    },
-    "cpi": {
-      "key": "cpi",
-      "name": "Consumer Price Index",
-      "value": 337.476,
-      "unit": "index",
-      "observation_date": "2026-10-01",
-      "previous_value": 336.298,
-      "previous_date": "2026-09-01",
-      "change": 1.178,
-      "change_percent": 0.3503,
-      "source": "FRED CSV",
-      "fetched_at": "2026-11-17T19:18:31Z",
+      "source": "FRED_CSV_EXPORT",
+      "fetched_at": "2026-11-17T19:27:27Z",
       "status": "OK",
       "error": null
     },
@@ -98,11 +38,71 @@
       "previous_date": "2026-09-01",
       "change": 165.0,
       "change_percent": 0.1037,
-      "source": "FRED CSV",
-      "fetched_at": "2026-11-17T19:18:31Z",
+      "source": "FRED_CSV_EXPORT",
+      "fetched_at": "2026-11-17T19:27:27Z",
       "status": "OK",
       "error": null,
       "monthly_change_thousands": 165.0
+    },
+    "core_pce": {
+      "key": "core_pce",
+      "name": "Core PCE Price Index",
+      "value": 130.902,
+      "unit": "index",
+      "observation_date": "2026-09-01",
+      "previous_value": 130.489,
+      "previous_date": "2026-08-01",
+      "change": 0.413,
+      "change_percent": 0.3165,
+      "source": "FRED_CSV_EXPORT",
+      "fetched_at": "2026-11-17T19:27:27Z",
+      "status": "OK",
+      "error": null
+    },
+    "pce": {
+      "key": "pce",
+      "name": "PCE Price Index",
+      "value": 132.257,
+      "unit": "index",
+      "observation_date": "2026-09-01",
+      "previous_value": 131.611,
+      "previous_date": "2026-08-01",
+      "change": 0.646,
+      "change_percent": 0.4908,
+      "source": "FRED_CSV_EXPORT",
+      "fetched_at": "2026-11-17T19:27:27Z",
+      "status": "OK",
+      "error": null
+    },
+    "unemployment": {
+      "key": "unemployment",
+      "name": "Unemployment Rate",
+      "value": 4.1,
+      "unit": "%",
+      "observation_date": "2026-10-01",
+      "previous_value": 4.2,
+      "previous_date": "2026-09-01",
+      "change": -0.1,
+      "change_percent": -2.381,
+      "source": "FRED_CSV_EXPORT",
+      "fetched_at": "2026-11-17T19:27:28Z",
+      "status": "OK",
+      "error": null
+    },
+    "cpi": {
+      "key": "cpi",
+      "name": "Consumer Price Index",
+      "value": 337.476,
+      "unit": "index",
+      "observation_date": "2026-10-01",
+      "previous_value": 336.298,
+      "previous_date": "2026-09-01",
+      "change": 1.178,
+      "change_percent": 0.3503,
+      "source": "FRED_CSV_EXPORT",
+      "fetched_at": "2026-11-17T19:27:28Z",
+      "status": "OK",
+      "error": null
     },
     "sp500": {
       "key": "sp500",
@@ -114,8 +114,8 @@
       "previous_date": "2026-11-13",
       "change": -145.08,
       "change_percent": -1.9186,
-      "source": "FRED CSV",
-      "fetched_at": "2026-11-17T19:18:31Z",
+      "source": "FRED_CSV_EXPORT",
+      "fetched_at": "2026-11-17T19:27:28Z",
       "status": "OK",
       "error": null
     },
@@ -129,8 +129,8 @@
       "previous_date": "2026-11-12",
       "change": 0.107,
       "change_percent": 0.0873,
-      "source": "FRED CSV",
-      "fetched_at": "2026-11-17T19:18:32Z",
+      "source": "FRED_CSV_EXPORT",
+      "fetched_at": "2026-11-17T19:27:29Z",
       "status": "OK",
       "error": null
     },
@@ -144,23 +144,8 @@
       "previous_date": "2026-11-13",
       "change": 3.61,
       "change_percent": 18.7047,
-      "source": "FRED CSV",
-      "fetched_at": "2026-11-17T19:18:32Z",
-      "status": "OK",
-      "error": null
-    },
-    "yield_2y": {
-      "key": "yield_2y",
-      "name": "US 2-Year Treasury Yield",
-      "value": 4.88,
-      "unit": "%",
-      "observation_date": "2026-11-13",
-      "previous_value": 4.86,
-      "previous_date": "2026-11-12",
-      "change": 0.02,
-      "change_percent": 0.4115,
-      "source": "FRED CSV",
-      "fetched_at": "2026-11-17T19:18:33Z",
+      "source": "FRED_CSV_EXPORT",
+      "fetched_at": "2026-11-17T19:27:30Z",
       "status": "OK",
       "error": null
     },
@@ -174,8 +159,23 @@
       "previous_date": "2026-11-12",
       "change": 0.04,
       "change_percent": 0.7366,
-      "source": "FRED CSV",
-      "fetched_at": "2026-11-17T19:18:33Z",
+      "source": "FRED_CSV_EXPORT",
+      "fetched_at": "2026-11-17T19:27:31Z",
+      "status": "OK",
+      "error": null
+    },
+    "yield_2y": {
+      "key": "yield_2y",
+      "name": "US 2-Year Treasury Yield",
+      "value": 4.88,
+      "unit": "%",
+      "observation_date": "2026-11-13",
+      "previous_value": 4.86,
+      "previous_date": "2026-11-12",
+      "change": 0.02,
+      "change_percent": 0.4115,
+      "source": "FRED_CSV_EXPORT",
+      "fetched_at": "2026-11-17T19:27:31Z",
       "status": "OK",
       "error": null
     },
@@ -183,14 +183,14 @@
       "key": "yield_curve_10y_2y",
       "name": "10Y-2Y Treasury Spread",
       "value": 0.29,
-      "unit": "%",
+      "unit": "percentage_points",
       "observation_date": "2026-11-16",
       "previous_value": 0.27,
       "previous_date": "2026-11-13",
       "change": 0.02,
       "change_percent": 7.4074,
-      "source": "FRED CSV",
-      "fetched_at": "2026-11-17T19:18:33Z",
+      "source": "FRED_CSV_EXPORT",
+      "fetched_at": "2026-11-17T19:27:31Z",
       "status": "OK",
       "error": null
     },
@@ -204,38 +204,23 @@
       "previous_date": "2026-11-04",
       "change": 10722.0,
       "change_percent": 0.1589,
-      "source": "FRED CSV",
-      "fetched_at": "2026-11-17T19:18:33Z",
+      "source": "FRED_CSV_EXPORT",
+      "fetched_at": "2026-11-17T19:27:32Z",
       "status": "OK",
       "error": null
     },
-    "nasdaq": {
-      "key": "nasdaq",
-      "name": "NASDAQ Composite",
-      "value": 24509.76,
-      "unit": "index",
-      "observation_date": "2026-11-16",
-      "previous_value": 25136.27,
-      "previous_date": "2026-11-13",
-      "change": -626.51,
-      "change_percent": -2.4925,
-      "source": "FRED CSV",
-      "fetched_at": "2026-11-17T19:18:33Z",
-      "status": "OK",
-      "error": null
-    },
-    "yield_10y": {
-      "key": "yield_10y",
-      "name": "US 10-Year Treasury Yield",
-      "value": 5.15,
-      "unit": "%",
-      "observation_date": "2026-11-13",
-      "previous_value": 5.1,
-      "previous_date": "2026-11-12",
-      "change": 0.05,
-      "change_percent": 0.9804,
-      "source": "FRED CSV",
-      "fetched_at": "2026-11-17T19:18:33Z",
+    "treasury_general_account": {
+      "key": "treasury_general_account",
+      "name": "Treasury General Account",
+      "value": 914370.0,
+      "unit": "millions USD",
+      "observation_date": "2026-11-11",
+      "previous_value": 957175.0,
+      "previous_date": "2026-11-04",
+      "change": -42805.0,
+      "change_percent": -4.472,
+      "source": "FRED_CSV_EXPORT",
+      "fetched_at": "2026-11-17T19:27:32Z",
       "status": "OK",
       "error": null
     },
@@ -249,23 +234,23 @@
       "previous_date": "2026-08-01",
       "change": 113.0,
       "change_percent": 0.485,
-      "source": "FRED CSV",
-      "fetched_at": "2026-11-17T19:18:33Z",
-      "status": "STALE",
-      "error": "Observation is stale"
+      "source": "FRED_CSV_EXPORT",
+      "fetched_at": "2026-11-17T19:27:32Z",
+      "status": "OK",
+      "error": null
     },
-    "treasury_general_account": {
-      "key": "treasury_general_account",
-      "name": "Treasury General Account",
-      "value": 914370.0,
-      "unit": "millions USD",
-      "observation_date": "2026-11-11",
-      "previous_value": 957175.0,
-      "previous_date": "2026-11-04",
-      "change": -42805.0,
-      "change_percent": -4.472,
-      "source": "FRED CSV",
-      "fetched_at": "2026-11-17T19:18:33Z",
+    "nasdaq": {
+      "key": "nasdaq",
+      "name": "NASDAQ Composite",
+      "value": 24509.76,
+      "unit": "index",
+      "observation_date": "2026-11-16",
+      "previous_value": 25136.27,
+      "previous_date": "2026-11-13",
+      "change": -626.51,
+      "change_percent": -2.4925,
+      "source": "FRED_CSV_EXPORT",
+      "fetched_at": "2026-11-17T19:27:32Z",
       "status": "OK",
       "error": null
     },
@@ -279,8 +264,23 @@
       "previous_date": "2026-11-10",
       "change": 0.0,
       "change_percent": 0.0,
-      "source": "FRED CSV",
-      "fetched_at": "2026-11-17T19:18:33Z",
+      "source": "FRED_CSV_EXPORT",
+      "fetched_at": "2026-11-17T19:27:32Z",
+      "status": "OK",
+      "error": null
+    },
+    "yield_10y": {
+      "key": "yield_10y",
+      "name": "US 10-Year Treasury Yield",
+      "value": 5.15,
+      "unit": "%",
+      "observation_date": "2026-11-13",
+      "previous_value": 5.1,
+      "previous_date": "2026-11-12",
+      "change": 0.05,
+      "change_percent": 0.9804,
+      "source": "FRED_CSV_EXPORT",
+      "fetched_at": "2026-11-17T19:27:32Z",
       "status": "OK",
       "error": null
     },
@@ -294,23 +294,8 @@
       "previous_date": "2026-11-16",
       "change": 0.169,
       "change_percent": 92.8571,
-      "source": "FRED CSV",
-      "fetched_at": "2026-11-17T19:18:33Z",
-      "status": "OK",
-      "error": null
-    },
-    "fed_funds_rate": {
-      "key": "fed_funds_rate",
-      "name": "Federal Funds Effective Rate",
-      "value": 3.88,
-      "unit": "%",
-      "observation_date": "2026-11-13",
-      "previous_value": 3.88,
-      "previous_date": "2026-11-12",
-      "change": 0.0,
-      "change_percent": 0.0,
-      "source": "FRED CSV",
-      "fetched_at": "2026-11-17T19:18:34Z",
+      "source": "FRED_CSV_EXPORT",
+      "fetched_at": "2026-11-17T19:27:32Z",
       "status": "OK",
       "error": null
     },
@@ -324,14 +309,29 @@
       "previous_date": "2026-11-12",
       "change": 0.33,
       "change_percent": 0.2068,
-      "source": "FRED CSV",
-      "fetched_at": "2026-11-17T19:18:34Z",
+      "source": "FRED_CSV_EXPORT",
+      "fetched_at": "2026-11-17T19:27:33Z",
+      "status": "OK",
+      "error": null
+    },
+    "fed_funds_rate": {
+      "key": "fed_funds_rate",
+      "name": "Federal Funds Effective Rate",
+      "value": 3.88,
+      "unit": "%",
+      "observation_date": "2026-11-13",
+      "previous_value": 3.88,
+      "previous_date": "2026-11-12",
+      "change": 0.0,
+      "change_percent": 0.0,
+      "source": "FRED_CSV_EXPORT",
+      "fetched_at": "2026-11-17T19:27:33Z",
       "status": "OK",
       "error": null
     },
     "gold": {
       "key": "gold",
-      "name": "London Gold Price AM",
+      "name": "Gold Price",
       "value": null,
       "unit": "USD/oz",
       "observation_date": null,
@@ -339,10 +339,10 @@
       "previous_date": null,
       "change": null,
       "change_percent": null,
-      "source": "FRED",
-      "fetched_at": "2026-11-17T19:18:37Z",
+      "source": "FRED GOLDAMGBD228NLBM (disabled)",
+      "fetched_at": "2026-11-17T19:27:33Z",
       "status": "UNAVAILABLE",
-      "error": "HTTP Error 404: Not Found"
+      "error": "FRED endpoint returned HTTP 404. No verified replacement price source is configured."
     }
   },
   "inflation": {
@@ -360,15 +360,15 @@
     },
     "pce": {
       "name": "PCE",
-      "mom_percent": null,
-      "yoy_percent": null,
-      "status": "UNAVAILABLE"
+      "mom_percent": 0.491,
+      "yoy_percent": 3.649,
+      "status": "OK"
     },
     "core_pce": {
       "name": "Core PCE",
-      "mom_percent": null,
-      "yoy_percent": null,
-      "status": "UNAVAILABLE"
+      "mom_percent": 0.317,
+      "yoy_percent": 3.121,
+      "status": "OK"
     }
   },
   "reports": {
@@ -377,42 +377,49 @@
         "yoy_percent": 4.081,
         "mom_percent": 0.35
       },
-      "ANALYSIS": "মুদ্রাস্ফীতির চাপ বেশি।",
+      "ANALYSIS": "CPI YoY উচ্চ পর্যায়ে রয়েছে।",
       "DECISION": "REDUCE RISK",
-      "ACTION": "CPI YoY উচ্চ—ঝুঁকিপূর্ণ Altcoin exposure কমান।",
-      "RISK": "Fed-এর কঠোর নীতির ঝুঁকি বাড়ছে।"
+      "ACTION": "CPI inflation বেশি—ঝুঁকিপূর্ণ Altcoin exposure কমান।",
+      "RISK": "একটি inflation reading দিয়ে Fed-এর পরবর্তী সিদ্ধান্ত নিশ্চিত হয় না।"
     },
     "core_cpi": {
       "DATA": {
-        "yoy_percent": 2.87
+        "yoy_percent": 2.87,
+        "mom_percent": 0.296
       },
-      "ANALYSIS": "Core CPI তুলনামূলকভাবে নিয়ন্ত্রিত।",
+      "ANALYSIS": "Core CPI YoY তুলনামূলকভাবে নিয়ন্ত্রিত।",
       "DECISION": "HOLD / SELECTIVE",
-      "ACTION": "Core inflation trend পর্যবেক্ষণ করুন।",
-      "RISK": "অন্যান্য inflation ও labor data-ও গুরুত্বপূর্ণ।"
+      "ACTION": "Inflation trend-কে Fed policy, yields ও BTC trend-এর সঙ্গে মিলিয়ে দেখুন।",
+      "RISK": "কম inflation একাই Crypto bullish signal নয়।"
     },
     "pce": {
-      "DATA": null,
-      "ANALYSIS": "PCE data unavailable.",
-      "DECISION": "WAIT — INSUFFICIENT DATA",
-      "ACTION": "PCE-ভিত্তিক সিদ্ধান্ত নেবেন না।",
-      "RISK": "Fed-এর preferred inflation measure অনুপস্থিত।"
+      "DATA": {
+        "yoy_percent": 3.649,
+        "mom_percent": 0.491
+      },
+      "ANALYSIS": "PCE YoY উচ্চ পর্যায়ে রয়েছে।",
+      "DECISION": "REDUCE RISK",
+      "ACTION": "PCE inflation বেশি—ঝুঁকিপূর্ণ Altcoin exposure কমান।",
+      "RISK": "একটি inflation reading দিয়ে Fed-এর পরবর্তী সিদ্ধান্ত নিশ্চিত হয় না।"
     },
     "core_pce": {
-      "DATA": null,
-      "ANALYSIS": "Core PCE unavailable.",
-      "DECISION": "WAIT — INSUFFICIENT DATA",
-      "ACTION": "Core PCE-ভিত্তিক সিদ্ধান্ত স্থগিত রাখুন।",
-      "RISK": "Underlying PCE inflation যাচাই করা যাচ্ছে না।"
+      "DATA": {
+        "yoy_percent": 3.121,
+        "mom_percent": 0.317
+      },
+      "ANALYSIS": "Core PCE YoY উচ্চ পর্যায়ে রয়েছে।",
+      "DECISION": "REDUCE RISK",
+      "ACTION": "Core PCE inflation বেশি—ঝুঁকিপূর্ণ Altcoin exposure কমান।",
+      "RISK": "একটি inflation reading দিয়ে Fed-এর পরবর্তী সিদ্ধান্ত নিশ্চিত হয় না।"
     },
     "fed_rate": {
       "DATA": {
-        "percent": 3.88
+        "effective_rate_percent": 3.88
       },
-      "ANALYSIS": "বর্তমান effective Fed funds rate যাচাই করা হয়েছে।",
+      "ANALYSIS": "সর্বশেষ effective Fed funds rate পাওয়া গেছে।",
       "DECISION": "HOLD / SELECTIVE",
-      "ACTION": "Fed rate-কে CPI, PCE, employment ও bond yield-এর সঙ্গে বিশ্লেষণ করুন।",
-      "RISK": "Fed funds rate একা পরবর্তী FOMC সিদ্ধান্ত নির্দেশ করে না।"
+      "ACTION": "Fed rate-কে CPI, PCE, employment ও Treasury yield-এর সঙ্গে বিশ্লেষণ করুন।",
+      "RISK": "Effective rate একা FOMC-এর পরবর্তী সিদ্ধান্ত জানায় না।"
     },
     "labor_market": {
       "DATA": {
@@ -421,80 +428,81 @@
       },
       "ANALYSIS": "Labor market তুলনামূলকভাবে স্থিতিশীল।",
       "DECISION": "HOLD / SELECTIVE",
-      "ACTION": "Employment trend পর্যবেক্ষণ করুন।",
-      "RISK": "শক্তিশালী employment inflation pressure বাড়াতে পারে।"
+      "ACTION": "Employment trend ও wage inflation একসঙ্গে পর্যবেক্ষণ করুন।",
+      "RISK": "শক্তিশালী employment inflation pressure বজায় রাখতে পারে।"
     },
     "bond_yields": {
       "DATA": {
         "2y": 4.88,
         "10y": 5.15,
         "30y": 5.47,
-        "10y_daily_change": 0.05
+        "10y_daily_change_pp": 0.05
       },
-      "ANALYSIS": "দীর্ঘমেয়াদি borrowing cost বাড়ছে।",
+      "ANALYSIS": "10Y Treasury yield সর্বশেষ observation-এ বেড়েছে।",
       "DECISION": "REDUCE RISK",
-      "ACTION": "10Y yield দ্রুত বাড়ছে—ঝুঁকিপূর্ণ Altcoin exposure কমান।",
-      "RISK": "Risk asset valuation-এর ওপর চাপ তৈরি হচ্ছে।"
+      "ACTION": "10Y yield বাড়ছে—ঝুঁকিপূর্ণ Altcoin exposure কমান।",
+      "RISK": "Yield বৃদ্ধি inflation বা Treasury supply concern—দুই কারণেই হতে পারে।"
     },
     "usd_index": {
       "DATA": {
         "daily_change_percent": 0.0873
       },
-      "ANALYSIS": "Broad dollar index-এ বড় পরিবর্তন নেই।",
+      "ANALYSIS": "Broad USD index-এ বড় দৈনিক পরিবর্তন নেই।",
       "DECISION": "WAIT",
       "ACTION": "USD trend পর্যবেক্ষণ করুন।",
-      "RISK": "এই সূচক ICE DXY-এর বিকল্প নয়।"
+      "RISK": "এটি ICE DXY নয়; broad trade-weighted USD index।"
     },
     "vix": {
       "DATA": {
         "value": 22.91
       },
-      "ANALYSIS": "Volatility elevated।",
+      "ANALYSIS": "VIX elevated range-এ রয়েছে।",
       "DECISION": "WAIT",
       "ACTION": "নতুন BUY-তে সতর্ক থাকুন।",
-      "RISK": "Risk sentiment স্থিতিশীল নয়।"
+      "RISK": "VIX একা Crypto market direction নির্ধারণ করে না।"
     },
     "equity_market": {
       "DATA": {
         "sp500": 7416.59,
         "nasdaq": 24509.76
       },
-      "ANALYSIS": "S&P 500 ও Nasdaq-এর সর্বশেষ উপলব্ধ closing value পাওয়া গেছে।",
+      "ANALYSIS": "S&P 500 ও Nasdaq-এর latest observations পাওয়া গেছে।",
       "DECISION": "HOLD / SELECTIVE",
       "ACTION": "Equity trend-কে VIX, yields ও BTC trend-এর সঙ্গে মিলিয়ে দেখুন।",
       "RISK": "Closing index value একা market trend নিশ্চিত করে না।"
     },
     "commodities": {
       "DATA": {
-        "wti_oil_usd": 89.62,
-        "gold_usd_oz": null,
-        "gold_data_status": "UNAVAILABLE"
+        "wti_oil_usd_per_barrel": 89.62,
+        "gold_usd_per_oz": null,
+        "gold_status": "UNAVAILABLE",
+        "gold_note": "FRED endpoint returned HTTP 404. No verified replacement price source is configured."
       },
-      "ANALYSIS": "Oil ও Gold-এর সর্বশেষ উপলব্ধ FRED observations।",
+      "ANALYSIS": "WTI oil data পাওয়া গেছে; Gold price source unavailable.",
       "DECISION": "HOLD / SELECTIVE",
-      "ACTION": "Oil inflation pressure এবং Gold safe-haven demand হিসেবে পর্যবেক্ষণ করুন।",
-      "RISK": "Gold fixing data পুরোনো হতে পারে; STALE হলে live price হিসেবে ব্যবহার করবেন না।"
+      "ACTION": "Oil-এর inflation impact পর্যবেক্ষণ করুন; Gold-এর জন্য verified replacement source প্রয়োজন।",
+      "RISK": "Gold-এর কোনো কৃত্রিম বা পুরোনো মান ব্যবহার করা হচ্ছে না।"
     },
     "yen": {
       "DATA": {
         "jpy_per_usd": 159.93
       },
-      "ANALYSIS": "USD/JPY exchange rate পাওয়া গেছে।",
+      "ANALYSIS": "USD/JPY latest observation পাওয়া গেছে।",
       "DECISION": "WAIT",
       "ACTION": "Yen movement-এর সঙ্গে BOJ policy ও Japanese bond yield পর্যবেক্ষণ করুন।",
-      "RISK": "শুধু USD/JPY দিয়ে carry-trade unwind নিশ্চিত করা যায় না।"
+      "RISK": "শুধু USD/JPY দিয়ে carry-trade unwind নিশ্চিত করা যায় না; JGB yield curve এখনো যুক্ত হয়নি।"
     },
     "liquidity": {
       "DATA": {
         "fed_balance_sheet": 6758867.0,
         "reverse_repo": 0.351,
         "treasury_general_account": 914370.0,
-        "m2": null
+        "m2_money_supply": 23413.9
       },
-      "ANALYSIS": "Liquidity data incomplete.",
-      "DECISION": "WAIT — INSUFFICIENT DATA",
-      "ACTION": "Global liquidity সম্পর্কে নিশ্চিত সিদ্ধান্ত নেবেন না।",
-      "RISK": "Missing data-এর কারণে liquidity direction নির্ধারণ করা যাচ্ছে না।"
+      "ANALYSIS": "Fed assets, RRP, TGA ও M2-এর latest observations পাওয়া গেছে।",
+      "DECISION": "HOLD / SELECTIVE",
+      "ACTION": "সব series-এর change একত্রে বিশ্লেষণ করুন; একটি metric দিয়ে liquidity সিদ্ধান্ত নেবেন না।",
+      "RISK": "এটি পূর্ণ global liquidity composite নয়; M2-এর প্রকাশ-ল্যাগও বিবেচনা করতে হবে।"
     }
   },
   "overall_macro_decision": {
@@ -503,32 +511,33 @@
       "vix": 22.91,
       "10y_yield_daily_change_percentage_points": 0.05,
       "risk_flags": [
-        "10Y yield increased"
+        "10Y yield daily change >= +0.05 percentage points"
       ],
-      "support_flags": []
+      "supportive_flags": []
     },
-    "ANALYSIS": "Macro signal মিশ্র বা অপর্যাপ্ত।",
+    "ANALYSIS": "Macro signal মিশ্র বা একমুখী নয়।",
     "DECISION": "WAIT",
-    "ACTION": "নতুন বড় risk exposure নেবেন না; BTC ও Macro trend পর্যবেক্ষণ করুন।",
-    "RISK": "দিক নির্ধারণের জন্য আরও confirmation প্রয়োজন।"
+    "ACTION": "নতুন বড় risk exposure নেবেন না; BTC ও পরবর্তী macro release পর্যবেক্ষণ করুন।",
+    "RISK": "এই assessment intraday price বা BTC technical trend-এর বিকল্প নয়।"
   },
   "limitations": [
-    "DTWEXBGS is a broad USD index proxy, not ICE DXY.",
-    "FRED observations may be delayed according to release schedules.",
-    "Gold fixing data may be stale and is not a guaranteed live gold quote.",
-    "Official economic calendar forecast and actual surprise are not integrated.",
+    "DTWEXBGS is a broad trade-weighted USD index proxy, not ICE DXY.",
+    "FRED observations are released with delays.",
+    "Per-series freshness limits account for normal release lags.",
+    "Gold series is disabled after HTTP 404.",
+    "No unverified replacement Gold price is used.",
+    "Economic calendar forecast/actual/surprise is not integrated.",
     "BOJ policy and Japanese government bond yield curves are not integrated.",
-    "Global liquidity composite is not integrated.",
+    "Global central-bank liquidity composite is not integrated.",
     "Crypto ETF flows and crypto-specific on-chain data are not integrated.",
-    "Macro decision is not a standalone trading signal.",
-    "No personal portfolio or buy/sell position data is used."
+    "Macro decision is not a standalone trading signal."
   ],
   "not_integrated_yet": [
-    "Economic calendar with forecast, actual and previous",
+    "Economic calendar with forecast and actual",
     "BOJ policy and JGB yields",
     "JPY carry-trade risk model",
     "Global central-bank liquidity composite",
-    "Live gold market price cross-check",
+    "Verified live Gold market price source",
     "Crypto ETF flows",
     "BTC market structure and technical confirmation",
     "Crypto-specific on-chain data"
