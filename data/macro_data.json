@@ -2,7 +2,7 @@
   "schema_version": 1,
   "engine": "Crypto Macro Engine",
   "engine_version": "1.0",
-  "fetched_at": "2026-11-17T19:12:48Z",
+  "fetched_at": "2026-11-17T19:18:37Z",
   "source": "Federal Reserve Economic Data (FRED)",
   "source_mode": "FRED CSV export",
   "summary": {
@@ -13,36 +13,20 @@
     "data_quality": "GOOD"
   },
   "metrics": {
-    "nonfarm_payrolls": {
-      "key": "nonfarm_payrolls",
-      "name": "Total Nonfarm Payrolls",
-      "value": 159293.0,
-      "unit": "thousands",
+    "unemployment": {
+      "key": "unemployment",
+      "name": "Unemployment Rate",
+      "value": 4.1,
+      "unit": "%",
       "observation_date": "2026-10-01",
-      "previous_value": 159128.0,
+      "previous_value": 4.2,
       "previous_date": "2026-09-01",
-      "change": 165.0,
-      "change_percent": 0.1037,
+      "change": -0.1,
+      "change_percent": -2.381,
       "source": "FRED CSV",
-      "fetched_at": "2026-11-17T19:12:40Z",
+      "fetched_at": "2026-11-17T19:18:30Z",
       "status": "OK",
-      "error": null,
-      "monthly_change_thousands": 165.0
-    },
-    "pce": {
-      "key": "pce",
-      "name": "PCE Price Index",
-      "value": 132.257,
-      "unit": "index",
-      "observation_date": "2026-09-01",
-      "previous_value": 131.611,
-      "previous_date": "2026-08-01",
-      "change": 0.646,
-      "change_percent": 0.4908,
-      "source": "FRED CSV",
-      "fetched_at": "2026-11-17T19:12:41Z",
-      "status": "STALE",
-      "error": "Observation is stale"
+      "error": null
     },
     "core_pce": {
       "key": "core_pce",
@@ -55,39 +39,24 @@
       "change": 0.413,
       "change_percent": 0.3165,
       "source": "FRED CSV",
-      "fetched_at": "2026-11-17T19:12:41Z",
+      "fetched_at": "2026-11-17T19:18:31Z",
       "status": "STALE",
       "error": "Observation is stale"
     },
-    "cpi": {
-      "key": "cpi",
-      "name": "Consumer Price Index",
-      "value": 337.476,
+    "pce": {
+      "key": "pce",
+      "name": "PCE Price Index",
+      "value": 132.257,
       "unit": "index",
-      "observation_date": "2026-10-01",
-      "previous_value": 336.298,
-      "previous_date": "2026-09-01",
-      "change": 1.178,
-      "change_percent": 0.3503,
+      "observation_date": "2026-09-01",
+      "previous_value": 131.611,
+      "previous_date": "2026-08-01",
+      "change": 0.646,
+      "change_percent": 0.4908,
       "source": "FRED CSV",
-      "fetched_at": "2026-11-17T19:12:41Z",
-      "status": "OK",
-      "error": null
-    },
-    "unemployment": {
-      "key": "unemployment",
-      "name": "Unemployment Rate",
-      "value": 4.1,
-      "unit": "%",
-      "observation_date": "2026-10-01",
-      "previous_value": 4.2,
-      "previous_date": "2026-09-01",
-      "change": -0.1,
-      "change_percent": -2.381,
-      "source": "FRED CSV",
-      "fetched_at": "2026-11-17T19:12:41Z",
-      "status": "OK",
-      "error": null
+      "fetched_at": "2026-11-17T19:18:31Z",
+      "status": "STALE",
+      "error": "Observation is stale"
     },
     "core_cpi": {
       "key": "core_cpi",
@@ -100,9 +69,40 @@
       "change": 1.004,
       "change_percent": 0.2963,
       "source": "FRED CSV",
-      "fetched_at": "2026-11-17T19:12:41Z",
+      "fetched_at": "2026-11-17T19:18:31Z",
       "status": "OK",
       "error": null
+    },
+    "cpi": {
+      "key": "cpi",
+      "name": "Consumer Price Index",
+      "value": 337.476,
+      "unit": "index",
+      "observation_date": "2026-10-01",
+      "previous_value": 336.298,
+      "previous_date": "2026-09-01",
+      "change": 1.178,
+      "change_percent": 0.3503,
+      "source": "FRED CSV",
+      "fetched_at": "2026-11-17T19:18:31Z",
+      "status": "OK",
+      "error": null
+    },
+    "nonfarm_payrolls": {
+      "key": "nonfarm_payrolls",
+      "name": "Total Nonfarm Payrolls",
+      "value": 159293.0,
+      "unit": "thousands",
+      "observation_date": "2026-10-01",
+      "previous_value": 159128.0,
+      "previous_date": "2026-09-01",
+      "change": 165.0,
+      "change_percent": 0.1037,
+      "source": "FRED CSV",
+      "fetched_at": "2026-11-17T19:18:31Z",
+      "status": "OK",
+      "error": null,
+      "monthly_change_thousands": 165.0
     },
     "sp500": {
       "key": "sp500",
@@ -115,7 +115,7 @@
       "change": -145.08,
       "change_percent": -1.9186,
       "source": "FRED CSV",
-      "fetched_at": "2026-11-17T19:12:41Z",
+      "fetched_at": "2026-11-17T19:18:31Z",
       "status": "OK",
       "error": null
     },
@@ -130,7 +130,7 @@
       "change": 0.107,
       "change_percent": 0.0873,
       "source": "FRED CSV",
-      "fetched_at": "2026-11-17T19:12:42Z",
+      "fetched_at": "2026-11-17T19:18:32Z",
       "status": "OK",
       "error": null
     },
@@ -145,7 +145,7 @@
       "change": 3.61,
       "change_percent": 18.7047,
       "source": "FRED CSV",
-      "fetched_at": "2026-11-17T19:12:44Z",
+      "fetched_at": "2026-11-17T19:18:32Z",
       "status": "OK",
       "error": null
     },
@@ -160,7 +160,7 @@
       "change": 0.02,
       "change_percent": 0.4115,
       "source": "FRED CSV",
-      "fetched_at": "2026-11-17T19:12:44Z",
+      "fetched_at": "2026-11-17T19:18:33Z",
       "status": "OK",
       "error": null
     },
@@ -175,7 +175,7 @@
       "change": 0.04,
       "change_percent": 0.7366,
       "source": "FRED CSV",
-      "fetched_at": "2026-11-17T19:12:44Z",
+      "fetched_at": "2026-11-17T19:18:33Z",
       "status": "OK",
       "error": null
     },
@@ -190,7 +190,7 @@
       "change": 0.02,
       "change_percent": 7.4074,
       "source": "FRED CSV",
-      "fetched_at": "2026-11-17T19:12:44Z",
+      "fetched_at": "2026-11-17T19:18:33Z",
       "status": "OK",
       "error": null
     },
@@ -205,7 +205,7 @@
       "change": 10722.0,
       "change_percent": 0.1589,
       "source": "FRED CSV",
-      "fetched_at": "2026-11-17T19:12:45Z",
+      "fetched_at": "2026-11-17T19:18:33Z",
       "status": "OK",
       "error": null
     },
@@ -220,22 +220,7 @@
       "change": -626.51,
       "change_percent": -2.4925,
       "source": "FRED CSV",
-      "fetched_at": "2026-11-17T19:12:45Z",
-      "status": "OK",
-      "error": null
-    },
-    "treasury_general_account": {
-      "key": "treasury_general_account",
-      "name": "Treasury General Account",
-      "value": 914370.0,
-      "unit": "millions USD",
-      "observation_date": "2026-11-11",
-      "previous_value": 957175.0,
-      "previous_date": "2026-11-04",
-      "change": -42805.0,
-      "change_percent": -4.472,
-      "source": "FRED CSV",
-      "fetched_at": "2026-11-17T19:12:45Z",
+      "fetched_at": "2026-11-17T19:18:33Z",
       "status": "OK",
       "error": null
     },
@@ -250,7 +235,7 @@
       "change": 0.05,
       "change_percent": 0.9804,
       "source": "FRED CSV",
-      "fetched_at": "2026-11-17T19:12:45Z",
+      "fetched_at": "2026-11-17T19:18:33Z",
       "status": "OK",
       "error": null
     },
@@ -265,9 +250,24 @@
       "change": 113.0,
       "change_percent": 0.485,
       "source": "FRED CSV",
-      "fetched_at": "2026-11-17T19:12:45Z",
+      "fetched_at": "2026-11-17T19:18:33Z",
       "status": "STALE",
       "error": "Observation is stale"
+    },
+    "treasury_general_account": {
+      "key": "treasury_general_account",
+      "name": "Treasury General Account",
+      "value": 914370.0,
+      "unit": "millions USD",
+      "observation_date": "2026-11-11",
+      "previous_value": 957175.0,
+      "previous_date": "2026-11-04",
+      "change": -42805.0,
+      "change_percent": -4.472,
+      "source": "FRED CSV",
+      "fetched_at": "2026-11-17T19:18:33Z",
+      "status": "OK",
+      "error": null
     },
     "oil": {
       "key": "oil",
@@ -280,7 +280,7 @@
       "change": 0.0,
       "change_percent": 0.0,
       "source": "FRED CSV",
-      "fetched_at": "2026-11-17T19:12:45Z",
+      "fetched_at": "2026-11-17T19:18:33Z",
       "status": "OK",
       "error": null
     },
@@ -295,7 +295,7 @@
       "change": 0.169,
       "change_percent": 92.8571,
       "source": "FRED CSV",
-      "fetched_at": "2026-11-17T19:12:45Z",
+      "fetched_at": "2026-11-17T19:18:33Z",
       "status": "OK",
       "error": null
     },
@@ -310,7 +310,7 @@
       "change": 0.0,
       "change_percent": 0.0,
       "source": "FRED CSV",
-      "fetched_at": "2026-11-17T19:12:46Z",
+      "fetched_at": "2026-11-17T19:18:34Z",
       "status": "OK",
       "error": null
     },
@@ -325,7 +325,7 @@
       "change": 0.33,
       "change_percent": 0.2068,
       "source": "FRED CSV",
-      "fetched_at": "2026-11-17T19:12:46Z",
+      "fetched_at": "2026-11-17T19:18:34Z",
       "status": "OK",
       "error": null
     },
@@ -340,7 +340,7 @@
       "change": null,
       "change_percent": null,
       "source": "FRED",
-      "fetched_at": "2026-11-17T19:12:48Z",
+      "fetched_at": "2026-11-17T19:18:37Z",
       "status": "UNAVAILABLE",
       "error": "HTTP Error 404: Not Found"
     }
