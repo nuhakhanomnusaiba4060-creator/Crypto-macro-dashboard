@@ -1,10 +1,13 @@
 
 #!/usr/bin/env python3
-"""Crypto Macro Dashboard - Public Market Data Engine.
+"""Crypto Macro Dashboard - public market data engine.
 
-Fetches public CoinGecko, Alternative.me and Binance Spot data.
-Writes data/market_data.json. No API keys are required.
-Unavailable or stale data is never replaced with fake values.
+Sources:
+- CoinGecko: global market statistics and BTC/ETH reference prices
+- Alternative.me: Fear & Greed Index
+- Binance Spot public API: fully closed daily BTC/ETH candles
+
+No API keys required. Missing/stale data is never fabricated.
 """
 
 from __future__ import annotations
@@ -21,12 +24,10 @@ from urllib.error import HTTPError, URLError
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 
-
-SCHEMA_VERSION = 1
+SCHEMA_VERSION = 2
 OUTPUT_FILE = Path(os.getenv("DASHBOARD_DATA_FILE", "data/market_data.json"))
-
 TIMEOUT_SECONDS = 15
-USER_AGENT = "CryptoMacroDashboard/1.0"
+USER_AGENT = "CryptoMacroDashboard/1.1"
 
 BINANCE_BASE = "https://data-api.binance.vision"
 COINGECKO_BASE = "https://api.coingecko.com/api/v3"
@@ -34,11 +35,9 @@ ALTERNATIVE_BASE = "https://api.alternative.me"
 
 
 def utc_now() -> str:
-    return (
-        datetime.now(timezone.utc)
-        .isoformat(timespec="seconds")
-        .replace("+00:00", "Z")
-    )
+    return datetime.now(timezone.utc).isoformat(
+        timespec="seconds"
+    ).replace("+00:00", "Z")
 
 
 def finite_number(value: Any) -> float | None:
@@ -46,7 +45,6 @@ def finite_number(value: Any) -> float | None:
         number = float(value)
     except (TypeError, ValueError, OverflowError):
         return None
-
     return number if math.isfinite(number) else None
 
 
@@ -74,21 +72,16 @@ def http_json(
                 request,
                 timeout=TIMEOUT_SECONDS
             ) as response:
-
                 payload = response.read()
 
-            return (
-                json.loads(payload.decode("utf-8")),
-                utc_now()
-            )
+            return json.loads(payload.decode("utf-8")), utc_now()
 
         except HTTPError as exc:
             last_error = f"HTTP_{exc.code}"
 
-            if (
-                exc.code not in (429, 500, 502, 503, 504)
-                or attempt == 2
-            ):
+            if exc.code not in (
+                429, 500, 502, 503, 504
+            ) or attempt == 2:
                 break
 
         except (
@@ -108,13 +101,14 @@ def http_json(
     raise RuntimeError(last_error)
 
 
-def make_metric(
+def metric(
     value: Any = None,
     unit: str | None = None,
     source: str | None = None,
     source_updated_at: str | None = None,
     status: str = "OK",
-    error: str | None = None
+    error: str | None = None,
+    fetched_at: str | None = None,
 ) -> dict[str, Any]:
 
     number = (
@@ -135,22 +129,78 @@ def make_metric(
         "unit": unit,
         "source": source,
         "source_updated_at": source_updated_at,
-        "fetched_at": utc_now(),
+        "fetched_at": fetched_at or utc_now(),
         "status": status,
-        "error": error
+        "error": error,
     }
 
 
-def unavailable_metric(
-    source: str,
-    error: str
-) -> dict[str, Any]:
-
-    return make_metric(
+def unavailable(source: str, error: str) -> dict[str, Any]:
+    return metric(
         source=source,
         status="UNAVAILABLE",
-        error=error
+        error=error[:240]
     )
+
+
+def timestamp_from_seconds(value: Any) -> str | None:
+    try:
+        return datetime.fromtimestamp(
+            int(value),
+            timezone.utc
+        ).isoformat(
+            timespec="seconds"
+        ).replace("+00:00", "Z")
+
+    except (
+        TypeError, ValueError, OverflowError, OSError
+    ):
+        return None
+
+
+def timestamp_from_milliseconds(value: Any) -> str | None:
+    try:
+        return datetime.fromtimestamp(
+            int(value) / 1000,
+            timezone.utc
+        ).isoformat(
+            timespec="seconds"
+        ).replace("+00:00", "Z")
+
+    except (
+        TypeError, ValueError, OverflowError, OSError
+    ):
+        return None
+
+
+def age_status(
+    timestamp: str | None,
+    stale_after_seconds: int
+) -> str:
+
+    if not timestamp:
+        return "TIMESTAMP_UNKNOWN"
+
+    try:
+        updated = datetime.fromisoformat(
+            timestamp.replace("Z", "+00:00")
+        )
+
+        age = (
+            datetime.now(timezone.utc) - updated
+        ).total_seconds()
+
+        if age < -300:
+            return "TIMESTAMP_INVALID"
+
+        return (
+            "STALE"
+            if age > stale_after_seconds
+            else "OK"
+        )
+
+    except (TypeError, ValueError):
+        return "TIMESTAMP_INVALID"
 
 
 def fetch_global_market() -> dict[str, Any]:
@@ -163,7 +213,7 @@ def fetch_global_market() -> dict[str, Any]:
         "btc_dominance_pct",
         "eth_dominance_pct",
         "active_cryptocurrencies",
-        "markets_count"
+        "markets_count",
     )
 
     try:
@@ -171,89 +221,69 @@ def fetch_global_market() -> dict[str, Any]:
             f"{COINGECKO_BASE}/global"
         )
 
-        market = data.get("data", {})
+        market_data = data.get("data", {})
 
-        if not isinstance(market, dict) or not market:
+        if not isinstance(market_data, dict) or not market_data:
             raise ValueError("Missing global market payload")
 
-        updated = market.get("updated_at")
+        updated_at = timestamp_from_seconds(
+            market_data.get("updated_at")
+        )
 
-        updated_at = None
-
-        if updated:
-            updated_at = (
-                datetime.fromtimestamp(
-                    int(updated),
-                    timezone.utc
-                )
-                .isoformat(timespec="seconds")
-                .replace("+00:00", "Z")
-            )
+        status = age_status(updated_at, 7200)
 
         fields = {
             "total_market_cap_usd": (
-                market.get("total_market_cap", {}).get("usd"),
+                market_data.get(
+                    "total_market_cap", {}
+                ).get("usd"),
                 "USD"
             ),
             "total_volume_24h_usd": (
-                market.get("total_volume", {}).get("usd"),
+                market_data.get(
+                    "total_volume", {}
+                ).get("usd"),
                 "USD"
             ),
             "btc_dominance_pct": (
-                market.get("market_cap_percentage", {}).get("btc"),
+                market_data.get(
+                    "market_cap_percentage", {}
+                ).get("btc"),
                 "%"
             ),
             "eth_dominance_pct": (
-                market.get("market_cap_percentage", {}).get("eth"),
+                market_data.get(
+                    "market_cap_percentage", {}
+                ).get("eth"),
                 "%"
             ),
             "active_cryptocurrencies": (
-                market.get("active_cryptocurrencies"),
+                market_data.get("active_cryptocurrencies"),
                 "count"
             ),
             "markets_count": (
-                market.get("markets"),
+                market_data.get("markets"),
                 "count"
-            )
+            ),
         }
 
         result = {}
 
         for key, (value, unit) in fields.items():
-
-            metric = make_metric(
+            result[key] = metric(
                 value,
                 unit,
                 source,
-                updated_at or fetched_at
+                updated_at,
+                status,
+                fetched_at=fetched_at
             )
-
-            if metric["status"] == "OK" and updated_at:
-
-                try:
-                    age = (
-                        datetime.now(timezone.utc)
-                        - datetime.fromisoformat(
-                            updated_at.replace("Z", "+00:00")
-                        )
-                    ).total_seconds()
-
-                    if age > 7200:
-                        metric["status"] = "STALE"
-
-                except ValueError:
-                    metric["status"] = "TIMESTAMP_UNKNOWN"
-
-            result[key] = metric
 
         return result
 
     except Exception as exc:
-
-        error = str(exc)[:240]
-
         return {
-            key: unavailable_metric(source, error)
+            key: unavailable(source, str(exc))
             for key in keys
         }
 
@@ -277,41 +307,21 @@ def fetch_fear_greed() -> dict[str, Any]:
             raise ValueError("No Fear & Greed observation")
 
         row = rows[0]
-
         value = finite_number(row.get("value"))
 
         if value is None or not 0 <= value <= 100:
-            raise ValueError("Fear & Greed value outside 0-100")
-
-        timestamp = row.get("timestamp")
-        updated = None
-
-        if timestamp:
-            updated = (
-                datetime.fromtimestamp(
-                    int(timestamp),
-                    timezone.utc
-                )
-                .isoformat(timespec="seconds")
-                .replace("+00:00", "Z")
+            raise ValueError(
+                "Fear & Greed value outside 0-100"
             )
 
-        age = None
+        updated_at = timestamp_from_seconds(
+            row.get("timestamp")
+        )
 
-        if updated:
-            age = (
-                datetime.now(timezone.utc)
-                - datetime.fromisoformat(
-                    updated.replace("Z", "+00:00")
-                )
-            ).total_seconds()
-
-        if age is None:
-            status = "TIMESTAMP_UNKNOWN"
-        elif age > 48 * 3600:
-            status = "STALE"
-        else:
-            status = "OK"
+        status = age_status(
+            updated_at,
+            48 * 3600
+        )
 
         return {
             "value": value,
@@ -320,14 +330,13 @@ def fetch_fear_greed() -> dict[str, Any]:
             ),
             "unit": "/100",
             "source": source,
-            "source_updated_at": updated,
+            "source_updated_at": updated_at,
             "fetched_at": fetched_at,
             "status": status,
-            "error": None
+            "error": None,
         }
 
     except Exception as exc:
-
         return {
             "value": None,
             "classification": None,
@@ -336,7 +345,7 @@ def fetch_fear_greed() -> dict[str, Any]:
             "source_updated_at": None,
             "fetched_at": utc_now(),
             "status": "UNAVAILABLE",
-            "error": str(exc)[:240]
+            "error": str(exc)[:240],
         }
 
 
@@ -361,15 +370,12 @@ def ema_series(
     if len(values) < period:
         return result
 
-    seed = sum(values[:period]) / period
+    previous = sum(values[:period]) / period
+    result[period - 1] = previous
 
-    result[period - 1] = seed
-
-    multiplier = 2 / (period + 1)
-    previous = seed
+    multiplier = 2.0 / (period + 1)
 
     for index in range(period, len(values)):
-
         previous = (
             (values[index] - previous) * multiplier
             + previous
@@ -380,12 +386,12 @@ def ema_series(
     return result
 
 
-def rsi(
+def calculate_rsi(
     values: list[float],
     period: int = 14
 ) -> float | None:
 
-    if len(values) <= period:
+    if len(values) < period + 1:
         return None
 
     changes = [
@@ -403,29 +409,166 @@ def rsi(
         for change in changes
     ]
 
-    avg_gain = sum(gains[:period]) / period
-    avg_loss = sum(losses[:period]) / period
+    average_gain = sum(gains[:period]) / period
+    average_loss = sum(losses[:period]) / period
 
     for index in range(period, len(gains)):
 
-        avg_gain = (
-            avg_gain * (period - 1) + gains[index]
+        average_gain = (
+            average_gain * (period - 1)
+            + gains[index]
         ) / period
 
-        avg_loss = (
-            avg_loss * (period - 1) + losses[index]
+        average_loss = (
+            average_loss * (period - 1)
+            + losses[index]
         ) / period
 
-    if avg_loss == 0:
-        return 100.0 if avg_gain > 0 else 50.0
+    if average_loss == 0:
+        return 100.0 if average_gain > 0 else 50.0
 
-    rs = avg_gain / avg_loss
+    relative_strength = average_gain / average_loss
 
-    return 100 - (100 / (1 + rs))
+    return 100.0 - (
+        100.0 / (1.0 + relative_strength)
+    )
+
+
+def calculate_macd(
+    values: list[float]
+) -> tuple[
+    float | None,
+    float | None,
+    float | None
+]:
+
+    fast = ema_series(values, 12)
+    slow = ema_series(values, 26)
+
+    macd_values = []
+
+    for fast_value, slow_value in zip(fast, slow):
+
+        if fast_value is not None and slow_value is not None:
+            macd_values.append(fast_value - slow_value)
+
+    if len(macd_values) < 9:
+        return None, None, None
+
+    signal_values = ema_series(macd_values, 9)
+
+    macd_value = macd_values[-1]
+    signal_value = signal_values[-1]
+
+    if signal_value is None:
+        return macd_value, None, None
+
+    return (
+        macd_value,
+        signal_value,
+        macd_value - signal_value
+    )
+
+
+def calculate_adx(
+    highs: list[float],
+    lows: list[float],
+    closes: list[float],
+    period: int = 14
+) -> float | None:
+
+    if len(closes) < period + 1:
+        return None
+
+    true_ranges = []
+    positive_dm = []
+    negative_dm = []
+
+    for i in range(1, len(closes)):
+
+        up_move = highs[i] - highs[i - 1]
+        down_move = lows[i - 1] - lows[i]
+
+        positive_dm.append(
+            up_move
+            if up_move > down_move and up_move > 0
+            else 0.0
+        )
+
+        negative_dm.append(
+            down_move
+            if down_move > up_move and down_move > 0
+            else 0.0
+        )
+
+        true_ranges.append(
+            max(
+                highs[i] - lows[i],
+                abs(highs[i] - closes[i - 1]),
+                abs(lows[i] - closes[i - 1])
+            )
+        )
+
+    if len(true_ranges) < period:
+        return None
+
+    smoothed_tr = sum(true_ranges[:period])
+    smoothed_plus = sum(positive_dm[:period])
+    smoothed_minus = sum(negative_dm[:period])
+
+    dx_values = []
+
+    for i in range(period - 1, len(true_ranges)):
+
+        if i > period - 1:
+
+            smoothed_tr = (
+                smoothed_tr
+                - smoothed_tr / period
+                + true_ranges[i]
+            )
+
+            smoothed_plus = (
+                smoothed_plus
+                - smoothed_plus / period
+                + positive_dm[i]
+            )
+
+            smoothed_minus = (
+                smoothed_minus
+                - smoothed_minus / period
+                + negative_dm[i]
+            )
+
+        if smoothed_tr <= 0:
+            continue
+
+        plus_di = 100.0 * smoothed_plus / smoothed_tr
+        minus_di = 100.0 * smoothed_minus / smoothed_tr
+
+        denominator = plus_di + minus_di
+
+        dx_values.append(
+            100.0 * abs(plus_di - minus_di) / denominator
+            if denominator > 0
+            else 0.0
+        )
+
+    if len(dx_values) < period:
+        return None
+
+    adx_value = sum(dx_values[:period]) / period
+
+    for dx in dx_values[period:]:
+        adx_value = (
+            adx_value * (period - 1) + dx
+        ) / period
+
+    return adx_value
 
 
 def calculate_indicators(
-    candles: list[dict[str, float]]
+    candles: list[dict[str, Any]]
 ) -> dict[str, Any]:
 
     closes = [c["close"] for c in candles]
@@ -433,128 +576,123 @@ def calculate_indicators(
     lows = [c["low"] for c in candles]
     volumes = [c["volume"] for c in candles]
 
-    ema20_series = ema_series(closes, 20)
-    ema50_series = ema_series(closes, 50)
+    source = "Binance Spot closed 1D candles"
 
-    ema12 = ema_series(closes, 12)
-    ema26 = ema_series(closes, 26)
-
-    macd_line = [
-        None if a is None or b is None else a - b
-        for a, b in zip(ema12, ema26)
-    ]
-
-    valid_macd = [
-        value
-        for value in macd_line
-        if value is not None
-    ]
-
-    signal_series = (
-        ema_series(valid_macd, 9)
-        if valid_macd
-        else []
+    updated_at = timestamp_from_milliseconds(
+        candles[-1]["close_time"]
     )
 
-    macd_value = (
-        valid_macd[-1]
-        if valid_macd
-        else None
+    fetched_at = utc_now()
+
+    candle_status = age_status(
+        updated_at,
+        36 * 3600
     )
 
-    macd_signal = (
-        signal_series[-1]
-        if signal_series
-        else None
-    )
+    def m(value: Any, unit: str) -> dict[str, Any]:
+        return metric(
+            value,
+            unit,
+            source,
+            updated_at,
+            candle_status,
+            fetched_at=fetched_at
+        )
 
-    bb_period = closes[-20:]
     bb_mid = sma(closes, 20)
-
     bb_std = None
 
     if bb_mid is not None:
+
+        last_twenty = closes[-20:]
+
         bb_std = math.sqrt(
             sum(
-                (value - bb_mid) ** 2
-                for value in bb_period
+                (x - bb_mid) ** 2
+                for x in last_twenty
             ) / 20
         )
 
-    latest_volume = volumes[-1]
-    avg_volume20 = sma(volumes, 20)
+    macd_value, macd_signal, macd_histogram = (
+        calculate_macd(closes)
+    )
+
+    average_volume = sma(volumes, 20)
 
     return {
-        "ma20": make_metric(
-            sma(closes, 20), "USD", "Binance Spot 1D candles"
+        "ma20": m(sma(closes, 20), "USDT"),
+        "ma50": m(sma(closes, 50), "USDT"),
+        "ma200": m(sma(closes, 200), "USDT"),
+
+        "ema20": m(
+            ema_series(closes, 20)[-1],
+            "USDT"
         ),
-        "ma50": make_metric(
-            sma(closes, 50), "USD", "Binance Spot 1D candles"
+
+        "ema50": m(
+            ema_series(closes, 50)[-1],
+            "USDT"
         ),
-        "ma200": make_metric(
-            sma(closes, 200), "USD", "Binance Spot 1D candles"
+
+        "rsi14": m(
+            calculate_rsi(closes, 14),
+            "index"
         ),
-        "ema20": make_metric(
-            ema20_series[-1], "USD", "Binance Spot 1D candles"
+
+        "macd": m(macd_value, "USDT"),
+        "macd_signal": m(macd_signal, "USDT"),
+        "macd_histogram": m(macd_histogram, "USDT"),
+
+        "adx14": m(
+            calculate_adx(highs, lows, closes, 14),
+            "index"
         ),
-        "ema50": make_metric(
-            ema50_series[-1], "USD", "Binance Spot 1D candles"
-        ),
-        "rsi14": make_metric(
-            rsi(closes, 14), "index", "Binance Spot 1D candles"
-        ),
-        "macd": make_metric(
-            macd_value, "USD", "Binance Spot 1D candles"
-        ),
-        "macd_signal": make_metric(
-            macd_signal, "USD", "Binance Spot 1D candles"
-        ),
-        "macd_histogram": make_metric(
-            macd_value - macd_signal
-            if macd_value is not None and macd_signal is not None
-            else None,
-            "USD",
-            "Binance Spot 1D candles"
-        ),
-        "bollinger_upper": make_metric(
+
+        "bollinger_upper": m(
             bb_mid + 2 * bb_std
             if bb_mid is not None and bb_std is not None
             else None,
-            "USD",
-            "Binance Spot 1D candles"
+            "USDT"
         ),
-        "bollinger_middle": make_metric(
-            bb_mid, "USD", "Binance Spot 1D candles"
-        ),
-        "bollinger_lower": make_metric(
+
+        "bollinger_middle": m(bb_mid, "USDT"),
+
+        "bollinger_lower": m(
             bb_mid - 2 * bb_std
             if bb_mid is not None and bb_std is not None
             else None,
-            "USD",
-            "Binance Spot 1D candles"
+            "USDT"
         ),
-        "volume_24h_base": make_metric(
-            latest_volume, "base asset", "Binance Spot 1D candles"
+
+        "volume_last_closed_day": m(
+            volumes[-1],
+            "base asset"
         ),
-        "volume_sma20_base": make_metric(
-            avg_volume20, "base asset", "Binance Spot 1D candles"
+
+        "volume_sma20": m(
+            average_volume,
+            "base asset"
         ),
-        "volume_ratio_20d": make_metric(
-            latest_volume / avg_volume20
-            if latest_volume is not None and avg_volume20
+
+        "volume_ratio_20d": m(
+            volumes[-1] / average_volume
+            if average_volume is not None and average_volume > 0
             else None,
-            "x",
-            "Binance Spot 1D candles"
+            "x"
         ),
-        "support_20d": make_metric(
-            min(lows[-20:]) if len(lows) >= 20 else None,
-            "USD",
-            "Binance Spot 1D candles"
+
+        "support_20d": m(
+            min(lows[-20:])
+            if len(lows) >= 20
+            else None,
+            "USDT"
         ),
-        "resistance_20d": make_metric(
-            max(highs[-20:]) if len(highs) >= 20 else None,
-            "USD",
-            "Binance Spot 1D candles"
+
+        "resistance_20d": m(
+            max(highs[-20:])
+            if len(highs) >= 20
+            else None,
+            "USDT"
         )
     }
 
@@ -571,8 +709,21 @@ def fetch_asset(
         "coin_id": coin_id
     }
 
+    indicator_names = (
+        "ma20", "ma50", "ma200",
+        "ema20", "ema50", "rsi14",
+        "macd", "macd_signal", "macd_histogram",
+        "adx14",
+        "bollinger_upper", "bollinger_middle",
+        "bollinger_lower",
+        "volume_last_closed_day", "volume_sma20",
+        "volume_ratio_20d",
+        "support_20d", "resistance_20d"
+    )
+
     try:
-        data, fetched_at = http_json(
+
+        raw, fetched_at = http_json(
             f"{BINANCE_BASE}/api/v3/klines",
             {
                 "symbol": f"{symbol}USDT",
@@ -581,77 +732,108 @@ def fetch_asset(
             }
         )
 
-        if not isinstance(data, list) or len(data) < 200:
-            raise ValueError("Insufficient daily candle history")
+        if not isinstance(raw, list):
+            raise ValueError(
+                "Binance returned an invalid candle payload"
+            )
 
+        now_ms = int(time.time() * 1000)
         candles = []
 
-        for row in data:
+        for row in raw:
 
             if not isinstance(row, list) or len(row) < 7:
                 continue
 
-            values = [
+            try:
+                open_time = int(row[0])
+                close_time = int(row[6])
+            except (TypeError, ValueError, OverflowError):
+                continue
+
+            # Exclude the currently forming daily candle.
+            if close_time >= now_ms:
+                continue
+
+            parsed = [
                 finite_number(row[i])
                 for i in (1, 2, 3, 4, 5)
             ]
 
-            if any(value is None for value in values):
+            if any(value is None for value in parsed):
+                continue
+
+            open_price, high, low, close, volume = parsed
+
+            if min(open_price, high, low, close) <= 0:
+                continue
+
+            if volume < 0:
+                continue
+
+            if high < max(open_price, close, low):
+                continue
+
+            if low > min(open_price, close, high):
                 continue
 
             candles.append({
-                "open": values[0],
-                "high": values[1],
-                "low": values[2],
-                "close": values[3],
-                "volume": values[4],
-                "open_time": int(row[0]),
-                "close_time": int(row[6])
+                "open_time": open_time,
+                "close_time": close_time,
+                "open": open_price,
+                "high": high,
+                "low": low,
+                "close": close,
+                "volume": volume
             })
 
-        if len(candles) < 200:
-            raise ValueError("Not enough valid candles")
-
-        latest_close_time = candles[-1]["close_time"]
-
-        latest_closed = datetime.fromtimestamp(
-            latest_close_time / 1000,
-            timezone.utc
+        candles.sort(
+            key=lambda candle: candle["open_time"]
         )
 
-        age = (
-            datetime.now(timezone.utc) - latest_closed
-        ).total_seconds()
+        if len(candles) < 200:
+            raise ValueError(
+                f"Only {len(candles)} fully closed valid daily candles; "
+                "200 required"
+            )
 
-        status = "STALE" if age > 36 * 3600 else "OK"
+        latest = candles[-1]
+
+        updated_at = timestamp_from_milliseconds(
+            latest["close_time"]
+        )
+
+        status = age_status(
+            updated_at,
+            36 * 3600
+        )
 
         indicators = calculate_indicators(candles)
 
-        updated_at = (
-            latest_closed
-            .isoformat(timespec="seconds")
-            .replace("+00:00", "Z")
-        )
-
-        for metric in indicators.values():
-
-            metric["source_updated_at"] = updated_at
-            metric["fetched_at"] = fetched_at
-
-            if metric["status"] == "OK":
-                metric["status"] = status
+        for item in indicators.values():
+            item["fetched_at"] = fetched_at
 
         result.update({
-            "price_usdt": make_metric(
-                candles[-1]["close"],
+            "price_usdt": metric(
+                latest["close"],
                 "USDT",
                 source,
                 updated_at,
-                status
+                status,
+                fetched_at=fetched_at
             ),
+
             "candle_interval": "1d",
+
+            "candle_policy": (
+                "Only fully closed candles; "
+                "current forming candle excluded"
+            ),
+
             "candle_count": len(candles),
+
             "last_closed_candle_at": updated_at,
+
             "indicators": indicators
         })
 
@@ -659,24 +841,23 @@ def fetch_asset(
 
         error = str(exc)[:240]
 
-        indicator_names = (
-            "ma20", "ma50", "ma200",
-            "ema20", "ema50", "rsi14",
-            "macd", "macd_signal", "macd_histogram",
-            "bollinger_upper", "bollinger_middle",
-            "bollinger_lower", "volume_24h_base",
-            "volume_sma20_base", "volume_ratio_20d",
-            "support_20d", "resistance_20d"
-        )
-
         result.update({
-            "price_usdt": unavailable_metric(source, error),
+            "price_usdt": unavailable(source, error),
+
             "candle_interval": "1d",
+
+            "candle_policy": (
+                "Only fully closed candles; "
+                "current forming candle excluded"
+            ),
+
             "candle_count": 0,
+
             "last_closed_candle_at": None,
+
             "indicators": {
-                key: unavailable_metric(source, error)
-                for key in indicator_names
+                name: unavailable(source, error)
+                for name in indicator_names
             }
         })
 
@@ -688,6 +869,7 @@ def fetch_coingecko_prices() -> dict[str, Any]:
     source = "CoinGecko API"
 
     try:
+
         data, fetched_at = http_json(
             f"{COINGECKO_BASE}/simple/price",
             {
@@ -703,47 +885,36 @@ def fetch_coingecko_prices() -> dict[str, Any]:
         for coin_id in ("bitcoin", "ethereum"):
 
             item = data.get(coin_id, {})
-            timestamp = item.get("last_updated_at")
-            updated = None
 
-            if timestamp:
-                updated = (
-                    datetime.fromtimestamp(
-                        int(timestamp),
-                        timezone.utc
-                    )
-                    .isoformat(timespec="seconds")
-                    .replace("+00:00", "Z")
-                )
+            updated_at = timestamp_from_seconds(
+                item.get("last_updated_at")
+            )
 
-            if not updated:
-                status = "TIMESTAMP_UNKNOWN"
-            else:
-                age = (
-                    datetime.now(timezone.utc)
-                    - datetime.fromisoformat(
-                        updated.replace("Z", "+00:00")
-                    )
-                ).total_seconds()
-
-                status = "STALE" if age > 1800 else "OK"
+            status = age_status(
+                updated_at,
+                1800
+            )
 
             result[coin_id] = {
-                "price_usd": make_metric(
+                "price_usd": metric(
                     item.get("usd"),
                     "USD",
                     source,
-                    updated,
-                    status
+                    updated_at,
+                    status,
+                    fetched_at=fetched_at
                 ),
-                "change_24h_pct": make_metric(
+
+                "change_24h_pct": metric(
                     item.get("usd_24h_change"),
                     "%",
                     source,
-                    updated,
-                    status
+                    updated_at,
+                    status,
+                    fetched_at=fetched_at
                 ),
-                "source_updated_at": updated,
+
+                "source_updated_at": updated_at,
                 "fetched_at": fetched_at
             }
 
@@ -751,12 +922,12 @@ def fetch_coingecko_prices() -> dict[str, Any]:
 
     except Exception as exc:
 
-        error = str(exc)[:240]
+        error = str(exc)
 
         return {
             coin: {
-                "price_usd": unavailable_metric(source, error),
-                "change_24h_pct": unavailable_metric(source, error),
+                "price_usd": unavailable(source, error),
+                "change_24h_pct": unavailable(source, error),
                 "source_updated_at": None,
                 "fetched_at": utc_now()
             }
@@ -781,6 +952,7 @@ def write_json_atomic(
     )
 
     try:
+
         with os.fdopen(
             fd,
             "w",
@@ -797,7 +969,10 @@ def write_json_atomic(
 
             handle.write("\n")
 
-        os.replace(temp_name, path)
+        os.replace(
+            temp_name,
+            path
+        )
 
     except Exception:
 
@@ -813,19 +988,27 @@ def build_payload() -> dict[str, Any]:
 
     return {
         "schema_version": SCHEMA_VERSION,
+
         "generated_at": utc_now(),
-        "update_mode": "on_workflow_run_not_realtime",
+
+        "update_mode": "scheduled_snapshot_not_realtime",
+
         "data_policy": (
-            "Unavailable or stale values must not be treated "
-            "as zero, neutral, or confirmed."
+            "Unavailable, stale, or timestamp-unknown values "
+            "must not be treated as zero, neutral, or confirmed."
         ),
+
         "global_market": fetch_global_market(),
+
         "fear_greed": fetch_fear_greed(),
+
         "major_assets": fetch_coingecko_prices(),
+
         "technical": {
             "BTC": fetch_asset("BTC", "bitcoin"),
             "ETH": fetch_asset("ETH", "ethereum")
         },
+
         "not_integrated_yet": [
             "Fed policy and FOMC",
             "CPI/PCE/NFP",
@@ -854,10 +1037,10 @@ def main() -> int:
         f"at {payload['generated_at']}"
     )
 
-    for name, metric in payload["global_market"].items():
+    for name, item in payload["global_market"].items():
         print(
             f"global_market.{name}: "
-            f"{metric['status']}"
+            f"{item['status']}"
         )
 
     print(
@@ -865,11 +1048,23 @@ def main() -> int:
         f"{payload['fear_greed']['status']}"
     )
 
-    for asset, data in payload["technical"].items():
+    for asset, item in payload["technical"].items():
+
         print(
             f"technical.{asset}.price_usdt: "
-            f"{data['price_usdt']['status']}"
+            f"{item['price_usdt']['status']}"
         )
+
+        print(
+            f"technical.{asset}.closed_candles: "
+            f"{item['candle_count']}"
+        )
+
+        for indicator, value in item["indicators"].items():
+            print(
+                f"technical.{asset}.{indicator}: "
+                f"{value['status']}"
+            )
 
     return 0
 
