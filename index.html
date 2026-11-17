@@ -17,7 +17,7 @@
 <body class="bg-gray-900 text-white font-sans p-4">
     <div class="max-w-5xl mx-auto">
         <h1 class="text-2xl font-bold mb-1 text-center text-blue-400">My Crypto Spot Dashboard</h1>
-        <p class="text-center text-gray-400 mb-6 text-sm">Last Updated: 2026-11-17 00:41 (UTC)</p>
+        <p class="text-center text-gray-400 mb-6 text-sm">Last Updated: 2026-11-17 00:47 (UTC)</p>
 
         <!-- Alert Section -->
 <div class="mb-6 space-y-2"><div class="p-3 rounded-lg border bg-orange-900/60 border-orange-500 text-orange-200 text-sm font-semibold shadow-lg">📈 VIX বেড়েছে (22.91)। বাজারে ভোলাটিলিটি বেশি, সতর্ক থাকুন।</div><div class="p-3 rounded-lg border bg-green-900/60 border-green-500 text-green-200 text-sm font-semibold shadow-lg">🩸 বাজারে চরম ভয় (12)। DCA করার সুযোগ হতে পারে।</div></div>
@@ -29,7 +29,7 @@
             </div>
             <div class="bg-gray-800 p-3 rounded-lg border border-gray-700 text-center flex flex-col justify-center">
                 <p class="text-xs text-gray-400">Total Market Cap</p>
-                <p class="text-xl font-bold text-blue-400">$2.21T</p>
+                <p class="text-xl font-bold text-blue-400">$2.22T</p>
             </div>
             <div class="bg-gray-800 p-3 rounded-lg border border-gray-700 text-center flex flex-col justify-center">
                 <p class="text-xs text-gray-400">Market Trend</p>
@@ -37,7 +37,7 @@
             </div>
             <div class="bg-gray-800 p-3 rounded-lg border border-gray-700 text-center flex flex-col justify-center">
                 <p class="text-xs text-gray-400">Global Volume 24h</p>
-                <p class="text-xl font-bold text-green-500">$75.9B</p>
+                <p class="text-xl font-bold text-green-500">$76.0B</p>
             </div>
         </div>
 
@@ -55,78 +55,27 @@
             </div>
         </div>
 
-        <!-- Live TradingView Charts (BTC, ETH, DXY, Brent, Gold, S&P500) -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        <!-- BTC Chart & Order Book Imbalance Link -->
+        <div class="grid grid-cols-1 gap-4 mb-6">
             <!-- BTC Chart -->
             <div class="bg-gray-800 rounded-lg border border-gray-700 p-2">
                 <h2 class="text-sm font-semibold text-gray-400 px-2 mb-2">BTC/USDT Live Chart</h2>
-                <div class="tradingview-widget-container" style="height:250px; width:100%;">
+                <div class="tradingview-widget-container" style="height:300px; width:100%;">
                     <div id="tradingview_btc"></div>
                     <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
                     <script type="text/javascript">
-                    new TradingView.widget({ "width": "100%", "height": 250, "symbol": "BINANCE:BTCUSDT", "interval": "60", "timezone": "Etc/UTC", "theme": "dark", "style": "1", "locale": "en", "enable_publishing": false, "hide_side_toolbar": true, "container_id": "tradingview_btc" });
-                    </script>
-                </div>
-            </div>
-            
-            <!-- ETH Chart -->
-            <div class="bg-gray-800 rounded-lg border border-gray-700 p-2">
-                <h2 class="text-sm font-semibold text-gray-400 px-2 mb-2">ETH/USDT Live Chart</h2>
-                <div class="tradingview-widget-container" style="height:250px; width:100%;">
-                    <div id="tradingview_eth"></div>
-                    <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
-                    <script type="text/javascript">
-                    new TradingView.widget({ "width": "100%", "height": 250, "symbol": "BINANCE:ETHUSDT", "interval": "60", "timezone": "Etc/UTC", "theme": "dark", "style": "1", "locale": "en", "enable_publishing": false, "hide_side_toolbar": true, "container_id": "tradingview_eth" });
+                    new TradingView.widget({ "width": "100%", "height": 300, "symbol": "BINANCE:BTCUSDT", "interval": "60", "timezone": "Etc/UTC", "theme": "dark", "style": "1", "locale": "en", "enable_publishing": false, "hide_side_toolbar": true, "container_id": "tradingview_btc" });
                     </script>
                 </div>
             </div>
 
-            <!-- DXY Chart -->
-            <div class="bg-gray-800 rounded-lg border border-gray-700 p-2">
-                <h2 class="text-sm font-semibold text-gray-400 px-2 mb-2">DXY (Dollar Index) Live Chart</h2>
-                <div class="tradingview-widget-container" style="height:250px; width:100%;">
-                    <div id="tradingview_dxy"></div>
-                    <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
-                    <script type="text/javascript">
-                    new TradingView.widget({ "width": "100%", "height": 250, "symbol": "TVC:DXY", "interval": "60", "timezone": "Etc/UTC", "theme": "dark", "style": "1", "locale": "en", "enable_publishing": false, "hide_side_toolbar": true, "container_id": "tradingview_dxy" });
-                    </script>
-                </div>
-            </div>
-
-            <!-- Gold Chart -->
-            <div class="bg-gray-800 rounded-lg border border-gray-700 p-2">
-                <h2 class="text-sm font-semibold text-gray-400 px-2 mb-2">Gold (XAUUSD) Live Chart</h2>
-                <div class="tradingview-widget-container" style="height:250px; width:100%;">
-                    <div id="tradingview_gold"></div>
-                    <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
-                    <script type="text/javascript">
-                    new TradingView.widget({ "width": "100%", "height": 250, "symbol": "OANDA:XAUUSD", "interval": "60", "timezone": "Etc/UTC", "theme": "dark", "style": "1", "locale": "en", "enable_publishing": false, "hide_side_toolbar": true, "container_id": "tradingview_gold" });
-                    </script>
-                </div>
-            </div>
-
-            <!-- Brent Oil Chart -->
-            <div class="bg-gray-800 rounded-lg border border-gray-700 p-2">
-                <h2 class="text-sm font-semibold text-gray-400 px-2 mb-2">Brent Oil Live Chart</h2>
-                <div class="tradingview-widget-container" style="height:250px; width:100%;">
-                    <div id="tradingview_brent"></div>
-                    <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
-                    <script type="text/javascript">
-                    new TradingView.widget({ "width": "100%", "height": 250, "symbol": "TVC:UKOIL", "interval": "60", "timezone": "Etc/UTC", "theme": "dark", "style": "1", "locale": "en", "enable_publishing": false, "hide_side_toolbar": true, "container_id": "tradingview_brent" });
-                    </script>
-                </div>
-            </div>
-
-            <!-- S&P 500 Chart -->
-            <div class="bg-gray-800 rounded-lg border border-gray-700 p-2">
-                <h2 class="text-sm font-semibold text-gray-400 px-2 mb-2">S&P 500 Live Chart</h2>
-                <div class="tradingview-widget-container" style="height:250px; width:100%;">
-                    <div id="tradingview_spx"></div>
-                    <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
-                    <script type="text/javascript">
-                    new TradingView.widget({ "width": "100%", "height": 250, "symbol": "SP:SPX", "interval": "60", "timezone": "Etc/UTC", "theme": "dark", "style": "1", "locale": "en", "enable_publishing": false, "hide_side_toolbar": true, "container_id": "tradingview_spx" });
-                    </script>
-                </div>
+            <!-- Order Book Imbalance Link -->
+            <div class="bg-gray-800 rounded-lg border border-gray-700 p-4 text-center">
+                <h2 class="text-lg font-bold text-gray-200 mb-2">Live Buying/Selling Pressure (Order Book)</h2>
+                <p class="text-sm text-gray-400 mb-4">বাজারে ক্রেতা নাকি বিক্রেতা বেশি, তা লাইভ দেখতে নিচের লিংকে ক্লিক করুন।</p>
+                <a href="https://www.coinglass.com/pro/futures/OrderBook" target="_blank" class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg transition duration-300">
+                    Open Live Order Book Imbalance →
+                </a>
             </div>
         </div>
 
@@ -294,6 +243,7 @@
                         <span class="text-xs font-bold px-2 py-1 rounded bg-yellow-900 text-yellow-500">103.59</span>
                     </div>
                     <p class="text-xs text-gray-400 mt-2"><span class="text-blue-400 font-bold">করণীয়:</span> ডলার ইনডেক্স স্বাভাবিক।</p>
+                    <a href="https://www.tradingview.com/chart/?symbol=TVC%3ADXY" target="_blank" class="text-xs text-blue-400 mt-1 block underline">TradingView-এ লাইভ চার্ট দেখুন →</a>
                 </div>
 
                 <div class="bg-gray-900 p-3 rounded-lg border border-gray-700">
@@ -302,6 +252,7 @@
                         <span class="text-xs font-bold px-2 py-1 rounded bg-yellow-900 text-yellow-500">22.91</span>
                     </div>
                     <p class="text-xs text-gray-400 mt-2"><span class="text-blue-400 font-bold">করণীয়:</span> বাজার স্থিতিশীল।</p>
+                    <a href="https://www.tradingview.com/chart/?symbol=TVC%3AVIX" target="_blank" class="text-xs text-blue-400 mt-1 block underline">TradingView-এ লাইভ চার্ট দেখুন →</a>
                 </div>
 
                 <div class="bg-gray-900 p-3 rounded-lg border border-gray-700">
@@ -310,14 +261,16 @@
                         <span class="text-xs font-bold px-2 py-1 rounded bg-blue-900 text-blue-400">7416.59</span>
                     </div>
                     <p class="text-xs text-gray-400 mt-2"><span class="text-blue-400 font-bold">করণীয়:</span> স্টক মার্কেট বাড়লে ক্রিপ্টোও বাড়ে (Risk-on)।</p>
+                    <a href="https://www.tradingview.com/chart/?symbol=SP%3ASPX" target="_blank" class="text-xs text-blue-400 mt-1 block underline">TradingView-এ লাইভ চার্ট দেখুন →</a>
                 </div>
 
                 <div class="bg-gray-900 p-3 rounded-lg border border-gray-700">
                     <div class="flex justify-between items-center mb-1">
                         <span class="text-sm font-semibold text-gray-300">Brent Crude Oil</span>
-                        <span class="text-xs font-bold px-2 py-1 rounded bg-red-900 text-red-500">$92.01</span>
+                        <span class="text-xs font-bold px-2 py-1 rounded bg-red-900 text-red-500">$92.04</span>
                     </div>
                     <p class="text-xs text-gray-400 mt-2"><span class="text-blue-400 font-bold">করণীয়:</span> ব্রেন্ট অয়েলের দাম বেশি। CPI বাড়তে পারে (বেয়ারিশ)।</p>
+                    <a href="https://www.tradingview.com/chart/?symbol=TVC%3AUKOIL" target="_blank" class="text-xs text-blue-400 mt-1 block underline">TradingView-এ লাইভ চার্ট দেখুন →</a>
                 </div>
 
                 <div class="bg-gray-900 p-3 rounded-lg border border-gray-700">
@@ -326,14 +279,16 @@
                         <span class="text-xs font-bold px-2 py-1 rounded bg-green-900 text-green-500">0.51%</span>
                     </div>
                     <p class="text-xs text-gray-400 mt-2"><span class="text-blue-400 font-bold">করণীয়:</span> ইল্ড ৪.৫% এর নিচে। বাজারে টাকা সহজলভ্য, ক্রিপ্টোর জন্য ইতিবাচক।</p>
+                    <a href="https://www.tradingview.com/chart/?symbol=TVC%3AUS10Y" target="_blank" class="text-xs text-blue-400 mt-1 block underline">TradingView-এ লাইভ চার্ট দেখুন →</a>
                 </div>
 
                 <div class="bg-gray-900 p-3 rounded-lg border border-gray-700">
                     <div class="flex justify-between items-center mb-1">
                         <span class="text-sm font-semibold text-gray-300">Gold</span>
-                        <span class="text-xs font-bold px-2 py-1 rounded bg-yellow-900 text-yellow-600">$3858.7</span>
+                        <span class="text-xs font-bold px-2 py-1 rounded bg-yellow-900 text-yellow-600">$3859.6</span>
                     </div>
                     <p class="text-xs text-gray-400 mt-2"><span class="text-blue-400 font-bold">করণীয়:</span> সোনার দাম বাড়লে বিনিয়োগকারীরা ঝুঁকি এড়াতে চাইছে।</p>
+                    <a href="https://www.tradingview.com/chart/?symbol=OANDA%3AXAUUSD" target="_blank" class="text-xs text-blue-400 mt-1 block underline">TradingView-এ লাইভ চার্ট দেখুন →</a>
                 </div>
 
             </div>
@@ -357,7 +312,7 @@
                         <tr class="border-b border-gray-700 hover:bg-gray-750">
                             <td class="px-3 py-3 font-medium text-white">BTC Price</td>
                             <td class="px-3 py-3">
-                                <div class="font-semibold">$64,504</div>
+                                <div class="font-semibold">$64,547</div>
                                 <div class="text-xs text-gray-400 mt-1 italic">↳ করণীয়: বর্তমান মূল্য ট্র্যাক করুন।</div>
                             </td>
                             <td class="px-3 py-3 text-right font-bold text-orange-400">LIVE</td>
