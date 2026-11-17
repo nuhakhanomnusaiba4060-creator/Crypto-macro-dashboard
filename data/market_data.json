@@ -1,0 +1,473 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-11-17T17:59:43Z",
+  "update_mode": "on_workflow_run_not_realtime",
+  "data_policy": "Unavailable or stale values must not be treated as zero, neutral, or confirmed.",
+  "global_market": {
+    "total_market_cap_usd": {
+      "value": 2194609152594.6118,
+      "unit": "USD",
+      "source": "CoinGecko API",
+      "source_updated_at": "2026-11-17T17:57:04Z",
+      "fetched_at": "2026-11-17T17:59:43Z",
+      "status": "OK",
+      "error": null
+    },
+    "total_volume_24h_usd": {
+      "value": 78381210493.37369,
+      "unit": "USD",
+      "source": "CoinGecko API",
+      "source_updated_at": "2026-11-17T17:57:04Z",
+      "fetched_at": "2026-11-17T17:59:43Z",
+      "status": "OK",
+      "error": null
+    },
+    "btc_dominance_pct": {
+      "value": 58.33210401500553,
+      "unit": "%",
+      "source": "CoinGecko API",
+      "source_updated_at": "2026-11-17T17:57:04Z",
+      "fetched_at": "2026-11-17T17:59:43Z",
+      "status": "OK",
+      "error": null
+    },
+    "eth_dominance_pct": {
+      "value": 9.924934590537186,
+      "unit": "%",
+      "source": "CoinGecko API",
+      "source_updated_at": "2026-11-17T17:57:04Z",
+      "fetched_at": "2026-11-17T17:59:43Z",
+      "status": "OK",
+      "error": null
+    },
+    "active_cryptocurrencies": {
+      "value": 21674.0,
+      "unit": "count",
+      "source": "CoinGecko API",
+      "source_updated_at": "2026-11-17T17:57:04Z",
+      "fetched_at": "2026-11-17T17:59:43Z",
+      "status": "OK",
+      "error": null
+    },
+    "markets_count": {
+      "value": 1529.0,
+      "unit": "count",
+      "source": "CoinGecko API",
+      "source_updated_at": "2026-11-17T17:57:04Z",
+      "fetched_at": "2026-11-17T17:59:43Z",
+      "status": "OK",
+      "error": null
+    }
+  },
+  "fear_greed": {
+    "value": 12.0,
+    "classification": "Extreme Fear",
+    "unit": "/100",
+    "source": "Alternative.me Fear & Greed API",
+    "source_updated_at": "2026-11-17T00:00:00Z",
+    "fetched_at": "2026-11-17T17:59:44Z",
+    "status": "OK",
+    "error": null
+  },
+  "major_assets": {
+    "bitcoin": {
+      "price_usd": {
+        "value": 63776.0,
+        "unit": "USD",
+        "source": "CoinGecko API",
+        "source_updated_at": "2026-11-17T17:59:08Z",
+        "fetched_at": "2026-11-17T17:59:44Z",
+        "status": "OK",
+        "error": null
+      },
+      "change_24h_pct": {
+        "value": -1.6149805518339295,
+        "unit": "%",
+        "source": "CoinGecko API",
+        "source_updated_at": "2026-11-17T17:59:08Z",
+        "fetched_at": "2026-11-17T17:59:44Z",
+        "status": "OK",
+        "error": null
+      },
+      "source_updated_at": "2026-11-17T17:59:08Z",
+      "fetched_at": "2026-11-17T17:59:44Z"
+    },
+    "ethereum": {
+      "price_usd": {
+        "value": 1786.0,
+        "unit": "USD",
+        "source": "CoinGecko API",
+        "source_updated_at": "2026-11-17T17:58:54Z",
+        "fetched_at": "2026-11-17T17:59:44Z",
+        "status": "OK",
+        "error": null
+      },
+      "change_24h_pct": {
+        "value": -1.8217184278097966,
+        "unit": "%",
+        "source": "CoinGecko API",
+        "source_updated_at": "2026-11-17T17:58:54Z",
+        "fetched_at": "2026-11-17T17:59:44Z",
+        "status": "OK",
+        "error": null
+      },
+      "source_updated_at": "2026-11-17T17:58:54Z",
+      "fetched_at": "2026-11-17T17:59:44Z"
+    }
+  },
+  "technical": {
+    "BTC": {
+      "symbol": "BTC",
+      "coin_id": "bitcoin",
+      "price_usdt": {
+        "value": 63824.23,
+        "unit": "USDT",
+        "source": "Binance Spot Public API",
+        "source_updated_at": "2026-11-17T23:59:59Z",
+        "fetched_at": "2026-11-17T17:59:45Z",
+        "status": "OK",
+        "error": null
+      },
+      "candle_interval": "1d",
+      "candle_count": 250,
+      "last_closed_candle_at": "2026-11-17T23:59:59Z",
+      "indicators": {
+        "ma20": {
+          "value": 73494.17,
+          "unit": "USD",
+          "source": "Binance Spot 1D candles",
+          "source_updated_at": "2026-11-17T23:59:59Z",
+          "fetched_at": "2026-11-17T17:59:45Z",
+          "status": "OK",
+          "error": null
+        },
+        "ma50": {
+          "value": 79058.47119999999,
+          "unit": "USD",
+          "source": "Binance Spot 1D candles",
+          "source_updated_at": "2026-11-17T23:59:59Z",
+          "fetched_at": "2026-11-17T17:59:45Z",
+          "status": "OK",
+          "error": null
+        },
+        "ma200": {
+          "value": 72849.11949999999,
+          "unit": "USD",
+          "source": "Binance Spot 1D candles",
+          "source_updated_at": "2026-11-17T23:59:59Z",
+          "fetched_at": "2026-11-17T17:59:45Z",
+          "status": "OK",
+          "error": null
+        },
+        "ema20": {
+          "value": 72251.17763937173,
+          "unit": "USD",
+          "source": "Binance Spot 1D candles",
+          "source_updated_at": "2026-11-17T23:59:59Z",
+          "fetched_at": "2026-11-17T17:59:45Z",
+          "status": "OK",
+          "error": null
+        },
+        "ema50": {
+          "value": 76187.58386377084,
+          "unit": "USD",
+          "source": "Binance Spot 1D candles",
+          "source_updated_at": "2026-11-17T23:59:59Z",
+          "fetched_at": "2026-11-17T17:59:45Z",
+          "status": "OK",
+          "error": null
+        },
+        "rsi14": {
+          "value": 22.423561298916397,
+          "unit": "index",
+          "source": "Binance Spot 1D candles",
+          "source_updated_at": "2026-11-17T23:59:59Z",
+          "fetched_at": "2026-11-17T17:59:45Z",
+          "status": "OK",
+          "error": null
+        },
+        "macd": {
+          "value": -4058.3065195459203,
+          "unit": "USD",
+          "source": "Binance Spot 1D candles",
+          "source_updated_at": "2026-11-17T23:59:59Z",
+          "fetched_at": "2026-11-17T17:59:45Z",
+          "status": "OK",
+          "error": null
+        },
+        "macd_signal": {
+          "value": -2933.8921639603277,
+          "unit": "USD",
+          "source": "Binance Spot 1D candles",
+          "source_updated_at": "2026-11-17T23:59:59Z",
+          "fetched_at": "2026-11-17T17:59:45Z",
+          "status": "OK",
+          "error": null
+        },
+        "macd_histogram": {
+          "value": -1124.4143555855926,
+          "unit": "USD",
+          "source": "Binance Spot 1D candles",
+          "source_updated_at": "2026-11-17T23:59:59Z",
+          "fetched_at": "2026-11-17T17:59:45Z",
+          "status": "OK",
+          "error": null
+        },
+        "bollinger_upper": {
+          "value": 83763.35273894276,
+          "unit": "USD",
+          "source": "Binance Spot 1D candles",
+          "source_updated_at": "2026-11-17T23:59:59Z",
+          "fetched_at": "2026-11-17T17:59:45Z",
+          "status": "OK",
+          "error": null
+        },
+        "bollinger_middle": {
+          "value": 73494.17,
+          "unit": "USD",
+          "source": "Binance Spot 1D candles",
+          "source_updated_at": "2026-11-17T23:59:59Z",
+          "fetched_at": "2026-11-17T17:59:45Z",
+          "status": "OK",
+          "error": null
+        },
+        "bollinger_lower": {
+          "value": 63224.987261057235,
+          "unit": "USD",
+          "source": "Binance Spot 1D candles",
+          "source_updated_at": "2026-11-17T23:59:59Z",
+          "fetched_at": "2026-11-17T17:59:45Z",
+          "status": "OK",
+          "error": null
+        },
+        "volume_24h_base": {
+          "value": 23174.14085,
+          "unit": "base asset",
+          "source": "Binance Spot 1D candles",
+          "source_updated_at": "2026-11-17T23:59:59Z",
+          "fetched_at": "2026-11-17T17:59:45Z",
+          "status": "OK",
+          "error": null
+        },
+        "volume_sma20_base": {
+          "value": 18321.392669,
+          "unit": "base asset",
+          "source": "Binance Spot 1D candles",
+          "source_updated_at": "2026-11-17T23:59:59Z",
+          "fetched_at": "2026-11-17T17:59:45Z",
+          "status": "OK",
+          "error": null
+        },
+        "volume_ratio_20d": {
+          "value": 1.2648678661426707,
+          "unit": "x",
+          "source": "Binance Spot 1D candles",
+          "source_updated_at": "2026-11-17T23:59:59Z",
+          "fetched_at": "2026-11-17T17:59:45Z",
+          "status": "OK",
+          "error": null
+        },
+        "support_20d": {
+          "value": 62006.0,
+          "unit": "USD",
+          "source": "Binance Spot 1D candles",
+          "source_updated_at": "2026-11-17T23:59:59Z",
+          "fetched_at": "2026-11-17T17:59:45Z",
+          "status": "OK",
+          "error": null
+        },
+        "resistance_20d": {
+          "value": 81971.0,
+          "unit": "USD",
+          "source": "Binance Spot 1D candles",
+          "source_updated_at": "2026-11-17T23:59:59Z",
+          "fetched_at": "2026-11-17T17:59:45Z",
+          "status": "OK",
+          "error": null
+        }
+      }
+    },
+    "ETH": {
+      "symbol": "ETH",
+      "coin_id": "ethereum",
+      "price_usdt": {
+        "value": 1787.89,
+        "unit": "USDT",
+        "source": "Binance Spot Public API",
+        "source_updated_at": "2026-11-17T23:59:59Z",
+        "fetched_at": "2026-11-17T17:59:46Z",
+        "status": "OK",
+        "error": null
+      },
+      "candle_interval": "1d",
+      "candle_count": 250,
+      "last_closed_candle_at": "2026-11-17T23:59:59Z",
+      "indicators": {
+        "ma20": {
+          "value": 2111.711499999999,
+          "unit": "USD",
+          "source": "Binance Spot 1D candles",
+          "source_updated_at": "2026-11-17T23:59:59Z",
+          "fetched_at": "2026-11-17T17:59:46Z",
+          "status": "OK",
+          "error": null
+        },
+        "ma50": {
+          "value": 2345.0286,
+          "unit": "USD",
+          "source": "Binance Spot 1D candles",
+          "source_updated_at": "2026-11-17T23:59:59Z",
+          "fetched_at": "2026-11-17T17:59:46Z",
+          "status": "OK",
+          "error": null
+        },
+        "ma200": {
+          "value": 2139.3741000000005,
+          "unit": "USD",
+          "source": "Binance Spot 1D candles",
+          "source_updated_at": "2026-11-17T23:59:59Z",
+          "fetched_at": "2026-11-17T17:59:46Z",
+          "status": "OK",
+          "error": null
+        },
+        "ema20": {
+          "value": 2068.348102564187,
+          "unit": "USD",
+          "source": "Binance Spot 1D candles",
+          "source_updated_at": "2026-11-17T23:59:59Z",
+          "fetched_at": "2026-11-17T17:59:46Z",
+          "status": "OK",
+          "error": null
+        },
+        "ema50": {
+          "value": 2242.2198741198235,
+          "unit": "USD",
+          "source": "Binance Spot 1D candles",
+          "source_updated_at": "2026-11-17T23:59:59Z",
+          "fetched_at": "2026-11-17T17:59:46Z",
+          "status": "OK",
+          "error": null
+        },
+        "rsi14": {
+          "value": 24.367377256437862,
+          "unit": "index",
+          "source": "Binance Spot 1D candles",
+          "source_updated_at": "2026-11-17T23:59:59Z",
+          "fetched_at": "2026-11-17T17:59:46Z",
+          "status": "OK",
+          "error": null
+        },
+        "macd": {
+          "value": -152.19099165415082,
+          "unit": "USD",
+          "source": "Binance Spot 1D candles",
+          "source_updated_at": "2026-11-17T23:59:59Z",
+          "fetched_at": "2026-11-17T17:59:46Z",
+          "status": "OK",
+          "error": null
+        },
+        "macd_signal": {
+          "value": -119.00427117203654,
+          "unit": "USD",
+          "source": "Binance Spot 1D candles",
+          "source_updated_at": "2026-11-17T23:59:59Z",
+          "fetched_at": "2026-11-17T17:59:46Z",
+          "status": "OK",
+          "error": null
+        },
+        "macd_histogram": {
+          "value": -33.18672048211428,
+          "unit": "USD",
+          "source": "Binance Spot 1D candles",
+          "source_updated_at": "2026-11-17T23:59:59Z",
+          "fetched_at": "2026-11-17T17:59:46Z",
+          "status": "OK",
+          "error": null
+        },
+        "bollinger_upper": {
+          "value": 2488.6960778423822,
+          "unit": "USD",
+          "source": "Binance Spot 1D candles",
+          "source_updated_at": "2026-11-17T23:59:59Z",
+          "fetched_at": "2026-11-17T17:59:46Z",
+          "status": "OK",
+          "error": null
+        },
+        "bollinger_middle": {
+          "value": 2111.711499999999,
+          "unit": "USD",
+          "source": "Binance Spot 1D candles",
+          "source_updated_at": "2026-11-17T23:59:59Z",
+          "fetched_at": "2026-11-17T17:59:46Z",
+          "status": "OK",
+          "error": null
+        },
+        "bollinger_lower": {
+          "value": 1734.7269221576157,
+          "unit": "USD",
+          "source": "Binance Spot 1D candles",
+          "source_updated_at": "2026-11-17T23:59:59Z",
+          "fetched_at": "2026-11-17T17:59:46Z",
+          "status": "OK",
+          "error": null
+        },
+        "volume_24h_base": {
+          "value": 281456.0034,
+          "unit": "base asset",
+          "source": "Binance Spot 1D candles",
+          "source_updated_at": "2026-11-17T23:59:59Z",
+          "fetched_at": "2026-11-17T17:59:46Z",
+          "status": "OK",
+          "error": null
+        },
+        "volume_sma20_base": {
+          "value": 277385.067995,
+          "unit": "base asset",
+          "source": "Binance Spot 1D candles",
+          "source_updated_at": "2026-11-17T23:59:59Z",
+          "fetched_at": "2026-11-17T17:59:46Z",
+          "status": "OK",
+          "error": null
+        },
+        "volume_ratio_20d": {
+          "value": 1.0146761158934243,
+          "unit": "x",
+          "source": "Binance Spot 1D candles",
+          "source_updated_at": "2026-11-17T23:59:59Z",
+          "fetched_at": "2026-11-17T17:59:46Z",
+          "status": "OK",
+          "error": null
+        },
+        "support_20d": {
+          "value": 1711.08,
+          "unit": "USD",
+          "source": "Binance Spot 1D candles",
+          "source_updated_at": "2026-11-17T23:59:59Z",
+          "fetched_at": "2026-11-17T17:59:46Z",
+          "status": "OK",
+          "error": null
+        },
+        "resistance_20d": {
+          "value": 2450.0,
+          "unit": "USD",
+          "source": "Binance Spot 1D candles",
+          "source_updated_at": "2026-11-17T23:59:59Z",
+          "fetched_at": "2026-11-17T17:59:46Z",
+          "status": "OK",
+          "error": null
+        }
+      }
+    }
+  },
+  "not_integrated_yet": [
+    "Fed policy and FOMC",
+    "CPI/PCE/NFP",
+    "DXY and Treasury yields",
+    "VIX and equities",
+    "ETF flows",
+    "on-chain metrics",
+    "whale flows",
+    "token unlocks",
+    "project fundamentals"
+  ]
+}
