@@ -6,113 +6,49 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#080d16">
 <title>Crypto Macro Intelligence Dashboard</title>
-
 <style>
-:root {
-  --bg:#080d16;
-  --panel:#101927;
-  --border:#233248;
-  --text:#e8eef7;
-  --muted:#8d9bb0;
-  --green:#22c98a;
-  --red:#ff5d68;
-  --yellow:#f4c65e;
-  --blue:#55a8ff;
-}
+:root{--bg:#080d16;--panel:#101927;--border:#233248;--text:#e8eef7;--muted:#8d9bb0;--green:#22c98a;--red:#ff5d68;--yellow:#f4c65e;--blue:#55a8ff}
 *{box-sizing:border-box}
-body{
-  margin:0;background:var(--bg);color:var(--text);
-  font-family:Arial,Helvetica,sans-serif;
-}
-header{
-  padding:22px 5%;border-bottom:1px solid var(--border);
-  background:#0b1320;display:flex;justify-content:space-between;
-  align-items:center;gap:15px;flex-wrap:wrap;
-}
-.brand{font-size:21px;font-weight:800}
-.brand span{color:var(--green)}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,Helvetica,sans-serif}
+header{padding:22px 5%;border-bottom:1px solid var(--border);background:#0b1320;display:flex;justify-content:space-between;align-items:center;gap:15px;flex-wrap:wrap}
+.brand{font-size:21px;font-weight:800}.brand span{color:var(--green)}
 .subtitle,.status{font-size:12px;color:var(--muted);margin-top:6px}
 main{max-width:1500px;margin:auto;padding:24px 5% 50px}
-.section-title{
-  font-size:16px;font-weight:700;margin:28px 0 14px;
-}
-.grid{
-  display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));
-  gap:13px;
-}
-.card{
-  background:var(--panel);border:1px solid var(--border);
-  border-radius:12px;padding:17px;min-width:0;
-}
-.card h3{
-  margin:0 0 12px;font-size:12px;color:var(--muted);
-  font-weight:600;text-transform:uppercase;letter-spacing:.5px;
-}
+.section-title{font-size:16px;font-weight:700;margin:28px 0 14px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:13px}
+.card{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:17px;min-width:0}
+.card h3{margin:0 0 12px;font-size:12px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.5px}
 .value{font-size:23px;font-weight:800;overflow-wrap:anywhere}
 .small{font-size:12px;color:var(--muted);margin-top:8px}
-.green{color:var(--green)}
-.red{color:var(--red)}
-.yellow{color:var(--yellow)}
-.blue{color:var(--blue)}
-.decision{
-  border:1px solid var(--border);border-radius:14px;
-  background:#142238;padding:22px;margin-bottom:18px;
-}
+.green{color:var(--green)}.red{color:var(--red)}.yellow{color:var(--yellow)}.blue{color:var(--blue)}
+.decision{border:1px solid var(--border);border-radius:14px;background:#142238;padding:22px;margin-bottom:18px}
 .decision-label{font-size:12px;color:var(--muted)}
 .decision-value{font-size:30px;font-weight:900;margin:9px 0}
-.report-grid{
-  display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
-  gap:13px;
-}
-.report{
-  background:var(--panel);border:1px solid var(--border);
-  border-radius:12px;padding:17px;line-height:1.65;
-  white-space:pre-wrap;overflow-wrap:anywhere;
-}
+.report-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:13px}
+.report{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:17px;line-height:1.65;white-space:pre-wrap;overflow-wrap:anywhere}
 .report h3{font-size:13px;margin:0 0 10px;color:var(--blue)}
 table{width:100%;border-collapse:collapse;font-size:13px}
 th,td{padding:12px 10px;border-bottom:1px solid var(--border);text-align:left}
 th{color:var(--muted)}
 .table-wrap{overflow-x:auto;background:var(--panel);border:1px solid var(--border);border-radius:12px}
-.alert{
-  padding:13px 15px;border-radius:9px;margin:9px 0;
-  background:#251d20;border:1px solid #58313a;color:#ffb6bc;
-  font-size:13px;line-height:1.5;
-}
-.notice{
-  padding:13px 15px;border-radius:9px;margin:9px 0;
-  background:#172333;border:1px solid var(--border);
-  color:var(--muted);font-size:12px;line-height:1.6;
-}
-footer{
-  border-top:1px solid var(--border);padding:22px 5%;
-  color:var(--muted);font-size:11px;text-align:center;
-}
-button{
-  background:#1b2c43;border:1px solid var(--border);
-  color:var(--text);padding:9px 13px;border-radius:8px;
-  cursor:pointer;margin-top:9px;
-}
-@media(max-width:600px){
-  main{padding:16px 4% 35px}
-  header{padding:17px 4%}
-  .value{font-size:20px}
-  .decision-value{font-size:25px}
-}
+.alert{padding:13px 15px;border-radius:9px;margin:9px 0;background:#251d20;border:1px solid #58313a;color:#ffb6bc;font-size:13px;line-height:1.5}
+.notice{padding:13px 15px;border-radius:9px;margin:9px 0;background:#172333;border:1px solid var(--border);color:var(--muted);font-size:12px;line-height:1.6}
+footer{border-top:1px solid var(--border);padding:22px 5%;color:var(--muted);font-size:11px;text-align:center}
+button{background:#1b2c43;border:1px solid var(--border);color:var(--text);padding:9px 13px;border-radius:8px;cursor:pointer;margin-top:9px}
+@media(max-width:600px){main{padding:16px 4% 35px}header{padding:17px 4%}.value{font-size:20px}.decision-value{font-size:25px}}
 </style>
 </head>
-
 <body>
 <header>
-  <div>
-    <div class="brand">CRYPTO <span>MACRO</span> INTELLIGENCE</div>
-    <div class="subtitle">Global Market • Macro Economy • Risk Intelligence</div>
-  </div>
-  <div>
-    <div class="status" id="connection">Connecting...</div>
-    <div class="status" id="updated">Last check: --</div>
-    <button onclick="loadDashboard()">Refresh Data</button>
-  </div>
+<div>
+<div class="brand">CRYPTO <span>MACRO</span> INTELLIGENCE</div>
+<div class="subtitle">Global Market • Macro Economy • Risk Intelligence</div>
+</div>
+<div>
+<div class="status" id="connection">Connecting...</div>
+<div class="status" id="updated">Last check: --</div>
+<button onclick="loadDashboard()">Refresh Data</button>
+</div>
 </header>
 
 <main>
@@ -120,29 +56,29 @@ button{
 
 <div class="section-title">GLOBAL CRYPTO MARKET</div>
 <div class="grid">
-  <div class="card"><h3>Total Market Cap</h3><div class="value" id="marketCap">--</div></div>
-  <div class="card"><h3>24H Trading Volume</h3><div class="value" id="volume">--</div></div>
-  <div class="card"><h3>BTC Dominance</h3><div class="value" id="btcDom">--</div></div>
-  <div class="card"><h3>ETH Dominance</h3><div class="value" id="ethDom">--</div></div>
-  <div class="card"><h3>Fear & Greed</h3><div class="value" id="fearGreed">--</div><div class="small" id="fearLabel">--</div></div>
+<div class="card"><h3>Total Market Cap</h3><div class="value" id="marketCap">--</div></div>
+<div class="card"><h3>24H Trading Volume</h3><div class="value" id="volume">--</div></div>
+<div class="card"><h3>BTC Dominance</h3><div class="value" id="btcDom">--</div></div>
+<div class="card"><h3>ETH Dominance</h3><div class="value" id="ethDom">--</div></div>
+<div class="card"><h3>Fear & Greed</h3><div class="value" id="fearGreed">--</div><div class="small" id="fearLabel">--</div></div>
 </div>
 
 <div class="section-title">OVERALL MARKET DECISION</div>
 <div class="decision">
-  <div class="decision-label">Decision Engine Output</div>
-  <div class="decision-value" id="decision">WAIT</div>
-  <div class="small" id="regime">Market regime: Unknown</div>
-  <div class="small" id="decisionQuality">Data quality: Unknown</div>
+<div class="decision-label">Decision Engine Output</div>
+<div class="decision-value" id="decision">WAIT</div>
+<div class="small" id="regime">Market regime: Unknown</div>
+<div class="small" id="decisionQuality">Data quality: Unknown</div>
 </div>
 
 <div class="section-title">BITCOIN & ETHEREUM TECHNICAL ANALYSIS</div>
 <div class="grid">
-  <div class="card"><h3>BTC Price</h3><div class="value" id="btcPrice">--</div><div class="small" id="btcChange">24H: --</div></div>
-  <div class="card"><h3>BTC RSI (14)</h3><div class="value" id="btcRsi">--</div><div class="small" id="btcRsiText">--</div></div>
-  <div class="card"><h3>BTC ADX (14)</h3><div class="value" id="btcAdx">--</div></div>
-  <div class="card"><h3>ETH Price</h3><div class="value" id="ethPrice">--</div><div class="small" id="ethChange">24H: --</div></div>
-  <div class="card"><h3>ETH RSI (14)</h3><div class="value" id="ethRsi">--</div><div class="small" id="ethRsiText">--</div></div>
-  <div class="card"><h3>BTC Support / Resistance</h3><div class="value" id="btcLevels">--</div></div>
+<div class="card"><h3>BTC Price</h3><div class="value" id="btcPrice">--</div><div class="small" id="btcChange">24H: --</div></div>
+<div class="card"><h3>BTC RSI (14)</h3><div class="value" id="btcRsi">--</div><div class="small" id="btcRsiText">--</div></div>
+<div class="card"><h3>BTC ADX (14)</h3><div class="value" id="btcAdx">--</div></div>
+<div class="card"><h3>ETH Price</h3><div class="value" id="ethPrice">--</div><div class="small" id="ethChange">24H: --</div></div>
+<div class="card"><h3>ETH RSI (14)</h3><div class="value" id="ethRsi">--</div><div class="small" id="ethRsiText">--</div></div>
+<div class="card"><h3>BTC Support / Resistance</h3><div class="value" id="btcLevels">--</div></div>
 </div>
 
 <div class="section-title">MOVING AVERAGES & MOMENTUM</div>
@@ -162,33 +98,33 @@ button{
 
 <div class="section-title">MACRO ECONOMIC INTELLIGENCE</div>
 <div class="grid">
-  <div class="card"><h3>CPI YoY</h3><div class="value" id="cpi">--</div></div>
-  <div class="card"><h3>Core CPI YoY</h3><div class="value" id="coreCpi">--</div></div>
-  <div class="card"><h3>PCE YoY</h3><div class="value" id="pce">--</div></div>
-  <div class="card"><h3>Core PCE YoY</h3><div class="value" id="corePce">--</div></div>
-  <div class="card"><h3>Fed Funds Rate</h3><div class="value" id="fedRate">--</div></div>
-  <div class="card"><h3>Unemployment</h3><div class="value" id="unemployment">--</div></div>
-  <div class="card"><h3>VIX</h3><div class="value" id="vix">--</div></div>
-  <div class="card"><h3>US 10Y Yield</h3><div class="value" id="yield10">--</div></div>
-  <div class="card"><h3>US 2Y Yield</h3><div class="value" id="yield2">--</div></div>
-  <div class="card"><h3>10Y - 2Y Spread</h3><div class="value" id="spread">--</div><div class="small" id="curveStatus">--</div></div>
-  <div class="card"><h3>Net Liquidity</h3><div class="value" id="liquidity">--</div><div class="small" id="liquidityTrend">--</div></div>
-  <div class="card"><h3>WTI Oil</h3><div class="value" id="oil">--</div></div>
+<div class="card"><h3>CPI YoY</h3><div class="value" id="cpi">--</div></div>
+<div class="card"><h3>Core CPI YoY</h3><div class="value" id="coreCpi">--</div></div>
+<div class="card"><h3>PCE YoY</h3><div class="value" id="pce">--</div></div>
+<div class="card"><h3>Core PCE YoY</h3><div class="value" id="corePce">--</div></div>
+<div class="card"><h3>Fed Funds Rate</h3><div class="value" id="fedRate">--</div></div>
+<div class="card"><h3>Unemployment</h3><div class="value" id="unemployment">--</div></div>
+<div class="card"><h3>VIX</h3><div class="value" id="vix">--</div></div>
+<div class="card"><h3>US 10Y Yield</h3><div class="value" id="yield10">--</div></div>
+<div class="card"><h3>US 2Y Yield</h3><div class="value" id="yield2">--</div></div>
+<div class="card"><h3>10Y - 2Y Spread</h3><div class="value" id="spread">--</div><div class="small" id="curveStatus">--</div></div>
+<div class="card"><h3>Net Liquidity</h3><div class="value" id="liquidity">--</div><div class="small" id="liquidityTrend">--</div></div>
+<div class="card"><h3>WTI Oil</h3><div class="value" id="oil">--</div></div>
 </div>
 
 <div class="section-title">DECISION REPORT</div>
 <div class="report-grid">
-  <div class="report"><h3>DATA</h3><div id="reportData">Waiting...</div></div>
-  <div class="report"><h3>ANALYSIS</h3><div id="reportAnalysis">Waiting...</div></div>
-  <div class="report"><h3>DECISION</h3><div id="reportDecision">Waiting...</div></div>
-  <div class="report"><h3>ACTION</h3><div id="reportAction">Waiting...</div></div>
-  <div class="report"><h3>RISK</h3><div id="reportRisk">Waiting...</div></div>
+<div class="report"><h3>DATA</h3><div id="reportData">Waiting...</div></div>
+<div class="report"><h3>ANALYSIS</h3><div id="reportAnalysis">Waiting...</div></div>
+<div class="report"><h3>DECISION</h3><div id="reportDecision">Waiting...</div></div>
+<div class="report"><h3>ACTION</h3><div id="reportAction">Waiting...</div></div>
+<div class="report"><h3>RISK</h3><div id="reportRisk">Waiting...</div></div>
 </div>
 
 <div class="section-title">DATA QUALITY & WARNINGS</div>
 <div class="card">
-  <div id="qualitySummary">Waiting for data...</div>
-  <div id="warnings"></div>
+<div id="qualitySummary">Waiting for data...</div>
+<div id="warnings"></div>
 </div>
 
 <div class="notice">
@@ -205,206 +141,255 @@ CRYPTO MACRO INTELLIGENCE • Data sources and timestamps should be checked befo
 </footer>
 
 <script>
+"use strict";
+
 const $ = id => document.getElementById(id);
 
+const PATHS = {
+market: "data/market_data.json",
+macro: "data/macro_data.json",
+decision: "data/decision_data.json"
+};
+
 function get(obj,path){
-  return path.split(".").reduce((v,k)=>v==null?undefined:v[k],obj);
+return path.split(".").reduce((v,k)=>v==null?undefined:v[k],obj);
 }
 
 function num(v){
-  if(v===null || v===undefined || v==="") return null;
-  if(typeof v==="object" && "value" in v){
-    const status=String(v.status||"").toUpperCase();
-    if(status && !["OK","SUCCESS","AVAILABLE","FRESH"].includes(status)) return null;
-    v=v.value;
-  }
-  const n=Number(v);
-  return Number.isFinite(n)?n:null;
+if(v===null||v===undefined||v==="")return null;
+if(typeof v==="object"){
+const s=String(v.status||"").toUpperCase();
+if(s&&!["OK","SUCCESS","AVAILABLE","FRESH"].includes(s))return null;
+v=v.value;
+}
+const n=Number(v);
+return Number.isFinite(n)?n:null;
 }
 
-function val(obj,path){return num(get(obj,path));}
+function value(obj,path){return num(get(obj,path));}
 
 function fmt(v,d=2){
-  return v===null?"Unavailable":Number(v).toLocaleString("en-US",{maximumFractionDigits:d});
+return v===null?"Unavailable":Number(v).toLocaleString("en-US",{maximumFractionDigits:d});
 }
 
 function money(v){
-  if(v===null)return "Unavailable";
-  if(v>=1e12)return "$"+(v/1e12).toFixed(2)+"T";
-  if(v>=1e9)return "$"+(v/1e9).toFixed(2)+"B";
-  if(v>=1e6)return "$"+(v/1e6).toFixed(2)+"M";
-  return "$"+fmt(v);
+if(v===null)return"Unavailable";
+if(v>=1e12)return"$"+(v/1e12).toFixed(2)+"T";
+if(v>=1e9)return"$"+(v/1e9).toFixed(2)+"B";
+if(v>=1e6)return"$"+(v/1e6).toFixed(2)+"M";
+return"$"+fmt(v);
 }
 
-function put(id,v){$(id).textContent=v;}
+function put(id,v){
+const e=$(id);
+if(e)e.textContent=v;
+}
 
-function show(id,v,suffix="",d=2){
-  put(id,v===null?"Unavailable":fmt(v,d)+suffix);
+function show(id,v,s="",d=2){
+put(id,v===null?"Unavailable":fmt(v,d)+s);
 }
 
 function safeText(v){
-  if(v===null || v===undefined)return "No verified report available.";
-  if(Array.isArray(v))return v.length?v.map(x=>"• "+String(x)).join("\n"):"None reported.";
-  if(typeof v==="object")return JSON.stringify(v,null,2);
-  return String(v);
+if(v===null||v===undefined||v==="")return"No verified report available.";
+if(Array.isArray(v))return v.length?v.map(x=>"• "+String(x)).join("\n"):"None reported.";
+if(typeof v==="object")return JSON.stringify(v,null,2);
+return String(v);
 }
 
 function escapeHTML(s){
-  return String(s).replace(/[&<>"']/g,c=>({
-    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
-  }[c]));
+return String(s).replace(/[&<>"']/g,c=>({
+"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+}[c]));
 }
 
-function technical(asset){
-  return asset?.indicators || {};
-}
+function setReport(id,v){put(id,safeText(v));}
 
 function loadTechnical(prefix,asset){
-  const i=technical(asset);
-  const price=val(asset,"price_usdt");
-  show(prefix+"MA20",val(i,"ma20"));
-  show(prefix+"MA50",val(i,"ma50"));
-  show(prefix+"MA200",val(i,"ma200"));
-  show(prefix+"MACD",val(i,"macd_histogram"));
-  show(prefix+"Support",val(i,"support_20d"));
-  show(prefix+"Resistance",val(i,"resistance_20d"));
-  show(prefix+"Rsi",val(i,"rsi14"));
-  show(prefix+"Adx",val(i,"adx14"));
-  return {price,rsi:val(i,"rsi14"),adx:val(i,"adx14"),indicators:i};
+const i=asset?.indicators||{};
+const price=value(asset,"price_usdt");
+
+show(prefix+"MA20",value(i,"ma20"));
+show(prefix+"MA50",value(i,"ma50"));
+show(prefix+"MA200",value(i,"ma200"));
+show(prefix+"MACD",value(i,"macd_histogram"));
+show(prefix+"Support",value(i,"support_20d"));
+show(prefix+"Resistance",value(i,"resistance_20d"));
+show(prefix+"Rsi",value(i,"rsi14"));
+show(prefix+"Adx",value(i,"adx14"));
+
+return{
+price,
+rsi:value(i,"rsi14"),
+adx:value(i,"adx14"),
+indicators:i
+};
 }
 
-function loadDashboard(){
-  put("connection","Loading data...");
-  $("mainAlert").innerHTML="";
+async function fetchJSON(path){
+const r=await fetch(path+"?ts="+Date.now(),{cache:"no-store"});
+if(!r.ok)throw Error(path+" HTTP "+r.status);
+return r.json();
+}
 
-  Promise.all([
-    fetch("data/market_data.json?ts="+Date.now(),{cache:"no-store"})
-      .then(r=>{if(!r.ok)throw Error("Market JSON HTTP "+r.status);return r.json()}),
-    fetch("data/macro_data.json?ts="+Date.now(),{cache:"no-store"})
-      .then(r=>{if(!r.ok)throw Error("Macro JSON HTTP "+r.status);return r.json()}),
-    fetch("data/decision_data.json?ts="+Date.now(),{cache:"no-store"})
-      .then(r=>{if(!r.ok)throw Error("Decision JSON HTTP "+r.status);return r.json()})
-  ]).then(([market,macro,decision])=>{
-    render(market,macro,decision);
-    put("connection","● Data connected");
-    $("connection").className="status green";
-    put("updated","Last check: "+new Date().toLocaleString());
-  }).catch(err=>{
-    put("connection","Data loading error");
-    $("connection").className="status red";
-    $("mainAlert").innerHTML=
-      '<div class="alert">Could not load JSON files: '+escapeHTML(err.message)+
-      '. Check GitHub Pages deployment and data file paths.</div>';
-  });
+async function loadDashboard(){
+put("connection","Loading data...");
+const a=$("mainAlert");
+if(a)a.innerHTML="";
+
+try{
+const [market,macro,decision]=await Promise.all([
+fetchJSON(PATHS.market),
+fetchJSON(PATHS.macro),
+fetchJSON(PATHS.decision)
+]);
+
+render(market,macro,decision);
+
+put("connection","● Data connected");
+if($("connection"))$("connection").className="status green";
+put("updated","Last check: "+new Date().toLocaleString());
+
+}catch(err){
+put("connection","Data loading error");
+if($("connection"))$("connection").className="status red";
+
+if(a)a.innerHTML=
+'<div class="alert">Could not load dashboard data: '+
+escapeHTML(err.message)+
+'. Verify GitHub Pages deployment and data file paths.</div>';
+
+console.error(err);
+}
 }
 
 function render(market,macro,decision){
-  const gm=market?.global_market||{};
 
-  put("marketCap",money(val(gm,"total_market_cap_usd")));
-  put("volume",money(val(gm,"total_volume_24h_usd")));
-  show("btcDom",val(gm,"btc_dominance_pct"),"%");
-  show("ethDom",val(gm,"eth_dominance_pct"),"%");
+const gm=market?.global_market||{};
 
-  const fg=market?.fear_greed||{};
-  show("fearGreed",num(fg.value),"/100",0);
-  put("fearLabel",fg.classification||"Unavailable");
+put("marketCap",money(value(gm,"total_market_cap_usd")));
+put("volume",money(value(gm,"total_volume_24h_usd")));
+show("btcDom",value(gm,"btc_dominance_pct"),"%");
+show("ethDom",value(gm,"eth_dominance_pct"),"%");
 
-  const btc=market?.technical?.BTC||market?.technical?.bitcoin||{};
-  const eth=market?.technical?.ETH||market?.technical?.ethereum||{};
-  const bt=loadTechnical("btc",btc);
-  const et=loadTechnical("eth",eth);
+const fg=market?.fear_greed||{};
+show("fearGreed",num(fg.value),"/100",0);
+put("fearLabel",fg.classification||"Unavailable");
 
-  show("btcPrice",bt.price===null?null:bt.price,"",2);
-  show("ethPrice",et.price===null?null:et.price,"",2);
-  if(bt.price!==null)put("btcPrice","$"+fmt(bt.price));
-  if(et.price!==null)put("ethPrice","$"+fmt(et.price));
+const bt=loadTechnical("btc",market?.technical?.BTC||{});
+const et=loadTechnical("eth",market?.technical?.ETH||{});
 
-  const ba=market?.major_assets?.bitcoin||{};
-  const ea=market?.major_assets?.ethereum||{};
-  show("btcChange",val(ba,"change_24h_pct"),"%");
-  show("ethChange",val(ea,"change_24h_pct"),"%");
+put("btcPrice",bt.price===null?"Unavailable":"$"+fmt(bt.price));
+put("ethPrice",et.price===null?"Unavailable":"$"+fmt(et.price));
 
-  show("btcRsi",bt.rsi);
-  show("ethRsi",et.rsi);
-  show("btcAdx",bt.adx);
+show("btcChange",value(market?.major_assets?.bitcoin,"change_24h_pct"),"%");
+show("ethChange",value(market?.major_assets?.ethereum,"change_24h_pct"),"%");
 
-  put("btcRsiText",bt.rsi===null?"Unavailable":
-    bt.rsi<30?"Oversold — not a buy signal":
-    bt.rsi>70?"Overbought — caution":"Middle range");
+show("btcRsi",bt.rsi);
+show("ethRsi",et.rsi);
+show("btcAdx",bt.adx);
 
-  put("ethRsiText",et.rsi===null?"Unavailable":
-    et.rsi<30?"Oversold — not a buy signal":
-    et.rsi>70?"Overbought — caution":"Middle range");
+put("btcRsiText",bt.rsi===null?"Unavailable":
+bt.rsi<30?"Oversold — not a buy signal":
+bt.rsi>70?"Overbought — caution":"Middle range");
 
-  const sup=val(bt.indicators,"support_20d");
-  const res=val(bt.indicators,"resistance_20d");
-  put("btcLevels",sup===null||res===null?"Unavailable":"$"+fmt(sup)+" / $"+fmt(res));
+put("ethRsiText",et.rsi===null?"Unavailable":
+et.rsi<30?"Oversold — not a buy signal":
+et.rsi>70?"Overbought — caution":"Middle range");
 
-  const m=macro?.metrics||{};
-  const inf=macro?.inflation||{};
+const sup=value(bt.indicators,"support_20d");
+const res=value(bt.indicators,"resistance_20d");
 
-  show("cpi",num(inf.cpi?.yoy_percent),"%");
-  show("coreCpi",num(inf.core_cpi?.yoy_percent),"%");
-  show("pce",num(inf.pce?.yoy_percent),"%");
-  show("corePce",num(inf.core_pce?.yoy_percent),"%");
+put("btcLevels",sup===null||res===null?
+"Unavailable":"$"+fmt(sup)+" / $"+fmt(res));
 
-  show("fedRate",val(m,"fed_funds_rate"),"%");
-  show("unemployment",val(m,"unemployment"),"%");
-  show("vix",val(m,"vix"));
-  show("yield10",val(m,"yield_10y"),"%");
-  show("yield2",val(m,"yield_2y"),"%");
-  show("spread",num(macro?.yield_curve?.spread),"%");
-  put("curveStatus",macro?.yield_curve?.trend||macro?.yield_curve?.status||"Unavailable");
+const m=macro?.metrics||{};
+const inf=macro?.inflation||{};
 
-  const liq=macro?.liquidity||{};
-  const liquidity=num(liq.current);
-  show("liquidity",liquidity===null?null:liquidity/1000);
-  put("liquidityTrend",liq.trend||liq.status||"Unavailable");
-  show("oil",val(m,"oil"));
+show("cpi",value(inf,"cpi.yoy_percent"),"%");
+show("coreCpi",value(inf,"core_cpi.yoy_percent"),"%");
+show("pce",value(inf,"pce.yoy_percent"),"%");
+show("corePce",value(inf,"core_pce.yoy_percent"),"%");
 
-  const od=decision?.overall_decision||{};
-  const d=od.DECISION||od.decision||decision?.decision||"WAIT";
-  put("decision",typeof d==="string"?d:safeText(d));
+show("fedRate",value(m,"fed_funds_rate.value"),"%");
+show("unemployment",value(m,"unemployment.value"),"%");
+show("vix",value(m,"vix.value"));
+show("yield10",value(m,"yield_10y.value"),"%");
+show("yield2",value(m,"yield_2y.value"),"%");
+show("spread",value(m,"yield_curve_10y_2y.value"),"%");
 
-  const regime=decision?.market_regime;
-  put("regime","Market regime: "+
-    (typeof regime==="string"?regime:regime?.label||regime?.name||"Unavailable"));
+put("curveStatus",macro?.yield_curve?.trend||"Unavailable");
+show("liquidity",value(macro,"liquidity.current"));
+put("liquidityTrend",macro?.liquidity?.trend||"Unavailable");
+show("oil",value(m,"oil.value"));
 
-  put("decisionQuality","Data quality: "+(decision?.data_quality?.status||"Unknown"));
+const final=decision?.final_decision||{};
+const ma=decision?.macro_analysis||{};
+const dq=decision?.data_quality||{};
 
-  put("reportData",safeText(od.DATA||od.data||decision?.DATA));
-  put("reportAnalysis",safeText(od.ANALYSIS||od.analysis||decision?.ANALYSIS));
-  put("reportDecision",safeText(od.DECISION||od.decision||decision?.DECISION));
-  put("reportAction",safeText(od.ACTION||od.action||decision?.ACTION));
-  put("reportRisk",safeText(od.RISK||od.risk||decision?.RISK));
+put("decision",final.decision||"WAIT");
+put("regime","Market regime: "+(final.market_context||ma.decision||"Unavailable"));
+put("decisionQuality","Data quality: "+safeText(dq));
 
-  const issues=[];
-  const dq=decision?.data_quality?.issues;
-  if(Array.isArray(dq))issues.push(...dq);
-  else if(dq)issues.push(String(dq));
+setReport("reportData",{
+generated_at:decision?.generated_at,
+data_quality:dq,
+market:decision?.crypto_market||{},
+macro_metrics:ma.key_metrics||{}
+});
 
-  const ms=macro?.summary||{};
-  if(Array.isArray(ms.critical_missing)&&ms.critical_missing.length)
-    issues.push("Critical macro data missing: "+ms.critical_missing.join(", "));
-  if(Array.isArray(ms.optional_unavailable)&&ms.optional_unavailable.length)
-    issues.push("Optional macro data unavailable: "+ms.optional_unavailable.join(", "));
+setReport("reportAnalysis",{
+macro_analysis:ma,
+reasons:final.reasons||[]
+});
 
-  put("qualitySummary",
-    "Macro quality: "+(ms.data_quality||"Unknown")+
-    " • Decision quality: "+(decision?.data_quality?.status||"Unknown")+
-    " • Market mode: "+(market?.update_mode||"Unknown"));
+setReport("reportDecision",{
+decision:final.decision||"WAIT",
+confidence:final.confidence_label||"Unavailable",
+important_note:final.important_note||""
+});
 
-  $("warnings").innerHTML=issues.length?
-    issues.map(x=>'<div class="alert">'+escapeHTML(x)+'</div>').join("") :
-    '<div class="notice">No additional warnings reported by the loaded data.</div>';
+setReport("reportAction",final.actions||[]);
 
-  const quality=String(decision?.data_quality?.status||"").toUpperCase();
-  if(quality && !["GOOD","OK","HEALTHY"].includes(quality)){
-    $("mainAlert").innerHTML=
-      '<div class="alert">DATA QUALITY WARNING: '+escapeHTML(quality)+
-      '. Check missing or stale inputs before relying on the decision.</div>';
-  }
+setReport("reportRisk",{
+risk:final.risk||"Unavailable",
+risk_flags:ma.risk_flags||[],
+limitations:decision?.limitations||[]
+});
+
+const ms=macro?.summary||{};
+
+put("qualitySummary",
+"Macro quality: "+(ms.data_quality||"Unknown")+
+" • Macro series: "+(ms.ok??"Unknown")+
+"/"+(ms.total_series??"Unknown")+
+" • Decision quality: "+safeText(dq));
+
+const warnings=[];
+
+if(Array.isArray(dq.issues))warnings.push(...dq.issues);
+
+if(Array.isArray(ms.critical_missing))
+warnings.push(...ms.critical_missing.map(x=>"Critical missing: "+x));
+
+if(Array.isArray(ms.optional_unavailable))
+warnings.push(...ms.optional_unavailable.map(x=>"Optional unavailable: "+x));
+
+if(Array.isArray(decision?.limitations))
+warnings.push(...decision.limitations);
+
+const w=$("warnings");
+
+if(w){
+w.innerHTML=warnings.length?
+warnings.map(x=>'<div class="alert">'+escapeHTML(x)+'</div>').join(""):
+'<div class="notice">No additional warnings reported.</div>';
+}
+
+if(ms.data_quality!=="GOOD"){
+const a=$("mainAlert");
+if(a)a.innerHTML=
+'<div class="alert">DATA QUALITY WARNING: কিছু data unavailable বা quality সীমিত। Warnings দেখুন।</div>';
+}
 }
 
 loadDashboard();
