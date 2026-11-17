@@ -108,29 +108,29 @@ def get_macro_insights(vix, spx, brent_oil, gold, yield_10y, dxy):
     if dxy != "N/A":
         if dxy > 105: dxy_status, dxy_color, dxy_action = "BEARISH", "text-red-500", "ডলার শক্তিশালী, ক্রিপ্টোর জন্য খারাপ।"
         elif dxy < 100: dxy_status, dxy_color, dxy_action = "BULLISH", "text-green-500", "ডলার দুর্বল, ক্রিপ্টোর জন্য ভালো।"
-    insights.append({"name": "Dollar Index (DXY)", "value": dxy, "status": dxy_status, "color": dxy_color, "action": dxy_action})
+    insights.append({"name": "Dollar Index (DXY)", "value": dxy, "status": dxy_status, "color": dxy_color, "action": dxy_action, "link": "https://www.tradingview.com/chart/?symbol=TVC%3ADXY"})
 
     vix_status = "NEUTRAL"; vix_color = "text-yellow-500"; vix_action = "বাজার স্থিতিশীল।"
     if vix != "N/A":
         if vix > 25: vix_status, vix_color, vix_action = "HIGH RISK", "text-red-500", "ভোলাটিলিটি বেশি। নতুন কেনা থেকে বিরত থাকুন।"
         elif vix < 15: vix_status, vix_color, vix_action = "LOW RISK", "text-green-500", "বাজারে ভয় নেই, রিস্ক-অন পরিবেশ।"
-    insights.append({"name": "VIX (Volatility)", "value": vix, "status": vix_status, "color": vix_color, "action": vix_action})
+    insights.append({"name": "VIX (Volatility)", "value": vix, "status": vix_status, "color": vix_color, "action": vix_action, "link": "https://www.tradingview.com/chart/?symbol=TVC%3AVIX"})
 
-    insights.append({"name": "S&P 500", "value": spx, "status": "TRACKING", "color": "text-blue-400", "action": "স্টক মার্কেট বাড়লে ক্রিপ্টোও বাড়ে (Risk-on)।"})
+    insights.append({"name": "S&P 500", "value": spx, "status": "TRACKING", "color": "text-blue-400", "action": "স্টক মার্কেট বাড়লে ক্রিপ্টোও বাড়ে (Risk-on)।", "link": "https://www.tradingview.com/chart/?symbol=SP%3ASPX"})
 
     brent_status = "NEUTRAL"; brent_color = "text-yellow-500"; brent_action = "ব্রেন্ট অয়েলের দাম স্বাভাবিক।"
     if brent_oil != "N/A":
         if brent_oil > 85: brent_status, brent_color, brent_action = "INFLATION RISK", "text-red-500", "ব্রেন্ট অয়েলের দাম বেশি। CPI বাড়তে পারে (বেয়ারিশ)।"
         elif brent_oil < 70: brent_status, brent_color, brent_action = "DISINFLATION", "text-green-500", "ব্রেন্ট অয়েলের দাম কম। মুদ্রাস্ফীতি কমার ইঙ্গিত (বুলিশ)।"
-    insights.append({"name": "Brent Crude Oil", "value": f"${brent_oil}", "status": brent_status, "color": brent_color, "action": brent_action})
+    insights.append({"name": "Brent Crude Oil", "value": f"${brent_oil}", "status": brent_status, "color": brent_color, "action": brent_action, "link": "https://www.tradingview.com/chart/?symbol=TVC%3AUKOIL"})
 
     yield_status = "NEUTRAL"; yield_color = "text-yellow-500"; yield_action = "ইল্ড স্বাভাবিক।"
     if yield_10y != "N/A":
         if yield_10y > 5.0: yield_status, yield_color, yield_action = "HIGH YIELD", "text-red-500", "ইল্ড ৫% এর উপরে। বাজারে তারল্য সংকুচিত হচ্ছে, ক্রিপ্টোর জন্য নেতিবাচক।"
         elif yield_10y < 4.5: yield_status, yield_color, yield_action = "LOW YIELD", "text-green-500", "ইল্ড ৪.৫% এর নিচে। বাজারে টাকা সহজলভ্য, ক্রিপ্টোর জন্য ইতিবাচক।"
-    insights.append({"name": "US 10Y Treasury Yield", "value": f"{yield_10y}%", "status": yield_status, "color": yield_color, "action": yield_action})
+    insights.append({"name": "US 10Y Treasury Yield", "value": f"{yield_10y}%", "status": yield_status, "color": yield_color, "action": yield_action, "link": "https://www.tradingview.com/chart/?symbol=TVC%3AUS10Y"})
 
-    insights.append({"name": "Gold", "value": f"${gold}", "status": "SAFE HAVEN", "color": "text-yellow-600", "action": "সোনার দাম বাড়লে বিনিয়োগকারীরা ঝুঁকি এড়াতে চাইছে।"})
+    insights.append({"name": "Gold", "value": f"${gold}", "status": "SAFE HAVEN", "color": "text-yellow-600", "action": "সোনার দাম বাড়লে বিনিয়োগকারীরা ঝুঁকি এড়াতে চাইছে।", "link": "https://www.tradingview.com/chart/?symbol=OANDA%3AXAUUSD"})
     return insights
 
 def get_event_alerts(fng, vix):
@@ -298,78 +298,27 @@ html_content += f"""
             </div>
         </div>
 
-        <!-- Live TradingView Charts (BTC, ETH, DXY, Brent, Gold, S&P500) -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        <!-- BTC Chart & Order Book Imbalance Link -->
+        <div class="grid grid-cols-1 gap-4 mb-6">
             <!-- BTC Chart -->
             <div class="bg-gray-800 rounded-lg border border-gray-700 p-2">
                 <h2 class="text-sm font-semibold text-gray-400 px-2 mb-2">BTC/USDT Live Chart</h2>
-                <div class="tradingview-widget-container" style="height:250px; width:100%;">
+                <div class="tradingview-widget-container" style="height:300px; width:100%;">
                     <div id="tradingview_btc"></div>
                     <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
                     <script type="text/javascript">
-                    new TradingView.widget({{ "width": "100%", "height": 250, "symbol": "BINANCE:BTCUSDT", "interval": "60", "timezone": "Etc/UTC", "theme": "dark", "style": "1", "locale": "en", "enable_publishing": false, "hide_side_toolbar": true, "container_id": "tradingview_btc" }});
-                    </script>
-                </div>
-            </div>
-            
-            <!-- ETH Chart -->
-            <div class="bg-gray-800 rounded-lg border border-gray-700 p-2">
-                <h2 class="text-sm font-semibold text-gray-400 px-2 mb-2">ETH/USDT Live Chart</h2>
-                <div class="tradingview-widget-container" style="height:250px; width:100%;">
-                    <div id="tradingview_eth"></div>
-                    <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
-                    <script type="text/javascript">
-                    new TradingView.widget({{ "width": "100%", "height": 250, "symbol": "BINANCE:ETHUSDT", "interval": "60", "timezone": "Etc/UTC", "theme": "dark", "style": "1", "locale": "en", "enable_publishing": false, "hide_side_toolbar": true, "container_id": "tradingview_eth" }});
+                    new TradingView.widget({{ "width": "100%", "height": 300, "symbol": "BINANCE:BTCUSDT", "interval": "60", "timezone": "Etc/UTC", "theme": "dark", "style": "1", "locale": "en", "enable_publishing": false, "hide_side_toolbar": true, "container_id": "tradingview_btc" }});
                     </script>
                 </div>
             </div>
 
-            <!-- DXY Chart -->
-            <div class="bg-gray-800 rounded-lg border border-gray-700 p-2">
-                <h2 class="text-sm font-semibold text-gray-400 px-2 mb-2">DXY (Dollar Index) Live Chart</h2>
-                <div class="tradingview-widget-container" style="height:250px; width:100%;">
-                    <div id="tradingview_dxy"></div>
-                    <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
-                    <script type="text/javascript">
-                    new TradingView.widget({{ "width": "100%", "height": 250, "symbol": "TVC:DXY", "interval": "60", "timezone": "Etc/UTC", "theme": "dark", "style": "1", "locale": "en", "enable_publishing": false, "hide_side_toolbar": true, "container_id": "tradingview_dxy" }});
-                    </script>
-                </div>
-            </div>
-
-            <!-- Gold Chart -->
-            <div class="bg-gray-800 rounded-lg border border-gray-700 p-2">
-                <h2 class="text-sm font-semibold text-gray-400 px-2 mb-2">Gold (XAUUSD) Live Chart</h2>
-                <div class="tradingview-widget-container" style="height:250px; width:100%;">
-                    <div id="tradingview_gold"></div>
-                    <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
-                    <script type="text/javascript">
-                    new TradingView.widget({{ "width": "100%", "height": 250, "symbol": "OANDA:XAUUSD", "interval": "60", "timezone": "Etc/UTC", "theme": "dark", "style": "1", "locale": "en", "enable_publishing": false, "hide_side_toolbar": true, "container_id": "tradingview_gold" }});
-                    </script>
-                </div>
-            </div>
-
-            <!-- Brent Oil Chart -->
-            <div class="bg-gray-800 rounded-lg border border-gray-700 p-2">
-                <h2 class="text-sm font-semibold text-gray-400 px-2 mb-2">Brent Oil Live Chart</h2>
-                <div class="tradingview-widget-container" style="height:250px; width:100%;">
-                    <div id="tradingview_brent"></div>
-                    <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
-                    <script type="text/javascript">
-                    new TradingView.widget({{ "width": "100%", "height": 250, "symbol": "TVC:UKOIL", "interval": "60", "timezone": "Etc/UTC", "theme": "dark", "style": "1", "locale": "en", "enable_publishing": false, "hide_side_toolbar": true, "container_id": "tradingview_brent" }});
-                    </script>
-                </div>
-            </div>
-
-            <!-- S&P 500 Chart -->
-            <div class="bg-gray-800 rounded-lg border border-gray-700 p-2">
-                <h2 class="text-sm font-semibold text-gray-400 px-2 mb-2">S&P 500 Live Chart</h2>
-                <div class="tradingview-widget-container" style="height:250px; width:100%;">
-                    <div id="tradingview_spx"></div>
-                    <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
-                    <script type="text/javascript">
-                    new TradingView.widget({{ "width": "100%", "height": 250, "symbol": "SP:SPX", "interval": "60", "timezone": "Etc/UTC", "theme": "dark", "style": "1", "locale": "en", "enable_publishing": false, "hide_side_toolbar": true, "container_id": "tradingview_spx" }});
-                    </script>
-                </div>
+            <!-- Order Book Imbalance Link -->
+            <div class="bg-gray-800 rounded-lg border border-gray-700 p-4 text-center">
+                <h2 class="text-lg font-bold text-gray-200 mb-2">Live Buying/Selling Pressure (Order Book)</h2>
+                <p class="text-sm text-gray-400 mb-4">বাজারে ক্রেতা নাকি বিক্রেতা বেশি, তা লাইভ দেখতে নিচের লিংকে ক্লিক করুন।</p>
+                <a href="https://www.coinglass.com/pro/futures/OrderBook" target="_blank" class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg transition duration-300">
+                    Open Live Order Book Imbalance →
+                </a>
             </div>
         </div>
 
@@ -540,6 +489,7 @@ for macro in macro_insights:
                         <span class="text-xs font-bold px-2 py-1 rounded {macro['color'].replace('text', 'bg').replace('500', '900').replace('600', '900').replace('400', '900')} {macro['color']}">{macro['value']}</span>
                     </div>
                     <p class="text-xs text-gray-400 mt-2"><span class="text-blue-400 font-bold">করণীয়:</span> {macro['action']}</p>
+                    <a href="{macro['link']}" target="_blank" class="text-xs text-blue-400 mt-1 block underline">TradingView-এ লাইভ চার্ট দেখুন →</a>
                 </div>
 """
 
@@ -627,4 +577,4 @@ html_content += f"""
 with open("index.html", "w", encoding="utf-8") as file:
     file.write(html_content)
 
-print("Dashboard updated successfully with multiple live charts and link indicators.")
+print("Dashboard updated successfully with order book link and removed other charts.")
