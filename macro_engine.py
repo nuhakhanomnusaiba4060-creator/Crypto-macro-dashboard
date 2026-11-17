@@ -4,19 +4,16 @@
 
 """
 CRYPTO MACRO DASHBOARD - MACRO ENGINE
-Version: 1.0
+Version: 1.1
+
 Output: data/macro_data.json
 
-Data source:
-- Federal Reserve Economic Data (FRED)
-- FRED CSV export (no API key required where available)
-- Official FRED API (optional FRED_API_KEY)
+Source: Federal Reserve Economic Data (FRED)
 
-Important:
-- DTWEXBGS is a broad trade-weighted USD index proxy,
-  NOT the ICE DXY index.
-- Missing or stale data is never replaced with zero.
-- This engine provides macro context, not personal investment advice.
+IMPORTANT:
+DTWEXBGS = Broad USD Index Proxy, NOT ICE DXY.
+Gold FRED series disabled after HTTP 404.
+No fake values or synthetic defaults.
 """
 
 import csv
@@ -41,22 +38,22 @@ from urllib.request import Request, urlopen
 # CONFIGURATION
 # ============================================================
 
-VERSION = "1.0"
+VERSION = "1.1"
 
 BASE_DIR = Path(__file__).resolve().parent
 DATA_DIR = BASE_DIR / "data"
 OUTPUT_FILE = DATA_DIR / "macro_data.json"
 
-FRED_API_KEY = os.getenv("FRED_API_KEY", "").strip()
-
 FRED_CSV_URL = "https://fred.stlouisfed.org/graph/fredgraph.csv"
 FRED_API_URL = "https://api.stlouisfed.org/fred/series/observations"
+
+FRED_API_KEY = os.getenv("FRED_API_KEY", "").strip()
 
 TIMEOUT = 20
 RETRIES = 2
 MAX_WORKERS = 8
 
-USER_AGENT = "CryptoMacroDashboard/1.0"
+USER_AGENT = "CryptoMacroDashboard/1.1"
 
 logging.basicConfig(
     level=logging.INFO,
@@ -67,181 +64,160 @@ LOGGER = logging.getLogger("macro_engine")
 
 
 # ============================================================
-# FRED SERIES CONFIGURATION
+# FRED SERIES
 # ============================================================
+
+# Freshness limits are series-specific.
+# Monthly observation dates differ from publication dates.
 
 SERIES = {
     "fed_funds_rate": {
         "id": "DFF",
         "name": "Federal Funds Effective Rate",
         "unit": "%",
-        "cadence": "daily",
-        "risk_type": "rate"
+        "freshness_days": 7
     },
     "cpi": {
         "id": "CPIAUCSL",
         "name": "Consumer Price Index",
         "unit": "index",
-        "cadence": "monthly",
-        "risk_type": "inflation"
+        "freshness_days": 75
     },
     "core_cpi": {
         "id": "CPILFESL",
         "name": "Core CPI",
         "unit": "index",
-        "cadence": "monthly",
-        "risk_type": "inflation"
+        "freshness_days": 75
     },
     "pce": {
         "id": "PCEPI",
         "name": "PCE Price Index",
         "unit": "index",
-        "cadence": "monthly",
-        "risk_type": "inflation"
+        "freshness_days": 100
     },
     "core_pce": {
         "id": "PCEPILFE",
         "name": "Core PCE Price Index",
         "unit": "index",
-        "cadence": "monthly",
-        "risk_type": "inflation"
+        "freshness_days": 100
     },
     "unemployment": {
         "id": "UNRATE",
         "name": "Unemployment Rate",
         "unit": "%",
-        "cadence": "monthly",
-        "risk_type": "labor"
+        "freshness_days": 75
     },
     "nonfarm_payrolls": {
         "id": "PAYEMS",
         "name": "Total Nonfarm Payrolls",
         "unit": "thousands",
-        "cadence": "monthly",
-        "risk_type": "labor"
+        "freshness_days": 75
     },
     "yield_2y": {
         "id": "DGS2",
         "name": "US 2-Year Treasury Yield",
         "unit": "%",
-        "cadence": "daily",
-        "risk_type": "yield"
+        "freshness_days": 7
     },
     "yield_10y": {
         "id": "DGS10",
         "name": "US 10-Year Treasury Yield",
         "unit": "%",
-        "cadence": "daily",
-        "risk_type": "yield"
+        "freshness_days": 7
     },
     "yield_30y": {
         "id": "DGS30",
         "name": "US 30-Year Treasury Yield",
         "unit": "%",
-        "cadence": "daily",
-        "risk_type": "yield"
+        "freshness_days": 7
     },
     "yield_curve_10y_2y": {
         "id": "T10Y2Y",
         "name": "10Y-2Y Treasury Spread",
-        "unit": "%",
-        "cadence": "daily",
-        "risk_type": "yield_curve"
+        "unit": "percentage_points",
+        "freshness_days": 7
     },
     "usd_broad_index": {
         "id": "DTWEXBGS",
         "name": "Trade Weighted US Dollar Index",
         "unit": "index",
-        "cadence": "daily",
-        "risk_type": "dollar"
+        "freshness_days": 10
     },
     "vix": {
         "id": "VIXCLS",
         "name": "CBOE Volatility Index",
         "unit": "index",
-        "cadence": "daily",
-        "risk_type": "volatility"
+        "freshness_days": 7
     },
     "sp500": {
         "id": "SP500",
         "name": "S&P 500",
         "unit": "index",
-        "cadence": "daily",
-        "risk_type": "equity"
+        "freshness_days": 7
     },
     "nasdaq": {
         "id": "NASDAQCOM",
         "name": "NASDAQ Composite",
         "unit": "index",
-        "cadence": "daily",
-        "risk_type": "equity"
+        "freshness_days": 7
     },
     "oil": {
         "id": "DCOILWTICO",
         "name": "WTI Crude Oil",
         "unit": "USD/barrel",
-        "cadence": "daily",
-        "risk_type": "commodity"
-    },
-    "gold": {
-        "id": "GOLDAMGBD228NLBM",
-        "name": "London Gold Price AM",
-        "unit": "USD/oz",
-        "cadence": "daily",
-        "risk_type": "commodity"
+        "freshness_days": 10
     },
     "usd_jpy": {
         "id": "DEXJPUS",
         "name": "Japanese Yen per US Dollar",
         "unit": "JPY/USD",
-        "cadence": "daily",
-        "risk_type": "currency"
+        "freshness_days": 10
     },
     "fed_balance_sheet": {
         "id": "WALCL",
         "name": "Federal Reserve Total Assets",
         "unit": "millions USD",
-        "cadence": "weekly",
-        "risk_type": "liquidity"
+        "freshness_days": 21
     },
     "reverse_repo": {
         "id": "RRPONTSYD",
         "name": "Overnight Reverse Repurchase Agreements",
         "unit": "billions USD",
-        "cadence": "daily",
-        "risk_type": "liquidity"
+        "freshness_days": 7
     },
     "treasury_general_account": {
         "id": "WTREGEN",
         "name": "Treasury General Account",
         "unit": "millions USD",
-        "cadence": "weekly",
-        "risk_type": "liquidity"
+        "freshness_days": 21
     },
     "m2_money_supply": {
         "id": "M2SL",
         "name": "M2 Money Supply",
         "unit": "billions USD",
-        "cadence": "monthly",
-        "risk_type": "liquidity"
+        "freshness_days": 100
+    }
+}
+
+
+# Gold is intentionally disabled.
+# Previous FRED request returned HTTP 404.
+
+DISABLED_SERIES = {
+    "gold": {
+        "name": "Gold Price",
+        "unit": "USD/oz",
+        "source": "FRED GOLDAMGBD228NLBM (disabled)",
+        "reason": (
+            "FRED endpoint returned HTTP 404. "
+            "No verified replacement price source is configured."
+        )
     }
 }
 
 
 # ============================================================
-# FRESHNESS POLICY
-# ============================================================
-
-FRESHNESS_DAYS = {
-    "daily": 7,
-    "weekly": 18,
-    "monthly": 55,
-    "quarterly": 120
-}
-
-
-# ============================================================
-# TIME AND JSON HELPERS
+# TIME AND NUMBER HELPERS
 # ============================================================
 
 def utc_now():
@@ -249,14 +225,16 @@ def utc_now():
 
 
 def iso_now():
-    return utc_now().isoformat(timespec="seconds").replace("+00:00", "Z")
+    return utc_now().isoformat(
+        timespec="seconds"
+    ).replace("+00:00", "Z")
 
 
 def parse_date(value):
     try:
-        return datetime.strptime(value, "%Y-%m-%d").replace(
-            tzinfo=timezone.utc
-        )
+        return datetime.strptime(
+            value, "%Y-%m-%d"
+        ).replace(tzinfo=timezone.utc)
     except (ValueError, TypeError):
         return None
 
@@ -274,18 +252,20 @@ def safe_number(value):
         return None
 
 
-def percentage_change(current, previous):
-    if current is None or previous is None or previous == 0:
-        return None
-
-    return ((current - previous) / abs(previous)) * 100
-
-
 def round_value(value, digits=4):
     if value is None:
         return None
 
     return round(value, digits)
+
+
+def percentage_change(current, previous):
+    if current is None or previous is None or previous == 0:
+        return None
+
+    return (
+        (current - previous) / abs(previous)
+    ) * 100
 
 
 # ============================================================
@@ -305,16 +285,28 @@ def http_get(url):
                 }
             )
 
-            with urlopen(request, timeout=TIMEOUT) as response:
+            with urlopen(
+                request,
+                timeout=TIMEOUT
+            ) as response:
+
                 return response.read().decode("utf-8-sig")
 
-        except (HTTPError, URLError, TimeoutError, OSError) as exc:
+        except (
+            HTTPError,
+            URLError,
+            TimeoutError,
+            OSError
+        ) as exc:
+
             last_error = str(exc)
 
             if attempt < RETRIES:
                 time.sleep(1.5 * (attempt + 1))
 
-    raise RuntimeError(last_error or "HTTP request failed")
+    raise RuntimeError(
+        last_error or "HTTP request failed"
+    )
 
 
 # ============================================================
@@ -323,14 +315,19 @@ def http_get(url):
 
 def fetch_fred_csv(series_id):
     params = urlencode({"id": series_id})
+
     url = f"{FRED_CSV_URL}?{params}"
 
     raw = http_get(url)
 
-    reader = csv.DictReader(io.StringIO(raw))
+    reader = csv.DictReader(
+        io.StringIO(raw)
+    )
+
     observations = []
 
     for row in reader:
+
         date_text = (
             row.get("observation_date")
             or row.get("DATE")
@@ -340,18 +337,28 @@ def fetch_fred_csv(series_id):
         value_text = (
             row.get(series_id)
             or row.get("value")
+            or row.get("VALUE")
         )
 
-        date = parse_date(date_text)
+        if not date_text:
+            continue
+
+        if parse_date(date_text) is None:
+            continue
+
         value = safe_number(value_text)
 
-        if date is None or value is None:
+        if value is None:
             continue
 
         observations.append({
             "date": date_text,
             "value": value
         })
+
+    observations.sort(
+        key=lambda item: item["date"]
+    )
 
     return observations
 
@@ -366,16 +373,22 @@ def fetch_fred_api(series_id):
 
     url = f"{FRED_API_URL}?{params}"
 
-    raw = http_get(url)
-    payload = json.loads(raw)
+    payload = json.loads(http_get(url))
 
     observations = []
 
     for item in payload.get("observations", []):
+
         date_text = item.get("date")
         value = safe_number(item.get("value"))
 
-        if parse_date(date_text) is None or value is None:
+        if not date_text:
+            continue
+
+        if parse_date(date_text) is None:
+            continue
+
+        if value is None:
             continue
 
         observations.append({
@@ -383,47 +396,66 @@ def fetch_fred_api(series_id):
             "value": value
         })
 
+    observations.sort(
+        key=lambda item: item["date"]
+    )
+
     return observations
 
 
 def fetch_series(series_id):
+
     if FRED_API_KEY:
+
         try:
-            return fetch_fred_api(series_id), "FRED API"
+            return (
+                fetch_fred_api(series_id),
+                "FRED_API"
+            )
+
         except Exception as exc:
+
             LOGGER.warning(
                 "%s API failed; trying CSV: %s",
                 series_id,
                 exc
             )
 
-    return fetch_fred_csv(series_id), "FRED CSV"
+    return (
+        fetch_fred_csv(series_id),
+        "FRED_CSV_EXPORT"
+    )
 
 
 # ============================================================
-# OBSERVATION PROCESSING
+# FRESHNESS AND METRIC PROCESSING
 # ============================================================
 
-def classify_freshness(observation_date, cadence):
-    date = parse_date(observation_date)
+def classify_freshness(observation_date, config):
 
-    if date is None:
+    observed = parse_date(observation_date)
+
+    if observed is None:
         return "UNAVAILABLE"
 
-    age_days = (utc_now() - date).total_seconds() / 86400
+    age_days = (
+        utc_now() - observed
+    ).total_seconds() / 86400
 
-    threshold = FRESHNESS_DAYS.get(cadence, 7)
+    limit = config.get("freshness_days", 7)
 
-    if age_days > threshold:
+    if age_days > limit:
         return "STALE"
 
     return "OK"
 
 
 def build_metric(key, config, observations, source):
+
     fetched_at = iso_now()
 
     if not observations:
+
         return {
             "key": key,
             "name": config["name"],
@@ -437,10 +469,12 @@ def build_metric(key, config, observations, source):
             "source": source,
             "fetched_at": fetched_at,
             "status": "UNAVAILABLE",
-            "error": "No valid observations"
+            "error": "No valid observations returned."
         }
 
-    observations.sort(key=lambda item: item["date"])
+    observations.sort(
+        key=lambda item: item["date"]
+    )
 
     current = observations[-1]
 
@@ -450,21 +484,24 @@ def build_metric(key, config, observations, source):
         else None
     )
 
-    status = classify_freshness(
-        current["date"],
-        config["cadence"]
-    )
-
     change = None
     change_percent = None
 
     if previous:
-        change = current["value"] - previous["value"]
+
+        change = (
+            current["value"] - previous["value"]
+        )
 
         change_percent = percentage_change(
             current["value"],
             previous["value"]
         )
+
+    status = classify_freshness(
+        current["date"],
+        config
+    )
 
     return {
         "key": key,
@@ -481,24 +518,34 @@ def build_metric(key, config, observations, source):
             if previous else None
         ),
         "change": round_value(change),
-        "change_percent": round_value(change_percent),
+        "change_percent": round_value(
+            change_percent
+        ),
         "source": source,
         "fetched_at": fetched_at,
         "status": status,
-        "error": None if status == "OK" else "Observation is stale"
+        "error": (
+            None
+            if status == "OK"
+            else "Latest observation is older than freshness limit."
+        )
     }
 
 
 # ============================================================
-# INFLATION CALCULATIONS
+# INFLATION AND PAYROLL CALCULATIONS
 # ============================================================
 
 def historical_change(observations, periods):
+
     if len(observations) <= periods:
         return None
 
     current = observations[-1]["value"]
-    previous = observations[-1 - periods]["value"]
+
+    previous = observations[
+        -1 - periods
+    ]["value"]
 
     return round_value(
         percentage_change(current, previous),
@@ -506,8 +553,21 @@ def historical_change(observations, periods):
     )
 
 
+def calculate_payroll_change(observations):
+
+    if len(observations) < 2:
+        return None
+
+    return round_value(
+        observations[-1]["value"]
+        - observations[-2]["value"],
+        1
+    )
+
+
 def build_inflation_report(metrics, observations_by_key):
-    inflation_keys = {
+
+    labels = {
         "cpi": "CPI",
         "core_cpi": "Core CPI",
         "pce": "PCE",
@@ -516,56 +576,54 @@ def build_inflation_report(metrics, observations_by_key):
 
     result = {}
 
-    for key, label in inflation_keys.items():
-        metric = metrics.get(key)
-        observations = observations_by_key.get(key, [])
+    for key, label in labels.items():
 
-        if not metric or metric["status"] != "OK":
+        metric = metrics.get(key, {})
+
+        observations = observations_by_key.get(
+            key, []
+        )
+
+        if metric.get("status") != "OK":
+
             result[key] = {
                 "name": label,
                 "mom_percent": None,
                 "yoy_percent": None,
-                "status": "UNAVAILABLE"
+                "status": metric.get(
+                    "status",
+                    "UNAVAILABLE"
+                )
             }
-            continue
 
-        result[key] = {
-            "name": label,
-            "mom_percent": historical_change(observations, 1),
-            "yoy_percent": historical_change(observations, 12),
-            "status": "OK"
-        }
+        else:
+
+            result[key] = {
+                "name": label,
+                "mom_percent": historical_change(
+                    observations, 1
+                ),
+                "yoy_percent": historical_change(
+                    observations, 12
+                ),
+                "status": "OK"
+            }
 
     return result
 
 
 # ============================================================
-# NFP CHANGE
+# REPORT FORMAT
 # ============================================================
 
-def calculate_payroll_change(observations):
-    if len(observations) < 2:
-        return None
-
-    return round_value(
-        observations[-1]["value"] -
-        observations[-2]["value"],
-        1
-    )
-
-
-# ============================================================
-# INDICATOR REPORT ENGINE
-# ============================================================
-
-def report(
+def make_report(
     data,
-    title,
     analysis,
     decision,
     action,
     risk
 ):
+
     return {
         "DATA": data,
         "ANALYSIS": analysis,
@@ -575,539 +633,488 @@ def report(
     }
 
 
-def get_metric(metrics, key):
-    metric = metrics.get(key)
+def metric_value(metrics, key):
 
-    if not metric:
+    item = metrics.get(key, {})
+
+    if item.get("status") != "OK":
         return None
 
-    if metric.get("status") != "OK":
-        return None
+    return item.get("value")
 
-    return metric.get("value")
 
+# ============================================================
+# INDICATOR REPORT ENGINE
+# ============================================================
 
 def build_indicator_reports(metrics, inflation):
+
     reports = {}
 
     # --------------------------------------------------------
-    # CPI
+    # CPI, CORE CPI, PCE, CORE PCE
     # --------------------------------------------------------
 
-    cpi = inflation.get("cpi", {})
-    cpi_yoy = cpi.get("yoy_percent")
-    cpi_mom = cpi.get("mom_percent")
+    inflation_rules = [
+        ("cpi", "CPI", 4.0, 3.0),
+        ("core_cpi", "Core CPI", 4.0, 3.0),
+        ("pce", "PCE", 3.0, 2.0),
+        ("core_pce", "Core PCE", 3.0, 2.0)
+    ]
 
-    if cpi_yoy is None:
-        reports["cpi"] = report(
-            None,
-            "CPI",
-            "CPI data unavailable or stale.",
-            "WAIT — INSUFFICIENT DATA",
-            "CPI-ভিত্তিক নতুন সিদ্ধান্ত নেবেন না।",
-            "মুদ্রাস্ফীতির বর্তমান চাপ যাচাই করা যাচ্ছে না।"
-        )
-    else:
-        if cpi_yoy >= 4:
-            decision = "REDUCE RISK"
-            action = "CPI YoY উচ্চ—ঝুঁকিপূর্ণ Altcoin exposure কমান।"
-            analysis = "মুদ্রাস্ফীতির চাপ বেশি।"
-            risk = "Fed-এর কঠোর নীতির ঝুঁকি বাড়ছে।"
+    for key, label, high_level, caution_level in inflation_rules:
 
-        elif cpi_yoy >= 3:
-            decision = "WAIT"
-            action = "নতুন ঝুঁকিপূর্ণ BUY এড়িয়ে চলুন।"
-            analysis = "মুদ্রাস্ফীতি এখনো লক্ষ্যমাত্রার ওপরে।"
-            risk = "Rate cut প্রত্যাশা দুর্বল হতে পারে।"
+        item = inflation.get(key, {})
+
+        yoy = item.get("yoy_percent")
+        mom = item.get("mom_percent")
+
+        if item.get("status") != "OK" or yoy is None:
+
+            reports[key] = make_report(
+                None,
+                f"{label} data unavailable or stale.",
+                "WAIT — INSUFFICIENT DATA",
+                f"{label} data যাচাই না হওয়া পর্যন্ত সিদ্ধান্ত স্থগিত রাখুন।",
+                "প্রকাশিত observation ও freshness যাচাই প্রয়োজন।"
+            )
+
+        elif yoy >= high_level:
+
+            reports[key] = make_report(
+                {
+                    "yoy_percent": yoy,
+                    "mom_percent": mom
+                },
+                f"{label} YoY উচ্চ পর্যায়ে রয়েছে।",
+                "REDUCE RISK",
+                f"{label} inflation বেশি—ঝুঁকিপূর্ণ Altcoin exposure কমান।",
+                "একটি inflation reading দিয়ে Fed-এর পরবর্তী সিদ্ধান্ত নিশ্চিত হয় না।"
+            )
+
+        elif yoy >= caution_level:
+
+            reports[key] = make_report(
+                {
+                    "yoy_percent": yoy,
+                    "mom_percent": mom
+                },
+                f"{label} এখনো সতর্কতার পর্যায়ে রয়েছে।",
+                "WAIT",
+                "নতুন ঝুঁকিপূর্ণ BUY সীমিত রাখুন এবং পরবর্তী inflation release পর্যবেক্ষণ করুন।",
+                "YoY একা inflation momentum পুরোপুরি দেখায় না; MoM-ও গুরুত্বপূর্ণ।"
+            )
 
         else:
-            decision = "HOLD / SELECTIVE"
-            action = "মুদ্রাস্ফীতি কমার প্রবণতা পর্যবেক্ষণ করুন।"
-            analysis = "CPI YoY তুলনামূলকভাবে নিয়ন্ত্রিত।"
-            risk = "একটি CPI রিপোর্ট দিয়ে Fed policy নিশ্চিত হয় না।"
 
-        reports["cpi"] = report(
-            {
-                "yoy_percent": cpi_yoy,
-                "mom_percent": cpi_mom
-            },
-            "CPI",
-            analysis,
-            decision,
-            action,
-            risk
-        )
-
-    # --------------------------------------------------------
-    # CORE CPI
-    # --------------------------------------------------------
-
-    core_cpi = inflation.get("core_cpi", {})
-    core_cpi_yoy = core_cpi.get("yoy_percent")
-
-    if core_cpi_yoy is None:
-        reports["core_cpi"] = report(
-            None,
-            "Core CPI",
-            "Core CPI data unavailable.",
-            "WAIT — INSUFFICIENT DATA",
-            "Core CPI-ভিত্তিক সিদ্ধান্ত স্থগিত রাখুন।",
-            "Underlying inflation যাচাই করা যাচ্ছে না।"
-        )
-    else:
-        if core_cpi_yoy >= 4:
-            decision = "REDUCE RISK"
-            action = "Core CPI উচ্চ—ঝুঁকিপূর্ণ Altcoin exposure কমান।"
-            analysis = "Underlying inflation শক্তিশালী।"
-            risk = "Monetary policy দীর্ঘ সময় restrictive থাকতে পারে."
-
-        elif core_cpi_yoy >= 3:
-            decision = "WAIT"
-            action = "নতুন BUY সীমিত রাখুন।"
-            analysis = "Core inflation এখনো বেশি।"
-            risk = "দ্রুত rate cut প্রত্যাশা ঝুঁকিপূর্ণ।"
-
-        else:
-            decision = "HOLD / SELECTIVE"
-            action = "Core inflation trend পর্যবেক্ষণ করুন।"
-            analysis = "Core CPI তুলনামূলকভাবে নিয়ন্ত্রিত।"
-            risk = "অন্যান্য inflation ও labor data-ও গুরুত্বপূর্ণ।"
-
-        reports["core_cpi"] = report(
-            {"yoy_percent": core_cpi_yoy},
-            "Core CPI",
-            analysis,
-            decision,
-            action,
-            risk
-        )
-
-    # --------------------------------------------------------
-    # PCE
-    # --------------------------------------------------------
-
-    pce = inflation.get("pce", {})
-    pce_yoy = pce.get("yoy_percent")
-
-    if pce_yoy is None:
-        reports["pce"] = report(
-            None,
-            "PCE",
-            "PCE data unavailable.",
-            "WAIT — INSUFFICIENT DATA",
-            "PCE-ভিত্তিক সিদ্ধান্ত নেবেন না।",
-            "Fed-এর preferred inflation measure অনুপস্থিত।"
-        )
-    else:
-        if pce_yoy >= 3:
-            decision = "REDUCE RISK"
-            action = "PCE উচ্চ—ঝুঁকিপূর্ণ exposure কমান।"
-            analysis = "Fed-এর inflation target থেকে PCE দূরে।"
-            risk = "Rate cut বিলম্বিত হওয়ার ঝুঁকি।"
-
-        elif pce_yoy > 2:
-            decision = "WAIT"
-            action = "Macro confirmation না পাওয়া পর্যন্ত সতর্ক থাকুন।"
-            analysis = "PCE target-এর ওপরে।"
-            risk = "Inflation আবার বাড়ার ঝুঁকি রয়েছে।"
-
-        else:
-            decision = "HOLD / SELECTIVE"
-            action = "অন্যান্য macro data-এর সঙ্গে মিলিয়ে দেখুন।"
-            analysis = "PCE target-এর কাছাকাছি বা নিচে।"
-            risk = "একক রিপোর্ট থেকে monetary easing নিশ্চিত নয়।"
-
-        reports["pce"] = report(
-            {"yoy_percent": pce_yoy},
-            "PCE",
-            analysis,
-            decision,
-            action,
-            risk
-        )
-
-    # --------------------------------------------------------
-    # CORE PCE
-    # --------------------------------------------------------
-
-    core_pce = inflation.get("core_pce", {})
-    core_pce_yoy = core_pce.get("yoy_percent")
-
-    if core_pce_yoy is None:
-        reports["core_pce"] = report(
-            None,
-            "Core PCE",
-            "Core PCE unavailable.",
-            "WAIT — INSUFFICIENT DATA",
-            "Core PCE-ভিত্তিক সিদ্ধান্ত স্থগিত রাখুন।",
-            "Underlying PCE inflation যাচাই করা যাচ্ছে না।"
-        )
-    else:
-        if core_pce_yoy >= 3:
-            decision = "REDUCE RISK"
-            action = "Core PCE উচ্চ—ঝুঁকিপূর্ণ Altcoin exposure কমান।"
-            analysis = "Underlying PCE inflation বেশি।"
-            risk = "Fed rate cut বিলম্বিত হওয়ার ঝুঁকি।"
-
-        elif core_pce_yoy > 2:
-            decision = "WAIT"
-            action = "নতুন BUY-তে সতর্ক থাকুন।"
-            analysis = "Core PCE এখনো target-এর ওপরে।"
-            risk = "Inflation persistence-এর ঝুঁকি।"
-
-        else:
-            decision = "HOLD / SELECTIVE"
-            action = "Inflation trend পর্যবেক্ষণ করুন।"
-            analysis = "Core PCE তুলনামূলকভাবে নিয়ন্ত্রিত।"
-            risk = "অন্যান্য অর্থনৈতিক সূচকও যাচাই প্রয়োজন।"
-
-        reports["core_pce"] = report(
-            {"yoy_percent": core_pce_yoy},
-            "Core PCE",
-            analysis,
-            decision,
-            action,
-            risk
-        )
+            reports[key] = make_report(
+                {
+                    "yoy_percent": yoy,
+                    "mom_percent": mom
+                },
+                f"{label} YoY তুলনামূলকভাবে নিয়ন্ত্রিত।",
+                "HOLD / SELECTIVE",
+                "Inflation trend-কে Fed policy, yields ও BTC trend-এর সঙ্গে মিলিয়ে দেখুন।",
+                "কম inflation একাই Crypto bullish signal নয়।"
+            )
 
     # --------------------------------------------------------
     # FED RATE
     # --------------------------------------------------------
 
-    fed_rate = get_metric(metrics, "fed_funds_rate")
+    fed = metric_value(
+        metrics,
+        "fed_funds_rate"
+    )
 
-    if fed_rate is None:
-        reports["fed_rate"] = report(
-            None,
-            "Fed Rate",
-            "Fed rate unavailable.",
-            "WAIT — INSUFFICIENT DATA",
-            "Fed policy সম্পর্কে নিশ্চিত সিদ্ধান্ত নেবেন না।",
-            "বর্তমান policy rate যাচাই করা যাচ্ছে না।"
-        )
-    else:
-        reports["fed_rate"] = report(
-            {"percent": fed_rate},
-            "Fed Rate",
-            "বর্তমান effective Fed funds rate যাচাই করা হয়েছে।",
-            "HOLD / SELECTIVE",
-            "Fed rate-কে CPI, PCE, employment ও bond yield-এর সঙ্গে বিশ্লেষণ করুন।",
-            "Fed funds rate একা পরবর্তী FOMC সিদ্ধান্ত নির্দেশ করে না।"
-        )
+    reports["fed_rate"] = make_report(
+        {
+            "effective_rate_percent": fed
+        } if fed is not None else None,
+
+        (
+            "সর্বশেষ effective Fed funds rate পাওয়া গেছে।"
+            if fed is not None
+            else "Fed rate unavailable or stale."
+        ),
+
+        (
+            "HOLD / SELECTIVE"
+            if fed is not None
+            else "WAIT — INSUFFICIENT DATA"
+        ),
+
+        (
+            "Fed rate-কে CPI, PCE, employment ও Treasury yield-এর সঙ্গে বিশ্লেষণ করুন।"
+            if fed is not None
+            else "Fed policy-ভিত্তিক সিদ্ধান্ত স্থগিত রাখুন।"
+        ),
+
+        "Effective rate একা FOMC-এর পরবর্তী সিদ্ধান্ত জানায় না।"
+    )
 
     # --------------------------------------------------------
     # LABOR MARKET
     # --------------------------------------------------------
 
-    unemployment = get_metric(metrics, "unemployment")
+    unemployment = metric_value(
+        metrics,
+        "unemployment"
+    )
+
     payroll_change = metrics.get(
         "nonfarm_payrolls", {}
     ).get("monthly_change_thousands")
 
-    labor_available = (
-        unemployment is not None
-        and payroll_change is not None
-    )
+    if unemployment is None or payroll_change is None:
 
-    if not labor_available:
-        reports["labor_market"] = report(
+        reports["labor_market"] = make_report(
             None,
-            "US Labor Market",
-            "Employment data incomplete.",
+            "Labor market data incomplete.",
             "WAIT — INSUFFICIENT DATA",
-            "Labor market নিয়ে নিশ্চিত সিদ্ধান্ত নেবেন না।",
-            "Unemployment বা NFP data অনুপস্থিত।"
+            "NFP ও Unemployment উভয় ডেটা fresh না হওয়া পর্যন্ত সিদ্ধান্ত স্থগিত রাখুন।",
+            "অসম্পূর্ণ employment data থেকে recession signal নিশ্চিত করা যাবে না।"
         )
-    else:
-        if unemployment >= 5 or payroll_change < 0:
-            decision = "REDUCE RISK"
-            action = "Labor market দুর্বল—ঝুঁকিপূর্ণ Altcoin exposure কমান।"
-            analysis = "Employment deterioration দেখা যাচ্ছে।"
-            risk = "Economic slowdown ও recession risk বাড়তে পারে।"
 
-        elif unemployment >= 4.5:
-            decision = "WAIT"
-            action = "নতুন BUY সীমিত রাখুন।"
-            analysis = "Labor market দুর্বল হওয়ার লক্ষণ রয়েছে।"
-            risk = "Economic slowdown risk পর্যবেক্ষণ করুন।"
+    elif unemployment >= 5.0 or payroll_change < 0:
 
-        else:
-            decision = "HOLD / SELECTIVE"
-            action = "Employment trend পর্যবেক্ষণ করুন।"
-            analysis = "Labor market তুলনামূলকভাবে স্থিতিশীল।"
-            risk = "শক্তিশালী employment inflation pressure বাড়াতে পারে।"
-
-        reports["labor_market"] = report(
+        reports["labor_market"] = make_report(
             {
                 "unemployment_percent": unemployment,
                 "nfp_monthly_change_thousands": payroll_change
             },
-            "US Labor Market",
-            analysis,
-            decision,
-            action,
-            risk
+            "Employment deterioration দেখা যাচ্ছে।",
+            "REDUCE RISK",
+            "Labor market দুর্বল—ঝুঁকিপূর্ণ Altcoin exposure কমান।",
+            "একটি মাসের NFP revision ও participation rate-ও গুরুত্বপূর্ণ।"
+        )
+
+    elif unemployment >= 4.5:
+
+        reports["labor_market"] = make_report(
+            {
+                "unemployment_percent": unemployment,
+                "nfp_monthly_change_thousands": payroll_change
+            },
+            "Labor market দুর্বল হওয়ার লক্ষণ রয়েছে।",
+            "WAIT",
+            "নতুন BUY সীমিত রাখুন এবং পরবর্তী employment release পর্যবেক্ষণ করুন।",
+            "Unemployment একা recession নিশ্চিত করে না।"
+        )
+
+    else:
+
+        reports["labor_market"] = make_report(
+            {
+                "unemployment_percent": unemployment,
+                "nfp_monthly_change_thousands": payroll_change
+            },
+            "Labor market তুলনামূলকভাবে স্থিতিশীল।",
+            "HOLD / SELECTIVE",
+            "Employment trend ও wage inflation একসঙ্গে পর্যবেক্ষণ করুন।",
+            "শক্তিশালী employment inflation pressure বজায় রাখতে পারে।"
         )
 
     # --------------------------------------------------------
     # TREASURY YIELDS
     # --------------------------------------------------------
 
-    yield_10y = metrics.get("yield_10y", {})
-    yield_10y_change = yield_10y.get("change")
+    y10 = metrics.get("yield_10y", {})
 
-    if yield_10y.get("status") != "OK" or yield_10y_change is None:
-        reports["bond_yields"] = report(
+    y10_change = y10.get("change")
+
+    if y10.get("status") != "OK" or y10_change is None:
+
+        reports["bond_yields"] = make_report(
             None,
-            "US Treasury Yields",
-            "Yield data unavailable.",
+            "Treasury yield data unavailable or stale.",
             "WAIT — INSUFFICIENT DATA",
-            "Bond yield trend যাচাই না হওয়া পর্যন্ত macro risk নির্ধারণ করবেন না।",
-            "Yield movement অনুপস্থিত।"
+            "Fresh yield data না পাওয়া পর্যন্ত সিদ্ধান্ত স্থগিত রাখুন।",
+            "Yield-এর daily movement অনুপস্থিত।"
         )
-    else:
-        if yield_10y_change >= 0.05:
-            decision = "REDUCE RISK"
-            action = "10Y yield দ্রুত বাড়ছে—ঝুঁকিপূর্ণ Altcoin exposure কমান।"
-            analysis = "দীর্ঘমেয়াদি borrowing cost বাড়ছে।"
-            risk = "Risk asset valuation-এর ওপর চাপ তৈরি হচ্ছে।"
 
-        elif yield_10y_change <= -0.05:
-            decision = "HOLD / SELECTIVE"
-            action = "Yield কমার প্রবণতা BTC ও Altcoin trend-এর সঙ্গে যাচাই করুন।"
-            analysis = "10Y yield কমছে।"
-            risk = "Yield পতন growth concern থেকেও হতে পারে।"
+    else:
+
+        yield_data = {
+            "2y": metric_value(metrics, "yield_2y"),
+            "10y": metric_value(metrics, "yield_10y"),
+            "30y": metric_value(metrics, "yield_30y"),
+            "10y_daily_change_pp": y10_change
+        }
+
+        if y10_change >= 0.05:
+
+            reports["bond_yields"] = make_report(
+                yield_data,
+                "10Y Treasury yield সর্বশেষ observation-এ বেড়েছে।",
+                "REDUCE RISK",
+                "10Y yield বাড়ছে—ঝুঁকিপূর্ণ Altcoin exposure কমান।",
+                "Yield বৃদ্ধি inflation বা Treasury supply concern—দুই কারণেই হতে পারে।"
+            )
+
+        elif y10_change <= -0.05:
+
+            reports["bond_yields"] = make_report(
+                yield_data,
+                "10Y Treasury yield সর্বশেষ observation-এ কমেছে।",
+                "HOLD / SELECTIVE",
+                "Yield decline-কে BTC ও equity trend-এর সঙ্গে যাচাই করুন।",
+                "Yield পতন growth concern থেকেও হতে পারে।"
+            )
 
         else:
-            decision = "WAIT"
-            action = "Bond yield movement পর্যবেক্ষণ করুন।"
-            analysis = "10Y yield-এ বড় দৈনিক পরিবর্তন নেই।"
-            risk = "দিক নির্ধারণে আরও data প্রয়োজন।"
 
-        reports["bond_yields"] = report(
-            {
-                "2y": get_metric(metrics, "yield_2y"),
-                "10y": get_metric(metrics, "yield_10y"),
-                "30y": get_metric(metrics, "yield_30y"),
-                "10y_daily_change": yield_10y_change
-            },
-            "US Treasury Yields",
-            analysis,
-            decision,
-            action,
-            risk
-        )
+            reports["bond_yields"] = make_report(
+                yield_data,
+                "10Y yield-এ বড় দৈনিক পরিবর্তন নেই।",
+                "WAIT",
+                "Treasury yield trend পর্যবেক্ষণ করুন।",
+                "এক দিনের পরিবর্তন দীর্ঘমেয়াদি yield trend নয়।"
+            )
 
     # --------------------------------------------------------
     # BROAD USD INDEX PROXY
     # --------------------------------------------------------
 
-    dollar = metrics.get("usd_broad_index", {})
-    dollar_change = dollar.get("change_percent")
+    usd = metrics.get("usd_broad_index", {})
 
-    if dollar.get("status") != "OK" or dollar_change is None:
-        reports["usd_index"] = report(
+    usd_change = usd.get("change_percent")
+
+    if usd.get("status") != "OK" or usd_change is None:
+
+        reports["usd_index"] = make_report(
             None,
-            "Broad USD Index Proxy",
-            "Dollar data unavailable.",
+            "Broad USD index data unavailable or stale.",
             "WAIT — INSUFFICIENT DATA",
-            "USD trend যাচাই না হওয়া পর্যন্ত সিদ্ধান্ত স্থগিত রাখুন।",
-            "এটি ICE DXY নয়; broad dollar proxy।"
+            "USD trend যাচাই না হওয়া পর্যন্ত macro সিদ্ধান্ত স্থগিত রাখুন।",
+            "DTWEXBGS হলো broad dollar proxy, ICE DXY নয়।"
         )
+
+    elif usd_change >= 0.30:
+
+        reports["usd_index"] = make_report(
+            {"daily_change_percent": usd_change},
+            "Broad USD index সর্বশেষ observation-এ বেড়েছে।",
+            "REDUCE RISK",
+            "Dollar strength বাড়ছে—ঝুঁকিপূর্ণ Altcoin exposure কমান।",
+            "এটি ICE DXY নয়; broad trade-weighted USD index।"
+        )
+
+    elif usd_change <= -0.30:
+
+        reports["usd_index"] = make_report(
+            {"daily_change_percent": usd_change},
+            "Broad USD index সর্বশেষ observation-এ কমেছে।",
+            "HOLD / SELECTIVE",
+            "USD দুর্বলতা BTC ও Altcoin trend-এর সঙ্গে যাচাই করুন।",
+            "USD দুর্বল হলেই Crypto bullish হয় না।"
+        )
+
     else:
-        if dollar_change >= 0.30:
-            decision = "REDUCE RISK"
-            action = "Broad USD index বাড়ছে—ঝুঁকিপূর্ণ Altcoin exposure কমান।"
-            analysis = "Dollar strength risk assets-এর জন্য চাপ তৈরি করছে।"
-            risk = "এটি ICE DXY নয়, broad dollar proxy।"
 
-        elif dollar_change <= -0.30:
-            decision = "HOLD / SELECTIVE"
-            action = "USD দুর্বলতা BTC ও Altcoin trend-এর সঙ্গে যাচাই করুন।"
-            analysis = "Broad dollar index দুর্বল হচ্ছে।"
-            risk = "USD দুর্বল হলেই Crypto bullish হয় না।"
-
-        else:
-            decision = "WAIT"
-            action = "USD trend পর্যবেক্ষণ করুন।"
-            analysis = "Broad dollar index-এ বড় পরিবর্তন নেই।"
-            risk = "এই সূচক ICE DXY-এর বিকল্প নয়।"
-
-        reports["usd_index"] = report(
-            {"daily_change_percent": dollar_change},
-            "Broad USD Index Proxy",
-            analysis,
-            decision,
-            action,
-            risk
+        reports["usd_index"] = make_report(
+            {"daily_change_percent": usd_change},
+            "Broad USD index-এ বড় দৈনিক পরিবর্তন নেই।",
+            "WAIT",
+            "USD trend পর্যবেক্ষণ করুন।",
+            "এটি ICE DXY নয়; broad trade-weighted USD index।"
         )
 
     # --------------------------------------------------------
     # VIX
     # --------------------------------------------------------
 
-    vix = get_metric(metrics, "vix")
+    vix = metric_value(metrics, "vix")
 
     if vix is None:
-        reports["vix"] = report(
+
+        reports["vix"] = make_report(
             None,
-            "VIX",
-            "VIX data unavailable.",
+            "VIX data unavailable or stale.",
             "WAIT — INSUFFICIENT DATA",
-            "Volatility risk যাচাই না হওয়া পর্যন্ত সতর্ক থাকুন।",
+            "Volatility data না পাওয়া পর্যন্ত risk assessment সীমিত রাখুন।",
             "বর্তমান VIX যাচাই করা যাচ্ছে না।"
         )
-    else:
-        if vix >= 30:
-            decision = "REDUCE RISK"
-            action = "VIX অত্যন্ত উচ্চ—Crypto risk exposure কমান।"
-            analysis = "Equity market volatility stress level-এ রয়েছে।"
-            risk = "Risk-off sentiment দ্রুত ছড়াতে পারে।"
 
-        elif vix >= 25:
-            decision = "REDUCE RISK"
-            action = "VIX উচ্চ—নতুন ঝুঁকিপূর্ণ BUY বন্ধ রাখুন।"
-            analysis = "Market uncertainty বেড়েছে।"
-            risk = "Crypto volatility আরও বাড়তে পারে।"
+    elif vix >= 30:
 
-        elif vix >= 18:
-            decision = "WAIT"
-            action = "নতুন BUY-তে সতর্ক থাকুন।"
-            analysis = "Volatility elevated।"
-            risk = "Risk sentiment স্থিতিশীল নয়।"
-
-        else:
-            decision = "HOLD / SELECTIVE"
-            action = "কম VIX-কে একমাত্র BUY signal হিসেবে ব্যবহার করবেন না।"
-            analysis = "Equity volatility তুলনামূলক কম।"
-            risk = "VIX কম থাকলেও Crypto-specific risk থাকে।"
-
-        reports["vix"] = report(
+        reports["vix"] = make_report(
             {"value": vix},
-            "VIX",
-            analysis,
-            decision,
-            action,
-            risk
+            "VIX অত্যন্ত উচ্চ।",
+            "REDUCE RISK",
+            "VIX অত্যন্ত উচ্চ—Crypto risk exposure কমান।",
+            "VIX equity volatility মাপে; Crypto volatility সরাসরি মাপে না।"
+        )
+
+    elif vix >= 25:
+
+        reports["vix"] = make_report(
+            {"value": vix},
+            "VIX উচ্চ।",
+            "REDUCE RISK",
+            "VIX বাড়তি ঝুঁকি দেখাচ্ছে—নতুন ঝুঁকিপূর্ণ BUY বন্ধ রাখুন।",
+            "VIX equity volatility মাপে; Crypto volatility সরাসরি মাপে না।"
+        )
+
+    elif vix >= 18:
+
+        reports["vix"] = make_report(
+            {"value": vix},
+            "VIX elevated range-এ রয়েছে।",
+            "WAIT",
+            "নতুন BUY-তে সতর্ক থাকুন।",
+            "VIX একা Crypto market direction নির্ধারণ করে না।"
+        )
+
+    else:
+
+        reports["vix"] = make_report(
+            {"value": vix},
+            "VIX তুলনামূলক কম।",
+            "HOLD / SELECTIVE",
+            "কম VIX-কে একমাত্র BUY signal হিসেবে ব্যবহার করবেন না।",
+            "কম VIX থাকা সত্ত্বেও Crypto-specific risk থাকতে পারে।"
         )
 
     # --------------------------------------------------------
     # EQUITY MARKET
     # --------------------------------------------------------
 
-    sp500 = get_metric(metrics, "sp500")
-    nasdaq = get_metric(metrics, "nasdaq")
+    sp = metric_value(metrics, "sp500")
+    nq = metric_value(metrics, "nasdaq")
 
-    equity_available = sp500 is not None and nasdaq is not None
+    equity_data = {
+        "sp500": sp,
+        "nasdaq": nq
+    }
 
-    if not equity_available:
-        reports["equity_market"] = report(
-            None,
-            "US Equity Market",
-            "Equity data incomplete.",
-            "WAIT — INSUFFICIENT DATA",
-            "Stock market direction যাচাই করুন।",
-            "S&P 500 বা Nasdaq data অনুপস্থিত।"
-        )
-    else:
-        reports["equity_market"] = report(
-            {
-                "sp500": sp500,
-                "nasdaq": nasdaq
-            },
-            "US Equity Market",
-            "S&P 500 ও Nasdaq-এর সর্বশেষ উপলব্ধ closing value পাওয়া গেছে।",
-            "HOLD / SELECTIVE",
-            "Equity trend-কে VIX, yields ও BTC trend-এর সঙ্গে মিলিয়ে দেখুন।",
-            "Closing index value একা market trend নিশ্চিত করে না।"
-        )
+    equity_missing = [
+        key for key, value in equity_data.items()
+        if value is None
+    ]
 
-    # --------------------------------------------------------
-    # COMMODITIES
-    # --------------------------------------------------------
+    reports["equity_market"] = make_report(
+        equity_data if not equity_missing else None,
 
-    oil = get_metric(metrics, "oil")
-    gold = get_metric(metrics, "gold")
+        (
+            "S&P 500 ও Nasdaq-এর latest observations পাওয়া গেছে।"
+            if not equity_missing
+            else "Equity index data incomplete."
+        ),
 
-    reports["commodities"] = report(
-        {
-            "wti_oil_usd": oil,
-            "gold_usd_oz": gold,
-            "gold_data_status": metrics.get("gold", {}).get("status")
-        },
-        "Oil & Gold",
-        "Oil ও Gold-এর সর্বশেষ উপলব্ধ FRED observations।",
         (
             "HOLD / SELECTIVE"
-            if oil is not None or gold is not None
+            if not equity_missing
             else "WAIT — INSUFFICIENT DATA"
         ),
-        "Oil inflation pressure এবং Gold safe-haven demand হিসেবে পর্যবেক্ষণ করুন।",
-        "Gold fixing data পুরোনো হতে পারে; STALE হলে live price হিসেবে ব্যবহার করবেন না।"
+
+        (
+            "Equity trend-কে VIX, yields ও BTC trend-এর সঙ্গে মিলিয়ে দেখুন।"
+            if not equity_missing
+            else "Equity data সম্পূর্ণ না হওয়া পর্যন্ত সিদ্ধান্ত স্থগিত রাখুন।"
+        ),
+
+        "Closing index value একা market trend নিশ্চিত করে না।"
+    )
+
+    # --------------------------------------------------------
+    # OIL AND GOLD
+    # --------------------------------------------------------
+
+    oil = metric_value(metrics, "oil")
+
+    gold = metrics.get("gold", {})
+
+    reports["commodities"] = make_report(
+        {
+            "wti_oil_usd_per_barrel": oil,
+            "gold_usd_per_oz": None,
+            "gold_status": gold.get("status", "UNAVAILABLE"),
+            "gold_note": gold.get("error")
+        },
+
+        (
+            "WTI oil data পাওয়া গেছে; Gold price source unavailable."
+            if oil is not None
+            else "Commodity data incomplete; Gold source unavailable."
+        ),
+
+        (
+            "HOLD / SELECTIVE"
+            if oil is not None
+            else "WAIT — INSUFFICIENT DATA"
+        ),
+
+        "Oil-এর inflation impact পর্যবেক্ষণ করুন; Gold-এর জন্য verified replacement source প্রয়োজন।",
+
+        "Gold-এর কোনো কৃত্রিম বা পুরোনো মান ব্যবহার করা হচ্ছে না।"
     )
 
     # --------------------------------------------------------
     # YEN
     # --------------------------------------------------------
 
-    yen = get_metric(metrics, "usd_jpy")
+    yen = metric_value(metrics, "usd_jpy")
 
-    if yen is None:
-        reports["yen"] = report(
-            None,
-            "USD/JPY",
-            "USD/JPY data unavailable.",
-            "WAIT — INSUFFICIENT DATA",
-            "Yen carry-trade risk সম্পর্কে নিশ্চিত সিদ্ধান্ত নেবেন না।",
-            "BOJ policy ও JGB yield data এই engine-এ সম্পূর্ণ নেই।"
-        )
-    else:
-        reports["yen"] = report(
-            {"jpy_per_usd": yen},
-            "USD/JPY",
-            "USD/JPY exchange rate পাওয়া গেছে।",
-            "WAIT",
-            "Yen movement-এর সঙ্গে BOJ policy ও Japanese bond yield পর্যবেক্ষণ করুন।",
-            "শুধু USD/JPY দিয়ে carry-trade unwind নিশ্চিত করা যায় না।"
-        )
+    reports["yen"] = make_report(
+        {"jpy_per_usd": yen} if yen is not None else None,
 
-    # --------------------------------------------------------
-    # LIQUIDITY
-    # --------------------------------------------------------
+        (
+            "USD/JPY latest observation পাওয়া গেছে।"
+            if yen is not None
+            else "USD/JPY data unavailable or stale."
+        ),
 
-    fed_assets = get_metric(metrics, "fed_balance_sheet")
-    rrp = get_metric(metrics, "reverse_repo")
-    tga = get_metric(metrics, "treasury_general_account")
-    m2 = get_metric(metrics, "m2_money_supply")
+        "WAIT" if yen is not None else "WAIT — INSUFFICIENT DATA",
 
-    liquidity_available = all(
-        value is not None
-        for value in [fed_assets, rrp, tga, m2]
+        (
+            "Yen movement-এর সঙ্গে BOJ policy ও Japanese bond yield পর্যবেক্ষণ করুন।"
+            if yen is not None
+            else "Yen-related macro সিদ্ধান্ত স্থগিত রাখুন।"
+        ),
+
+        "শুধু USD/JPY দিয়ে carry-trade unwind নিশ্চিত করা যায় না; JGB yield curve এখনো যুক্ত হয়নি।"
     )
 
-    if liquidity_available:
-        decision = "HOLD / SELECTIVE"
-        analysis = "Fed assets, RRP, TGA ও M2-এর latest observations পাওয়া গেছে।"
-        action = "সব series-এর পরিবর্তন একত্রে বিশ্লেষণ করুন; একটি metric দিয়ে liquidity সিদ্ধান্ত নেবেন না।"
-        risk = "এটি পূর্ণ global liquidity composite নয়।"
-    else:
-        decision = "WAIT — INSUFFICIENT DATA"
-        analysis = "Liquidity data incomplete."
-        action = "Global liquidity সম্পর্কে নিশ্চিত সিদ্ধান্ত নেবেন না।"
-        risk = "Missing data-এর কারণে liquidity direction নির্ধারণ করা যাচ্ছে না।"
+    # --------------------------------------------------------
+    # US LIQUIDITY
+    # --------------------------------------------------------
 
-    reports["liquidity"] = report(
-        {
-            "fed_balance_sheet": fed_assets,
-            "reverse_repo": rrp,
-            "treasury_general_account": tga,
-            "m2": m2
-        },
-        "US Liquidity",
-        analysis,
-        decision,
-        action,
-        risk
+    liquidity_keys = (
+        "fed_balance_sheet",
+        "reverse_repo",
+        "treasury_general_account",
+        "m2_money_supply"
+    )
+
+    liquidity_data = {
+        key: metric_value(metrics, key)
+        for key in liquidity_keys
+    }
+
+    missing = [
+        key for key, value in liquidity_data.items()
+        if value is None
+    ]
+
+    reports["liquidity"] = make_report(
+        liquidity_data,
+
+        (
+            "US liquidity series incomplete."
+            if missing
+            else "Fed assets, RRP, TGA ও M2-এর latest observations পাওয়া গেছে।"
+        ),
+
+        (
+            "WAIT — INSUFFICIENT DATA"
+            if missing
+            else "HOLD / SELECTIVE"
+        ),
+
+        "সব series-এর change একত্রে বিশ্লেষণ করুন; একটি metric দিয়ে liquidity সিদ্ধান্ত নেবেন না।",
+
+        "এটি পূর্ণ global liquidity composite নয়; M2-এর প্রকাশ-ল্যাগও বিবেচনা করতে হবে।"
     )
 
     return reports
@@ -1118,11 +1125,12 @@ def build_indicator_reports(metrics, inflation):
 # ============================================================
 
 def build_overall_decision(metrics):
-    required = [
+
+    required = (
         "usd_broad_index",
         "vix",
         "yield_10y"
-    ]
+    )
 
     missing = [
         key for key in required
@@ -1130,90 +1138,127 @@ def build_overall_decision(metrics):
     ]
 
     if missing:
+
         return {
             "DATA": {
-                "required_metrics": required,
+                "required_metrics": list(required),
                 "missing_metrics": missing
             },
-            "ANALYSIS": "প্রয়োজনীয় Macro data সম্পূর্ণ বা fresh নয়।",
+            "ANALYSIS": "প্রয়োজনীয় Macro data incomplete বা stale.",
             "DECISION": "WAIT — INSUFFICIENT DATA",
-            "ACTION": "Macro data সম্পূর্ণ না হওয়া পর্যন্ত নতুন risk-on সিদ্ধান্ত নেবেন না।",
+            "ACTION": "Fresh macro data না পাওয়া পর্যন্ত risk-on/risk-off সিদ্ধান্ত নেবেন না।",
             "RISK": "অসম্পূর্ণ data থেকে ভুল market assessment হতে পারে।"
         }
 
-    dollar = metrics["usd_broad_index"]
+    usd = metrics["usd_broad_index"]
     vix = metrics["vix"]
-    yield_10y = metrics["yield_10y"]
+    y10 = metrics["yield_10y"]
 
-    dollar_change = dollar.get("change_percent")
+    usd_change = usd.get("change_percent")
     vix_value = vix.get("value")
-    yield_change = yield_10y.get("change")
+    y10_change = y10.get("change")
 
     if (
-        dollar_change is None
+        usd_change is None
         or vix_value is None
-        or yield_change is None
+        or y10_change is None
     ):
+
         return {
             "DATA": None,
             "ANALYSIS": "প্রয়োজনীয় পরিবর্তনের হিসাব অনুপস্থিত।",
             "DECISION": "WAIT — INSUFFICIENT DATA",
             "ACTION": "নির্ভরযোগ্য change data সংগ্রহ করুন।",
-            "RISK": "শুধু বর্তমান level দিয়ে macro direction নির্ধারণ করা যাচ্ছে না।"
+            "RISK": "শুধু level দিয়ে macro direction নির্ধারণ করা যাচ্ছে না।"
         }
 
     risk_flags = []
-    support_flags = []
+    supportive_flags = []
 
-    if dollar_change >= 0.30:
-        risk_flags.append("Broad USD index increased")
+    if usd_change >= 0.30:
+        risk_flags.append(
+            "Broad USD index daily change >= +0.30%"
+        )
+
+    elif usd_change <= -0.30:
+        supportive_flags.append(
+            "Broad USD index daily change <= -0.30%"
+        )
 
     if vix_value >= 25:
-        risk_flags.append("VIX elevated")
+        risk_flags.append("VIX >= 25")
 
-    if yield_change >= 0.05:
-        risk_flags.append("10Y yield increased")
+    elif vix_value < 18:
+        supportive_flags.append("VIX < 18")
 
-    if dollar_change <= -0.30:
-        support_flags.append("Broad USD index decreased")
+    if y10_change >= 0.05:
+        risk_flags.append(
+            "10Y yield daily change >= +0.05 percentage points"
+        )
 
-    if vix_value < 18:
-        support_flags.append("VIX low")
-
-    if yield_change <= -0.05:
-        support_flags.append("10Y yield decreased")
+    elif y10_change <= -0.05:
+        supportive_flags.append(
+            "10Y yield daily change <= -0.05 percentage points"
+        )
 
     if len(risk_flags) >= 2:
+
         decision = "REDUCE RISK"
+
+        analysis = (
+            "একাধিক Macro risk indicator একই সময়ে চাপ তৈরি করছে।"
+        )
+
         action = (
             "Macro risk elevated—ঝুঁকিপূর্ণ Altcoin exposure কমান "
             "এবং নতুন BUY সীমিত রাখুন।"
         )
-        analysis = "একাধিক Macro risk indicator একসঙ্গে চাপ তৈরি করছে।"
-        risk = "BTC trend, ETF flows ও crypto liquidity-ও যাচাই করা প্রয়োজন।"
 
-    elif len(support_flags) >= 2 and not risk_flags:
-        decision = "HOLD / SELECTIVE"
-        action = (
-            "Macro পরিবেশ তুলনামূলক সহায়ক—তবুও "
-            "BTC trend ও market breadth ছাড়া aggressive BUY নয়।"
+        risk = (
+            "BTC trend, ETF flows ও crypto liquidity-ও যাচাই করা প্রয়োজন।"
         )
-        analysis = "একাধিক Macro indicator তুলনামূলক সহায়ক।"
-        risk = "Macro support নিশ্চিত Bull market signal নয়।"
+
+    elif len(supportive_flags) >= 2 and not risk_flags:
+
+        decision = "HOLD / SELECTIVE"
+
+        analysis = (
+            "একাধিক Macro indicator তুলনামূলক supportive."
+        )
+
+        action = (
+            "Macro পরিবেশ তুলনামূলক সহায়ক; তবু BTC trend ও "
+            "market breadth ছাড়া aggressive BUY নয়।"
+        )
+
+        risk = (
+            "Macro support নিশ্চিত Bull market signal নয়।"
+        )
 
     else:
+
         decision = "WAIT"
-        action = "নতুন বড় risk exposure নেবেন না; BTC ও Macro trend পর্যবেক্ষণ করুন।"
-        analysis = "Macro signal মিশ্র বা অপর্যাপ্ত।"
-        risk = "দিক নির্ধারণের জন্য আরও confirmation প্রয়োজন।"
+
+        analysis = (
+            "Macro signal মিশ্র বা একমুখী নয়।"
+        )
+
+        action = (
+            "নতুন বড় risk exposure নেবেন না; "
+            "BTC ও পরবর্তী macro release পর্যবেক্ষণ করুন।"
+        )
+
+        risk = (
+            "এই assessment intraday price বা BTC technical trend-এর বিকল্প নয়।"
+        )
 
     return {
         "DATA": {
-            "broad_usd_daily_change_percent": dollar_change,
+            "broad_usd_daily_change_percent": usd_change,
             "vix": vix_value,
-            "10y_yield_daily_change_percentage_points": yield_change,
+            "10y_yield_daily_change_percentage_points": y10_change,
             "risk_flags": risk_flags,
-            "support_flags": support_flags
+            "supportive_flags": supportive_flags
         },
         "ANALYSIS": analysis,
         "DECISION": decision,
@@ -1226,36 +1271,56 @@ def build_overall_decision(metrics):
 # FETCH ALL SERIES
 # ============================================================
 
+def fetch_worker(key, config):
+
+    observations, source = fetch_series(
+        config["id"]
+    )
+
+    metric = build_metric(
+        key,
+        config,
+        observations,
+        source
+    )
+
+    return key, metric, observations
+
+
 def fetch_all_series():
+
     metrics = {}
     observations_by_key = {}
 
-    def worker(key, config):
-        observations, source = fetch_series(config["id"])
+    with ThreadPoolExecutor(
+        max_workers=MAX_WORKERS
+    ) as executor:
 
-        metric = build_metric(
-            key,
-            config,
-            observations,
-            source
-        )
-
-        return key, metric, observations
-
-    with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
         futures = {
-            executor.submit(worker, key, config): key
+            executor.submit(
+                fetch_worker,
+                key,
+                config
+            ): key
+
             for key, config in SERIES.items()
         }
 
         for future in as_completed(futures):
+
             key = futures[future]
 
             try:
-                result_key, metric, observations = future.result()
+
+                result_key, metric, observations = (
+                    future.result()
+                )
 
                 metrics[result_key] = metric
-                observations_by_key[result_key] = observations
+
+                observations_by_key[result_key] = (
+                    observations
+                )
 
                 LOGGER.info(
                     "%s | %s | %s",
@@ -1265,9 +1330,14 @@ def fetch_all_series():
                 )
 
             except Exception as exc:
+
                 config = SERIES[key]
 
-                LOGGER.error("%s failed: %s", key, exc)
+                LOGGER.error(
+                    "%s fetch failed: %s",
+                    key,
+                    exc
+                )
 
                 metrics[key] = build_metric(
                     key,
@@ -1276,8 +1346,31 @@ def fetch_all_series():
                     "FRED"
                 )
 
-                metrics[key]["error"] = str(exc)
+                metrics[key]["error"] = str(exc)[:500]
+
                 observations_by_key[key] = []
+
+    # Gold is disabled to avoid repeated HTTP 404 requests.
+
+    gold_config = DISABLED_SERIES["gold"]
+
+    metrics["gold"] = {
+        "key": "gold",
+        "name": gold_config["name"],
+        "value": None,
+        "unit": gold_config["unit"],
+        "observation_date": None,
+        "previous_value": None,
+        "previous_date": None,
+        "change": None,
+        "change_percent": None,
+        "source": gold_config["source"],
+        "fetched_at": iso_now(),
+        "status": "UNAVAILABLE",
+        "error": gold_config["reason"]
+    }
+
+    observations_by_key["gold"] = []
 
     return metrics, observations_by_key
 
@@ -1287,16 +1380,20 @@ def fetch_all_series():
 # ============================================================
 
 def build_payload():
-    LOGGER.info("Starting Macro Engine v%s", VERSION)
+
+    LOGGER.info(
+        "Starting Macro Engine v%s",
+        VERSION
+    )
 
     metrics, observations = fetch_all_series()
 
-    # Add payroll change
     payroll_change = calculate_payroll_change(
         observations.get("nonfarm_payrolls", [])
     )
 
     if "nonfarm_payrolls" in metrics:
+
         metrics["nonfarm_payrolls"][
             "monthly_change_thousands"
         ] = payroll_change
@@ -1306,12 +1403,14 @@ def build_payload():
         observations
     )
 
-    indicator_reports = build_indicator_reports(
+    reports = build_indicator_reports(
         metrics,
         inflation
     )
 
-    overall = build_overall_decision(metrics)
+    overall = build_overall_decision(
+        metrics
+    )
 
     ok_count = sum(
         1 for item in metrics.values()
@@ -1329,21 +1428,24 @@ def build_payload():
     )
 
     return {
-        "schema_version": 1,
+        "schema_version": 2,
         "engine": "Crypto Macro Engine",
         "engine_version": VERSION,
         "fetched_at": iso_now(),
         "source": "Federal Reserve Economic Data (FRED)",
+
         "source_mode": (
-            "FRED API"
+            "FRED API with CSV fallback"
             if FRED_API_KEY
             else "FRED CSV export"
         ),
+
         "summary": {
-            "total_series": len(SERIES),
+            "total_series": len(metrics),
             "ok": ok_count,
             "stale": stale_count,
             "unavailable": unavailable_count,
+
             "data_quality": (
                 "GOOD"
                 if ok_count >= 18
@@ -1352,27 +1454,34 @@ def build_payload():
                 else "POOR"
             )
         },
+
         "metrics": metrics,
+
         "inflation": inflation,
-        "reports": indicator_reports,
+
+        "reports": reports,
+
         "overall_macro_decision": overall,
+
         "limitations": [
-            "DTWEXBGS is a broad USD index proxy, not ICE DXY.",
-            "FRED observations may be delayed according to release schedules.",
-            "Gold fixing data may be stale and is not a guaranteed live gold quote.",
-            "Official economic calendar forecast and actual surprise are not integrated.",
+            "DTWEXBGS is a broad trade-weighted USD index proxy, not ICE DXY.",
+            "FRED observations are released with delays.",
+            "Per-series freshness limits account for normal release lags.",
+            "Gold series is disabled after HTTP 404.",
+            "No unverified replacement Gold price is used.",
+            "Economic calendar forecast/actual/surprise is not integrated.",
             "BOJ policy and Japanese government bond yield curves are not integrated.",
-            "Global liquidity composite is not integrated.",
+            "Global central-bank liquidity composite is not integrated.",
             "Crypto ETF flows and crypto-specific on-chain data are not integrated.",
-            "Macro decision is not a standalone trading signal.",
-            "No personal portfolio or buy/sell position data is used."
+            "Macro decision is not a standalone trading signal."
         ],
+
         "not_integrated_yet": [
-            "Economic calendar with forecast, actual and previous",
+            "Economic calendar with forecast and actual",
             "BOJ policy and JGB yields",
             "JPY carry-trade risk model",
             "Global central-bank liquidity composite",
-            "Live gold market price cross-check",
+            "Verified live Gold market price source",
             "Crypto ETF flows",
             "BTC market structure and technical confirmation",
             "Crypto-specific on-chain data"
@@ -1385,7 +1494,11 @@ def build_payload():
 # ============================================================
 
 def save_json(payload):
-    DATA_DIR.mkdir(parents=True, exist_ok=True)
+
+    DATA_DIR.mkdir(
+        parents=True,
+        exist_ok=True
+    )
 
     fd, temp_path = tempfile.mkstemp(
         prefix="macro_data_",
@@ -1394,7 +1507,13 @@ def save_json(payload):
     )
 
     try:
-        with os.fdopen(fd, "w", encoding="utf-8") as file:
+
+        with os.fdopen(
+            fd,
+            "w",
+            encoding="utf-8"
+        ) as file:
+
             json.dump(
                 payload,
                 file,
@@ -1405,9 +1524,13 @@ def save_json(payload):
 
             file.write("\n")
 
-        os.replace(temp_path, OUTPUT_FILE)
+        os.replace(
+            temp_path,
+            OUTPUT_FILE
+        )
 
     except Exception:
+
         try:
             os.unlink(temp_path)
         except OSError:
@@ -1421,7 +1544,9 @@ def save_json(payload):
 # ============================================================
 
 def main():
+
     try:
+
         payload = build_payload()
 
         save_json(payload)
@@ -1440,20 +1565,28 @@ def main():
             payload["overall_macro_decision"]["DECISION"]
         )
 
-        LOGGER.info("Output: %s", OUTPUT_FILE)
+        LOGGER.info(
+            "Output: %s",
+            OUTPUT_FILE
+        )
 
-        # Fail the workflow if data collection is too poor.
         if summary["ok"] < 8:
+
             LOGGER.error(
                 "Insufficient successful data series: %s",
                 summary["ok"]
             )
+
             return 1
 
         return 0
 
     except Exception:
-        LOGGER.exception("Macro Engine failed")
+
+        LOGGER.exception(
+            "Macro Engine failed"
+        )
+
         return 1
 
 
