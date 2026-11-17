@@ -1,6 +1,5 @@
 import requests
 import datetime
-import numpy as np
 
 # --- API Helper Functions ---
 def safe_request(url, headers=None):
@@ -48,52 +47,7 @@ def get_crypto_global_data():
         except: pass
     return 0, 0.0, 0.0, 0.0, 0.0, 0.0
 
-# ৪. ফান্ডিং এবং OI
-def get_funding_and_oi():
-    funding_data = safe_request("https://fapi.binance.com/fapi/v1/premiumIndex?symbol=BTCUSDT")
-    oi_data = safe_request("https://fapi.binance.com/fapi/v1/openInterest?symbol=BTCUSDT")
-    fr, oi = 0.0, 0.0
-    if funding_data:
-        try: fr = float(funding_data['lastFundingRate']) * 100 
-        except: pass
-    if oi_data:
-        try: oi = float(oi_data['openInterest'])
-        except: pass
-    return round(fr, 4), round(oi, 0)
-
-# ৫. লং/শর্ট এবং টেকার
-def get_market_sentiment():
-    ls_data = safe_request("https://fapi.binance.com/futures/data/globalLongShortAccountRatio?symbol=BTCUSDT&period=1h&limit=1")
-    taker_data = safe_request("https://fapi.binance.com/futures/data/takerlongshortRatio?symbol=BTCUSDT&period=1h&limit=1")
-    ls, tk = 0.0, 0.0
-    if ls_data and len(ls_data) > 0:
-        try: ls = float(ls_data[0]['longShortRatio'])
-        except: pass
-    if taker_data and len(taker_data) > 0:
-        try: tk = float(taker_data[0]['buySellRatio'])
-        except: pass
-    return round(ls, 2), round(tk, 2)
-
-# ৬. টেকনিক্যাল সূচক (RSI, MACD, 200W MA)
-def get_technical_indicators():
-    url = "https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=1400&interval=daily"
-    data = safe_request(url)
-    if data and 'prices' in data:
-        prices = [p[1] for p in data['prices']]
-        if len(prices) >= 200:
-            ma_200w = sum(prices[-1400:]) / 1400 if len(prices) >= 1400 else sum(prices) / len(prices)
-            deltas = np.diff(prices[-15:])
-            gains = deltas[deltas > 0].sum() / 14 if len(deltas[deltas > 0]) > 0 else 0
-            losses = -deltas[deltas < 0].sum() / 14 if len(deltas[deltas < 0]) > 0 else 0
-            rs = gains / losses if losses != 0 else 100
-            rsi = 100 - (100 / (1 + rs))
-            ema_12 = sum(prices[-12:]) / 12
-            ema_26 = sum(prices[-26:]) / 26
-            macd_line = ema_12 - ema_26
-            return round(rsi, 1), round(macd_line, 2), round(ma_200w, 0)
-    return 50, 0, 0
-
-# --- Logic Functions ---
+# ৪. সাইকেল স্টেজ
 def get_cycle_stage(fng, dxy):
     if fng < 30 and dxy != "N/A" and dxy < 105:
         return "ACCUMULATION (Buy Zone)", "text-green-500", "বাজার Accumulation জোনে। ধীরে ধীরে কেনার (DCA) জন্য ভালো সময়।"
@@ -102,6 +56,7 @@ def get_cycle_stage(fng, dxy):
     else:
         return "NEUTRAL / GRINDING", "text-yellow-500", "বাজার নিরপেক্ষ। রেগুলার প্ল্যান অনুযায়ী হোল্ড করুন।"
 
+# ৫. ম্যাক্রো লজিক
 def get_macro_insights(vix, spx, brent_oil, gold, yield_10y, dxy):
     insights = []
     dxy_status = "NEUTRAL"; dxy_color = "text-yellow-500"; dxy_action = "ডলার ইনডেক্স স্বাভাবিক।"
@@ -133,6 +88,7 @@ def get_macro_insights(vix, spx, brent_oil, gold, yield_10y, dxy):
     insights.append({"name": "Gold", "value": f"${gold}", "status": "SAFE HAVEN", "color": "text-yellow-600", "action": "সোনার দাম বাড়লে বিনিয়োগকারীরা ঝুঁকি এড়াতে চাইছে।", "link": "https://www.tradingview.com/chart/?symbol=OANDA%3AXAUUSD"})
     return insights
 
+# ৬. ইভেন্ট অ্যালার্ট
 def get_event_alerts(fng, vix):
     alerts = []
     if vix != "N/A" and vix > 20: 
@@ -141,13 +97,14 @@ def get_event_alerts(fng, vix):
         alerts.append({"msg": f"🩸 বাজারে চরম ভয় ({fng})। DCA করার সুযোগ হতে পারে।", "color": "bg-green-900/60 border-green-500 text-green-200"})
     return alerts
 
+# ৭. হালভিং কাউন্টডাউন
 def get_halving_countdown():
     next_halving = datetime.date(2028, 4, 15)
     today = datetime.date.today()
     days_left = (next_halving - today).days
     return f"{days_left} দিন বাকি" if days_left > 0 else "হালভিং সম্পন্ন"
 
-# --- Data Processing ---
+# ডেটা প্রসেসিং
 fng_val, fng_class = get_fear_and_greed()
 dxy_val = get_yahoo_price("DX-Y.NYB")
 brent_oil_val = get_yahoo_price("BZ=F")
@@ -156,9 +113,6 @@ spx_val = get_yahoo_price("%5EGSPC")
 yield_10y = get_yahoo_price("%5ETNX")
 gold_val = get_yahoo_price("GC=F")
 btc_val, total_mcap_val, btc_dom_val, eth_dom_val, btc_vol_val, global_vol_val = get_crypto_global_data()
-funding_rate, open_interest = get_funding_and_oi()
-ls_ratio, taker_ratio = get_market_sentiment()
-rsi_val, macd_val, ma_200w_val = get_technical_indicators()
 
 cycle_text, cycle_color, cycle_action = get_cycle_stage(fng_val, dxy_val)
 macro_insights = get_macro_insights(vix_val, spx_val, brent_oil_val, gold_val, yield_10y, dxy_val)
@@ -171,49 +125,6 @@ if btc_dom_val < 50:
 else:
     alt_status = "BTC SEASON"; alt_color = "text-orange-400"
 
-if btc_val > ma_200w_val and ma_200w_val != 0:
-    ma_status = "BULLISH"; ma_color = "text-green-500"; ma_action = "দাম 200W MA এর উপরে। লং-টার্ম সাপোর্ট টিকে আছে।"
-else:
-    ma_status = "BEARISH"; ma_color = "text-red-500"; ma_action = "দাম 200W MA এর নিচে। সতর্ক হোন।"
-
-if funding_rate > 0.01:
-    funding_status = "LONGS PAY"; funding_color = "text-red-500"; funding_action = "ফান্ডিং রেট পজিটিভ। লং পজিশন বেশি, বাজারে লোভ। সতর্ক থাকুন।"
-elif funding_rate < -0.01:
-    funding_status = "SHORTS PAY"; funding_color = "text-green-500"; funding_action = "ফান্ডিং রেট নেগেটিভ। শর্ট পজিশন বেশি, বাজারে ভয়। সুযোগ হতে পারে।"
-else:
-    funding_status = "NEUTRAL"; funding_color = "text-yellow-500"; funding_action = "ফান্ডিং রেট স্বাভাবিক। বাজারে ভারসাম্য আছে।"
-
-if ls_ratio > 2.0:
-    ls_status = "LONG HEAVY"; ls_color = "text-red-500"; ls_action = "ট্রেডাররা অতিরিক্ত লং পজিশনে। শর্ট স্কুইজের ঝুঁকি আছে।"
-elif ls_ratio < 0.5 and ls_ratio > 0:
-    ls_status = "SHORT HEAVY"; ls_color = "text-green-500"; ls_action = "ট্রেডাররা অতিরিক্ত শর্ট পজিশনে। লং স্কুইজের সম্ভাবনা।"
-else:
-    ls_status = "BALANCED"; ls_color = "text-yellow-500"; ls_action = "লং/শর্ট ভারসাম্যপূর্ণ বা ডেটা লোড হচ্ছে।"
-
-if taker_ratio > 1.2:
-    taker_status = "BUYERS AGGRESSIVE"; taker_color = "text-green-500"; taker_action = "আগ্রাসী ক্রেতা বেশি। বুলিশ মুভমেন্ট হতে পারে।"
-elif taker_ratio < 0.8 and taker_ratio > 0:
-    taker_status = "SELLERS AGGRESSIVE"; taker_color = "text-red-500"; taker_action = "আগ্রাসী বিক্রেতা বেশি। বেয়ারিশ মুভমেন্ট হতে পারে।"
-else:
-    taker_status = "NEUTRAL"; taker_color = "text-yellow-500"; taker_action = "ক্রেতা-বিক্রেতা ভারসাম্যপূর্ণ বা ডেটা লোড হচ্ছে।"
-
-mvrv_z = round((btc_val / 45000 - 1.5) / 0.8, 2) if btc_val > 0 else 0
-if mvrv_z > 3.5:
-    mvrv_status = "EXTREME HIGH"; mvrv_color = "text-red-500"; mvrv_action = "MVRV非常高। বাজার শীর্ষের কাছাকাছি, সতর্ক থাকুন।"
-elif mvrv_z < 0:
-    mvrv_status = "DEEP VALUE"; mvrv_color = "text-green-500"; mvrv_action = "MVRV কম। বাজার কম মূল্যায়িত, DCA করার সুযোগ।"
-else:
-    mvrv_status = "NEUTRAL"; mvrv_color = "text-yellow-500"; mvrv_action = "MVRV স্বাভাবিক। বাজার ভারসাম্যে আছে।"
-
-sopr_val = 0.987
-sopr_status = "LOSS SELLING"; sopr_color = "text-green-500"; sopr_action = "স্বল্পমেয়াদী হোল্ডাররা ক্ষতিতে বিক্রি করছে। DCA করার সুযোগ।"
-
-stablecoin_supply = 160.5 
-stablecoin_status = "CONTRACTING"; stablecoin_color = "text-red-500"; stablecoin_action = "স্টেবলকয়েন কমছে, বাজারে নগদ কমছে। সতর্ক থাকুন।"
-
-m2_supply = 102.5 
-m2_status = "EXPANDING"; m2_color = "text-green-500"; m2_action = "M2 বাড়ছে (তারল্য বাড়ছে), ক্রিপ্টোর জন্য ভালো।"
-
 if fng_val < 30 and dxy_val != "N/A" and dxy_val < 105:
     outlook = "বাজার 'Accumulation' জোনে আছে। DCA করার জন্য ভালো সময়।"
     outlook_color = "text-green-400"
@@ -224,7 +135,7 @@ else:
     outlook = "বাজার নিরপেক্ষ। রেগুলার প্ল্যান অনুযায়ী হোল্ড করুন।"
     outlook_color = "text-yellow-400"
 
-# --- HTML Generation ---
+# HTML জেনারেশন
 html_content = f"""
 <!DOCTYPE html>
 <html lang="en">
@@ -298,9 +209,8 @@ html_content += f"""
             </div>
         </div>
 
-        <!-- BTC Chart & Order Book Imbalance Link -->
+        <!-- BTC Chart & Order Book Link -->
         <div class="grid grid-cols-1 gap-4 mb-6">
-            <!-- BTC Chart -->
             <div class="bg-gray-800 rounded-lg border border-gray-700 p-2">
                 <h2 class="text-sm font-semibold text-gray-400 px-2 mb-2">BTC/USDT Live Chart</h2>
                 <div class="tradingview-widget-container" style="height:300px; width:100%;">
@@ -312,7 +222,6 @@ html_content += f"""
                 </div>
             </div>
 
-            <!-- Order Book Imbalance Link -->
             <div class="bg-gray-800 rounded-lg border border-gray-700 p-4 text-center">
                 <h2 class="text-lg font-bold text-gray-200 mb-2">Live Buying/Selling Pressure (Order Book)</h2>
                 <p class="text-sm text-gray-400 mb-4">বাজারে ক্রেতা নাকি বিক্রেতা বেশি, তা লাইভ দেখতে নিচের লিংকে ক্লিক করুন।</p>
@@ -322,160 +231,7 @@ html_content += f"""
             </div>
         </div>
 
-        <!-- Dominance Pie Chart & Technicals -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-            <!-- Dominance Pie Chart -->
-            <div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
-                <h2 class="text-sm font-semibold text-gray-400 mb-2">Market Dominance</h2>
-                <div class="flex items-center justify-between">
-                    <div class="w-1/2"><canvas id="dominanceChart"></canvas></div>
-                    <div class="w-1/2 pl-4">
-                        <div class="flex items-center mb-2"><span class="w-3 h-3 bg-orange-500 rounded-full mr-2"></span><span class="text-sm font-semibold">BTC: {btc_dom_val}%</span></div>
-                        <div class="flex items-center"><span class="w-3 h-3 bg-blue-500 rounded-full mr-2"></span><span class="text-sm font-semibold">ETH: {eth_dom_val}%</span></div>
-                        <p class="text-xs text-gray-400 mt-3"><span class="text-blue-400 font-bold">করণীয়:</span> BTC ডমিনেন্স বেশি মানে বাজার বিটকয়েন সিজনে আছে।</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Technical Indicators -->
-            <div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
-                <h2 class="text-sm font-semibold text-gray-400 mb-2">Technical Indicators (Live)</h2>
-                <div class="flex justify-between items-center mb-3">
-                    <span class="text-sm">RSI (14):</span>
-                    <span class="font-bold {'text-green-500' if rsi_val < 30 else 'text-red-500' if rsi_val > 70 else 'text-yellow-500'}">{rsi_val}</span>
-                </div>
-                <div class="flex justify-between items-center mb-3">
-                    <span class="text-sm">MACD:</span>
-                    <span class="font-bold {'text-green-500' if macd_val > 0 else 'text-red-500'}">{macd_val}</span>
-                </div>
-                <p class="text-xs text-gray-400 mt-2 bg-gray-900 p-2 rounded"><span class="text-blue-400 font-bold">করণীয়:</span> RSI ৩০-এর নিচে = কেনার সুযোগ, ৭০-এর উপরে = বিক্রির সুযোগ। MACD পজিটিভ = বুলিশ।</p>
-            </div>
-        </div>
-
-        <!-- Market Movement Indicators (Long/Short & Taker) -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-            <div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
-                <div class="flex justify-between items-center mb-2">
-                    <h2 class="text-sm font-semibold text-gray-400">Long/Short Ratio (1H)</h2>
-                    <span class="text-xs font-bold px-2 py-1 rounded {ls_color.replace('text', 'bg').replace('500', '900')} {ls_color}">{ls_ratio} ({ls_status})</span>
-                </div>
-                <p class="text-xs text-gray-400 mt-2 bg-gray-900 p-2 rounded"><span class="text-blue-400 font-bold">করণীয়:</span> {ls_action}</p>
-            </div>
-            <div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
-                <div class="flex justify-between items-center mb-2">
-                    <h2 class="text-sm font-semibold text-gray-400">Taker Buy/Sell Ratio (1H)</h2>
-                    <span class="text-xs font-bold px-2 py-1 rounded {taker_color.replace('text', 'bg').replace('500', '900')} {taker_color}">{taker_ratio} ({taker_status})</span>
-                </div>
-                <p class="text-xs text-gray-400 mt-2 bg-gray-900 p-2 rounded"><span class="text-blue-400 font-bold">করণীয়:</span> {taker_action}</p>
-            </div>
-        </div>
-
-        <!-- Advanced On-Chain Indicators -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-            <!-- 200W MA -->
-            <div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
-                <div class="flex justify-between items-center mb-2">
-                    <h2 class="text-sm font-semibold text-gray-400">200W Moving Average (Live)</h2>
-                    <span class="text-xs font-bold px-2 py-1 rounded {ma_color.replace('text', 'bg').replace('500', '900')} {ma_color}">{ma_status}</span>
-                </div>
-                <p class="text-2xl font-bold text-white mb-2">${ma_200w_val:,.0f}</p>
-                <p class="text-xs text-gray-400 mt-2 bg-gray-900 p-2 rounded"><span class="text-blue-400 font-bold">করণীয়:</span> {ma_action}</p>
-            </div>
-
-            <!-- Funding Rate -->
-            <div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
-                <div class="flex justify-between items-center mb-2">
-                    <h2 class="text-sm font-semibold text-gray-400">Funding Rate (Binance)</h2>
-                    <span class="text-xs font-bold px-2 py-1 rounded {funding_color.replace('text', 'bg').replace('500', '900')} {funding_color}">{funding_rate}% ({funding_status})</span>
-                </div>
-                <p class="text-xs text-gray-400 mt-2 bg-gray-900 p-2 rounded"><span class="text-blue-400 font-bold">করণীয়:</span> {funding_action}</p>
-            </div>
-
-            <!-- Open Interest -->
-            <div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
-                <div class="flex justify-between items-center mb-2">
-                    <h2 class="text-sm font-semibold text-gray-400">Open Interest (BTC)</h2>
-                    <span class="text-xs font-bold px-2 py-1 rounded bg-orange-900 text-orange-400">{open_interest:,} BTC</span>
-                </div>
-                <p class="text-xs text-gray-400 mt-2 bg-gray-900 p-2 rounded"><span class="text-blue-400 font-bold">করণীয়:</span> ফিউচার মার্কেটে মোট খোলা পজিশন। বেশি হলে ভোলাটিলিটি বাড়তে পারে।</p>
-            </div>
-            
-            <!-- Halving Countdown -->
-            <div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
-                <div class="flex justify-between items-center mb-2">
-                    <h2 class="text-sm font-semibold text-gray-400">Halving Countdown</h2>
-                    <span class="text-xs font-bold px-2 py-1 rounded bg-purple-900 text-purple-400">লং-টার্ম</span>
-                </div>
-                <p class="text-xl font-bold text-purple-400 mb-2">{halving_text}</p>
-                <p class="text-xs text-gray-400 mt-2 bg-gray-900 p-2 rounded"><span class="text-blue-400 font-bold">করণীয়:</span> হালভিং যত কাছে আসবে, বাজার তত বুলিশ হতে পারে। ধৈর্য ধরে হোল্ড করুন।</p>
-            </div>
-        </div>
-
-        <!-- Long-Term Deep Metrics Section -->
-        <div class="bg-gray-800 rounded-lg border border-gray-700 p-4 mb-6">
-            <h2 class="text-lg font-bold text-gray-200 mb-4 text-center border-b border-gray-700 pb-2">LONG-TERM DEEP METRICS</h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                <!-- MVRV -->
-                <div class="bg-gray-900 p-3 rounded-lg border border-gray-700">
-                    <div class="flex justify-between items-center mb-1">
-                        <span class="text-sm font-semibold text-gray-300">MVRV Z-Score</span>
-                        <span class="text-xs font-bold px-2 py-1 rounded {mvrv_color.replace('text', 'bg').replace('500', '900')} {mvrv_color}">{mvrv_z}</span>
-                    </div>
-                    <p class="text-xs text-gray-400 mt-2"><span class="text-blue-400 font-bold">করণীয়:</span> {mvrv_action}</p>
-                    <a href="https://www.coinglass.com/pro/onchain/bitcoin-mvrv-market-value-to-realized-value" target="_blank" class="text-xs text-blue-400 mt-2 block underline">CoinGlass-এ লাইভ দেখুন →</a>
-                </div>
-                <!-- SOPR -->
-                <div class="bg-gray-900 p-3 rounded-lg border border-gray-700">
-                    <div class="flex justify-between items-center mb-1">
-                        <span class="text-sm font-semibold text-gray-300">STH SOPR</span>
-                        <span class="text-xs font-bold px-2 py-1 rounded {sopr_color.replace('text', 'bg').replace('500', '900')} {sopr_color}">{sopr_val}</span>
-                    </div>
-                    <p class="text-xs text-gray-400 mt-2"><span class="text-blue-400 font-bold">করণীয়:</span> {sopr_action}</p>
-                    <a href="https://www.coinglass.com/pro/onchain/bitcoin-sopr" target="_blank" class="text-xs text-blue-400 mt-2 block underline">CoinGlass-এ লাইভ দেখুন →</a>
-                </div>
-                <!-- Netflow -->
-                <div class="bg-gray-900 p-3 rounded-lg border border-gray-700">
-                    <div class="flex justify-between items-center mb-1">
-                        <span class="text-sm font-semibold text-gray-300">Exchange Netflow</span>
-                        <span class="text-xs font-bold px-2 py-1 rounded bg-blue-900 text-blue-400">LIVE LINK</span>
-                    </div>
-                    <p class="text-xs text-gray-400 mt-2"><span class="text-blue-400 font-bold">করণীয়:</span> এক্সচেঞ্জে বিটকয়েন কমলে বুলিশ, বাড়লে সতর্ক হোন।</p>
-                    <a href="https://www.coinglass.com/pro/onchain/bitcoin-exchange-netflow" target="_blank" class="text-xs text-blue-400 mt-2 block underline">CoinGlass-এ লাইভ দেখুন →</a>
-                </div>
-            </div>
-            
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <!-- Stablecoin -->
-                <div class="bg-gray-900 p-3 rounded-lg border border-gray-700">
-                    <div class="flex justify-between items-center mb-1">
-                        <span class="text-sm font-semibold text-gray-300">Stablecoin Supply</span>
-                        <span class="text-xs font-bold px-2 py-1 rounded {stablecoin_color.replace('text', 'bg').replace('500', '900')} {stablecoin_color}">${stablecoin_supply}B</span>
-                    </div>
-                    <p class="text-xs text-gray-400 mt-2"><span class="text-blue-400 font-bold">করণীয়:</span> {stablecoin_action}</p>
-                    <a href="https://defillama.com/stablecoins" target="_blank" class="text-xs text-blue-400 mt-2 block underline">DefiLlama-তে লাইভ দেখুন →</a>
-                </div>
-                <!-- M2 -->
-                <div class="bg-gray-900 p-3 rounded-lg border border-gray-700">
-                    <div class="flex justify-between items-center mb-1">
-                        <span class="text-sm font-semibold text-gray-300">Global M2 Supply</span>
-                        <span class="text-xs font-bold px-2 py-1 rounded {m2_color.replace('text', 'bg').replace('500', '900')} {m2_color}">${m2_supply}T</span>
-                    </div>
-                    <p class="text-xs text-gray-400 mt-2"><span class="text-blue-400 font-bold">করণীয়:</span> {m2_action}</p>
-                    <a href="https://www.tradingview.com/chart/?symbol=ECONOMICS%3AGLOBALM2" target="_blank" class="text-xs text-blue-400 mt-2 block underline">TradingView-এ দেখুন →</a>
-                </div>
-                <!-- Liquidation Heatmap -->
-                <div class="bg-gray-900 p-3 rounded-lg border border-gray-700">
-                    <div class="flex justify-between items-center mb-1">
-                        <span class="text-sm font-semibold text-gray-300">Liquidation Heatmap</span>
-                        <span class="text-xs font-bold px-2 py-1 rounded bg-purple-900 text-purple-400">LIVE LINK</span>
-                    </div>
-                    <p class="text-xs text-gray-400 mt-2"><span class="text-blue-400 font-bold">করণীয়:</span> বড় লিকুইডেশন ক্লাস্টার দেখে বোঝা যায় বাজার কোথায় আটকে আছে।</p>
-                    <a href="https://www.coinglass.com/pro/futures/LiquidationHeatMap" target="_blank" class="text-xs text-blue-400 mt-2 block underline">CoinGlass-এ লাইভ দেখুন →</a>
-                </div>
-            </div>
-        </div>
-
-        <!-- Macro Insights & Actions -->
+        <!-- Macro Indicators & Links (Replacing live zeros) -->
         <div class="bg-gray-800 rounded-lg border border-gray-700 p-4 mb-6">
             <h2 class="text-lg font-bold text-gray-200 mb-4 text-center border-b border-gray-700 pb-2">MACRO INDICATORS & ACTIONS</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -489,11 +245,114 @@ for macro in macro_insights:
                         <span class="text-xs font-bold px-2 py-1 rounded {macro['color'].replace('text', 'bg').replace('500', '900').replace('600', '900').replace('400', '900')} {macro['color']}">{macro['value']}</span>
                     </div>
                     <p class="text-xs text-gray-400 mt-2"><span class="text-blue-400 font-bold">করণীয়:</span> {macro['action']}</p>
-                    <a href="{macro['link']}" target="_blank" class="text-xs text-blue-400 mt-1 block underline">TradingView-এ লাইভ চার্ট দেখুন →</a>
+                    <a href="{macro['link']}" target="_blank" class="text-xs text-blue-400 mt-2 block underline font-semibold">TradingView-এ লাইভ চার্ট দেখুন →</a>
                 </div>
 """
 
 html_content += f"""
+            </div>
+        </div>
+
+        <!-- Advanced On-Chain Indicators (Replacing live zeros) -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            <!-- 200W MA Link -->
+            <div class="bg-gray-800 p-4 rounded-lg border border-gray-700 flex flex-col justify-between">
+                <div>
+                    <h2 class="text-sm font-semibold text-gray-400 mb-2">200W Moving Average</h2>
+                    <p class="text-xs text-gray-400 mt-2 bg-gray-900 p-2 rounded"><span class="text-blue-400 font-bold">করণীয়:</span> 200W MA এর উপরে থাকলে বুলিশ, নিচে নামলে সতর্ক হোন।</p>
+                </div>
+                <a href="https://www.tradingview.com/chart/?symbol=BINANCE%3ABTCUSDT" target="_blank" class="text-sm text-blue-400 mt-3 block underline font-semibold">TradingView-এ 200W MA দেখুন →</a>
+            </div>
+
+            <!-- Funding Rate Link -->
+            <div class="bg-gray-800 p-4 rounded-lg border border-gray-700 flex flex-col justify-between">
+                <div>
+                    <h2 class="text-sm font-semibold text-gray-400 mb-2">Funding Rate</h2>
+                    <p class="text-xs text-gray-400 mt-2 bg-gray-900 p-2 rounded"><span class="text-blue-400 font-bold">করণীয়:</span> ফান্ডিং রেট পজিটিভ হলে বাজারে লোভ (সতর্ক), নেগেটিভ হলে ভয় (সুযোগ)।</p>
+                </div>
+                <a href="https://www.coinglass.com/FundingRate" target="_blank" class="text-sm text-blue-400 mt-3 block underline font-semibold">CoinGlass-এ লাইভ দেখুন →</a>
+            </div>
+
+            <!-- Open Interest Link -->
+            <div class="bg-gray-800 p-4 rounded-lg border border-gray-700 flex flex-col justify-between">
+                <div>
+                    <h2 class="text-sm font-semibold text-gray-400 mb-2">Open Interest (OI)</h2>
+                    <p class="text-xs text-gray-400 mt-2 bg-gray-900 p-2 rounded"><span class="text-blue-400 font-bold">করণীয়:</span> OI বেশি হলে বাজারে অস্থিরতা বাড়তে পারে।</p>
+                </div>
+                <a href="https://www.coinglass.com/OpenInterest" target="_blank" class="text-sm text-blue-400 mt-3 block underline font-semibold">CoinGlass-এ লাইভ দেখুন →</a>
+            </div>
+
+            <!-- Halving Countdown -->
+            <div class="bg-gray-800 p-4 rounded-lg border border-gray-700 flex flex-col justify-between">
+                <div>
+                    <h2 class="text-sm font-semibold text-gray-400 mb-1">Halving Countdown</h2>
+                    <p class="text-xl font-bold text-purple-400 mb-2">{halving_text}</p>
+                    <p class="text-xs text-gray-400 mt-2 bg-gray-900 p-2 rounded"><span class="text-blue-400 font-bold">করণীয়:</span> হালভিং যত কাছে আসবে, বাজার তত বুলিশ হতে পারে। ধৈর্য ধরে হোল্ড করুন।</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Long-Term Deep Metrics Section -->
+        <div class="bg-gray-800 rounded-lg border border-gray-700 p-4 mb-6">
+            <h2 class="text-lg font-bold text-gray-200 mb-4 text-center border-b border-gray-700 pb-2">LONG-TERM DEEP METRICS</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                <!-- MVRV -->
+                <div class="bg-gray-900 p-3 rounded-lg border border-gray-700">
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="text-sm font-semibold text-gray-300">MVRV Z-Score</span>
+                        <span class="text-xs font-bold px-2 py-1 rounded bg-gray-700 text-gray-300">LIVE LINK</span>
+                    </div>
+                    <p class="text-xs text-gray-400 mt-2"><span class="text-blue-400 font-bold">করণীয়:</span> ৩.৫ এর উপরে গেলে সতর্ক হোন, ০ এর নিচে নামলে DCA করুন।</p>
+                    <a href="https://www.coinglass.com/pro/onchain/bitcoin-mvrv-market-value-to-realized-value" target="_blank" class="text-xs text-blue-400 mt-2 block underline font-semibold">CoinGlass-এ লাইভ দেখুন →</a>
+                </div>
+                <!-- SOPR -->
+                <div class="bg-gray-900 p-3 rounded-lg border border-gray-700">
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="text-sm font-semibold text-gray-300">STH SOPR</span>
+                        <span class="text-xs font-bold px-2 py-1 rounded bg-gray-700 text-gray-300">LIVE LINK</span>
+                    </div>
+                    <p class="text-xs text-gray-400 mt-2"><span class="text-blue-400 font-bold">করণীয়:</span> ১.০ এর নিচে থাকলে বাজার কম মূল্যায়িত (DCA সুযোগ)।</p>
+                    <a href="https://www.coinglass.com/pro/onchain/bitcoin-sopr" target="_blank" class="text-xs text-blue-400 mt-2 block underline font-semibold">CoinGlass-এ লাইভ দেখুন →</a>
+                </div>
+                <!-- Netflow -->
+                <div class="bg-gray-900 p-3 rounded-lg border border-gray-700">
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="text-sm font-semibold text-gray-300">Exchange Netflow</span>
+                        <span class="text-xs font-bold px-2 py-1 rounded bg-blue-900 text-blue-400">LIVE LINK</span>
+                    </div>
+                    <p class="text-xs text-gray-400 mt-2"><span class="text-blue-400 font-bold">করণীয়:</span> এক্সচেঞ্জে বিটকয়েন কমলে বুলিশ, বাড়লে সতর্ক হোন।</p>
+                    <a href="https://www.coinglass.com/pro/onchain/bitcoin-exchange-netflow" target="_blank" class="text-xs text-blue-400 mt-2 block underline font-semibold">CoinGlass-এ লাইভ দেখুন →</a>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <!-- Stablecoin -->
+                <div class="bg-gray-900 p-3 rounded-lg border border-gray-700">
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="text-sm font-semibold text-gray-300">Stablecoin Supply</span>
+                        <span class="text-xs font-bold px-2 py-1 rounded bg-gray-700 text-gray-300">LIVE LINK</span>
+                    </div>
+                    <p class="text-xs text-gray-400 mt-2"><span class="text-blue-400 font-bold">করণীয়:</span> স্টেবলকয়েন বাড়লে (ইনফ্লো) বুলিশ, কমলে সতর্ক হোন।</p>
+                    <a href="https://defillama.com/stablecoins" target="_blank" class="text-xs text-blue-400 mt-2 block underline font-semibold">DefiLlama-তে লাইভ দেখুন →</a>
+                </div>
+                <!-- M2 -->
+                <div class="bg-gray-900 p-3 rounded-lg border border-gray-700">
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="text-sm font-semibold text-gray-300">Global M2 Supply</span>
+                        <span class="text-xs font-bold px-2 py-1 rounded bg-gray-700 text-gray-300">LIVE LINK</span>
+                    </div>
+                    <p class="text-xs text-gray-400 mt-2"><span class="text-blue-400 font-bold">করণীয়:</span> M2 বাড়লে তারল্য বাড়ে, ক্রিপ্টোর জন্য ভালো।</p>
+                    <a href="https://www.tradingview.com/chart/?symbol=ECONOMICS%3AGLOBALM2" target="_blank" class="text-xs text-blue-400 mt-2 block underline font-semibold">TradingView-এ দেখুন →</a>
+                </div>
+                <!-- Liquidation Heatmap -->
+                <div class="bg-gray-900 p-3 rounded-lg border border-gray-700">
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="text-sm font-semibold text-gray-300">Liquidation Heatmap</span>
+                        <span class="text-xs font-bold px-2 py-1 rounded bg-purple-900 text-purple-400">LIVE LINK</span>
+                    </div>
+                    <p class="text-xs text-gray-400 mt-2"><span class="text-blue-400 font-bold">করণীয়:</span> বড় লিকুইডেশন ক্লাস্টার দেখে বোঝা যায় বাজার কোথায় আটকে আছে।</p>
+                    <a href="https://www.coinglass.com/pro/futures/LiquidationHeatMap" target="_blank" class="text-xs text-blue-400 mt-2 block underline font-semibold">CoinGlass-এ লাইভ দেখুন →</a>
+                </div>
             </div>
         </div>
 
@@ -519,14 +378,6 @@ html_content += f"""
                                 <div class="text-xs text-gray-400 mt-1 italic">↳ করণীয়: বর্তমান মূল্য ট্র্যাক করুন।</div>
                             </td>
                             <td class="px-3 py-3 text-right font-bold text-orange-400">LIVE</td>
-                        </tr>
-                        <tr class="border-b border-gray-700 hover:bg-gray-750">
-                            <td class="px-3 py-3 font-medium text-white">Long/Short Ratio</td>
-                            <td class="px-3 py-3">
-                                <div class="font-semibold {ls_color}">{ls_ratio}</div>
-                                <div class="text-xs text-gray-400 mt-1 italic">↳ করণীয়: {ls_action}</div>
-                            </td>
-                            <td class="px-3 py-3 text-right font-bold {ls_color}">{ls_status}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -560,16 +411,6 @@ html_content += f"""
             Built for Long-Term Spot Trading. Live data only.
         </div>
     </div>
-
-    <!-- Chart.js Scripts -->
-    <script>
-        const ctxDom = document.getElementById('dominanceChart').getContext('2d');
-        new Chart(ctxDom, {{
-            type: 'doughnut',
-            data: {{ labels: ['BTC', 'ETH', 'Others'], datasets: [{{ data: [{btc_dom_val}, {eth_dom_val}, {100 - btc_dom_val - eth_dom_val}], backgroundColor: ['#f97316', '#3b82f6', '#4b5563'], borderWidth: 0 }}] }},
-            options: {{ cutout: '70%', plugins: {{ legend: {{ display: false }} }} }}
-        }});
-    </script>
 </body>
 </html>
 """
@@ -577,4 +418,4 @@ html_content += f"""
 with open("index.html", "w", encoding="utf-8") as file:
     file.write(html_content)
 
-print("Dashboard updated successfully with order book link and removed other charts.")
+print("Dashboard updated successfully with links instead of static zeros.")
