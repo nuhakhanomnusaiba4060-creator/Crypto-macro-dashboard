@@ -890,6 +890,7 @@ def report_unavailable(label):
 # US NET LIQUIDITY ENGINE
 # ============================================================
 
+
 def build_liquidity_analysis(
     metrics,
     observations_by_key
@@ -901,10 +902,11 @@ def build_liquidity_analysis(
     - WTREGEN (millions USD) / 1000
     - RRPONTSYD (billions USD)
 
-    All output values are billions USD.
+    Historical observations are aligned using as-of dates.
+    RRP/TGA observation age is measured against the
+    historical target date, NOT the current date.
 
-    Historical comparisons use dates where all
-    three series have valid as-of observations.
+    All output values are billions USD.
     """
 
     required = (
@@ -913,15 +915,12 @@ def build_liquidity_analysis(
         "reverse_repo"
     )
 
-    missing = []
-
-    for key in required:
-
-        if metrics.get(key, {}).get("status") != "OK":
-            missing.append(key)
+    missing = [
+        key for key in required
+        if metrics.get(key, {}).get("status") != "OK"
+    ]
 
     if missing:
-
         return {
             "status": "UNAVAILABLE",
             "missing_metrics": missing,
@@ -929,100 +928,23 @@ def build_liquidity_analysis(
             "current": None,
             "change_7d": None,
             "change_30d": None,
-            "formula": "WALCL - TGA - RRP"
+            "formula": "WALCL - TGA - RRP",
+            "error": "Required liquidity series unavailable or stale."
         }
 
     walcl = observations_by_key.get(
-        "fed_balance_sheet",
-        []
+        "fed_balance_sheet", []
     )
 
     tga = observations_by_key.get(
-        "treasury_general_account",
-        []
+        "treasury_general_account", []
     )
 
     rrp = observations_by_key.get(
-        "reverse_repo",
-        []
+        "reverse_repo", []
     )
 
     if not walcl or not tga or not rrp:
-
-        return {
-            "status": "UNAVAILABLE",
-            "missing_metrics": [],
-            "unit": "billions USD",
-            "current": None,
-            "change_7d": None,
-            "change_30d": None,
-            "formula": "WALCL - TGA - RRP"
-        }
-
-    tga_lookup = {
-        item["date"]: item["value"]
-        for item in tga
-    }
-
-    rrp_lookup = {
-        item["date"]: item["value"]
-        for item in rrp
-    }
-
-    combined = []
-
-    # Use exact weekly dates shared by WALCL and TGA.
-    # RRP uses the latest available observation on or
-    # before that weekly date.
-
-    for item in walcl:
-
-        date_text = item["date"]
-
-        if date_text not in tga_lookup:
-            continue
-
-        target = parse_date(date_text)
-
-        if target is None:
-            continue
-
-        rrp_item = find_observation_at_or_before(
-            rrp,
-            target
-        )
-
-        if rrp_item is None:
-            continue
-
-        rrp_age = observation_age_days(
-            rrp_item["date"]
-        )
-
-        if rrp_age is None or rrp_age > 7:
-            continue
-
-        net_liquidity = (
-            item["value"] / 1000.0
-            - tga_lookup[date_text] / 1000.0
-            - rrp_item["value"]
-        )
-
-        combined.append({
-            "date": date_text,
-            "value": net_liquidity,
-            "walcl": item["value"] / 1000.0,
-            "tga": tga_lookup[date_text] / 1000.0,
-            "rrp": rrp_item["value"],
-            "rrp_observation_date": rrp_item["date"]
-        })
-
-    combined.sort(
-        key=lambda item: item["date"]
-    )
-
-    if not combined:
-
         return {
             "status": "UNAVAILABLE",
             "missing_metrics": [],
@@ -1031,7 +953,160 @@ def build_liquidity_analysis(
             "change_7d": None,
             "change_30d": None,
             "formula": "WALCL - TGA - RRP",
-            "error": "No aligned weekly liquidity observations."
+            "error": "One or more historical liquidity series are empty."
+        }
+
+    # Sort and validate all observations.
+    def clean_observations(items):
+        cleaned = []
+
+        for item in items:
+            date_text = item.get("date")
+            value = safe_number(item.get("value"))
+
+            if parse_date(date_text) is None:
+                continue
+
+            if value is None:
+                continue
+
+            cleaned.append({
+                "date": date_text,
+                "value": value
+            })
+
+        cleaned.sort(key=lambda x: x["date"])
+
+        return cleaned
+
+    walcl = clean_observations(walcl)
+    tga = clean_observations(tga)
+    rrp = clean_observations(rrp)
+
+    if not walcl or not tga or not rrp:
+        return {
+            "status": "UNAVAILABLE",
+            "missing_metrics": [],
+            "unit": "billions USD",
+            "current": None,
+            "change_7d": None,
+            "change_30d": None,
+            "formula": "WALCL - TGA - RRP",
+            "error": "No valid historical liquidity observations."
+        }
+
+    # Maximum allowed age relative to each target date.
+    MAX_TGA_AGE_DAYS = 10
+    MAX_RRP_AGE_DAYS = 7
+
+    combined = []
+
+    # WALCL weekly observations are the calculation anchors.
+    for walcl_item in walcl:
+
+        target_date = parse_date(
+            walcl_item["date"]
+        )
+
+        if target_date is None:
+            continue
+
+        # Find latest TGA observation on or before target.
+        tga_item = find_observation_at_or_before(
+            tga,
+            target_date
+        )
+
+        if tga_item is None:
+            continue
+
+        tga_date = parse_date(tga_item["date"])
+
+        if tga_date is None:
+            continue
+
+        tga_age = (
+            target_date - tga_date
+        ).total_seconds() / 86400
+
+        if tga_age < 0 or tga_age > MAX_TGA_AGE_DAYS:
+            continue
+
+        # Find latest RRP observation on or before target.
+        rrp_item = find_observation_at_or_before(
+            rrp,
+            target_date
+        )
+
+        if rrp_item is None:
+            continue
+
+        rrp_date = parse_date(rrp_item["date"])
+
+        if rrp_date is None:
+            continue
+
+        # IMPORTANT:
+        # Compare RRP date with historical target date,
+        # not with today's date.
+        rrp_age = (
+            target_date - rrp_date
+        ).total_seconds() / 86400
+
+        if rrp_age < 0 or rrp_age > MAX_RRP_AGE_DAYS:
+            continue
+
+        walcl_billions = (
+            walcl_item["value"] / 1000.0
+        )
+
+        tga_billions = (
+            tga_item["value"] / 1000.0
+        )
+
+        rrp_billions = rrp_item["value"]
+
+        net_liquidity = (
+            walcl_billions
+            - tga_billions
+            - rrp_billions
+        )
+
+        if not math.isfinite(net_liquidity):
+            continue
+
+        combined.append({
+            "date": walcl_item["date"],
+            "value": net_liquidity,
+            "walcl": walcl_billions,
+            "tga": tga_billions,
+            "rrp": rrp_billions,
+            "tga_observation_date": tga_item["date"],
+            "rrp_observation_date": rrp_item["date"]
+        })
+
+    combined.sort(
+        key=lambda x: x["date"]
+    )
+
+    if not combined:
+        return {
+            "status": "UNAVAILABLE",
+            "missing_metrics": [],
+            "unit": "billions USD",
+            "current": None,
+            "change_7d": None,
+            "change_30d": None,
+            "formula": "WALCL - TGA - RRP",
+            "error": (
+                "No valid as-of aligned weekly observations. "
+                "Check historical date coverage and source data."
+            ),
+            "source_observation_counts": {
+                "walcl": len(walcl),
+                "tga": len(tga),
+                "rrp": len(rrp)
+            }
         }
 
     latest = combined[-1]
@@ -1040,28 +1115,25 @@ def build_liquidity_analysis(
         latest["date"]
     )
 
+    if latest_date is None:
+        raise ValueError(
+            "Invalid latest liquidity observation date."
+        )
+
     def find_combined_before(days):
 
         cutoff = latest_date - timedelta(
             days=days
         )
 
-        candidate = None
+        candidates = [
+            item for item in combined
+            if parse_date(item["date"]) <= cutoff
+        ]
 
-        for item in combined:
+        return candidates[-1] if candidates else None
 
-            item_date = parse_date(
-                item["date"]
-            )
-
-            if item_date and item_date <= cutoff:
-                candidate = item
-            else:
-                break
-
-        return candidate
-
-    def calculate_change(days):
+    def calculate_absolute_change(days):
 
         previous = find_combined_before(days)
 
@@ -1073,18 +1145,15 @@ def build_liquidity_analysis(
             3
         )
 
-    change_7d = calculate_change(7)
-    change_30d = calculate_change(30)
+    change_7d = calculate_absolute_change(7)
+    change_30d = calculate_absolute_change(30)
 
     if change_30d is None:
         trend = "INSUFFICIENT_HISTORY"
-
     elif change_30d > 0:
         trend = "EXPANDING"
-
     elif change_30d < 0:
         trend = "CONTRACTING"
-
     else:
         trend = "FLAT"
 
@@ -1099,16 +1168,16 @@ def build_liquidity_analysis(
         ),
         "components": {
             "fed_assets": round_value(
-                latest["walcl"],
-                3
+                latest["walcl"], 3
             ),
             "treasury_general_account": round_value(
-                latest["tga"],
-                3
+                latest["tga"], 3
             ),
             "reverse_repo": round_value(
-                latest["rrp"],
-                3
+                latest["rrp"], 3
+            ),
+            "tga_observation_date": (
+                latest["tga_observation_date"]
             ),
             "reverse_repo_observation_date": (
                 latest["rrp_observation_date"]
@@ -1117,94 +1186,11 @@ def build_liquidity_analysis(
         "change_7d": change_7d,
         "change_30d": change_30d,
         "trend": trend,
-        "observations_available": len(combined)
+        "observations_available": len(combined),
+        "alignment_method": "AS_OF_DATE",
+        "max_tga_age_days": MAX_TGA_AGE_DAYS,
+        "max_rrp_age_days": MAX_RRP_AGE_DAYS
     }
-
-
-def build_liquidity_report(
-    metrics,
-    observations_by_key
-):
-
-    liquidity = build_liquidity_analysis(
-        metrics,
-        observations_by_key
-    )
-
-    if liquidity["status"] != "OK":
-
-        return make_report(
-            liquidity,
-            "US Net Liquidity calculation unavailable.",
-            "WAIT — INSUFFICIENT DATA",
-            "Aligned Fed Assets, TGA ও RRP data সংগ্রহ করুন।",
-            "অসম্পূর্ণ liquidity calculation-কে market signal হিসেবে ব্যবহার করবেন না।"
-        )
-
-    change_30d = liquidity.get(
-        "change_30d"
-    )
-
-    if change_30d is None:
-
-        decision = "WAIT"
-
-        analysis = (
-            "বর্তমান US Net Liquidity পাওয়া গেছে, "
-            "কিন্তু 30D comparison অসম্পূর্ণ।"
-        )
-
-        action = (
-            "Liquidity trend নিশ্চিত না হওয়া পর্যন্ত "
-            "এটিকে BUY বা SELL signal হিসেবে ব্যবহার করবেন না।"
-        )
-
-    elif change_30d > 0:
-
-        decision = "HOLD / SELECTIVE"
-
-        analysis = (
-            "US Net Liquidity-এর 30D পরিবর্তন ইতিবাচক। "
-            "Liquidity expansion দেখা যাচ্ছে।"
-        )
-
-        action = (
-            "Liquidity support-কে BTC trend ও market breadth-এর "
-            "সঙ্গে যাচাই করুন।"
-        )
-
-    elif change_30d < 0:
-
-        decision = "WAIT"
-
-        analysis = (
-            "US Net Liquidity-এর 30D পরিবর্তন নেতিবাচক। "
-            "Liquidity contraction দেখা যাচ্ছে।"
-        )
-
-        action = (
-            "নতুন ঝুঁকিপূর্ণ BUY সীমিত রাখুন এবং "
-            "BTC market structure পর্যবেক্ষণ করুন।"
-        )
-
-    else:
-
-        decision = "WAIT"
-
-        analysis = "US Net Liquidity 30D-তে প্রায় অপরিবর্তিত।"
-
-        action = "Liquidity trend পর্যবেক্ষণ করুন।"
-
-    return make_report(
-        liquidity,
-        analysis,
-        decision,
-        action,
-        (
-            "এটি US liquidity proxy; পূর্ণ Global Liquidity "
-            "Composite নয়।"
-        )
-    )
 
 
 # ============================================================
