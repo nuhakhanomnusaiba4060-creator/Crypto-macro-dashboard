@@ -4,118 +4,241 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#080d16">
+<meta name="theme-color" content="#080e18">
 <title>ক্রিপ্টো ম্যাক্রো ইন্টেলিজেন্স ড্যাশবোর্ড</title>
 
 <style>
 :root{
-  --bg:#080d16;
-  --panel:#101927;
+  color-scheme:dark;
+  --bg:#080e18;
+  --panel:#101a2a;
   --panel2:#142238;
-  --border:#233248;
-  --text:#e8eef7;
-  --muted:#8d9bb0;
-  --green:#22c98a;
-  --red:#ff5d68;
-  --yellow:#f4c65e;
-  --blue:#55a8ff;
+  --line:#263750;
+  --text:#edf3fc;
+  --muted:#91a2b8;
+  --green:#32d69a;
+  --red:#ff6675;
+  --gold:#f2c66d;
+  --blue:#69b5ff;
 }
 *{box-sizing:border-box}
+html{scroll-behavior:smooth}
 body{
-  margin:0;background:var(--bg);color:var(--text);
+  margin:0;
+  background:radial-gradient(ellipse at 15% 0%,#14243a 0,transparent 36%),var(--bg);
+  color:var(--text);
   font-family:Arial,"Noto Sans Bengali",sans-serif;
+  line-height:1.55;
 }
 header{
-  padding:20px 5%;border-bottom:1px solid var(--border);
-  background:#0b1320;display:flex;justify-content:space-between;
-  align-items:center;gap:15px;flex-wrap:wrap;
+  padding:22px 4%;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:18px;
+  flex-wrap:wrap;
+  background:rgba(10,18,31,.96);
+  border-bottom:1px solid var(--line);
 }
-.brand{font-size:21px;font-weight:800}
+.brand{
+  font-size:clamp(18px,2.5vw,25px);
+  font-weight:900;
+  letter-spacing:.5px;
+}
 .brand span{color:var(--green)}
-.subtitle,.status{font-size:12px;color:var(--muted);margin-top:6px}
-main{max-width:1500px;margin:auto;padding:24px 5% 50px}
+.subtitle,.status{
+  font-size:12px;
+  color:var(--muted);
+  margin-top:5px;
+}
+main{
+  max-width:1440px;
+  margin:auto;
+  padding:22px 4% 48px;
+}
 .section-title{
-  font-size:16px;font-weight:700;margin:28px 0 14px;
-  border-left:3px solid var(--blue);padding-left:10px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-size:15px;
+  font-weight:800;
+  margin:30px 0 13px;
+}
+.section-title:before{
+  content:"";
+  width:4px;
+  height:19px;
+  border-radius:5px;
+  background:var(--blue);
 }
 .grid{
-  display:grid;grid-template-columns:repeat(auto-fit,minmax(185px,1fr));
-  gap:13px;
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(min(100%,190px),1fr));
+  gap:12px;
+}
+.card,.decision,.report,.table-wrap{
+  background:linear-gradient(145deg,rgba(20,34,54,.97),rgba(14,24,39,.97));
+  border:1px solid var(--line);
+  border-radius:16px;
+  box-shadow:0 8px 24px #00000018;
 }
 .card{
-  background:var(--panel);border:1px solid var(--border);
-  border-radius:12px;padding:16px;min-width:0;
+  padding:16px;
+  min-width:0;
+  transition:border-color .2s;
 }
+.card:hover{border-color:#466384}
 .card h3{
-  margin:0 0 12px;font-size:12px;color:var(--muted);
-  font-weight:600;letter-spacing:.2px;
+  margin:0 0 10px;
+  font-size:12px;
+  color:var(--muted);
+  font-weight:650;
 }
-.value{font-size:22px;font-weight:800;overflow-wrap:anywhere}
-.small{font-size:12px;color:var(--muted);margin-top:8px;line-height:1.6}
+.value{
+  font-size:clamp(18px,2vw,23px);
+  font-weight:850;
+  overflow-wrap:anywhere;
+}
+.small{
+  font-size:12px;
+  color:var(--muted);
+  margin-top:7px;
+  line-height:1.65;
+}
 .green{color:var(--green)}
 .red{color:var(--red)}
-.yellow{color:var(--yellow)}
+.yellow{color:var(--gold)}
 .blue{color:var(--blue)}
 .decision{
-  border:1px solid var(--border);border-radius:14px;
-  background:var(--panel2);padding:22px;margin-bottom:18px;
+  padding:20px 22px;
+  background:linear-gradient(120deg,#172c43,#142238 65%,#172033);
+  border-color:#34506f;
 }
 .decision-label{font-size:12px;color:var(--muted)}
-.decision-value{font-size:30px;font-weight:900;margin:9px 0}
+.decision-value{
+  font-size:clamp(25px,4vw,34px);
+  font-weight:900;
+  margin:7px 0;
+  color:var(--gold);
+}
 .report-grid{
-  display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
-  gap:13px;
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr));
+  gap:12px;
 }
 .report{
-  background:var(--panel);border:1px solid var(--border);
-  border-radius:12px;padding:17px;line-height:1.75;
-  white-space:pre-wrap;overflow-wrap:anywhere;font-size:13px;
+  padding:17px;
+  line-height:1.75;
+  white-space:pre-wrap;
+  overflow-wrap:anywhere;
+  font-size:13px;
 }
-.report h3{font-size:13px;margin:0 0 10px;color:var(--blue)}
-.table-wrap{
-  overflow-x:auto;background:var(--panel);
-  border:1px solid var(--border);border-radius:12px;
+.report h3{
+  font-size:13px;
+  margin:0 0 10px;
+  color:var(--blue);
 }
-table{width:100%;border-collapse:collapse;font-size:13px;min-width:430px}
+.table-wrap{overflow-x:auto}
+table{
+  width:100%;
+  border-collapse:collapse;
+  font-size:12px;
+  min-width:430px;
+}
 th,td{
-  padding:12px 10px;border-bottom:1px solid var(--border);
-  text-align:left;white-space:nowrap;
+  padding:12px 11px;
+  border-bottom:1px solid var(--line);
+  text-align:left;
+  white-space:nowrap;
 }
-th{color:var(--muted);background:#111d2c}
+th{
+  color:#b8c6d8;
+  background:#17253a;
+  font-weight:750;
+}
+tbody tr:last-child td{border-bottom:0}
+tbody tr:hover{background:#ffffff08}
 .alert{
-  padding:13px 15px;border-radius:9px;margin:9px 0;
-  background:#251d20;border:1px solid #58313a;
-  color:#ffb6bc;font-size:13px;line-height:1.6;
+  padding:12px 14px;
+  border-radius:11px;
+  margin:9px 0;
+  background:#321f2a;
+  border:1px solid #67404a;
+  color:#ffc0c6;
+  font-size:13px;
+  line-height:1.6;
   overflow-wrap:anywhere;
 }
 .notice{
-  padding:13px 15px;border-radius:9px;margin:9px 0;
-  background:#172333;border:1px solid var(--border);
-  color:var(--muted);font-size:12px;line-height:1.7;
+  padding:13px 15px;
+  border-radius:11px;
+  margin:10px 0;
+  background:#14243a;
+  border:1px solid #2b405b;
+  color:#b0bfd2;
+  font-size:12px;
+  line-height:1.75;
 }
 button{
-  background:#1b2c43;border:1px solid var(--border);
-  color:var(--text);padding:9px 13px;border-radius:8px;
-  cursor:pointer;margin-top:9px;
+  background:linear-gradient(135deg,#24517a,#1c3c5c);
+  border:1px solid #416487;
+  color:#f5f9ff;
+  padding:10px 15px;
+  border-radius:10px;
+  font-weight:750;
+  cursor:pointer;
+  margin-top:9px;
 }
+button:hover{filter:brightness(1.15)}
 button:disabled{opacity:.5;cursor:wait}
 footer{
-  border-top:1px solid var(--border);padding:22px 5%;
-  color:var(--muted);font-size:11px;text-align:center;line-height:1.8;
+  border-top:1px solid var(--line);
+  padding:22px 4%;
+  color:var(--muted);
+  font-size:11px;
+  text-align:center;
+  line-height:1.8;
+  background:#09111d;
 }
 .status-line{
-  display:flex;gap:8px;flex-wrap:wrap;align-items:center;
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  align-items:center;
 }
 .pill{
-  display:inline-block;padding:4px 8px;border-radius:6px;
-  background:#1b2c43;color:var(--muted);font-size:11px;
+  display:inline-block;
+  padding:4px 9px;
+  border-radius:7px;
+  background:#1b3049;
+  color:#b9c9dc;
+  font-size:11px;
 }
-@media(max-width:600px){
-  main{padding:16px 4% 35px}
-  header{padding:17px 4%}
-  .value{font-size:19px}
+@media(max-width:650px){
+  header{
+    padding:16px 4%;
+    align-items:flex-start;
+  }
+  header>div:last-child{width:100%}
+  header button{width:100%}
+  main{padding:15px 3.5% 34px}
+  .grid{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:9px;
+  }
+  .card{padding:12px;border-radius:12px}
+  .card h3{font-size:11px}
+  .value{font-size:17px}
+  .small{font-size:11px}
+  .section-title{font-size:14px;margin:24px 0 11px}
+  .decision{padding:16px}
   .decision-value{font-size:25px}
-  .section-title{font-size:15px}
+  .report-grid{grid-template-columns:1fr}
+  .report{padding:14px}
+  th,td{padding:10px 8px}
+}
+@media(max-width:360px){
+  .grid{grid-template-columns:1fr}
 }
 </style>
 </head>
@@ -127,7 +250,6 @@ footer{
     <div class="brand">CRYPTO <span>MACRO</span> INTELLIGENCE</div>
     <div class="subtitle">বিশ্ববাজার • সামষ্টিক অর্থনীতি • ক্রিপ্টো ঝুঁকি বিশ্লেষণ</div>
   </div>
-
   <div>
     <div class="status" id="connection">ডেটার সঙ্গে সংযোগ করা হচ্ছে...</div>
     <div class="status" id="updated">সর্বশেষ পরীক্ষা: --</div>
@@ -259,23 +381,23 @@ footer{
 <div class="section-title">সিদ্ধান্ত প্রতিবেদন</div>
 <div class="report-grid">
   <div class="report">
-    <h3>তথ্য</h3>
+    <h3>তথ্য (DATA)</h3>
     <div id="reportData">তথ্যের জন্য অপেক্ষা করা হচ্ছে...</div>
   </div>
   <div class="report">
-    <h3>বিশ্লেষণ</h3>
+    <h3>বিশ্লেষণ (ANALYSIS)</h3>
     <div id="reportAnalysis">বিশ্লেষণের জন্য অপেক্ষা করা হচ্ছে...</div>
   </div>
   <div class="report">
-    <h3>সিদ্ধান্ত</h3>
+    <h3>সিদ্ধান্ত (DECISION)</h3>
     <div id="reportDecision">সিদ্ধান্তের জন্য অপেক্ষা করা হচ্ছে...</div>
   </div>
   <div class="report">
-    <h3>করণীয়</h3>
+    <h3>করণীয় (ACTION)</h3>
     <div id="reportAction">করণীয় নির্ধারণ করা হচ্ছে...</div>
   </div>
   <div class="report">
-    <h3>ঝুঁকি</h3>
+    <h3>ঝুঁকি (RISK)</h3>
     <div id="reportRisk">ঝুঁকির তথ্যের জন্য অপেক্ষা করা হচ্ছে...</div>
   </div>
 </div>
@@ -293,12 +415,17 @@ footer{
   <div class="small" id="decisionTimestamp">সিদ্ধান্ত ডেটা: --</div>
   <div class="small" id="technicalTimestamp">BTC/ETH সর্বশেষ বন্ধ দৈনিক ক্যান্ডেল: --</div>
   <div class="notice">
-    এই ড্যাশবোর্ড নির্ধারিত সময়ের বাজার ডেটা ব্যবহার করে। এটি প্রতি ৫ মিনিটে ডেটা ফাইল পরীক্ষা করে, কিন্তু প্রতিবার নতুন বাজার ডেটা তৈরি করে না। GitHub Actions-এর নির্ধারিত আপডেটের ওপর নতুন ডেটা আসা নির্ভরশীল।
+    এই ড্যাশবোর্ড প্রতি ৫ মিনিটে ডেটা ফাইল পরীক্ষা করে।
+    GitHub Actions-এর নির্ধারিত আপডেটের ওপর নতুন বাজার ডেটা আসা নির্ভরশীল।
+    প্রতি ৫ মিনিটে নতুন বাজার ডেটা তৈরি হয় না।
   </div>
 </div>
 
 <div class="notice">
-  এটি বাজার বিশ্লেষণের সহায়ক ব্যবস্থা, লাভের নিশ্চয়তা নয়। অনুপস্থিত, পুরোনো বা যাচাই না হওয়া তথ্যকে শূন্য বা নিরপেক্ষ ধরে নেওয়া যাবে না। কোনো একটি সূচক একা BUY বা SELL সিদ্ধান্তের জন্য যথেষ্ট নয়। এই ড্যাশবোর্ড Spot বাজার বিশ্লেষণের জন্য; Futures বা Margin পরামর্শ দেয় না।
+  এটি বাজার বিশ্লেষণের সহায়ক ব্যবস্থা, লাভের নিশ্চয়তা নয়।
+  অনুপস্থিত, পুরোনো বা যাচাই না হওয়া তথ্যকে শূন্য বা নিরপেক্ষ ধরে নেওয়া যাবে না।
+  কোনো একটি সূচক একা BUY বা SELL সিদ্ধান্তের জন্য যথেষ্ট নয়।
+  এই ড্যাশবোর্ড Spot বাজার বিশ্লেষণের জন্য; Futures বা Margin পরামর্শ দেয় না।
 </div>
 
 </main>
@@ -320,490 +447,436 @@ const PATHS = {
 
 const $ = id => document.getElementById(id);
 
-function put(id, value) {
-  const el = $(id);
-  if (el) el.textContent = value;
+function put(id,value){
+  const el=$(id);
+  if(el) el.textContent=value;
 }
 
-function get(obj, path) {
+function get(obj,path){
   return path.split(".").reduce(
-    (value, key) => value == null ? undefined : value[key],
-    obj
+    (v,k)=>v==null?undefined:v[k],obj
   );
 }
 
-function num(value) {
-  if (value === null || value === undefined || value === "") return null;
+function num(value){
+  if(value===null||value===undefined||value==="") return null;
 
-  if (typeof value === "object") {
-    const status = String(value.status || "").toUpperCase();
-
-    if (status && !["OK", "SUCCESS", "AVAILABLE", "FRESH"].includes(status)) {
-      return null;
-    }
-
-    value = value.value;
+  if(typeof value==="object"){
+    const status=String(value.status||"").toUpperCase();
+    if(status&&!["OK","SUCCESS","AVAILABLE","FRESH"].includes(status)) return null;
+    value=value.value;
   }
 
-  const n = Number(value);
-  return Number.isFinite(n) ? n : null;
+  const n=Number(value);
+  return Number.isFinite(n)?n:null;
 }
 
-function val(obj, path) {
-  return num(get(obj, path));
+function val(obj,path){
+  return num(get(obj,path));
 }
 
-function fmt(value, digits = 2) {
-  if (value === null || value === undefined || !Number.isFinite(Number(value))) {
+function fmt(value,digits=2){
+  if(value===null||value===undefined||!Number.isFinite(Number(value))){
     return "তথ্য পাওয়া যায়নি";
   }
-
-  return Number(value).toLocaleString("en-US", {
-    maximumFractionDigits: digits
+  return Number(value).toLocaleString("en-US",{
+    maximumFractionDigits:digits
   });
 }
 
-function money(value) {
-  if (value === null) return "তথ্য পাওয়া যায়নি";
-
-  if (value >= 1e12) return "$" + (value / 1e12).toFixed(2) + " ট্রিলিয়ন";
-  if (value >= 1e9) return "$" + (value / 1e9).toFixed(2) + " বিলিয়ন";
-  if (value >= 1e6) return "$" + (value / 1e6).toFixed(2) + " মিলিয়ন";
-
-  return "$" + fmt(value);
+function money(value){
+  if(value===null) return "তথ্য পাওয়া যায়নি";
+  if(value>=1e12) return "$"+(value/1e12).toFixed(2)+" ট্রিলিয়ন";
+  if(value>=1e9) return "$"+(value/1e9).toFixed(2)+" বিলিয়ন";
+  if(value>=1e6) return "$"+(value/1e6).toFixed(2)+" মিলিয়ন";
+  return "$"+fmt(value);
 }
 
-function show(id, value, suffix = "", digits = 2) {
-  put(id, value === null ? "তথ্য পাওয়া যায়নি" : fmt(value, digits) + suffix);
+function show(id,value,suffix="",digits=2){
+  put(id,value===null?"তথ্য পাওয়া যায়নি":fmt(value,digits)+suffix);
 }
 
-function safeArray(value) {
-  if (Array.isArray(value)) return value;
-  if (value === null || value === undefined) return [];
+function safeArray(value){
+  if(Array.isArray(value)) return value;
+  if(value===null||value===undefined) return [];
   return [value];
 }
 
-function translateDecision(value) {
-  const raw = String(value || "").trim();
-  const key = raw.toUpperCase();
+function translateDecision(value){
+  const raw=String(value||"").trim();
+  const key=raw.toUpperCase();
 
-  const map = {
-    "BUY": "কিনুন",
-    "STRONG BUY": "শক্তিশালী BUY সংকেত",
-    "DCA": "ধাপে ধাপে কিনুন",
-    "HOLD": "ধরে রাখুন",
-    "WAIT": "অপেক্ষা করুন",
-    "SELL": "বিক্রি করুন",
-    "STRONG SELL": "সম্পূর্ণ বিক্রির সতর্কতা",
-    "NO TRADE": "লেনদেন করবেন না",
-    "NEUTRAL": "নিরপেক্ষ",
-    "BULLISH": "ঊর্ধ্বমুখী",
-    "BEARISH": "নিম্নমুখী",
-    "CONTRACTING": "সংকুচিত হচ্ছে",
-    "EXPANDING": "বাড়ছে",
-    "FLATTENING": "সমতল হচ্ছে",
-    "EXTREME FEAR": "চরম ভয়",
-    "FEAR": "ভয়",
-    "NEUTRAL": "নিরপেক্ষ",
-    "GREED": "লোভ",
-    "EXTREME GREED": "চরম লোভ"
+  const map={
+    "BUY":"কিনুন",
+    "STRONG BUY":"শক্তিশালী BUY সংকেত",
+    "DCA":"ধাপে ধাপে কিনুন",
+    "HOLD":"ধরে রাখুন",
+    "WAIT":"অপেক্ষা করুন",
+    "SELL":"বিক্রি করুন",
+    "STRONG SELL":"সম্পূর্ণ বিক্রির সতর্কতা",
+    "NO TRADE":"লেনদেন করবেন না",
+    "NEUTRAL":"নিরপেক্ষ",
+    "BULLISH":"ঊর্ধ্বমুখী",
+    "BEARISH":"নিম্নমুখী",
+    "CONTRACTING":"সংকুচিত হচ্ছে",
+    "EXPANDING":"বাড়ছে",
+    "FLATTENING":"সমতল হচ্ছে",
+    "EXTREME FEAR":"চরম ভয়",
+    "FEAR":"ভয়",
+    "GREED":"লোভ",
+    "EXTREME GREED":"চরম লোভ"
   };
 
-  return map[key] || raw || "তথ্য পাওয়া যায়নি";
+  return map[key]||raw||"তথ্য পাওয়া যায়নি";
 }
 
-function formatList(items, fallback = "কোনো তথ্য পাওয়া যায়নি।") {
-  const list = safeArray(items).filter(
-    item => item !== null && item !== undefined && String(item).trim() !== ""
+function formatList(items,fallback="কোনো তথ্য পাওয়া যায়নি।"){
+  const list=safeArray(items).filter(
+    item=>item!==null&&item!==undefined&&String(item).trim()!==""
   );
-
-  if (!list.length) return fallback;
-
-  return list.map(item => "• " + String(item)).join("\n");
+  if(!list.length) return fallback;
+  return list.map(item=>"• "+String(item)).join("\n");
 }
 
-function formatDate(value) {
-  if (!value) return "তথ্য পাওয়া যায়নি";
-
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return String(value);
-
-  return date.toLocaleString("bn-BD", {
-    dateStyle: "medium",
-    timeStyle: "short",
-    timeZone: "Asia/Dhaka"
+function formatDate(value){
+  if(!value) return "তথ্য পাওয়া যায়নি";
+  const date=new Date(value);
+  if(Number.isNaN(date.getTime())) return String(value);
+  return date.toLocaleString("bn-BD",{
+    dateStyle:"medium",
+    timeStyle:"short",
+    timeZone:"Asia/Dhaka"
   });
 }
 
-function showRsiText(id, value) {
-  if (value === null) {
-    put(id, "তথ্য পাওয়া যায়নি");
-  } else if (value < 30) {
-    put(id, "অতিরিক্ত বিক্রির অঞ্চল — একা BUY সংকেত নয়");
-  } else if (value > 70) {
-    put(id, "অতিরিক্ত কেনার অঞ্চল — সতর্ক থাকুন");
-  } else {
-    put(id, "মধ্যবর্তী অঞ্চল");
+function showRsiText(id,value){
+  if(value===null){
+    put(id,"তথ্য পাওয়া যায়নি");
+  }else if(value<30){
+    put(id,"অতিরিক্ত বিক্রির অঞ্চল — একা BUY সংকেত নয়");
+  }else if(value>70){
+    put(id,"অতিরিক্ত কেনার অঞ্চল — সতর্ক থাকুন");
+  }else{
+    put(id,"মধ্যবর্তী অঞ্চল");
   }
 }
 
-function showTechnical(prefix, asset) {
-  const indicators = asset?.indicators || {};
+function showTechnical(prefix,asset){
+  const indicators=asset?.indicators||{};
+  const price=val(asset,"price_usdt");
+  const rsi=val(indicators,"rsi14");
+  const adx=val(indicators,"adx14");
 
-  const price = val(asset, "price_usdt");
-  const rsi = val(indicators, "rsi14");
-  const adx = val(indicators, "adx14");
+  show(prefix+"MA20",val(indicators,"ma20"));
+  show(prefix+"MA50",val(indicators,"ma50"));
+  show(prefix+"MA200",val(indicators,"ma200"));
+  show(prefix+"MACD",val(indicators,"macd_histogram"));
+  show(prefix+"Support",val(indicators,"support_20d"));
+  show(prefix+"Resistance",val(indicators,"resistance_20d"));
+  show(prefix+"VolumeRatio",val(indicators,"volume_ratio_20d"),"x");
 
-  show(prefix + "MA20", val(indicators, "ma20"));
-  show(prefix + "MA50", val(indicators, "ma50"));
-  show(prefix + "MA200", val(indicators, "ma200"));
-  show(prefix + "MACD", val(indicators, "macd_histogram"));
-  show(prefix + "Support", val(indicators, "support_20d"));
-  show(prefix + "Resistance", val(indicators, "resistance_20d"));
-  show(prefix + "VolumeRatio", val(indicators, "volume_ratio_20d"), "x");
+  put(prefix+"Trend",translateDecision(asset?.trend));
+  show(prefix+"Rsi",rsi);
+  show(prefix+"Adx",adx);
+  showRsiText(prefix+"RsiText",rsi);
 
-  put(prefix + "Trend", translateDecision(asset?.trend || "তথ্য পাওয়া যায়নি"));
-  show(prefix + "Rsi", rsi);
-  show(prefix + "Adx", adx);
-
-  put(prefix + "RsiText", " ");
-  showRsiText(prefix + "RsiText", rsi);
-
-  return { price, rsi, adx, indicators };
+  return {price,rsi,adx,indicators};
 }
 
-async function fetchOne(path) {
-  const response = await fetch(path + "?t=" + Date.now(), {
-    cache: "no-store"
+async function fetchOne(path){
+  const response=await fetch(path+"?t="+Date.now(),{
+    cache:"no-store"
   });
-
-  if (!response.ok) {
-    throw new Error(path + " — HTTP " + response.status);
-  }
-
+  if(!response.ok) throw new Error(path+" — HTTP "+response.status);
   return response.json();
 }
 
-function showDataStatus(id, data, name) {
-  if (!data) {
-    put(id, name + ": ডেটা পাওয়া যায়নি");
-    return;
-  }
+function renderMarket(market){
+  if(!market) return;
 
-  put(id, name + ": " + formatDate(
-    data.generated_at || data.fetched_at
-  ));
-}
+  const global=market.global_market||{};
 
-function renderMarket(market) {
-  if (!market) return;
+  put("marketCap",money(val(global,"total_market_cap_usd")));
+  put("volume",money(val(global,"total_volume_24h_usd")));
 
-  const global = market.global_market || {};
+  show("btcDom",val(global,"btc_dominance_pct"),"%");
+  show("ethDom",val(global,"eth_dominance_pct"),"%");
+  show("activeCoins",val(global,"active_cryptocurrencies"),"",0);
 
-  put("marketCap", money(val(global, "total_market_cap_usd")));
-  put("volume", money(val(global, "total_volume_24h_usd")));
+  const fg=market.fear_greed||{};
+  show("fearGreed",num(fg.value),"/100",0);
+  put("fearLabel",translateDecision(fg.classification));
 
-  show("btcDom", val(global, "btc_dominance_pct"), "%");
-  show("ethDom", val(global, "eth_dominance_pct"), "%");
-  show("activeCoins", val(global, "active_cryptocurrencies"), "", 0);
+  const btc=showTechnical("btc",market.technical?.BTC||{});
+  const eth=showTechnical("eth",market.technical?.ETH||{});
 
-  const fg = market.fear_greed || {};
-  show("fearGreed", num(fg.value), "/100", 0);
-  put("fearLabel", translateDecision(fg.classification));
+  put("btcPrice",btc.price===null?"তথ্য পাওয়া যায়নি":"$"+fmt(btc.price));
+  put("ethPrice",eth.price===null?"তথ্য পাওয়া যায়নি":"$"+fmt(eth.price));
 
-  const btc = showTechnical("btc", market.technical?.BTC || {});
-  const eth = showTechnical("eth", market.technical?.ETH || {});
+  const btcChange=val(market.major_assets?.bitcoin,"change_24h_pct");
+  const ethChange=val(market.major_assets?.ethereum,"change_24h_pct");
 
-  put("btcPrice", btc.price === null ? "তথ্য পাওয়া যায়নি" : "$" + fmt(btc.price));
-  put("ethPrice", eth.price === null ? "তথ্য পাওয়া যায়নি" : "$" + fmt(eth.price));
+  put("btcChange","২৪ ঘণ্টার পরিবর্তন: "+(btcChange===null?"তথ্য পাওয়া যায়নি":fmt(btcChange)+"%"));
+  put("ethChange","২৪ ঘণ্টার পরিবর্তন: "+(ethChange===null?"তথ্য পাওয়া যায়নি":fmt(ethChange)+"%"));
 
-  show("btcChange", val(market.major_assets?.bitcoin, "change_24h_pct"), "%");
-  show("ethChange", val(market.major_assets?.ethereum, "change_24h_pct"), "%");
-
-  put("btcChange", "২৪ ঘণ্টার পরিবর্তন: " +
-    (val(market.major_assets?.bitcoin, "change_24h_pct") === null
-      ? "তথ্য পাওয়া যায়নি"
-      : fmt(val(market.major_assets?.bitcoin, "change_24h_pct")) + "%"));
-
-  put("ethChange", "২৪ ঘণ্টার পরিবর্তন: " +
-    (val(market.major_assets?.ethereum, "change_24h_pct") === null
-      ? "তথ্য পাওয়া যায়নি"
-      : fmt(val(market.major_assets?.ethereum, "change_24h_pct")) + "%"));
-
-  showRsiText("btcRsiText", btc.rsi);
-  showRsiText("ethRsiText", eth.rsi);
-
-  put("marketTimestamp", "বাজার ডেটা: " + formatDate(market.generated_at));
-
-  const btcTime = market.technical?.BTC?.last_closed_candle_at;
-  const ethTime = market.technical?.ETH?.last_closed_candle_at;
+  put("marketTimestamp","বাজার ডেটা: "+formatDate(market.generated_at));
 
   put("technicalTimestamp",
-    "BTC/ETH সর্বশেষ বন্ধ দৈনিক ক্যান্ডেল: BTC " +
-    formatDate(btcTime) + " | ETH " + formatDate(ethTime)
+    "BTC/ETH সর্বশেষ বন্ধ দৈনিক ক্যান্ডেল: BTC "+
+    formatDate(market.technical?.BTC?.last_closed_candle_at)+
+    " | ETH "+formatDate(market.technical?.ETH?.last_closed_candle_at)
   );
 }
 
-function renderMacro(macro) {
-  if (!macro) return;
+function renderMacro(macro){
+  if(!macro) return;
 
-  const metrics = macro.metrics || {};
-  const inflation = macro.inflation || {};
+  const metrics=macro.metrics||{};
+  const inflation=macro.inflation||{};
 
-  show("cpi", num(inflation.cpi?.yoy_percent), "%");
-  show("coreCpi", num(inflation.core_cpi?.yoy_percent), "%");
-  show("pce", num(inflation.pce?.yoy_percent), "%");
-  show("corePce", num(inflation.core_pce?.yoy_percent), "%");
+  show("cpi",num(inflation.cpi?.yoy_percent),"%");
+  show("coreCpi",num(inflation.core_cpi?.yoy_percent),"%");
+  show("pce",num(inflation.pce?.yoy_percent),"%");
+  show("corePce",num(inflation.core_pce?.yoy_percent),"%");
 
-  show("fedRate", val(metrics, "fed_funds_rate"), "%");
-  show("unemployment", val(metrics, "unemployment"), "%");
-  show("vix", val(metrics, "vix"));
-  show("dxy", val(metrics, "usd_broad_index"));
+  show("fedRate",val(metrics,"fed_funds_rate"),"%");
+  show("unemployment",val(metrics,"unemployment"),"%");
+  show("vix",val(metrics,"vix"));
+  show("dxy",val(metrics,"usd_broad_index"));
 
-  show("yield10", val(metrics, "yield_10y"), "%");
-  show("yield2", val(metrics, "yield_2y"), "%");
-  show("yield30", val(metrics, "yield_30y"), "%");
-  show("spread", val(metrics, "yield_curve_10y_2y"));
+  show("yield10",val(metrics,"yield_10y"),"%");
+  show("yield2",val(metrics,"yield_2y"),"%");
+  show("yield30",val(metrics,"yield_30y"),"%");
+  show("spread",val(metrics,"yield_curve_10y_2y"));
 
-  put("curveStatus", translateDecision(macro.yield_curve?.trend));
+  put("curveStatus",translateDecision(macro.yield_curve?.trend));
 
-  const liquidity = macro.liquidity || {};
-  const liquidityValue = num(liquidity.current);
+  const liquidity=macro.liquidity||{};
+  const liquidityValue=num(liquidity.current);
 
-  put("liquidity", liquidityValue === null
-    ? "তথ্য পাওয়া যায়নি"
-    : "$" + fmt(liquidityValue) + " বিলিয়ন"
+  put("liquidity",liquidityValue===null
+    ?"তথ্য পাওয়া যায়নি"
+    :"$"+fmt(liquidityValue)+" বিলিয়ন"
   );
 
-  put("liquidityTrend", "প্রবণতা: " + translateDecision(liquidity.trend));
+  put("liquidityTrend","প্রবণতা: "+translateDecision(liquidity.trend));
 
-  const oil = val(metrics, "oil");
-  show("oil", oil, " USD/ব্যারেল");
+  show("oil",val(metrics,"oil")," USD/ব্যারেল");
+  show("gold",val(metrics,"gold"));
+  show("usdjpy",val(metrics,"usd_jpy"));
+  show("fedBalance",val(metrics,"fed_balance_sheet"));
+  show("m2",val(metrics,"m2_money_supply"));
 
-  const gold = val(metrics, "gold");
-  show("gold", gold);
-
-  show("usdjpy", val(metrics, "usd_jpy"));
-  show("fedBalance", val(metrics, "fed_balance_sheet"));
-  show("m2", val(metrics, "m2_money_supply"));
-
-  put("macroTimestamp", "ম্যাক্রো ডেটা: " + formatDate(macro.fetched_at));
-
-  const summary = macro.summary || {};
-  const quality = summary.data_quality || "তথ্য পাওয়া যায়নি";
+  put("macroTimestamp","ম্যাক্রো ডেটা: "+formatDate(macro.fetched_at));
 
   return {
-    summary,
-    quality
+    summary:macro.summary||{},
+    quality:macro.summary?.data_quality||"তথ্য পাওয়া যায়নি"
   };
 }
 
-function renderDecision(decision, market, macro) {
-  if (!decision) return;
+function renderDecision(decision){
+  if(!decision) return;
 
-  const final = decision.final_decision || {};
-  const analysis = decision.macro_analysis || {};
-  const quality = decision.data_quality || {};
+  const final=decision.final_decision||{};
+  const analysis=decision.macro_analysis||{};
+  const quality=decision.data_quality||{};
 
-  put("decision", translateDecision(final.decision));
+  put("decision",translateDecision(final.decision));
 
-  const btcTrend = decision.crypto_market?.btc?.trend;
-  const marketRegime = btcTrend
-    ? "BTC প্রবণতা: " + translateDecision(btcTrend)
-    : "বাজারের অবস্থা: তথ্য পাওয়া যায়নি";
-
-  put("regime", marketRegime);
+  const btcTrend=decision.crypto_market?.btc?.trend;
+  put("regime",btcTrend
+    ?"BTC প্রবণতা: "+translateDecision(btcTrend)
+    :"বাজারের অবস্থা: তথ্য পাওয়া যায়নি"
+  );
 
   put("decisionQuality",
-    "ডেটার মান: " + translateDecision(analysis.data_quality || "তথ্য পাওয়া যায়নি")
+    "ডেটার মান: "+translateDecision(analysis.data_quality)
   );
 
   put("confidence",
-    "সিদ্ধান্তের ধরন: " +
-    (final.confidence_label === "RULE_BASED_NOT_PROBABILITY"
-      ? "নিয়মভিত্তিক বিশ্লেষণ; সম্ভাবনার নিশ্চয়তা নয়"
-      : (final.confidence_label || "তথ্য পাওয়া যায়নি"))
+    "সিদ্ধান্তের ধরন: "+
+    (final.confidence_label==="RULE_BASED_NOT_PROBABILITY"
+      ?"নিয়মভিত্তিক বিশ্লেষণ; সম্ভাবনার নিশ্চয়তা নয়"
+      :(final.confidence_label||"তথ্য পাওয়া যায়নি"))
   );
 
-  const dataReport = [
-    "তৈরির সময়: " + formatDate(decision.generated_at),
-    "সামগ্রিক ডেটার অবস্থা: " + (decision.status || "তথ্য পাওয়া যায়নি"),
-    "ম্যাক্রো ডেটা: " + (quality.macro?.status || "তথ্য পাওয়া যায়নি"),
-    "বাজার ডেটা: " + (quality.market?.status || "তথ্য পাওয়া যায়নি"),
-    "BTC দৈনিক ডেটা: " + (quality.btc_technical?.status || "তথ্য পাওয়া যায়নি"),
-    "ETH দৈনিক ডেটা: " + (quality.eth_technical?.status || "তথ্য পাওয়া যায়নি"),
-    "BTC বাজার আধিপত্য: " + fmt(num(decision.crypto_market?.btc_dominance_percent)) + "%",
-    "ভয় ও লোভ সূচক: " + fmt(num(decision.crypto_market?.fear_greed?.value), 0)
+  const dataReport=[
+    "তৈরির সময়: "+formatDate(decision.generated_at),
+    "সামগ্রিক ডেটার অবস্থা: "+(decision.status||"তথ্য পাওয়া যায়নি"),
+    "ম্যাক্রো ডেটা: "+(quality.macro?.status||"তথ্য পাওয়া যায়নি"),
+    "বাজার ডেটা: "+(quality.market?.status||"তথ্য পাওয়া যায়নি"),
+    "BTC দৈনিক ডেটা: "+(quality.btc_technical?.status||"তথ্য পাওয়া যায়নি"),
+    "ETH দৈনিক ডেটা: "+(quality.eth_technical?.status||"তথ্য পাওয়া যায়নি"),
+    "BTC বাজার আধিপত্য: "+fmt(num(decision.crypto_market?.btc_dominance_percent))+"%",
+    "ভয় ও লোভ সূচক: "+fmt(num(decision.crypto_market?.fear_greed?.value),0)
   ];
 
-  put("reportData", dataReport.join("\n"));
+  put("reportData",dataReport.join("\n"));
 
-  const analysisReport = [
-    "ম্যাক্রো সিদ্ধান্ত: " + translateDecision(analysis.decision),
-    "ঝুঁকি স্কোর: " + fmt(num(analysis.risk_score)),
-    "সহায়ক স্কোর: " + fmt(num(analysis.support_score)),
-    "BTC প্রবণতা: " + translateDecision(decision.crypto_market?.btc?.trend),
-    "ETH প্রবণতা: " + translateDecision(decision.crypto_market?.eth?.trend),
+  const analysisReport=[
+    "ম্যাক্রো সিদ্ধান্ত: "+translateDecision(analysis.decision),
+    "ঝুঁকি স্কোর: "+fmt(num(analysis.risk_score)),
+    "সহায়ক স্কোর: "+fmt(num(analysis.support_score)),
+    "BTC প্রবণতা: "+translateDecision(decision.crypto_market?.btc?.trend),
+    "ETH প্রবণতা: "+translateDecision(decision.crypto_market?.eth?.trend),
     "",
     "মূল কারণ:",
     formatList(final.reasons)
   ];
 
-  put("reportAnalysis", analysisReport.join("\n"));
+  put("reportAnalysis",analysisReport.join("\n"));
 
-  const decisionReport = [
-    "সিদ্ধান্ত: " + translateDecision(final.decision),
-    "বিশ্বাসযোগ্যতার ধরন: " +
-      (final.confidence_label === "RULE_BASED_NOT_PROBABILITY"
-        ? "নিয়মভিত্তিক; সম্ভাবনার নিশ্চয়তা নয়"
-        : (final.confidence_label || "তথ্য পাওয়া যায়নি")),
+  const decisionReport=[
+    "সিদ্ধান্ত: "+translateDecision(final.decision),
+    "বিশ্বাসযোগ্যতার ধরন: "+
+      (final.confidence_label==="RULE_BASED_NOT_PROBABILITY"
+        ?"নিয়মভিত্তিক; সম্ভাবনার নিশ্চয়তা নয়"
+        :(final.confidence_label||"তথ্য পাওয়া যায়নি")),
     "",
     "গুরুত্বপূর্ণ নোট:",
-    final.important_note || "কোনো অতিরিক্ত নোট নেই।"
+    final.important_note||"কোনো অতিরিক্ত নোট নেই।"
   ];
 
-  put("reportDecision", decisionReport.join("\n"));
+  put("reportDecision",decisionReport.join("\n"));
+  put("reportAction",formatList(final.actions,"কোনো করণীয় পাওয়া যায়নি।"));
+  put("reportRisk",formatList(final.risk,"কোনো ঝুঁকির তথ্য পাওয়া যায়নি।"));
 
-  put("reportAction", formatList(final.actions, "কোনো করণীয় পাওয়া যায়নি।"));
-  put("reportRisk", formatList(final.risk, "কোনো ঝুঁকির তথ্য পাওয়া যায়নি।"));
-
-  put("decisionTimestamp",
-    "সিদ্ধান্ত ডেটা: " + formatDate(decision.generated_at)
-  );
+  put("decisionTimestamp","সিদ্ধান্ত ডেটা: "+formatDate(decision.generated_at));
 }
 
-function renderWarnings(market, macro, decision, macroInfo) {
-  const warnings = [];
+function renderWarnings(market,macro,decision,macroInfo){
+  const warnings=[];
 
-  if (!market) warnings.push("বাজারের ডেটা লোড করা যায়নি।");
-  if (!macro) warnings.push("ম্যাক্রো ডেটা লোড করা যায়নি।");
-  if (!decision) warnings.push("সিদ্ধান্ত ইঞ্জিনের ডেটা লোড করা যায়নি।");
+  if(!market) warnings.push("বাজারের ডেটা লোড করা যায়নি।");
+  if(!macro) warnings.push("ম্যাক্রো ডেটা লোড করা যায়নি।");
+  if(!decision) warnings.push("সিদ্ধান্ত ইঞ্জিনের ডেটা লোড করা যায়নি।");
 
-  const issues = decision?.data_quality?.issues || [];
-  issues.forEach(item => warnings.push(String(item)));
+  const issues=decision?.data_quality?.issues||[];
+  issues.forEach(item=>warnings.push(String(item)));
 
-  const summary = macroInfo?.summary || {};
+  const summary=macroInfo?.summary||{};
 
-  safeArray(summary.critical_missing).forEach(item => {
-    warnings.push("গুরুত্বপূর্ণ অনুপস্থিত ডেটা: " + item);
+  safeArray(summary.critical_missing).forEach(item=>{
+    warnings.push("গুরুত্বপূর্ণ অনুপস্থিত ডেটা: "+item);
   });
 
-  safeArray(summary.optional_unavailable).forEach(item => {
-    warnings.push("ঐচ্ছিক ডেটা পাওয়া যায়নি: " + item);
+  safeArray(summary.optional_unavailable).forEach(item=>{
+    warnings.push("ঐচ্ছিক ডেটা পাওয়া যায়নি: "+item);
   });
 
-  safeArray(decision?.limitations).forEach(item => {
-    warnings.push("সীমাবদ্ধতা: " + item);
+  safeArray(decision?.limitations).forEach(item=>{
+    warnings.push("সীমাবদ্ধতা: "+item);
   });
 
-  const uniqueWarnings = [...new Set(warnings)];
+  const uniqueWarnings=[...new Set(warnings)];
 
   put("qualitySummary",
-    "ম্যাক্রো ডেটার মান: " +
-    (summary.data_quality || "তথ্য পাওয়া যায়নি") +
-    " | পাওয়া গেছে: " + (summary.ok ?? "তথ্য পাওয়া যায়নি") +
-    "/" + (summary.total_series ?? "তথ্য পাওয়া যায়নি") +
-    " | সিদ্ধান্ত ডেটা: " + (decision?.status || "পাওয়া যায়নি")
+    "ম্যাক্রো ডেটার মান: "+
+    (summary.data_quality||"তথ্য পাওয়া যায়নি")+
+    " | পাওয়া গেছে: "+(summary.ok??"তথ্য পাওয়া যায়নি")+
+    "/"+(summary.total_series??"তথ্য পাওয়া যায়নি")+
+    " | সিদ্ধান্ত ডেটা: "+(decision?.status||"পাওয়া যায়নি")
   );
 
-  const container = $("warnings");
-
-  if (!container) return;
+  const container=$("warnings");
+  if(!container) return;
 
   container.replaceChildren();
 
-  if (!uniqueWarnings.length) {
-    const notice = document.createElement("div");
-    notice.className = "notice";
-    notice.textContent = "বর্তমান ডেটা ফাইলে অতিরিক্ত কোনো সতর্কবার্তা পাওয়া যায়নি।";
+  if(!uniqueWarnings.length){
+    const notice=document.createElement("div");
+    notice.className="notice";
+    notice.textContent="বর্তমান ডেটা ফাইলে অতিরিক্ত কোনো সতর্কবার্তা পাওয়া যায়নি।";
     container.appendChild(notice);
     return;
   }
 
-  uniqueWarnings.forEach(message => {
-    const item = document.createElement("div");
-    item.className = "alert";
-    item.textContent = message;
+  uniqueWarnings.forEach(message=>{
+    const item=document.createElement("div");
+    item.className="alert";
+    item.textContent=message;
     container.appendChild(item);
   });
 }
 
-async function loadDashboard() {
-  const button = $("refreshButton");
-  if (button) {
-    button.disabled = true;
-    button.textContent = "লোড হচ্ছে...";
+async function loadDashboard(){
+  const button=$("refreshButton");
+
+  if(button){
+    button.disabled=true;
+    button.textContent="লোড হচ্ছে...";
   }
 
-  put("connection", "ডেটা পরীক্ষা করা হচ্ছে...");
+  put("connection","ডেটা পরীক্ষা করা হচ্ছে...");
 
-  const alertBox = $("mainAlert");
-  if (alertBox) alertBox.replaceChildren();
+  const alertBox=$("mainAlert");
+  if(alertBox) alertBox.replaceChildren();
 
-  const results = await Promise.allSettled([
-    fetchOne(PATHS.market),
-    fetchOne(PATHS.macro),
-    fetchOne(PATHS.decision)
-  ]);
+  try{
+    const results=await Promise.allSettled([
+      fetchOne(PATHS.market),
+      fetchOne(PATHS.macro),
+      fetchOne(PATHS.decision)
+    ]);
 
-  const market = results[0].status === "fulfilled" ? results[0].value : null;
-  const macro = results[1].status === "fulfilled" ? results[1].value : null;
-  const decision = results[2].status === "fulfilled" ? results[2].value : null;
+    const market=results[0].status==="fulfilled"?results[0].value:null;
+    const macro=results[1].status==="fulfilled"?results[1].value:null;
+    const decision=results[2].status==="fulfilled"?results[2].value:null;
 
-  if (market) renderMarket(market);
-  if (macro) {
-    const macroInfo = renderMacro(macro);
-    window.__macroInfo = macroInfo;
-  }
+    if(market) renderMarket(market);
 
-  if (decision) renderDecision(decision, market, macro);
+    let macroInfo=null;
+    if(macro) macroInfo=renderMacro(macro);
 
-  renderWarnings(market, macro, decision, window.__macroInfo);
+    if(decision) renderDecision(decision);
 
-  const failures = results
-    .map((result, index) => {
-      if (result.status === "fulfilled") return null;
-      return [
-        "বাজার ডেটা",
-        "ম্যাক্রো ডেটা",
-        "সিদ্ধান্ত ডেটা"
-      ][index] + ": " + result.reason.message;
-    })
-    .filter(Boolean);
+    renderWarnings(market,macro,decision,macroInfo);
 
-  if (failures.length) {
-    put("connection", "কিছু ডেটা পাওয়া যায়নি");
+    const failures=results.map((result,index)=>{
+      if(result.status==="fulfilled") return null;
 
-    if (alertBox) {
-      failures.forEach(message => {
-        const item = document.createElement("div");
-        item.className = "alert";
-        item.textContent = message;
-        alertBox.appendChild(item);
-      });
+      const names=["বাজার ডেটা","ম্যাক্রো ডেটা","সিদ্ধান্ত ডেটা"];
+      return names[index]+": "+(result.reason?.message||"অজানা সমস্যা");
+    }).filter(Boolean);
+
+    if(failures.length){
+      put("connection","কিছু ডেটা পাওয়া যায়নি");
+
+      if(alertBox){
+        failures.forEach(message=>{
+          const item=document.createElement("div");
+          item.className="alert";
+          item.textContent=message;
+          alertBox.appendChild(item);
+        });
+      }
+    }else{
+      put("connection","● সব ডেটা ফাইল সংযুক্ত");
+      const connection=$("connection");
+      if(connection) connection.className="status green";
     }
-  } else {
-    put("connection", "● সব ডেটা ফাইল সংযুক্ত");
-    const connection = $("connection");
-    if (connection) connection.className = "status green";
-  }
 
-  put("updated", "সর্বশেষ পরীক্ষা: " +
-    new Date().toLocaleString("bn-BD", { timeZone: "Asia/Dhaka" })
-  );
+    put("updated","সর্বশেষ পরীক্ষা: "+
+      new Date().toLocaleString("bn-BD",{timeZone:"Asia/Dhaka"})
+    );
 
-  if (button) {
-    button.disabled = false;
-    button.textContent = "ডেটা রিফ্রেশ করুন";
+  }catch(error){
+    put("connection","ডেটা লোডে সমস্যা");
+    put("mainAlert",error.message);
+  }finally{
+    if(button){
+      button.disabled=false;
+      button.textContent="ডেটা রিফ্রেশ করুন";
+    }
   }
 }
 
 loadDashboard();
-setInterval(loadDashboard, 5 * 60 * 1000);
+setInterval(loadDashboard,5*60*1000);
 </script>
 
 <script src="advanced-dashboard.js"></script>
 
 </body>
 </html>
-
