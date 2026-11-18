@@ -2,34 +2,34 @@
   "schema_version": 1,
   "engine": "Crypto Final Decision Engine",
   "engine_version": "1.0.0",
-  "generated_at": "2026-11-17T23:08:16Z",
+  "generated_at": "2026-11-18T00:00:53Z",
   "status": "OK",
   "data_quality": {
     "macro": {
       "name": "macro_data",
-      "timestamp": "2026-11-17T23:08:16Z",
+      "timestamp": "2026-11-18T00:00:52Z",
       "age_hours": 0.0,
       "max_age_hours": 72,
       "status": "FRESH"
     },
     "market": {
       "name": "market_data",
-      "timestamp": "2026-11-17T23:08:01Z",
-      "age_hours": 0.0,
+      "timestamp": "2026-11-18T00:00:13Z",
+      "age_hours": 0.01,
       "max_age_hours": 36,
       "status": "FRESH"
     },
     "btc_technical": {
       "name": "BTC last closed daily candle",
-      "timestamp": "2026-11-16T23:59:59Z",
-      "age_hours": 23.14,
+      "timestamp": "2026-11-17T23:59:59Z",
+      "age_hours": 0.02,
       "max_age_hours": 60,
       "status": "FRESH"
     },
     "eth_technical": {
       "name": "ETH last closed daily candle",
-      "timestamp": "2026-11-16T23:59:59Z",
-      "age_hours": 23.14,
+      "timestamp": "2026-11-17T23:59:59Z",
+      "age_hours": 0.02,
       "max_age_hours": 60,
       "status": "FRESH"
     },
@@ -65,34 +65,34 @@
     ]
   },
   "crypto_market": {
-    "global_market_cap_usd": 2232564738970.3813,
-    "global_volume_24h_usd": 79969966626.55824,
-    "btc_dominance_percent": 58.48390702234938,
+    "global_market_cap_usd": 2227201145755.2036,
+    "global_volume_24h_usd": 80532155324.85698,
+    "btc_dominance_percent": 58.44189238729716,
     "fear_greed": {
-      "value": 12.0,
+      "value": 11.0,
       "classification": "Extreme Fear",
       "unit": "/100",
       "source": "Alternative.me Fear & Greed API",
-      "source_updated_at": "2026-11-17T00:00:00Z",
-      "fetched_at": "2026-11-17T23:08:01Z",
+      "source_updated_at": "2026-11-18T00:00:00Z",
+      "fetched_at": "2026-11-18T00:00:22Z",
       "status": "OK",
       "error": null
     },
     "btc": {
       "symbol": "BTC",
-      "price_usdt": 64882.87,
-      "ma20": 74370.13350000001,
-      "ma50": 79451.98679999998,
-      "ma200": 72921.15399999997,
-      "rsi14": 23.709574976737414,
-      "macd": -3797.86204731997,
-      "macd_signal": -2652.78857506393,
-      "adx14": 34.128006814198905,
-      "volume_ratio_20d": 1.2307243183821446,
+      "price_usdt": 64947.35,
+      "ma20": 73550.326,
+      "ma50": 79080.93359999999,
+      "ma200": 72854.73509999998,
+      "rsi14": 23.9751415160717,
+      "macd": -3968.7128973891813,
+      "macd_signal": -2915.9734345442857,
+      "adx14": 36.677509103167544,
+      "volume_ratio_20d": 1.524166486288279,
       "support_20d": 62006.0,
       "resistance_20d": 81971.0,
-      "bollinger_lower": 64571.78086899458,
-      "last_closed_candle_at": "2026-11-16T23:59:59Z",
+      "bollinger_lower": 63482.9738832706,
+      "last_closed_candle_at": "2026-11-17T23:59:59Z",
       "candle_count": 249,
       "trend": "BEARISH",
       "signals": [
@@ -106,26 +106,27 @@
     },
     "eth": {
       "symbol": "ETH",
-      "price_usdt": 1820.67,
-      "ma20": 2140.300999999999,
-      "ma50": 2363.045,
-      "ma200": 2141.9128,
-      "rsi14": 25.52951238512955,
-      "macd": -145.7614696883736,
-      "macd_signal": -110.70759105150798,
-      "adx14": 34.59243370306835,
-      "volume_ratio_20d": 1.1119690268479172,
+      "price_usdt": 1824.88,
+      "ma20": 2113.560999999999,
+      "ma50": 2345.7684000000004,
+      "ma200": 2139.5590500000003,
+      "rsi14": 25.98288281353547,
+      "macd": -149.24022236915357,
+      "macd_signal": -118.4141172461357,
+      "adx14": 36.373931591792754,
+      "volume_ratio_20d": 1.2923906754979122,
       "support_20d": 1711.08,
       "resistance_20d": 2450.0,
-      "bollinger_lower": 1779.505300862662,
-      "last_closed_candle_at": "2026-11-16T23:59:59Z",
+      "bollinger_lower": 1742.6350256654964,
+      "last_closed_candle_at": "2026-11-17T23:59:59Z",
       "candle_count": 249,
       "trend": "BEARISH",
       "signals": [
         "দাম MA20-এর নিচে।",
         "MA20 < MA50; short/mid-term trend দুর্বল।",
         "RSI 30-এর নিচে; oversold, কিন্তু reversal নিশ্চিত নয়।",
-        "MACD signal line-এর নিচে।"
+        "MACD signal line-এর নিচে।",
+        "শেষ দিনের volume 20D average-এর তুলনায় বেশি।"
       ],
       "data_complete": true
     }
@@ -145,11 +146,11 @@
       "BTC MA20 < MA50; short/mid-term trend দুর্বল।"
     ],
     "market_context": {
-      "fear_greed_value": 12.0,
+      "fear_greed_value": 11.0,
       "fear_greed_classification": "Extreme Fear",
-      "btc_dominance_percent": 58.48390702234938,
-      "total_market_cap_usd": 2232564738970.3813,
-      "total_volume_24h_usd": 79969966626.55824
+      "btc_dominance_percent": 58.44189238729716,
+      "total_market_cap_usd": 2227201145755.2036,
+      "total_volume_24h_usd": 80532155324.85698
     },
     "important_note": "এটি সামগ্রিক market-regime guidance; ব্যক্তিগত portfolio holdings-এর coin-by-coin SELL signal নয়।"
   },
