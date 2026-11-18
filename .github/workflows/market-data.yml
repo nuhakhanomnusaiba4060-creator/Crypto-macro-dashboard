@@ -16,7 +16,7 @@ concurrency:
 jobs:
   update-market-data:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
 
     steps:
       - name: Checkout repository
@@ -38,25 +38,29 @@ jobs:
       - name: Run decision engine
         run: python decision_engine.py
 
-      - name: Validate market data JSON
-        run: python -m json.tool data/market_data.json > /dev/null
+      - name: Run advanced intelligence engine
+        run: python advanced_engine.py
 
-      - name: Validate macro data JSON
-        run: python -m json.tool data/macro_data.json > /dev/null
-
-      - name: Validate decision data JSON
-        run: python -m json.tool data/decision_data.json > /dev/null
+      - name: Validate all JSON files
+        run: |
+          python -m json.tool data/market_data.json > /dev/null
+          python -m json.tool data/macro_data.json > /dev/null
+          python -m json.tool data/decision_data.json > /dev/null
+          python -m json.tool data/advanced_data.json > /dev/null
 
       - name: Commit updated data
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          git add data/market_data.json data/macro_data.json data/decision_data.json
+          git add data/market_data.json
+          git add data/macro_data.json
+          git add data/decision_data.json
+          git add data/advanced_data.json
 
           if git diff --cached --quiet; then
             echo "No data changes to commit."
           else
-            git commit -m "Update crypto market macro and decision data"
+            git commit -m "Update crypto macro and advanced market data"
             git push
           fi
