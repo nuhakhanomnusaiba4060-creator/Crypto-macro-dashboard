@@ -41,12 +41,16 @@ jobs:
       - name: Run advanced intelligence engine
         run: python advanced_engine.py
 
+      - name: Run market zone analysis engine
+        run: python market_zone_engine.py
+
       - name: Validate all JSON files
         run: |
           python -m json.tool data/market_data.json > /dev/null
           python -m json.tool data/macro_data.json > /dev/null
           python -m json.tool data/decision_data.json > /dev/null
           python -m json.tool data/advanced_data.json > /dev/null
+          python -m json.tool data/market_zone_data.json > /dev/null
 
       - name: Commit updated data
         run: |
@@ -57,10 +61,11 @@ jobs:
           git add data/macro_data.json
           git add data/decision_data.json
           git add data/advanced_data.json
+          git add data/market_zone_data.json
 
           if git diff --cached --quiet; then
             echo "No data changes to commit."
           else
-            git commit -m "Update crypto macro and advanced market data"
+            git commit -m "Update crypto macro and market zone data"
             git push
           fi
