@@ -82,7 +82,7 @@ footer{text-align:center;padding:18px;border-top:1px solid var(--line);font-size
 <div class="grid three">
 <div class="card"><div class="label">CURRENT CYCLE STAGE</div><div class="value" id="cycleStage">যাচাই প্রয়োজন</div><div class="action" id="cycleAction">করণীয়: নিশ্চিত ডেটার অপেক্ষা।</div></div>
 <div class="card"><div class="label">WEEKLY MARKET OUTLOOK</div><div class="report" id="weeklyOutlook">যাচাইকৃত সাপ্তাহিক আউটলুক নেই।</div></div>
-<div class="card"><div class="label">NEXT BTC HALVING</div><div class="value" id="halvingCountdown">অনুপলব্ধ</div><div class="note">ব্লক উচ্চতা API যুক্ত হয়নি।</div></div>
+<div class="card"><div class="label">NEXT BTC HALVING</div><div class="value" id="halvingCountdown">অনুপলব্ধ</div><div class="note">Mempool.space block height · আনুমানিক সময়; প্রকৃত Halving block height নির্ভর।</div></div>
 </div>
 </section>
 
@@ -135,7 +135,8 @@ footer{text-align:center;padding:18px;border-top:1px solid var(--line);font-size
 <section class="section" id="onchain">
 <div class="head"><h2>৬. অন-চেইন ও ডিপ মেট্রিক্স</h2><span class="sub">যাচাইকৃত ডেটা ছাড়া অনুমান নয়</span></div>
 <div class="grid three">
-<div class="card"><div class="label">MVRV Z-SCORE</div><div class="value" id="mvrv">অনুপলব্ধ</div></div>
+<div class="card"><div class="label">MVRV Z-SCORE</div><div class="value" id="mvrv">অনুপলব্ধ</div><div class="note">Z-Score API অনুপলব্ধ</div></div>
+<div class="card"><div class="label">BITCOIN MVRV RATIO</div><div class="value" id="mvrvRatio">অনুপলব্ধ</div><div class="note">Coin Metrics Community API · Ratio, Z-Score নয়</div></div>
 <div class="card"><div class="label">STH SOPR</div><div class="value" id="sopr">অনুপলব্ধ</div></div>
 <div class="card"><div class="label">EXCHANGE NETFLOW</div><div class="value" id="netflow">অনুপলব্ধ</div></div>
 <div class="card"><div class="label">STABLECOIN SUPPLY</div><div class="value" id="stablecoin">অনুপলব্ধ</div></div>
@@ -145,15 +146,15 @@ footer{text-align:center;padding:18px;border-top:1px solid var(--line);font-size
 <div class="card"><div class="label">MINING DIFFICULTY</div><div class="value" id="difficulty">অনুপলব্ধ</div></div>
 <div class="card"><div class="label">WHALE ACTIVITY</div><div class="value" id="whales">অনুপলব্ধ</div></div>
 </div>
-<div class="notice">এই মেট্রিকগুলোর যাচাইকৃত Provider এখনো যুক্ত নেই। তাই এগুলোকে শূন্য হিসেবে দেখানো হচ্ছে না।</div>
+<div class="notice">MVRV Ratio, Hashrate ও Mining Difficulty পাওয়া গেলে দেখানো হবে। MVRV Z-Score, SOPR, Exchange Netflow, Stablecoin Supply, Liquidation Heatmap ও Whale Activity-এর ডেটা অনুপলব্ধ হলে অনুমান করা হবে না।</div>
 </section>
 
 <section class="section" id="movement">
 <div class="head"><h2>৭. মার্কেট মুভমেন্ট</h2><span class="sub">Derivatives ও Spot Market</span></div>
 <div class="grid three">
 <div class="card"><div class="label">LONG / SHORT RATIO</div><div class="value" id="longShort">অনুপলব্ধ</div><div class="action" id="longShortAction">ডেটা সোর্স নেই।</div></div>
-<div class="card"><div class="label">TAKER BUY / SELL RATIO</div><div class="value" id="takerRatio">অনুপলব্ধ</div><div class="action" id="takerAction">ডেটা সোর্স নেই।</div></div>
-<div class="card"><div class="label">SPOT ORDER BOOK IMBALANCE</div><div class="value" id="orderImbalance">অনুপলব্ধ</div><div class="action" id="orderAction">Spot order book API যুক্ত হয়নি।</div></div>
+<div class="card"><div class="label">SPOT TAKER BUY / SELL RATIO (15m)</div><div class="value" id="takerRatio">অনুপলব্ধ</div><div class="action" id="takerAction">ডেটা সোর্স নেই।</div></div>
+<div class="card"><div class="label">SPOT ORDER BOOK IMBALANCE (BTC / ETH)</div><div class="value" id="orderImbalance">অনুপলব্ধ</div><div class="action" id="orderAction">Spot order book API যুক্ত হয়নি।</div></div>
 <div class="card"><div class="label">BINANCE SPOT ADVANCING PAIRS</div><div class="value" id="advancing">—</div></div>
 <div class="card"><div class="label">BINANCE SPOT DECLINING PAIRS</div><div class="value" id="declining">—</div></div>
 <div class="card"><div class="label">ADVANCE / DECLINE RATIO</div><div class="value" id="advanceRatio">—</div></div>
@@ -377,39 +378,94 @@ function renderMacro(){
 function renderAdvanced(){
  const a=DATA.advanced||{};
  const on=a.on_chain||{};
- const der=a.derivatives?.BTCUSDT||{};
+ const derivatives=a.derivatives||{};
  const spot=a.spot_market_activity||{};
  const breadth=spot.breadth||{};
+ const order=a.spot_order_book||{};
+ const taker=a.spot_taker_activity||{};
+ const halving=a.halving||{};
 
- text("etfFlow",a.etf_flows?.value==null?"অনুপলব্ধ":num(a.etf_flows.value));
- text("mvrv",on.mvrv_z_score?.value==null?"অনুপলব্ধ":num(on.mvrv_z_score.value));
- text("sopr",on.sth_sopr?.value==null?"অনুপলব্ধ":num(on.sth_sopr.value));
- text("netflow",on.exchange_netflow?.value==null?"অনুপলব্ধ":num(on.exchange_netflow.value));
- text("stablecoin",on.stablecoin_supply?.value==null?"অনুপলব্ধ":num(on.stablecoin_supply.value));
- text("liquidation",a.liquidation_heatmap?.value==null?"অনুপলব্ধ":num(a.liquidation_heatmap.value));
- text("altseason",a.altcoin_season_index?.value==null?"অনুপলব্ধ":num(a.altcoin_season_index.value));
- text("hashrate",on.hashrate?.value==null?"অনুপলব্ধ":num(on.hashrate.value));
- text("difficulty",on.mining_difficulty?.value==null?"অনুপলব্ধ":num(on.mining_difficulty.value));
- text("whales",on.whale_activity?.value==null?"অনুপলব্ধ":num(on.whale_activity.value));
+ function metric(item,digits=2){
+  if(!item||item.status!=="OK"||item.value===null||item.value===undefined)return "অনুপলব্ধ";
+  const n=Number(item.value);
+  return Number.isFinite(n)?num(n,digits):"অনুপলব্ধ";
+ }
+ function quote(item){
+  if(!item||item.status!=="OK"||item.value===null||item.value===undefined)return "অনুপলব্ধ";
+  return compact(item.value);
+ }
 
- const funding=der.last_funding_rate;
- const oi=der.open_interest_contracts;
- text("fundingRate",funding?.value==null?"অনুপলব্ধ":percent(Number(funding.value)*100));
- text("openInterest",oi?.value==null?"অনুপলব্ধ":num(oi.value));
- text("fundingAction",funding?.value==null?"Binance Futures API unavailable।":"Funding rate derivatives sentiment; Spot signal নয়।");
- text("oiAction",oi?.value==null?"Open Interest ডেটা unavailable।":"OI-কে price ও volume-এর সঙ্গে বিশ্লেষণ করুন।");
- status("fundingStatus",funding?.value==null?"অনুপলব্ধ":"পাওয়া গেছে",funding?.value==null?"warn":"ok");
- status("oiStatus",oi?.value==null?"অনুপলব্ধ":"পাওয়া গেছে",oi?.value==null?"warn":"ok");
+ // ETF flow and on-chain metrics
+ text("etfFlow",metric(a.etf_flows));
+ text("mvrv",metric(on.mvrv_z_score));
+ text("mvrvRatio",metric(on.mvrv_ratio,3));
+ text("sopr",metric(on.sth_sopr,3));
+ text("netflow",metric(on.exchange_netflow));
+ text("stablecoin",metric(on.stablecoin_supply));
+ text("liquidation",metric(a.liquidation_heatmap));
+ text("altseason",metric(a.altcoin_season_index));
+ text("whales",metric(on.whale_activity));
 
+ // Bitcoin hashrate: H/s to EH/s
+ if(on.hashrate?.status==="OK"&&Number.isFinite(Number(on.hashrate.value))){
+  text("hashrate",num(Number(on.hashrate.value)/1e18,2)+" EH/s");
+ }else{text("hashrate","অনুপলব্ধ");}
+
+ // Mining difficulty: raw difficulty / 1 trillion
+ if(on.mining_difficulty?.status==="OK"&&Number.isFinite(Number(on.mining_difficulty.value))){
+  text("difficulty",num(Number(on.mining_difficulty.value)/1e12,2)+" T");
+ }else{text("difficulty","অনুপলব্ধ");}
+
+ // Halving countdown from current block height API
+ if(halving.status==="OK"&&halving.blocks_remaining!=null){
+  text("halvingCountdown",num(halving.blocks_remaining,0)+" Blocks বাকি · প্রায় "+num(halving.estimated_days_remaining,0)+" দিন");
+ }else{text("halvingCountdown","অনুপলব্ধ");}
+
+ // Derivatives are shown only when a verified provider returns values
+ const btcDer=derivatives.BTCUSDT||{};
+ const funding=btcDer.last_funding_rate;
+ const oi=btcDer.open_interest_contracts;
+ text("fundingRate",funding?.status==="OK"?percent(Number(funding.value)*100):"অনুপলব্ধ");
+ text("openInterest",metric(oi));
+ text("fundingAction",funding?.status==="OK"?"Funding rate derivatives sentiment; এটি Spot signal নয়।":"Futures Funding Rate ডেটা অনুপলব্ধ।");
+ text("oiAction",oi?.status==="OK"?"Open Interest-কে price ও volume-এর সঙ্গে বিশ্লেষণ করুন।":"Open Interest ডেটা অনুপলব্ধ।");
+ status("fundingStatus",funding?.status==="OK"?"পাওয়া গেছে":"অনুপলব্ধ",funding?.status==="OK"?"ok":"warn");
+ status("oiStatus",oi?.status==="OK"?"পাওয়া গেছে":"অনুপলব্ধ",oi?.status==="OK"?"ok":"warn");
+
+ // Long/Short ratio has no connected verified source
  text("longShort","অনুপলব্ধ");
- text("longShortAction","Long/Short Ratio API যুক্ত হয়নি।");
- text("takerRatio","অনুপলব্ধ");
- text("takerAction","Taker Buy/Sell Ratio API যুক্ত হয়নি।");
- text("orderImbalance","অনুপলব্ধ");
- text("orderAction","Spot Order Book Imbalance API যুক্ত হয়নি।");
- text("advancing",breadth.advancing_pairs==null?"—":num(breadth.advancing_pairs,0));
- text("declining",breadth.declining_pairs==null?"—":num(breadth.declining_pairs,0));
- text("advanceRatio",breadth.advance_decline_ratio==null?"—":num(breadth.advance_decline_ratio,3));
+ text("longShortAction","যাচাইকৃত Long/Short Ratio API সংযুক্ত নেই।");
+
+ // Spot taker buy/sell ratio: 15-minute Binance Spot snapshot
+ const btcTaker=taker.BTCUSDT||{};
+ const ethTaker=taker.ETHUSDT||{};
+ const btcTakerRatio=btcTaker.taker_buy_sell_ratio;
+ const ethTakerRatio=ethTaker.taker_buy_sell_ratio;
+ const btcTR=metric(btcTakerRatio,3);
+ const ethTR=metric(ethTakerRatio,3);
+ text("takerRatio","BTC "+btcTR+" | ETH "+ethTR);
+ text("takerAction",
+  "15m Spot | BTC Buy "+quote(btcTaker.taker_buy_quote_volume)+" / Sell "+quote(btcTaker.taker_sell_quote_volume)+
+  " · ETH Buy "+quote(ethTaker.taker_buy_quote_volume)+" / Sell "+quote(ethTaker.taker_sell_quote_volume)+
+  " · Ratio > 1 মানে ওই interval-এ taker buy volume বেশি; একা BUY signal নয়।"
+ );
+
+ // Spot order book imbalance, BTC and ETH
+ const btcBook=order.BTCUSDT||{};
+ const ethBook=order.ETHUSDT||{};
+ const btcImb=btcBook.imbalance_percent;
+ const ethImb=ethBook.imbalance_percent;
+ text("orderImbalance","BTC "+metric(btcImb,2)+"% | ETH "+metric(ethImb,2)+"%");
+ text("orderAction",
+  "BTC Bid "+quote(btcBook.bid_value_usdt)+" / Ask "+quote(btcBook.ask_value_usdt)+
+  " · ETH Bid "+quote(ethBook.bid_value_usdt)+" / Ask "+quote(ethBook.ask_value_usdt)+
+  " · Snapshot order book; imbalance একা price direction নিশ্চিত করে না।"
+ );
+
+ // Binance Spot market breadth
+ text("advancing",breadth.advancing_pairs==null?"অনুপলব্ধ":num(breadth.advancing_pairs,0));
+ text("declining",breadth.declining_pairs==null?"অনুপলব্ধ":num(breadth.declining_pairs,0));
+ text("advanceRatio",breadth.advance_decline_ratio==null?"অনুপলব্ধ":num(breadth.advance_decline_ratio,3));
 }
 
 async function refreshAll(){
