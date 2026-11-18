@@ -2,19 +2,19 @@
   "schema_version": 1,
   "engine": "Crypto Final Decision Engine",
   "engine_version": "1.0.0",
-  "generated_at": "2026-11-18T04:12:40Z",
+  "generated_at": "2026-11-18T05:18:10Z",
   "status": "OK",
   "data_quality": {
     "macro": {
       "name": "macro_data",
-      "timestamp": "2026-11-18T04:12:39Z",
+      "timestamp": "2026-11-18T05:18:10Z",
       "age_hours": 0.0,
       "max_age_hours": 72,
       "status": "FRESH"
     },
     "market": {
       "name": "market_data",
-      "timestamp": "2026-11-18T04:12:18Z",
+      "timestamp": "2026-11-18T05:17:47Z",
       "age_hours": 0.01,
       "max_age_hours": 36,
       "status": "FRESH"
@@ -22,14 +22,14 @@
     "btc_technical": {
       "name": "BTC last closed daily candle",
       "timestamp": "2026-11-17T23:59:59Z",
-      "age_hours": 4.21,
+      "age_hours": 5.3,
       "max_age_hours": 60,
       "status": "FRESH"
     },
     "eth_technical": {
       "name": "ETH last closed daily candle",
       "timestamp": "2026-11-17T23:59:59Z",
-      "age_hours": 4.21,
+      "age_hours": 5.3,
       "max_age_hours": 60,
       "status": "FRESH"
     },
@@ -41,7 +41,7 @@
   },
   "macro_analysis": {
     "decision": "WAIT",
-    "risk_score": 2.0,
+    "risk_score": 1.0,
     "support_score": 1.0,
     "data_quality": "GOOD_WITH_OPTIONAL_GAPS",
     "critical_series_available": 18,
@@ -52,7 +52,7 @@
       "core_pce_yoy_percent": 3.121,
       "vix": 22.91,
       "sp500_daily_change_percent": -1.9186,
-      "nasdaq_daily_change_percent": -2.4925,
+      "nasdaq_daily_change_percent": -0.74,
       "yield_10y_daily_change_pp": -0.03,
       "net_liquidity_trend": "CONTRACTING"
     },
@@ -60,21 +60,20 @@
       "CPI YoY উচ্চ; inflation pressure রয়েছে।",
       "Core PCE YoY 3% বা তার বেশি।",
       "VIX 20-এর ওপরে; equity volatility elevated।",
-      "S&P 500 ও Nasdaq উভয়ই সর্বশেষ session-এ 1.5% বা বেশি কমেছে।",
       "US Net Liquidity proxy-এর trend CONTRACTING।"
     ]
   },
   "crypto_market": {
-    "global_market_cap_usd": 2211205306546.275,
-    "global_volume_24h_usd": 77938967117.9718,
-    "btc_dominance_percent": 58.39316434882398,
+    "global_market_cap_usd": 2211872902907.3525,
+    "global_volume_24h_usd": 77172297289.98941,
+    "btc_dominance_percent": 58.3943195886087,
     "fear_greed": {
       "value": 11.0,
       "classification": "Extreme Fear",
       "unit": "/100",
       "source": "Alternative.me Fear & Greed API",
       "source_updated_at": "2026-11-18T00:00:00Z",
-      "fetched_at": "2026-11-18T04:12:18Z",
+      "fetched_at": "2026-11-18T05:17:47Z",
       "status": "OK",
       "error": null
     },
@@ -148,9 +147,9 @@
     "market_context": {
       "fear_greed_value": 11.0,
       "fear_greed_classification": "Extreme Fear",
-      "btc_dominance_percent": 58.39316434882398,
-      "total_market_cap_usd": 2211205306546.275,
-      "total_volume_24h_usd": 77938967117.9718
+      "btc_dominance_percent": 58.3943195886087,
+      "total_market_cap_usd": 2211872902907.3525,
+      "total_volume_24h_usd": 77172297289.98941
     },
     "important_note": "এটি সামগ্রিক market-regime guidance; ব্যক্তিগত portfolio holdings-এর coin-by-coin SELL signal নয়।"
   },
