@@ -2,28 +2,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-"""
-CRYPTO MARKET ZONE ENGINE
-Version: 1.0.0
-
-Inputs:
-    data/market_data.json
-    data/macro_data.json
-    data/advanced_data.json
-
-Output:
-    data/market_zone_data.json
-
-Spot investor only.
-No futures or margin signals.
-Missing data is never fabricated.
-"""
+"""Conservative BTC market-zone classifier for spot investors."""
 
 import json
 import math
 from pathlib import Path
 from datetime import datetime, timezone
-
 
 BASE_DIR = Path(__file__).resolve().parent
 DATA_DIR = BASE_DIR / "data"
@@ -70,36 +54,43 @@ def number(value):
 
 def get(obj, *keys):
     current = obj
+
     for key in keys:
         if not isinstance(current, dict):
             return None
         current = current.get(key)
+
     return number(current)
 
 
 def metric(metrics, key):
-    item = metrics.get(key, {})
+    item = metrics.get(key)
+
     if not isinstance(item, dict):
         return None
+
     if item.get("status") != "OK":
         return None
+
     return number(item.get("value"))
 
 
 def classify(market, macro, advanced):
 
-    # -------------------------------------------------
-    # INPUT DATA
-    # -------------------------------------------------
+    # BTC market data
+    btc = market.get("technical", {}).get("BTC", {})
 
- # Current market_data.json schema
- btc = market.get("technical", {}).get("BTC", {})
+    # Backward compatibility
+    if not isinstance(btc, dict) or not btc:
+        btc = market.get("btc_technical", {})
 
- # Backward compatibility
- if not btc:
-    btc = market.get("btc_technical", {})
+    if not isinstance(btc, dict):
+        btc = {}
 
-indicators = btc.get("indicators", {})
+    indicators = btc.get("indicators", {})
+
+    if not isinstance(indicators, dict):
+        indicators = {}
 
     price = get(btc, "price_usdt")
     ma20 = get(indicators, "ma20")
@@ -109,60 +100,93 @@ indicators = btc.get("indicators", {})
     macd = get(indicators, "macd")
     macd_signal = get(indicators, "macd_signal")
     volume_ratio = get(indicators, "volume_ratio_20d")
+    support = get(indicators, "support_20d")
+    resistance = get(indicators, "resistance_20d")
 
-    fg = get(market, "fear_greed", "value")
-    btc_dom = get(
-        market, "global_market", "btc_dominance_pct"
+    fear_greed = get(market, "fear_greed", "value")
+
+    btc_dominance = get(
+        market,
+        "global_market",
+        "btc_dominance_pct"
     )
 
+    # Macro data
     macro_metrics = macro.get("metrics", {})
+
+    if not isinstance(macro_metrics, dict):
+        macro_metrics = {}
 
     vix = metric(macro_metrics, "vix")
     usd_broad = metric(macro_metrics, "usd_broad_index")
     yield_10y = metric(macro_metrics, "yield_10y")
 
-    advanced_onchain = advanced.get("on_chain", {})
-    mvrv = get(advanced_onchain, "mvrv_ratio")
+    # On-chain data
+    on_chain = advanced.get("on_chain", {})
 
-    breadth = (
-        advanced.get("spot_market_activity", {})
-        .get("breadth", {})
-    )
+    if not isinstance(on_chain, dict):
+        on_chain = {}
 
-    advancing = number(
-        breadth.get("advancing_pairs")
-    ) if isinstance(breadth, dict) else None
+    mvrv = get(on_chain, "mvrv_ratio")
 
-    declining = number(
-        breadth.get("declining_pairs")
-    ) if isinstance(breadth, dict) else None
+    # Spot market breadth
+    activity = advanced.get("spot_market_activity", {})
+
+    if not isinstance(activity, dict):
+        activity = {}
+
+    breadth = activity.get("breadth", {})
+
+    if (
+        not isinstance(breadth, dict)
+        or breadth.get("status") not in (None, "OK")
+    ):
+        breadth = {}
 
     breadth_ratio = number(
         breadth.get("advance_decline_ratio")
-    ) if isinstance(breadth, dict) else None
+    )
 
-    # -------------------------------------------------
-    # DATA QUALITY GATE
-    # -------------------------------------------------
-
+    # Required data validation
     required = {
         "BTC Price": price,
         "MA20": ma20,
         "MA50": ma50,
         "MA200": ma200,
-        "RSI": rsi,
+        "RSI14": rsi,
         "MACD": macd,
         "MACD Signal": macd_signal,
-        "Fear & Greed": fg,
-        "BTC Dominance": btc_dom,
+        "Fear & Greed": fear_greed,
+        "BTC Dominance": btc_dominance,
         "VIX": vix,
         "US 10Y Yield": yield_10y,
     }
 
     missing = [
-        name for name, value in required.items()
+        label
+        for label, value in required.items()
         if value is None
     ]
+
+    verified = {
+        "btc_price": price,
+        "ma20": ma20,
+        "ma50": ma50,
+        "ma200": ma200,
+        "rsi14": rsi,
+        "macd": macd,
+        "macd_signal": macd_signal,
+        "fear_greed": fear_greed,
+        "btc_dominance": btc_dominance,
+        "vix": vix,
+        "usd_broad_index": usd_broad,
+        "us_10y_yield": yield_10y,
+        "mvrv_ratio": mvrv,
+        "market_breadth_ratio": breadth_ratio,
+        "volume_ratio_20d": volume_ratio,
+        "support_20d": support,
+        "resistance_20d": resistance,
+    }
 
     if missing:
         return {
@@ -175,17 +199,18 @@ indicators = btc.get("indicators", {})
             "risk_level": "UNKNOWN",
             "next_zone": "UNKNOWN",
             "reason": [
-                "Market Zone নির্ধারণের জন্য প্রয়োজনীয় ডেটা অসম্পূর্ণ।"
+                "প্রয়োজনীয় verified ইনপুট পাওয়া যায়নি।"
             ],
             "missing_data": missing,
-            "verified_inputs": required,
-            "method": "Conservative multi-factor rule engine"
+            "verified_inputs": verified,
+            "data_limitations": [
+                "প্রয়োজনীয় ইনপুট অনুপস্থিত থাকায় "
+                "Market Zone নির্ধারণ করা হয়নি।"
+            ],
+            "method": "Conservative multi-factor rule engine",
         }
 
-    # -------------------------------------------------
-    # TECHNICAL STRUCTURE
-    # -------------------------------------------------
-
+    # Technical structure
     bullish_stack = ma20 > ma50 > ma200
     bearish_stack = ma20 < ma50 < ma200
 
@@ -199,15 +224,11 @@ indicators = btc.get("indicators", {})
     oversold = rsi < 30
     overbought = rsi >= 70
 
-    support = get(indicators, "support_20d")
     support_broken = (
         support is not None and price < support
     )
 
-    # -------------------------------------------------
-    # MARKET BREADTH
-    # -------------------------------------------------
-
+    # Market breadth
     breadth_bullish = (
         breadth_ratio is not None
         and breadth_ratio >= 1.20
@@ -218,10 +239,7 @@ indicators = btc.get("indicators", {})
         and breadth_ratio < 0.80
     )
 
-    # -------------------------------------------------
-    # MACRO RISK
-    # -------------------------------------------------
-
+    # Macro risk
     macro_risk = 0
 
     if vix >= 25:
@@ -229,16 +247,13 @@ indicators = btc.get("indicators", {})
     elif vix >= 20:
         macro_risk += 1
 
-    if usd_broad >= 125:
+    if usd_broad is not None and usd_broad >= 125:
         macro_risk += 1
 
     if yield_10y >= 5:
         macro_risk += 1
 
-    # -------------------------------------------------
-    # SCORING
-    # -------------------------------------------------
-
+    # Scoring
     bull_score = 0
     bear_score = 0
     accumulation_score = 0
@@ -250,20 +265,17 @@ indicators = btc.get("indicators", {})
     if bearish_stack:
         bear_score += 3
 
-    if price_above_20:
-        bull_score += 1
-    else:
-        bear_score += 1
+    bull_score += (
+        int(price_above_20)
+        + int(price_above_50)
+        + 2 * int(price_above_200)
+    )
 
-    if price_above_50:
-        bull_score += 1
-    else:
-        bear_score += 1
-
-    if price_above_200:
-        bull_score += 2
-    else:
-        bear_score += 2
+    bear_score += (
+        int(not price_above_20)
+        + int(not price_above_50)
+        + 2 * int(not price_above_200)
+    )
 
     if macd_bullish:
         bull_score += 1
@@ -272,14 +284,13 @@ indicators = btc.get("indicators", {})
 
     if breadth_bullish:
         bull_score += 1
-
-    if breadth_bearish:
+    elif breadth_bearish:
         bear_score += 1
 
-    if fg >= 60:
+    if fear_greed >= 60:
         bull_score += 1
 
-    if fg <= 25:
+    if fear_greed <= 25:
         accumulation_score += 2
         bear_score += 1
 
@@ -293,13 +304,13 @@ indicators = btc.get("indicators", {})
     if overbought:
         distribution_score += 2
 
-    if fg >= 75:
+    if fear_greed >= 75:
         distribution_score += 2
 
-    if btc_dom >= 60 and bear_score > bull_score:
+    if btc_dominance >= 60 and bear_score > bull_score:
         bear_score += 1
 
-    if btc_dom < 50 and bull_score > bear_score:
+    if btc_dominance < 50 and bull_score > bear_score:
         bull_score += 1
 
     if mvrv is not None:
@@ -308,79 +319,79 @@ indicators = btc.get("indicators", {})
         elif mvrv > 3:
             distribution_score += 2
 
-    # -------------------------------------------------
-    # ZONE CLASSIFICATION
-    # -------------------------------------------------
-
+    # Zone classification
     zone = "INSUFFICIENT DATA"
     zone_code = "INSUFFICIENT_DATA"
+
     action = "WAIT"
     risk = "HIGH"
     position = "UNKNOWN"
     next_zone = "UNKNOWN"
+
     reasons = []
 
     if (
         bearish_stack
         and support_broken
         and oversold
-        and fg <= 20
+        and fear_greed <= 20
     ):
         zone = "Capitulation Zone"
         zone_code = "CAPITULATION"
-        action = "WAIT"
-        risk = "HIGH"
         position = "LATE"
         next_zone = "Accumulation Zone"
+
         reasons.append(
-            "Bearish MA structure, support breakdown, "
-            "oversold RSI এবং Extreme Fear একসঙ্গে রয়েছে।"
+            "MA structure bearish, গুরুত্বপূর্ণ support ভাঙা, "
+            "RSI oversold এবং Extreme Fear একসঙ্গে রয়েছে।"
         )
 
-    elif (
-        bearish_stack
-        and bear_score >= 6
-    ):
+    elif bearish_stack and bear_score >= 6:
         zone = "Bear Market Zone"
         zone_code = "BEAR_MARKET"
-        action = "WAIT"
-        risk = "HIGH"
         position = "LATE"
-        next_zone = "Capitulation / Accumulation"
+        next_zone = "Capitulation / Accumulation Zone"
+
         reasons.append(
-            "দাম ও MA structure দীর্ঘমেয়াদি bearish।"
+            "MA20 < MA50 < MA200; "
+            "দীর্ঘমেয়াদি bearish structure নিশ্চিত হচ্ছে।"
         )
 
     elif (
         bullish_stack
         and bull_score >= 7
-        and fg < 75
-        and macro_risk <= 2
+        and fear_greed < 75
     ):
         zone = "Bull Market Zone"
         zone_code = "BULL_MARKET"
+
         action = "HOLD"
         risk = "MEDIUM"
         position = "MID"
         next_zone = "Distribution Zone"
+
         reasons.append(
-            "BTC MA20 > MA50 > MA200 এবং bullish confirmation রয়েছে।"
+            "MA20 > MA50 > MA200 এবং "
+            "একাধিক bullish confirmation রয়েছে।"
         )
 
     elif (
-        price > ma50
-        and price > ma200
+        price_above_50
+        and price_above_200
         and ma20 > ma50
         and bull_score >= 5
     ):
         zone = "Early Bull Zone"
         zone_code = "EARLY_BULL"
+
         action = "DCA"
         risk = "MEDIUM"
         position = "EARLY"
         next_zone = "Bull Market Zone"
+
         reasons.append(
-            "দাম MA50 ও MA200-এর ওপরে এবং short-term recovery শক্তিশালী।"
+            "দাম MA50 ও MA200-এর ওপরে; "
+            "short-term trend recovery নিশ্চিত করছে।"
         )
 
     elif (
@@ -389,40 +400,64 @@ indicators = btc.get("indicators", {})
     ):
         zone = "Distribution Zone"
         zone_code = "DISTRIBUTION"
+
         action = "SELL"
         risk = "HIGH"
         position = "LATE"
         next_zone = "Bear Market Zone"
+
         reasons.append(
-            "উচ্চ sentiment / overbought condition এবং distribution risk রয়েছে।"
+            "Overbought ও অতিরিক্ত bullish sentiment "
+            "distribution risk বাড়াচ্ছে।"
         )
 
     elif (
-        bear_score >= 4
-        and accumulation_score >= 3
-        and fg <= 30
+        fear_greed <= 25
+        and oversold
         and not support_broken
+        and accumulation_score >= 3
     ):
         zone = "Accumulation Zone"
         zone_code = "ACCUMULATION"
+
         action = "DCA"
         risk = "MEDIUM"
         position = "EARLY"
         next_zone = "Early Bull Zone"
+
         reasons.append(
-            "Extreme fear, দুর্বল trend এবং support এখনো অক্ষত।"
+            "Extreme Fear ও oversold condition আছে; "
+            "পর্যবেক্ষিত support এখনো অক্ষত।"
+        )
+
+    elif (
+        ma20 < ma50
+        and price < ma20
+        and price < ma50
+        and bear_score >= 4
+    ):
+        zone = "Bear Market Zone"
+        zone_code = "BEAR_MARKET"
+
+        action = "WAIT"
+        risk = "HIGH"
+        position = "MID"
+        next_zone = "Capitulation / Accumulation Zone"
+
+        reasons.append(
+            "দাম MA20 ও MA50-এর নিচে এবং "
+            "short-term trend bearish; "
+            "পূর্ণ death-cross structure এখনো নেই।"
         )
 
     else:
         reasons.append(
-            "বর্তমান ডেটা কোনো নির্দিষ্ট Market Zone নিশ্চিত করছে না।"
+            "বর্তমান verified signals কোনো "
+            "নির্দিষ্ট Market Zone নিশ্চিত করছে না।"
         )
 
-    # -------------------------------------------------
-    # CONFIDENCE
-    # -------------------------------------------------
-
-    confidence = 45
+    # Confidence
+    confidence = 40
 
     if bullish_stack or bearish_stack:
         confidence += 15
@@ -439,40 +474,47 @@ indicators = btc.get("indicators", {})
     if volume_ratio is not None:
         confidence += 5
 
-    if zone == "INSUFFICIENT DATA":
+    if zone_code == "INSUFFICIENT_DATA":
         confidence = None
         confidence_label = "NOT_AVAILABLE"
-    else:
-        confidence = min(confidence, 80)
 
-        if confidence >= 70:
+    else:
+        confidence = min(confidence, 75)
+
+        if confidence >= 65:
             confidence_label = "MODERATE"
-        elif confidence >= 55:
+        elif confidence >= 50:
             confidence_label = "LOW"
         else:
             confidence_label = "VERY_LOW"
 
-    # -------------------------------------------------
-    # POSITION AND RISK OVERRIDES
-    # -------------------------------------------------
-
+    # Macro risk override
     if macro_risk >= 3:
         risk = "HIGH"
+
         if action == "DCA":
             action = "WAIT"
+
             reasons.append(
-                "Macro risk বেশি; নতুন DCA আপাতত স্থগিত।"
+                "VIX / US Treasury yield-এ macro stress বেশি; "
+                "নতুন DCA আপাতত স্থগিত।"
             )
 
     if overbought and action == "DCA":
         action = "WAIT"
+
         reasons.append(
             "RSI overbought; নতুন DCA ঝুঁকিপূর্ণ।"
         )
 
-    # -------------------------------------------------
-    # RETURN
-    # -------------------------------------------------
+    if support_broken and action in ("DCA", "HOLD"):
+        action = "WAIT"
+        risk = "HIGH"
+
+        reasons.append(
+            "20-day support ভেঙেছে; "
+            "নতুন spot entry আপাতত এড়িয়ে চলুন।"
+        )
 
     return {
         "current_zone": zone,
@@ -485,31 +527,17 @@ indicators = btc.get("indicators", {})
         "next_zone": next_zone,
         "reason": reasons,
         "missing_data": [],
-        "verified_inputs": {
-            "btc_price": price,
-            "ma20": ma20,
-            "ma50": ma50,
-            "ma200": ma200,
-            "rsi14": rsi,
-            "macd": macd,
-            "macd_signal": macd_signal,
-            "fear_greed": fg,
-            "btc_dominance": btc_dom,
-            "vix": vix,
-            "usd_broad_index": usd_broad,
-            "us_10y_yield": yield_10y,
-            "mvrv_ratio": mvrv,
-            "market_breadth_ratio": breadth_ratio,
-            "volume_ratio_20d": volume_ratio
-        },
+        "verified_inputs": verified,
+        "macro_risk_score": macro_risk,
         "data_limitations": [
-            "Weekly BTC trend এখনো আলাদা করে যাচাই করা হয়নি।",
+            "BTC weekly trend আলাদা timeframe data দিয়ে এখনো যাচাই করা হয়নি।",
             "USD Broad Index হলো DXY নয়।",
-            "MVRV Ratio পাওয়া না গেলে সেটি বাদ থাকে।",
-            "ETF flow, SOPR ও Exchange Netflow অনুপলব্ধ হলে অনুমান করা হয় না।",
-            "পরবর্তী Zone সম্ভাব্য পর্যায়, নিশ্চিত ভবিষ্যদ্বাণী নয়।"
+            "MVRV Ratio পাওয়া গেছে; এটি MVRV Z-Score নয়।",
+            "ETF flow, SOPR, Exchange Netflow ও whale data "
+            "অনুপলব্ধ থাকলে সেগুলো score-এ ব্যবহার করা হয় না।",
+            "পরবর্তী Zone conditional outlook; নিশ্চিত ভবিষ্যদ্বাণী নয়।",
         ],
-        "method": "Conservative multi-factor rule engine"
+        "method": "Conservative multi-factor rule engine",
     }
 
 
@@ -526,14 +554,14 @@ def main():
     output = {
         "schema_version": 1,
         "engine": "Crypto Market Zone Engine",
-        "engine_version": "1.0.0",
+        "engine_version": "1.1.0",
         "generated_at": now(),
         "status": (
             "OK"
             if result["zone_code"] != "INSUFFICIENT_DATA"
             else "DATA_WARNING"
         ),
-        "market_zone": result
+        "market_zone": result,
     }
 
     temporary = OUTPUT_FILE.with_suffix(".tmp")
@@ -543,9 +571,9 @@ def main():
             output,
             ensure_ascii=False,
             indent=2,
-            allow_nan=False
+            allow_nan=False,
         ) + "\n",
-        encoding="utf-8"
+        encoding="utf-8",
     )
 
     temporary.replace(OUTPUT_FILE)
@@ -553,6 +581,7 @@ def main():
     print("Market Zone Engine completed.")
     print("Zone:", result["current_zone"])
     print("Action:", result["spot_action"])
+    print("Missing data:", result["missing_data"])
     print("Output:", OUTPUT_FILE)
 
 
