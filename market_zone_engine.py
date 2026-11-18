@@ -92,8 +92,14 @@ def classify(market, macro, advanced):
     # INPUT DATA
     # -------------------------------------------------
 
+ # Current market_data.json schema
+ btc = market.get("technical", {}).get("BTC", {})
+
+ # Backward compatibility
+ if not btc:
     btc = market.get("btc_technical", {})
-    indicators = btc.get("indicators", {})
+
+indicators = btc.get("indicators", {})
 
     price = get(btc, "price_usdt")
     ma20 = get(indicators, "ma20")
