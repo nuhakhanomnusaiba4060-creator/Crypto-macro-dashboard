@@ -3,33 +3,41 @@
 # -*- coding: utf-8 -*-
 
 """
-ADVANCED CRYPTO INTELLIGENCE ENGINE
-Version: 1.0.0
+FREE ADVANCED CRYPTO INTELLIGENCE ENGINE
 
-Output:
-data/advanced_data.json
+Free sources:
+1. Binance Spot Public API
+2. Mempool.space Bitcoin API
+3. Coin Metrics Community API
 
-Sources:
-- Binance Spot public API
-- Binance USD-M Futures public API
-
-Missing ETF and on-chain data are explicitly marked unavailable.
-No synthetic values are generated.
+No paid API.
+No API key required.
+No synthetic values.
 """
 
 import json
 import math
+import time
+
 from datetime import datetime, timezone
 from pathlib import Path
 from urllib.request import Request, urlopen
+from urllib.error import HTTPError, URLError
 
 
 BASE_DIR = Path(__file__).resolve().parent
 DATA_DIR = BASE_DIR / "data"
 OUTPUT_FILE = DATA_DIR / "advanced_data.json"
 
-TIMEOUT = 15
-USER_AGENT = "CryptoMacroDashboard-Advanced/1.0"
+TIMEOUT = 20
+
+BINANCE = "https://data-api.binance.vision"
+MEMPOOL = "https://mempool.space/api"
+COINMETRICS = "https://community-api.coinmetrics.io/v4"
+
+USER_AGENT = "CryptoMacroDashboard-FreeEngine/2.0"
+
+HALVING_INTERVAL = 210000
 
 
 def utc_now():
@@ -42,168 +50,481 @@ def utc_now():
 
 
 def fetch_json(url):
+
     request = Request(
         url,
-        headers={"User-Agent": USER_AGENT}
+        headers={
+            "User-Agent": USER_AGENT,
+            "Accept": "application/json"
+        }
     )
 
-    with urlopen(request, timeout=TIMEOUT) as response:
-        return json.loads(response.read().decode("utf-8"))
+    last_error = None
+
+    for attempt in range(3):
+
+        try:
+
+            with urlopen(
+                request,
+                timeout=TIMEOUT
+            ) as response:
+
+                return json.loads(
+                    response.read().decode("utf-8")
+                )
+
+        except (
+            HTTPError,
+            URLError,
+            TimeoutError,
+            OSError,
+            json.JSONDecodeError
+        ) as error:
+
+            last_error = str(error)
+
+            if attempt < 2:
+                time.sleep(attempt + 1)
+
+    raise RuntimeError(last_error or "API request failed")
 
 
-def unavailable(reason):
-    return {
-        "value": None,
-        "status": "UNAVAILABLE",
-        "reason": reason
-    }
+def fetch_text(url):
+
+    request = Request(
+        url,
+        headers={
+            "User-Agent": USER_AGENT
+        }
+    )
+
+    with urlopen(
+        request,
+        timeout=TIMEOUT
+    ) as response:
+
+        return response.read().decode("utf-8").strip()
+
+
+def finite(value):
+
+    try:
+
+        number = float(value)
+
+        if math.isfinite(number):
+            return number
+
+    except (TypeError, ValueError, OverflowError):
+        pass
+
+    return None
 
 
 def metric(value, unit, source):
-    try:
-        value = float(value)
 
-        if not math.isfinite(value):
-            raise ValueError("Non-finite value")
+    number = finite(value)
 
-        return {
-            "value": value,
-            "unit": unit,
-            "status": "OK",
-            "source": source,
-            "fetched_at": utc_now()
-        }
+    if number is None:
+        return unavailable("Valid data unavailable")
 
-    except (TypeError, ValueError):
-        return unavailable("Valid numeric data unavailable")
+    return {
+        "value": number,
+        "unit": unit,
+        "status": "OK",
+        "source": source,
+        "fetched_at": utc_now()
+    }
+
+
+def unavailable(reason):
+
+    return {
+        "value": None,
+        "status": "UNAVAILABLE",
+        "reason": str(reason)[:250],
+        "fetched_at": utc_now()
+    }
 
 
 def safe_fetch(url):
+
     try:
         return fetch_json(url), None
+
     except Exception as error:
         return None, str(error)[:250]
 
 
-def get_derivatives(symbol):
-    base = "https://fapi.binance.com"
-    result = {"symbol": symbol}
+# ============================================================
+# BINANCE SPOT ORDER BOOK
+# ============================================================
 
-    # Funding, mark price and index price
-    data, error = safe_fetch(
-        f"{base}/fapi/v1/premiumIndex?symbol={symbol}"
+def get_order_book(symbol):
+
+    url = (
+        f"{BINANCE}/api/v3/depth"
+        f"?symbol={symbol}&limit=100"
     )
 
-    if data:
-        result["mark_price"] = metric(
-            data.get("markPrice"),
-            "USDT",
-            "Binance USD-M Futures"
+    data, error = safe_fetch(url)
+
+    if not isinstance(data, dict):
+
+        return {
+            "symbol": symbol,
+            "imbalance_percent": unavailable(error),
+            "bid_value_usdt": unavailable(error),
+            "ask_value_usdt": unavailable(error)
+        }
+
+    try:
+
+        bids = data.get("bids", [])
+        asks = data.get("asks", [])
+
+        bid_value = sum(
+            float(price) * float(quantity)
+            for price, quantity in bids
         )
 
-        result["index_price"] = metric(
-            data.get("indexPrice"),
-            "USDT",
-            "Binance USD-M Futures"
+        ask_value = sum(
+            float(price) * float(quantity)
+            for price, quantity in asks
         )
 
-        result["last_funding_rate"] = metric(
-            float(data.get("lastFundingRate", 0)) * 100,
-            "% per 8h",
-            "Binance USD-M Futures"
-        )
+        total = bid_value + ask_value
 
-        mark = float(data.get("markPrice", 0))
-        index = float(data.get("indexPrice", 0))
+        if total <= 0:
+            raise ValueError("Empty order book")
 
-        basis = ((mark / index) - 1) * 100 if index else None
+        imbalance = (
+            (bid_value - ask_value) / total
+        ) * 100
 
-        result["basis_percent"] = metric(
-            basis,
-            "%",
-            "Binance USD-M Futures"
-        )
+        return {
+            "symbol": symbol,
 
-        result["next_funding_time"] = data.get(
-            "nextFundingTime"
-        )
+            "imbalance_percent": metric(
+                imbalance,
+                "%",
+                "Binance Spot Order Book"
+            ),
 
-    else:
-        reason = "Binance Futures API unavailable: " + str(error)
+            "bid_value_usdt": metric(
+                bid_value,
+                "USDT",
+                "Binance Spot Order Book"
+            ),
 
-        for key in (
-            "mark_price",
-            "index_price",
-            "last_funding_rate",
-            "basis_percent"
-        ):
-            result[key] = unavailable(reason)
+            "ask_value_usdt": metric(
+                ask_value,
+                "USDT",
+                "Binance Spot Order Book"
+            ),
 
-        result["next_funding_time"] = None
+            "last_update_id": data.get("lastUpdateId")
+        }
 
-    # Open Interest
-    oi, oi_error = safe_fetch(
-        f"{base}/fapi/v1/openInterest?symbol={symbol}"
+    except Exception as error:
+
+        reason = str(error)
+
+        return {
+            "symbol": symbol,
+            "imbalance_percent": unavailable(reason),
+            "bid_value_usdt": unavailable(reason),
+            "ask_value_usdt": unavailable(reason)
+        }
+
+
+# ============================================================
+# BINANCE SPOT TAKER BUY / SELL
+# ============================================================
+
+def get_taker_ratio(symbol):
+
+    url = (
+        f"{BINANCE}/api/v3/klines"
+        f"?symbol={symbol}&interval=15m&limit=3"
     )
 
-    if oi:
-        result["open_interest_contracts"] = metric(
-            oi.get("openInterest"),
-            "contracts",
-            "Binance USD-M Futures"
-        )
-    else:
-        result["open_interest_contracts"] = unavailable(
-            "Open Interest unavailable: " + str(oi_error)
+    data, error = safe_fetch(url)
+
+    if not isinstance(data, list) or len(data) < 2:
+
+        return {
+            "symbol": symbol,
+            "interval": "15m",
+            "taker_buy_sell_ratio": unavailable(error),
+            "taker_buy_quote_volume": unavailable(error),
+            "taker_sell_quote_volume": unavailable(error)
+        }
+
+    try:
+
+        # শেষ Candle চলমান হতে পারে।
+        # তাই শেষ সম্পূর্ণ বন্ধ হওয়া Candle নেওয়া হচ্ছে।
+        candle = data[-2]
+
+        total_quote = float(candle[7])
+        taker_buy_quote = float(candle[10])
+
+        taker_sell_quote = (
+            total_quote - taker_buy_quote
         )
 
-    # Recent funding history
-    history, history_error = safe_fetch(
-        f"{base}/fapi/v1/fundingRate?symbol={symbol}&limit=8"
+        if total_quote <= 0 or taker_sell_quote < 0:
+            raise ValueError("Invalid candle volume")
+
+        ratio = (
+            taker_buy_quote / taker_sell_quote
+            if taker_sell_quote > 0
+            else None
+        )
+
+        return {
+            "symbol": symbol,
+            "interval": "15m",
+
+            "candle_close_time": candle[6],
+
+            "taker_buy_sell_ratio": metric(
+                ratio,
+                "ratio",
+                "Binance Spot 15m Kline"
+            ),
+
+            "taker_buy_quote_volume": metric(
+                taker_buy_quote,
+                "USDT",
+                "Binance Spot 15m Kline"
+            ),
+
+            "taker_sell_quote_volume": metric(
+                taker_sell_quote,
+                "USDT",
+                "Binance Spot 15m Kline"
+            )
+        }
+
+    except Exception as error:
+
+        reason = str(error)
+
+        return {
+            "symbol": symbol,
+            "interval": "15m",
+            "taker_buy_sell_ratio": unavailable(reason),
+            "taker_buy_quote_volume": unavailable(reason),
+            "taker_sell_quote_volume": unavailable(reason)
+        }
+
+
+# ============================================================
+# MEMPOOL BITCOIN MINING DATA
+# ============================================================
+
+def get_mining_data():
+
+    url = (
+        f"{MEMPOOL}/v1/mining/hashrate/3d"
     )
 
-    if isinstance(history, list) and history:
-        result["funding_history_percent"] = [
-            float(item["fundingRate"]) * 100
-            for item in history
-            if item.get("fundingRate") is not None
-        ]
-        result["funding_history_status"] = "OK"
-    else:
-        result["funding_history_percent"] = []
-        result["funding_history_status"] = "UNAVAILABLE"
-        result["funding_history_reason"] = str(history_error)
+    data, error = safe_fetch(url)
 
-    result["liquidation_clusters"] = unavailable(
-        "Aggregated liquidation heatmap requires a dedicated provider."
+    if not isinstance(data, dict):
+
+        return {
+            "hashrate": unavailable(error),
+            "difficulty": unavailable(error)
+        }
+
+    return {
+        "hashrate": metric(
+            data.get("currentHashrate"),
+            "H/s",
+            "Mempool.space"
+        ),
+
+        "difficulty": metric(
+            data.get("currentDifficulty"),
+            "difficulty",
+            "Mempool.space"
+        ),
+
+        "estimated_hashrate": metric(
+            data.get("estimatedHashrate"),
+            "H/s",
+            "Mempool.space"
+        )
+    }
+
+
+# ============================================================
+# BITCOIN HALVING COUNTDOWN
+# ============================================================
+
+def get_halving():
+
+    try:
+
+        height = int(
+            fetch_text(
+                f"{MEMPOOL}/blocks/tip/height"
+            )
+        )
+
+        next_halving = (
+            (height // HALVING_INTERVAL) + 1
+        ) * HALVING_INTERVAL
+
+        remaining = max(
+            0,
+            next_halving - height
+        )
+
+        estimated_days = (
+            remaining * 10 / 1440
+        )
+
+        return {
+            "current_block_height": height,
+
+            "next_halving_block": next_halving,
+
+            "blocks_remaining": remaining,
+
+            "estimated_days_remaining": round(
+                estimated_days,
+                2
+            ),
+
+            "estimated_years_remaining": round(
+                estimated_days / 365.25,
+                2
+            ),
+
+            "status": "OK",
+
+            "source": "Mempool.space",
+
+            "note": (
+                "আনুমানিক সময়; প্রকৃত Halving নির্ধারিত "
+                "হবে Block Height অনুযায়ী।"
+            ),
+
+            "fetched_at": utc_now()
+        }
+
+    except Exception as error:
+
+        return {
+            "current_block_height": None,
+            "next_halving_block": None,
+            "blocks_remaining": None,
+            "estimated_days_remaining": None,
+            "status": "UNAVAILABLE",
+            "reason": str(error)[:250]
+        }
+
+
+# ============================================================
+# COIN METRICS COMMUNITY API
+# ============================================================
+
+def get_mvrv():
+
+    url = (
+        f"{COINMETRICS}"
+        "/timeseries/asset-metrics"
+        "?assets=btc"
+        "&metrics=CapMVRVCur"
+        "&frequency=1d"
+        "&page_size=2"
     )
 
-    return result
+    data, error = safe_fetch(url)
 
+    if not isinstance(data, dict):
+
+        return {
+            "mvrv_ratio": unavailable(error),
+            "mvrv_z_score": unavailable(
+                "Community endpoint unavailable"
+            )
+        }
+
+    rows = data.get("data", [])
+
+    if not rows:
+
+        return {
+            "mvrv_ratio": unavailable(
+                "No MVRV observation returned"
+            ),
+
+            "mvrv_z_score": unavailable(
+                "MVRV Z-Score is not supplied by this metric"
+            )
+        }
+
+    latest = rows[-1]
+
+    ratio = metric(
+        latest.get("CapMVRVCur"),
+        "ratio",
+        "Coin Metrics Community API"
+    )
+
+    ratio["observation_date"] = latest.get("time")
+
+    return {
+        "mvrv_ratio": ratio,
+
+        "mvrv_z_score": unavailable(
+            "Coin Metrics CapMVRVCur is MVRV Ratio, not MVRV Z-Score"
+        )
+    }
+
+
+# ============================================================
+# SPOT MARKET BREADTH
+# ============================================================
 
 def get_spot_activity():
+
     url = (
-        "https://data-api.binance.vision"
-        "/api/v3/ticker/24hr"
+        f"{BINANCE}/api/v3/ticker/24hr"
     )
 
     rows, error = safe_fetch(url)
 
     if not isinstance(rows, list):
+
         return {
             "status": "UNAVAILABLE",
             "reason": str(error),
             "volume_leaders_24h": [],
-            "breadth": unavailable(str(error))
+            "breadth": unavailable(error)
         }
 
     valid = []
+
     advancing = 0
     declining = 0
+    unchanged = 0
 
-    excluded = ("UPUSDT", "DOWNUSDT", "BULLUSDT", "BEARUSDT")
+    excluded = (
+        "UPUSDT",
+        "DOWNUSDT",
+        "BULLUSDT",
+        "BEARUSDT"
+    )
 
     for item in rows:
+
         symbol = item.get("symbol", "")
 
         if not symbol.endswith("USDT"):
@@ -213,9 +534,18 @@ def get_spot_activity():
             continue
 
         try:
-            quote_volume = float(item.get("quoteVolume", 0))
-            change = float(item.get("priceChangePercent", 0))
-            trades = int(item.get("count", 0))
+
+            quote_volume = float(
+                item.get("quoteVolume", 0)
+            )
+
+            change = float(
+                item.get("priceChangePercent", 0)
+            )
+
+            trades = int(
+                item.get("count", 0)
+            )
 
             if quote_volume <= 0:
                 continue
@@ -229,8 +559,12 @@ def get_spot_activity():
 
             if change > 0:
                 advancing += 1
+
             elif change < 0:
                 declining += 1
+
+            else:
+                unchanged += 1
 
         except (TypeError, ValueError):
             continue
@@ -240,81 +574,185 @@ def get_spot_activity():
         reverse=True
     )
 
-    total = advancing + declining
-
-    breadth = {
-        "advancing_pairs": advancing,
-        "declining_pairs": declining,
-        "measured_pairs": total,
-        "advance_decline_ratio": (
-            round(advancing / declining, 3)
-            if declining else None
-        ),
-        "status": "OK",
-        "source": "Binance Spot 24h ticker",
-        "fetched_at": utc_now()
-    }
-
     return {
         "status": "OK",
+
         "volume_leaders_24h": valid[:12],
-        "breadth": breadth,
+
+        "breadth": {
+            "advancing_pairs": advancing,
+            "declining_pairs": declining,
+            "unchanged_pairs": unchanged,
+
+            "measured_pairs": (
+                advancing + declining + unchanged
+            ),
+
+            "advance_decline_ratio": (
+                round(advancing / declining, 3)
+                if declining > 0
+                else None
+            ),
+
+            "status": "OK",
+            "source": "Binance Spot 24h ticker",
+            "fetched_at": utc_now()
+        },
+
         "note": (
-            "২৪ ঘণ্টার ভলিউম লিডার; "
-            "এটি ৫ মিনিট বা ১ ঘণ্টার volume spike নয়।"
+            "২৪ ঘণ্টার Spot Market Breadth; "
+            "এটি স্বল্পমেয়াদি volume spike নয়।"
         )
     }
 
 
+# ============================================================
+# MAIN ENGINE
+# ============================================================
+
 def main():
-    DATA_DIR.mkdir(parents=True, exist_ok=True)
+
+    DATA_DIR.mkdir(
+        parents=True,
+        exist_ok=True
+    )
+
+    print("Starting Free Advanced Crypto Engine...")
+
+    print("Fetching BTC and ETH Spot Order Books...")
+
+    order_books = {
+        "BTCUSDT": get_order_book("BTCUSDT"),
+        "ETHUSDT": get_order_book("ETHUSDT")
+    }
+
+    print("Fetching Spot Taker Ratios...")
+
+    taker_ratios = {
+        "BTCUSDT": get_taker_ratio("BTCUSDT"),
+        "ETHUSDT": get_taker_ratio("ETHUSDT")
+    }
+
+    print("Fetching Bitcoin Mining Data...")
+
+    mining = get_mining_data()
+
+    print("Fetching Bitcoin Halving Countdown...")
+
+    halving = get_halving()
+
+    print("Fetching Coin Metrics MVRV...")
+
+    mvrv = get_mvrv()
+
+    print("Fetching Binance Spot Market Breadth...")
+
+    spot_activity = get_spot_activity()
+
+    unavailable_derivative = {
+        "mark_price": unavailable(
+            "Paid or restricted derivatives source not configured"
+        ),
+
+        "index_price": unavailable(
+            "Paid or restricted derivatives source not configured"
+        ),
+
+        "last_funding_rate": unavailable(
+            "No free derivatives connection configured"
+        ),
+
+        "open_interest_contracts": unavailable(
+            "No free derivatives connection configured"
+        ),
+
+        "liquidation_clusters": unavailable(
+            "No free liquidation heatmap provider"
+        )
+    }
 
     result = {
-        "schema_version": 1,
-        "engine": "Advanced Crypto Intelligence",
-        "engine_version": "1.0.0",
+
+        "schema_version": 2,
+
+        "engine": "Free Advanced Crypto Intelligence",
+
+        "engine_version": "2.0.0",
+
         "generated_at": utc_now(),
 
         "data_policy": (
-            "Unavailable data is null. "
-            "Never interpret missing data as zero."
+            "Free public APIs only. "
+            "Unavailable data remains null. "
+            "No synthetic values."
         ),
 
+        "data_sources": [
+            "Binance Spot Public API",
+            "Mempool.space",
+            "Coin Metrics Community API"
+        ],
+
         "etf_flows": unavailable(
-            "Verified ETF flow provider is not configured."
+            "No reliable free ETF flow API configured"
         ),
 
         "on_chain": {
-            "mvrv_z_score": unavailable(
-                "Requires a verified on-chain data provider."
+
+            "mvrv_ratio": mvrv["mvrv_ratio"],
+
+            "mvrv_z_score": mvrv["mvrv_z_score"],
+
+            "sth_sopr": unavailable(
+                "No verified free STH SOPR source configured"
             ),
+
             "nupl": unavailable(
-                "Requires a verified on-chain data provider."
+                "No verified free NUPL source configured"
             ),
+
             "exchange_netflow": unavailable(
-                "Requires a verified exchange-flow provider."
+                "No verified free exchange flow source configured"
             ),
+
+            "stablecoin_supply": unavailable(
+                "No verified free stablecoin supply source configured"
+            ),
+
             "whale_activity": unavailable(
-                "Requires verified entity-labelled wallet data."
-            )
+                "Entity-labelled whale data unavailable"
+            ),
+
+            "hashrate": mining["hashrate"],
+
+            "mining_difficulty": mining["difficulty"],
+
+            "estimated_hashrate": mining["estimated_hashrate"]
+        },
+
+        "halving": halving,
+
+        "spot_market_activity": spot_activity,
+
+        "spot_order_book": order_books,
+
+        "spot_taker_activity": taker_ratios,
+
+        "derivatives": {
+
+            "BTCUSDT": unavailable_derivative,
+
+            "ETHUSDT": unavailable_derivative
         },
 
         "liquidation_heatmap": unavailable(
-            "Requires a dedicated liquidation heatmap provider."
+            "No free verified liquidation heatmap source configured"
         ),
-
-        "derivatives": {
-            "BTCUSDT": get_derivatives("BTCUSDT"),
-            "ETHUSDT": get_derivatives("ETHUSDT")
-        },
-
-        "spot_market_activity": get_spot_activity(),
 
         "portfolio": {
             "status": "LOCAL_ONLY",
             "note": (
-                "Portfolio calculations are performed "
-                "in the browser from user-entered holdings."
+                "Portfolio data is not uploaded to external providers."
             )
         }
     }
@@ -333,7 +771,11 @@ def main():
 
     temporary_file.replace(OUTPUT_FILE)
 
-    print("Advanced data successfully written:", OUTPUT_FILE)
+    print("----------------------------------")
+    print("FREE ADVANCED ENGINE SUCCESS")
+    print("Output:", OUTPUT_FILE)
+    print("Version: 2.0.0")
+    print("----------------------------------")
 
 
 if __name__ == "__main__":
