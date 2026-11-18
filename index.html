@@ -7,449 +7,427 @@
 <meta name="theme-color" content="#080d18">
 <title>Crypto Macro Terminal</title>
 <style>
-:root{
-  --bg:#080d18;--panel:#101827;--panel2:#141f30;--line:#243249;
-  --text:#edf3ff;--muted:#91a1b8;--green:#22c58b;--red:#ff647c;
-  --yellow:#f5bd4f;--blue:#61a9ff;--purple:#ae91ff;
-}
+:root{--bg:#080d18;--panel:#101827;--panel2:#142238;--line:#26364e;--text:#edf3ff;--muted:#91a1b8;--green:#22c58b;--red:#ff647c;--yellow:#f5bd4f;--blue:#61a9ff}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,"Noto Sans Bengali",sans-serif}
-header{position:sticky;top:0;z-index:20;background:#080d18ed;backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
-.top{max-width:1450px;margin:auto;padding:15px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px}
-.brand{font-size:19px;font-weight:800;letter-spacing:.5px}
-.brand span{color:var(--blue)}
-.status{font-size:11px;color:var(--green);border:1px solid #1c654f;padding:6px 9px;border-radius:20px}
-nav{max-width:1450px;margin:auto;padding:0 14px 12px;display:flex;gap:7px;overflow-x:auto}
-nav a{white-space:nowrap;text-decoration:none;color:var(--muted);font-size:12px;padding:8px 11px;background:var(--panel);border:1px solid var(--line);border-radius:8px}
-nav a:hover{color:white;border-color:var(--blue)}
+header{position:sticky;top:0;z-index:10;background:#080d18ee;border-bottom:1px solid var(--line)}
+.top{max-width:1450px;margin:auto;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.brand{font-size:18px;font-weight:800}.brand span{color:var(--blue)}
+.status{font-size:11px;color:var(--green)}
+nav{display:flex;gap:7px;overflow-x:auto;max-width:1450px;margin:auto;padding:0 14px 12px}
+nav a{white-space:nowrap;text-decoration:none;color:var(--muted);font-size:12px;padding:8px 10px;background:var(--panel);border:1px solid var(--line);border-radius:8px}
 main{max-width:1450px;margin:auto;padding:18px}
-.section{margin:0 0 25px;scroll-margin-top:115px}
-.section-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 12px}
-h2{font-size:17px;margin:0}
-.sub{font-size:11px;color:var(--muted)}
+.section{margin-bottom:26px;scroll-margin-top:115px}
+.head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:12px}
+h2{font-size:17px;margin:0}.sub,.note{font-size:11px;color:var(--muted)}
 .grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
-.grid.two{grid-template-columns:repeat(2,minmax(0,1fr))}
 .grid.three{grid-template-columns:repeat(3,minmax(0,1fr))}
-.card{background:linear-gradient(145deg,var(--panel),#0e1725);border:1px solid var(--line);border-radius:12px;padding:14px;min-width:0}
-.metric-label{font-size:11px;color:var(--muted);margin-bottom:9px}
-.metric-value{font-size:21px;font-weight:750;overflow-wrap:anywhere}
-.metric-note{font-size:11px;color:var(--muted);margin-top:7px}
-.action{font-size:12px;color:#dce8f8;margin-top:9px;padding-top:8px;border-top:1px solid var(--line);line-height:1.6}
-.green{color:var(--green)}.red{color:var(--red)}.yellow{color:var(--yellow)}.blue{color:var(--blue)}
-.pill{display:inline-block;font-size:10px;padding:4px 7px;border-radius:20px;background:#1b2a3d;color:var(--muted);margin-top:6px}
-.pill.ok{color:var(--green);background:#123326}.pill.warn{color:var(--yellow);background:#392d16}.pill.bad{color:var(--red);background:#3b1c29}
+.grid.two{grid-template-columns:repeat(2,minmax(0,1fr))}
+.card{background:linear-gradient(145deg,var(--panel),#0d1726);border:1px solid var(--line);border-radius:12px;padding:14px;min-width:0}
+.label{font-size:11px;color:var(--muted);margin-bottom:9px}
+.value{font-size:20px;font-weight:750;overflow-wrap:anywhere}
+.note{margin-top:7px;line-height:1.6}
+.action{font-size:12px;line-height:1.7;margin-top:9px;padding-top:8px;border-top:1px solid var(--line);color:#dce8f8}
+.green{color:var(--green)}.red{color:var(--red)}.yellow{color:var(--yellow)}
+.table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:10px}
+table{width:100%;border-collapse:collapse;min-width:620px;background:var(--panel)}
+td,th{padding:11px;border-bottom:1px solid var(--line);font-size:12px;text-align:left}
+th{color:var(--muted);background:#142033}
+.pill{display:inline-block;padding:4px 8px;border-radius:20px;background:#27364b;color:var(--muted);font-size:10px}
+.pill.ok{background:#123326;color:var(--green)}.pill.warn{background:#392d16;color:var(--yellow)}
 .chart-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-.chart{height:390px;background:var(--panel);border:1px solid var(--line);border-radius:12px;overflow:hidden}
-.chart.large{grid-column:1/-1;height:490px}
-.chart-title{font-size:13px;font-weight:700;padding:11px 13px;border-bottom:1px solid var(--line)}
-.chart iframe{width:100%;height:calc(100% - 39px);border:0}
-.table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:11px;background:var(--panel)}
-table{width:100%;border-collapse:collapse;min-width:600px}
-th,td{text-align:left;padding:11px 12px;border-bottom:1px solid var(--line);font-size:12px}
-th{color:var(--muted);font-weight:600;background:#121d2d}
-td{color:#dce6f5}
-tr:last-child td{border-bottom:0}
-.notice{padding:12px;border:1px solid var(--line);border-radius:10px;background:var(--panel);font-size:12px;line-height:1.7;color:#cbd7e8}
-.notice strong{color:var(--yellow)}
-.report{line-height:1.8;font-size:13px;color:#dce6f5}
-.report b{color:white}
-.empty{color:var(--muted);font-size:12px}
-.news-item{padding:11px 0;border-bottom:1px solid var(--line);font-size:12px;line-height:1.6}
-.news-item:last-child{border:0}
-footer{border-top:1px solid var(--line);padding:18px;text-align:center;color:var(--muted);font-size:11px}
-button{background:var(--panel2);border:1px solid var(--line);color:var(--text);border-radius:8px;padding:8px 11px;font-size:11px}
-@media(max-width:850px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.grid.three{grid-template-columns:repeat(2,minmax(0,1fr))}.chart{height:330px}.chart.large{height:400px}}
-@media(max-width:520px){
- main{padding:12px}.top{padding:12px}.brand{font-size:16px}
- .grid,.grid.two,.grid.three{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
- .card{padding:11px}.metric-value{font-size:17px}h2{font-size:15px}
- .chart-grid{grid-template-columns:1fr}.chart,.chart.large{grid-column:auto;height:320px}
- .chart.large{height:370px}
-}
+.chart{height:350px;background:var(--panel);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.chart.large{grid-column:1/-1;height:450px}
+.chart-title{padding:10px;font-size:13px;border-bottom:1px solid var(--line)}
+.chart iframe{width:100%;height:calc(100% - 38px);border:0}
+.notice{padding:12px;background:var(--panel);border:1px solid var(--line);border-radius:10px;font-size:12px;line-height:1.7;color:#cbd7e8;margin-top:10px}
+.report{font-size:13px;line-height:1.9;overflow-wrap:anywhere}
+.report div{margin-bottom:5px}
+.news-item{padding:10px 0;border-bottom:1px solid var(--line);font-size:12px;line-height:1.7}
+footer{text-align:center;padding:18px;border-top:1px solid var(--line);font-size:11px;color:var(--muted)}
+@media(max-width:850px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.grid.three{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:520px){main{padding:12px}.top{padding:12px}.brand{font-size:15px}.grid,.grid.two,.grid.three{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.card{padding:10px}.value{font-size:17px}.chart-grid{grid-template-columns:1fr}.chart,.chart.large{grid-column:auto;height:310px}.chart.large{height:370px}h2{font-size:15px}}
 </style>
 </head>
 <body>
 <header>
-  <div class="top">
-    <div class="brand">CRYPTO <span>MACRO TERMINAL</span></div>
-    <div class="status" id="connectionStatus">ডেটা সংযোগ পরীক্ষা হচ্ছে</div>
-  </div>
-  <nav>
-    <a href="#summary">টপ সামারি</a>
-    <a href="#cycle">সাইকেল ও আউটলুক</a>
-    <a href="#charts">লাইভ চার্ট</a>
-    <a href="#signals">কোর সিগন্যাল</a>
-    <a href="#macro">ম্যাক্রো</a>
-    <a href="#onchain">অন-চেইন</a>
-    <a href="#movement">মার্কেট মুভমেন্ট</a>
-    <a href="#news">নিউজ ও অ্যালার্ট</a>
-  </nav>
+<div class="top">
+ <div class="brand">CRYPTO <span>MACRO TERMINAL</span></div>
+ <div class="status" id="connectionStatus">ডেটা যাচাই হচ্ছে</div>
+</div>
+<nav>
+<a href="#summary">টপ সামারি</a><a href="#cycle">সাইকেল</a><a href="#charts">চার্ট</a>
+<a href="#signals">কোর সিগন্যাল</a><a href="#macro">ম্যাক্রো</a>
+<a href="#onchain">অন-চেইন</a><a href="#movement">মুভমেন্ট</a><a href="#news">নিউজ</a>
+</nav>
 </header>
 
 <main>
 <section class="section" id="summary">
-  <div class="section-head"><h2>১. টপ সামারি</h2><span class="sub" id="marketUpdated">আপডেট: অপেক্ষমাণ</span></div>
-  <div class="grid">
-    <div class="card"><div class="metric-label">BTC PRICE</div><div class="metric-value" id="btcPrice">—</div><div class="metric-note" id="btcChange">ডেটা অপেক্ষমাণ</div></div>
-    <div class="card"><div class="metric-label">TOTAL MARKET CAP</div><div class="metric-value" id="marketCap">—</div><div class="metric-note">বিশ্ব ক্রিপ্টো বাজার</div></div>
-    <div class="card"><div class="metric-label">BTC DOMINANCE</div><div class="metric-value" id="btcDom">—</div><div class="metric-note">বাজারে BTC-এর অংশ</div></div>
-    <div class="card"><div class="metric-label">ETH DOMINANCE</div><div class="metric-value" id="ethDom">—</div><div class="metric-note">বাজারে ETH-এর অংশ</div></div>
-    <div class="card"><div class="metric-label">GLOBAL VOLUME (24H)</div><div class="metric-value" id="globalVolume">—</div><div class="metric-note">২৪ ঘণ্টার ট্রেডিং ভলিউম</div></div>
-    <div class="card"><div class="metric-label">FEAR & GREED INDEX</div><div class="metric-value" id="fearGreed">—</div><div class="metric-note" id="fearLabel">ডেটা অপেক্ষমাণ</div><div class="action" id="fearAction">করণীয়: ডেটা যাচাই হচ্ছে।</div></div>
-    <div class="card"><div class="metric-label">ETH PRICE</div><div class="metric-value" id="ethPrice">—</div><div class="metric-note" id="ethChange">ডেটা অপেক্ষমাণ</div></div>
-    <div class="card"><div class="metric-label">MARKET DATA QUALITY</div><div class="metric-value" id="dataQuality">—</div><div class="metric-note" id="dataStatus">ডেটা যাচাই হচ্ছে</div></div>
-  </div>
+<div class="head"><h2>১. টপ সামারি</h2><span class="sub" id="marketUpdated">—</span></div>
+<div class="grid">
+<div class="card"><div class="label">BTC PRICE</div><div class="value" id="btcPrice">—</div><div class="note" id="btcChange">—</div></div>
+<div class="card"><div class="label">TOTAL MARKET CAP</div><div class="value" id="marketCap">—</div><div class="note">বিশ্ব ক্রিপ্টো বাজার</div></div>
+<div class="card"><div class="label">BTC DOMINANCE</div><div class="value" id="btcDom">—</div></div>
+<div class="card"><div class="label">ETH DOMINANCE</div><div class="value" id="ethDom">—</div></div>
+<div class="card"><div class="label">GLOBAL VOLUME 24H</div><div class="value" id="globalVolume">—</div></div>
+<div class="card"><div class="label">FEAR & GREED</div><div class="value" id="fearGreed">—</div><div class="note" id="fearLabel">—</div><div class="action" id="fearAction">করণীয়: ডেটা অপেক্ষমাণ।</div></div>
+<div class="card"><div class="label">ETH PRICE</div><div class="value" id="ethPrice">—</div><div class="note" id="ethChange">—</div></div>
+<div class="card"><div class="label">DATA QUALITY</div><div class="value" id="dataQuality">—</div><div class="note" id="dataStatus">—</div></div>
+</div>
 </section>
 
 <section class="section" id="cycle">
-  <div class="section-head"><h2>২. সাইকেল ও আউটলুক</h2><span class="sub">বিশ্লেষণভিত্তিক</span></div>
-  <div class="grid three">
-    <div class="card"><div class="metric-label">CURRENT CYCLE STAGE</div><div class="metric-value" id="cycleStage">যাচাই প্রয়োজন</div><div class="action" id="cycleAction">করণীয়: পর্যাপ্ত যাচাইকৃত ডেটা না পাওয়া পর্যন্ত অপেক্ষা।</div></div>
-    <div class="card"><div class="metric-label">WEEKLY MARKET OUTLOOK</div><div class="report" id="weeklyOutlook">সাপ্তাহিক আউটলুক তৈরির জন্য পর্যাপ্ত তথ্য সংযুক্ত হয়নি।</div></div>
-    <div class="card"><div class="metric-label">NEXT BTC HALVING</div><div class="metric-value" id="halvingCountdown">—</div><div class="metric-note" id="halvingNote">ব্লক উচ্চতা যাচাই প্রয়োজন</div></div>
-  </div>
+<div class="head"><h2>২. সাইকেল ও আউটলুক</h2><span class="sub">বিশ্লেষণভিত্তিক</span></div>
+<div class="grid three">
+<div class="card"><div class="label">CURRENT CYCLE STAGE</div><div class="value" id="cycleStage">যাচাই প্রয়োজন</div><div class="action" id="cycleAction">করণীয়: নিশ্চিত ডেটার অপেক্ষা।</div></div>
+<div class="card"><div class="label">WEEKLY MARKET OUTLOOK</div><div class="report" id="weeklyOutlook">যাচাইকৃত সাপ্তাহিক আউটলুক নেই।</div></div>
+<div class="card"><div class="label">NEXT BTC HALVING</div><div class="value" id="halvingCountdown">অনুপলব্ধ</div><div class="note">ব্লক উচ্চতা API যুক্ত হয়নি।</div></div>
+</div>
 </section>
 
 <section class="section" id="charts">
-  <div class="section-head"><h2>৩. লাইভ চার্ট</h2><span class="sub">TradingView · বাজার খোলা/ডেটা উৎস অনুযায়ী</span></div>
-  <div class="chart-grid">
-    <div class="chart large"><div class="chart-title">BTC / USDT — Binance</div><iframe title="BTC USDT chart" src="https://s.tradingview.com/widgetembed/?symbol=BINANCE%3ABTCUSDT&interval=60&hidesidetoolbar=0&symboledit=0&saveimage=0&toolbarbg=101827&theme=dark&style=1&timezone=Etc%2FUTC&withdateranges=1&hideideas=1& studies=[]" loading="lazy"></iframe></div>
-    <div class="chart"><div class="chart-title">DXY — US Dollar Index</div><iframe title="DXY chart" src="https://s.tradingview.com/widgetembed/?symbol=TVC%3ADXY&interval=D&hidesidetoolbar=1&symboledit=0&saveimage=0&theme=dark&style=1&timezone=Etc%2FUTC&hideideas=1" loading="lazy"></iframe></div>
-    <div class="chart"><div class="chart-title">GOLD — Gold Spot</div><iframe title="Gold chart" src="https://s.tradingview.com/widgetembed/?symbol=OANDA%3AXAUUSD&interval=D&hidesidetoolbar=1&symboledit=0&saveimage=0&theme=dark&style=1&timezone=Etc%2FUTC&hideideas=1" loading="lazy"></iframe></div>
-    <div class="chart"><div class="chart-title">BRENT OIL</div><iframe title="Brent chart" src="https://s.tradingview.com/widgetembed/?symbol=TVC%3AUKOIL&interval=D&hidesidetoolbar=1&symboledit=0&saveimage=0&theme=dark&style=1&timezone=Etc%2FUTC&hideideas=1" loading="lazy"></iframe></div>
-    <div class="chart"><div class="chart-title">S&P 500</div><iframe title="SP500 chart" src="https://s.tradingview.com/widgetembed/?symbol=SP%3ASPX&interval=D&hidesidetoolbar=1&symboledit=0&saveimage=0&theme=dark&style=1&timezone=Etc%2FUTC&hideideas=1" loading="lazy"></iframe></div>
-    <div class="chart"><div class="chart-title">VIX — Volatility Index</div><iframe title="VIX chart" src="https://s.tradingview.com/widgetembed/?symbol=CBOE%3AVIX&interval=D&hidesidetoolbar=1&symboledit=0&saveimage=0&theme=dark&style=1&timezone=Etc%2FUTC&hideideas=1" loading="lazy"></iframe></div>
-  </div>
-  <div class="notice" style="margin-top:10px">চার্ট TradingView থেকে লোড হয়। চার্টের ডেটা ও বিলম্ব TradingView এবং সংশ্লিষ্ট এক্সচেঞ্জের ওপর নির্ভরশীল। চার্টে দেখা দামকে অন্য API-এর ডেটার সঙ্গে একই সময়ের বলে ধরে নেবেন না।</div>
+<div class="head"><h2>৩. লাইভ চার্ট</h2><span class="sub">TradingView Embed</span></div>
+<div class="chart-grid">
+<div class="chart large"><div class="chart-title">BTC / USDT — Binance</div><iframe title="BTC chart" src="https://s.tradingview.com/widgetembed/?symbol=BINANCE%3ABTCUSDT&interval=60&theme=dark&style=1&timezone=Etc%2FUTC&hideideas=1" loading="lazy"></iframe></div>
+<div class="chart"><div class="chart-title">DXY</div><iframe title="DXY" src="https://s.tradingview.com/widgetembed/?symbol=TVC%3ADXY&interval=D&theme=dark&style=1&timezone=Etc%2FUTC" loading="lazy"></iframe></div>
+<div class="chart"><div class="chart-title">GOLD</div><iframe title="Gold" src="https://s.tradingview.com/widgetembed/?symbol=OANDA%3AXAUUSD&interval=D&theme=dark&style=1&timezone=Etc%2FUTC" loading="lazy"></iframe></div>
+<div class="chart"><div class="chart-title">BRENT OIL</div><iframe title="Brent" src="https://s.tradingview.com/widgetembed/?symbol=TVC%3AUKOIL&interval=D&theme=dark&style=1&timezone=Etc%2FUTC" loading="lazy"></iframe></div>
+<div class="chart"><div class="chart-title">S&P 500</div><iframe title="SP500" src="https://s.tradingview.com/widgetembed/?symbol=SP%3ASPX&interval=D&theme=dark&style=1&timezone=Etc%2FUTC" loading="lazy"></iframe></div>
+<div class="chart"><div class="chart-title">VIX</div><iframe title="VIX" src="https://s.tradingview.com/widgetembed/?symbol=CBOE%3AVIX&interval=D&theme=dark&style=1&timezone=Etc%2FUTC" loading="lazy"></iframe></div>
+</div>
+<div class="notice">চার্ট TradingView থেকে আসে। কিছু মার্কেটে ডেটা বিলম্বিত হতে পারে। API ডেটা ও চার্টের সময় এক নাও হতে পারে।</div>
 </section>
 
 <section class="section" id="signals">
-  <div class="section-head"><h2>৪. কোর সিগন্যাল</h2><span class="sub">DATA → ANALYSIS → DECISION → ACTION → RISK</span></div>
-  <div class="table-wrap"><table>
-    <thead><tr><th>ইন্ডিকেটর</th><th>বর্তমান ডেটা</th><th>বিশ্লেষণ / করণীয়</th><th>স্ট্যাটাস</th></tr></thead>
-    <tbody>
-      <tr><td>BTC Support</td><td id="btcSupport">—</td><td id="supportAction">ডেটা অপেক্ষমাণ</td><td id="supportStatus">—</td></tr>
-      <tr><td>BTC Resistance</td><td id="btcResistance">—</td><td id="resistanceAction">ডেটা অপেক্ষমাণ</td><td id="resistanceStatus">—</td></tr>
-      <tr><td>ETF Net Flow</td><td id="etfFlow">সংযুক্ত নয়</td><td>বিশ্বস্ত ETF ডেটা সোর্স প্রয়োজন</td><td>অনুপলব্ধ</td></tr>
-      <tr><td>Market Sentiment</td><td id="marketSentiment">—</td><td id="sentimentAction">Fear & Greed অনুযায়ী</td><td id="sentimentStatus">—</td></tr>
-      <tr><td>Funding Rate</td><td id="fundingRate">—</td><td id="fundingAction">Derivatives ডেটা প্রয়োজন</td><td id="fundingStatus">—</td></tr>
-      <tr><td>Open Interest</td><td id="openInterest">—</td><td id="oiAction">Derivatives ডেটা প্রয়োজন</td><td id="oiStatus">—</td></tr>
-    </tbody>
-  </table></div>
-  <div class="notice" style="margin-top:10px"><strong>সতর্কতা:</strong> Funding Rate ও Open Interest Binance Futures-এর ডেটা। এগুলো Spot কেনাবেচার সরাসরি সংকেত নয়; অতিরিক্ত লিভারেজের ঝুঁকি বোঝাতে ব্যবহার করা হবে।</div>
+<div class="head"><h2>৪. কোর সিগন্যাল</h2><span class="sub">DATA → ANALYSIS → DECISION → ACTION → RISK</span></div>
+<div class="table-wrap"><table>
+<thead><tr><th>ইন্ডিকেটর</th><th>ডেটা</th><th>করণীয়</th><th>স্ট্যাটাস</th></tr></thead>
+<tbody>
+<tr><td>BTC Support</td><td id="btcSupport">—</td><td id="supportAction">—</td><td id="supportStatus">—</td></tr>
+<tr><td>BTC Resistance</td><td id="btcResistance">—</td><td id="resistanceAction">—</td><td id="resistanceStatus">—</td></tr>
+<tr><td>ETF Net Flow</td><td id="etfFlow">—</td><td>ETF Provider সংযুক্ত নয়</td><td>অনুপলব্ধ</td></tr>
+<tr><td>Market Sentiment</td><td id="marketSentiment">—</td><td id="sentimentAction">—</td><td id="sentimentStatus">—</td></tr>
+<tr><td>Funding Rate</td><td id="fundingRate">—</td><td id="fundingAction">—</td><td id="fundingStatus">—</td></tr>
+<tr><td>Open Interest</td><td id="openInterest">—</td><td id="oiAction">—</td><td id="oiStatus">—</td></tr>
+</tbody></table></div>
+<div class="notice">Funding ও Open Interest derivatives market-এর ঝুঁকি বোঝার জন্য। এগুলো Spot BUY/SELL সংকেত নয়।</div>
 </section>
 
 <section class="section" id="macro">
-  <div class="section-head"><h2>৫. ম্যাক্রো ইন্ডিকেটর</h2><span class="sub">মূল্য ও করণীয়</span></div>
-  <div class="grid">
-    <div class="card"><div class="metric-label">DXY / DOLLAR INDEX</div><div class="metric-value" id="dxy">—</div><div class="action" id="dxyAction">করণীয়: ডেটা অপেক্ষমাণ।</div></div>
-    <div class="card"><div class="metric-label">US 10Y YIELD</div><div class="metric-value" id="yield10y">—</div><div class="action" id="yieldAction">করণীয়: ডেটা অপেক্ষমাণ।</div></div>
-    <div class="card"><div class="metric-label">VIX</div><div class="metric-value" id="vix">—</div><div class="action" id="vixAction">করণীয়: ডেটা অপেক্ষমাণ।</div></div>
-    <div class="card"><div class="metric-label">S&P 500</div><div class="metric-value" id="sp500">চার্ট দেখুন</div><div class="action">করণীয়: চার্টের ট্রেন্ড ও বাজারের সময় যাচাই করুন।</div></div>
-    <div class="card"><div class="metric-label">BRENT OIL</div><div class="metric-value" id="brent">চার্ট দেখুন</div><div class="action">করণীয়: তেলের দামের পরিবর্তন ও মুদ্রাস্ফীতির ঝুঁকি পর্যবেক্ষণ করুন।</div></div>
-    <div class="card"><div class="metric-label">GOLD</div><div class="metric-value" id="gold">চার্ট দেখুন</div><div class="action">করণীয়: নিরাপদ সম্পদের চাহিদা পর্যবেক্ষণ করুন।</div></div>
-    <div class="card"><div class="metric-label">GLOBAL M2</div><div class="metric-value" id="globalM2">—</div><div class="action" id="m2Action">করণীয়: M2-এর সর্বশেষ আপডেট যাচাই করুন।</div></div>
-    <div class="card"><div class="metric-label">FED RATE</div><div class="metric-value" id="fedRate">—</div><div class="action">করণীয়: Fed-এর নীতি ও পরবর্তী সিদ্ধান্ত পর্যবেক্ষণ করুন।</div></div>
-  </div>
+<div class="head"><h2>৫. ম্যাক্রো ইন্ডিকেটর</h2><span class="sub">FRED পর্যবেক্ষণভিত্তিক ডেটা</span></div>
+<div class="grid">
+<div class="card"><div class="label">USD BROAD INDEX (DXY নয়)</div><div class="value" id="dxy">—</div><div class="action" id="dxyAction">—</div></div>
+<div class="card"><div class="label">US 10Y YIELD</div><div class="value" id="yield10y">—</div><div class="action" id="yieldAction">—</div></div>
+<div class="card"><div class="label">VIX</div><div class="value" id="vix">—</div><div class="action" id="vixAction">—</div></div>
+<div class="card"><div class="label">S&P 500</div><div class="value" id="sp500">—</div><div class="note" id="sp500Note">—</div></div>
+<div class="card"><div class="label">WTI OIL (BRENT নয়)</div><div class="value" id="brent">—</div><div class="note" id="oilNote">—</div></div>
+<div class="card"><div class="label">GOLD</div><div class="value" id="gold">—</div><div class="note" id="goldNote">—</div></div>
+<div class="card"><div class="label">US M2 MONEY SUPPLY</div><div class="value" id="globalM2">—</div><div class="action" id="m2Action">—</div></div>
+<div class="card"><div class="label">FED FUNDS RATE</div><div class="value" id="fedRate">—</div></div>
+<div class="card"><div class="label">US 30Y YIELD</div><div class="value" id="yield30y">—</div></div>
+<div class="card"><div class="label">USD / JPY</div><div class="value" id="usdJpy">—</div></div>
+<div class="card"><div class="label">NET LIQUIDITY TREND</div><div class="value" id="netLiquidity">—</div><div class="note" id="liquidityNote">—</div></div>
+<div class="card"><div class="label">MACRO DATA AGE</div><div class="value" id="macroUpdated">—</div><div class="note">Observation date অনুযায়ী বিলম্ব থাকতে পারে।</div></div>
+</div>
 </section>
 
 <section class="section" id="onchain">
-  <div class="section-head"><h2>৬. অন-চেইন ও ডিপ মেট্রিক্স</h2><span class="sub">যাচাইকৃত ডেটা ছাড়া কোনো অনুমান নয়</span></div>
-  <div class="grid three">
-    <div class="card"><div class="metric-label">MVRV Z-SCORE</div><div class="metric-value" id="mvrv">সংযুক্ত নয়</div><div class="metric-note">On-chain Provider প্রয়োজন</div></div>
-    <div class="card"><div class="metric-label">STH SOPR</div><div class="metric-value" id="sopr">সংযুক্ত নয়</div><div class="metric-note">Short-Term Holder Profit/Loss</div></div>
-    <div class="card"><div class="metric-label">EXCHANGE NETFLOW</div><div class="metric-value" id="netflow">সংযুক্ত নয়</div><div class="metric-note">Exchange Inflow / Outflow</div></div>
-    <div class="card"><div class="metric-label">STABLECOIN SUPPLY</div><div class="metric-value" id="stablecoin">সংযুক্ত নয়</div><div class="metric-note">Stablecoin Market Supply</div></div>
-    <div class="card"><div class="metric-label">LIQUIDATION HEATMAP</div><div class="metric-value" id="liquidation">সংযুক্ত নয়</div><div class="metric-note">বিশ্বস্ত Heatmap Provider প্রয়োজন</div></div>
-    <div class="card"><div class="metric-label">ALTCOIN SEASON INDEX</div><div class="metric-value" id="altseason">সংযুক্ত নয়</div><div class="metric-note">Altcoin বনাম BTC Performance</div></div>
-    <div class="card"><div class="metric-label">BITCOIN HASHRATE</div><div class="metric-value" id="hashrate">সংযুক্ত নয়</div><div class="metric-note">Mining Network Security</div></div>
-    <div class="card"><div class="metric-label">MINING DIFFICULTY</div><div class="metric-value" id="difficulty">সংযুক্ত নয়</div><div class="metric-note">Network Mining Difficulty</div></div>
-    <div class="card"><div class="metric-label">ON-CHAIN DATA STATUS</div><div class="metric-value yellow">Provider প্রয়োজন</div><div class="metric-note">API যুক্ত হলে স্বয়ংক্রিয়ভাবে দেখাবে</div></div>
-  </div>
-  <div class="notice" style="margin-top:10px">MVRV, SOPR, Netflow, Stablecoin Supply ও Liquidation-এর তথ্য বর্তমানে এই Dashboard-এর JSON-এ নিশ্চিতভাবে পাওয়া যাচ্ছে না। API যুক্ত না হওয়া পর্যন্ত এগুলো অনুপলব্ধ থাকবে।</div>
+<div class="head"><h2>৬. অন-চেইন ও ডিপ মেট্রিক্স</h2><span class="sub">যাচাইকৃত ডেটা ছাড়া অনুমান নয়</span></div>
+<div class="grid three">
+<div class="card"><div class="label">MVRV Z-SCORE</div><div class="value" id="mvrv">অনুপলব্ধ</div></div>
+<div class="card"><div class="label">STH SOPR</div><div class="value" id="sopr">অনুপলব্ধ</div></div>
+<div class="card"><div class="label">EXCHANGE NETFLOW</div><div class="value" id="netflow">অনুপলব্ধ</div></div>
+<div class="card"><div class="label">STABLECOIN SUPPLY</div><div class="value" id="stablecoin">অনুপলব্ধ</div></div>
+<div class="card"><div class="label">LIQUIDATION HEATMAP</div><div class="value" id="liquidation">অনুপলব্ধ</div></div>
+<div class="card"><div class="label">ALTCOIN SEASON INDEX</div><div class="value" id="altseason">অনুপলব্ধ</div></div>
+<div class="card"><div class="label">BITCOIN HASHRATE</div><div class="value" id="hashrate">অনুপলব্ধ</div></div>
+<div class="card"><div class="label">MINING DIFFICULTY</div><div class="value" id="difficulty">অনুপলব্ধ</div></div>
+<div class="card"><div class="label">WHALE ACTIVITY</div><div class="value" id="whales">অনুপলব্ধ</div></div>
+</div>
+<div class="notice">এই মেট্রিকগুলোর যাচাইকৃত Provider এখনো যুক্ত নেই। তাই এগুলোকে শূন্য হিসেবে দেখানো হচ্ছে না।</div>
 </section>
 
 <section class="section" id="movement">
-  <div class="section-head"><h2>৭. মার্কেট মুভমেন্ট ও সেন্টিমেন্ট</h2><span class="sub">Derivatives Market Data</span></div>
-  <div class="grid three">
-    <div class="card"><div class="metric-label">LONG / SHORT RATIO</div><div class="metric-value" id="longShort">—</div><div class="action" id="longShortAction">করণীয়: ডেটা সোর্স সংযুক্ত হয়নি।</div></div>
-    <div class="card"><div class="metric-label">TAKER BUY / SELL RATIO</div><div class="metric-value" id="takerRatio">—</div><div class="action" id="takerAction">করণীয়: ডেটা সোর্স সংযুক্ত হয়নি।</div></div>
-    <div class="card"><div class="metric-label">ORDER BOOK IMBALANCE</div><div class="metric-value" id="orderImbalance">—</div><div class="action" id="orderAction">করণীয়: Binance Spot Order Book সংযোগ প্রয়োজন।</div></div>
-  </div>
+<div class="head"><h2>৭. মার্কেট মুভমেন্ট</h2><span class="sub">Derivatives ও Spot Market</span></div>
+<div class="grid three">
+<div class="card"><div class="label">LONG / SHORT RATIO</div><div class="value" id="longShort">অনুপলব্ধ</div><div class="action" id="longShortAction">ডেটা সোর্স নেই।</div></div>
+<div class="card"><div class="label">TAKER BUY / SELL RATIO</div><div class="value" id="takerRatio">অনুপলব্ধ</div><div class="action" id="takerAction">ডেটা সোর্স নেই।</div></div>
+<div class="card"><div class="label">SPOT ORDER BOOK IMBALANCE</div><div class="value" id="orderImbalance">অনুপলব্ধ</div><div class="action" id="orderAction">Spot order book API যুক্ত হয়নি।</div></div>
+<div class="card"><div class="label">BINANCE SPOT ADVANCING PAIRS</div><div class="value" id="advancing">—</div></div>
+<div class="card"><div class="label">BINANCE SPOT DECLINING PAIRS</div><div class="value" id="declining">—</div></div>
+<div class="card"><div class="label">ADVANCE / DECLINE RATIO</div><div class="value" id="advanceRatio">—</div></div>
+</div>
 </section>
 
 <section class="section" id="news">
-  <div class="section-head"><h2>৮. নিউজ ও অ্যালার্ট</h2><span class="sub">Macro · AI · CPI · FOMC</span></div>
-  <div class="grid two">
-    <div class="card">
-      <div class="metric-label">MARKET ALERTS</div>
-      <div class="news-item" id="fearAlert">Fear & Greed Alert: ডেটা অপেক্ষমাণ।</div>
-      <div class="news-item" id="vixAlert">VIX Alert: ডেটা অপেক্ষমাণ।</div>
-      <div class="news-item" id="riskAlert">Market Risk: সিদ্ধান্তের ডেটা অপেক্ষমাণ।</div>
-    </div>
-    <div class="card">
-      <div class="metric-label">MACRO & AI NEWS</div>
-      <div class="news-item">CPI / Inflation News — News API সংযুক্ত নয়।</div>
-      <div class="news-item">FOMC / Federal Reserve — News API সংযুক্ত নয়।</div>
-      <div class="news-item">AI & Crypto News — News API সংযুক্ত নয়।</div>
-      <div class="news-item">Exchange Netflow News — On-chain News Provider প্রয়োজন।</div>
-    </div>
-  </div>
+<div class="head"><h2>৮. নিউজ ও অ্যালার্ট</h2><span class="sub">Macro · CPI · FOMC · AI</span></div>
+<div class="grid two">
+<div class="card"><div class="label">MARKET ALERTS</div>
+<div class="news-item" id="fearAlert">Fear & Greed: অপেক্ষমাণ</div>
+<div class="news-item" id="vixAlert">VIX: অপেক্ষমাণ</div>
+<div class="news-item" id="riskAlert">Market Risk: অপেক্ষমাণ</div>
+<div class="news-item" id="btcTrendAlert">BTC Trend: অপেক্ষমাণ</div>
+</div>
+<div class="card"><div class="label">MACRO & AI NEWS</div>
+<div class="news-item">CPI / Inflation News: News API সংযুক্ত নয়।</div>
+<div class="news-item">FOMC / Federal Reserve: News API সংযুক্ত নয়।</div>
+<div class="news-item">AI & Crypto News: News API সংযুক্ত নয়।</div>
+<div class="news-item">Exchange Netflow News: Provider প্রয়োজন।</div>
+</div>
+</div>
 </section>
 
 <section class="section">
-  <div class="section-head"><h2>চূড়ান্ত বাজার সিদ্ধান্ত</h2><span class="sub">Decision Engine</span></div>
-  <div class="card report">
-    <div><b>DATA:</b> <span id="finalData">ডেটা অপেক্ষমাণ।</span></div>
-    <div><b>ANALYSIS:</b> <span id="finalAnalysis">বিশ্লেষণ অপেক্ষমাণ।</span></div>
-    <div><b>DECISION:</b> <span id="finalDecision">WAIT — যাচাই চলছে।</span></div>
-    <div><b>ACTION:</b> <span id="finalAction">নতুন কেনাকাটার আগে BTC ট্রেন্ড ও বাজারের ঝুঁকি যাচাই করুন।</span></div>
-    <div><b>RISK:</b> <span id="finalRisk">ডেটা অসম্পূর্ণ থাকতে পারে।</span></div>
-    <div class="metric-note" id="decisionUpdated">সর্বশেষ সিদ্ধান্ত: —</div>
-  </div>
+<div class="head"><h2>চূড়ান্ত বাজার সিদ্ধান্ত</h2><span class="sub">Crypto Final Decision Engine</span></div>
+<div class="card report">
+<div><b>DATA:</b> <span id="finalData">—</span></div>
+<div><b>ANALYSIS:</b> <span id="finalAnalysis">—</span></div>
+<div><b>DECISION:</b> <span id="finalDecision">WAIT</span></div>
+<div><b>ACTION:</b> <span id="finalAction">—</span></div>
+<div><b>RISK:</b> <span id="finalRisk">—</span></div>
+<div class="note" id="decisionUpdated">—</div>
+</div>
 </section>
 </main>
 
 <footer>
-  CRYPTO MACRO TERMINAL · Spot Investor Dashboard · Auto refresh: 5 মিনিট
-  <div id="lastRefresh" style="margin-top:6px">সর্বশেষ রিফ্রেশ: —</div>
+CRYPTO MACRO TERMINAL · SPOT INVESTOR DASHBOARD
+<div id="lastRefresh" style="margin-top:6px">সর্বশেষ রিফ্রেশ: —</div>
+<div class="note">ডেটা ইঞ্জিন প্রতি ঘণ্টায় চলে; ব্রাউজার প্রতি ৫ মিনিটে নতুন ফাইল পরীক্ষা করে।</div>
 </footer>
 
 <script>
 "use strict";
 
-const DATA_FILES = {
-  market: "data/market_data.json",
-  macro: "data/macro_data.json",
-  decision: "data/decision_data.json",
-  advanced: "data/advanced_data.json"
+const FILES={
+ market:"data/market_data.json",
+ macro:"data/macro_data.json",
+ decision:"data/decision_data.json",
+ advanced:"data/advanced_data.json"
 };
+let DATA={};
 
-let DATA = {market:null,macro:null,decision:null,advanced:null};
-
-function byId(id){return document.getElementById(id)}
-function setText(id,value){
-  const el=byId(id);
-  if(el) el.textContent=(value===undefined||value===null||value==="")?"—":String(value);
+function el(id){return document.getElementById(id)}
+function text(id,value){
+ const node=el(id);
+ if(node) node.textContent=value===null||value===undefined||value===""?"—":String(value);
 }
-function unwrap(value){
-  if(value && typeof value==="object" && !Array.isArray(value)){
-    if("value" in value) return value.value;
-    if("data" in value) return value.data;
-  }
-  return value;
+function raw(obj,path){
+ if(!obj)return undefined;
+ return path.split(".").reduce((v,k)=>v==null?undefined:v[k],obj);
 }
-function get(obj,path){
-  if(!obj) return undefined;
-  const parts=path.split(".");
-  let value=obj;
-  for(const part of parts){
-    if(value===null||value===undefined) return undefined;
-    value=value[part];
-  }
-  return unwrap(value);
+function value(obj,path){
+ const v=raw(obj,path);
+ if(v&&typeof v==="object"&&!Array.isArray(v)&&"value" in v)return v.value;
+ return v;
 }
-function first(obj,paths){
-  for(const path of paths){
-    const value=get(obj,path);
-    if(value!==undefined&&value!==null&&value!=="") return value;
-  }
-  return undefined;
+function pick(obj,paths){
+ for(const p of paths){
+  const v=value(obj,p);
+  if(v!==undefined&&v!==null&&v!=="")return v;
+ }
+ return undefined;
 }
-function fmt(value,digits=2){
-  value=unwrap(value);
-  if(value===undefined||value===null||value==="") return "—";
-  const n=Number(value);
-  if(!Number.isFinite(n)) return String(value);
-  return n.toLocaleString("en-US",{maximumFractionDigits:digits});
+function num(v,d=2){
+ if(v===null||v===undefined||v==="")return "—";
+ const n=Number(v);
+ return Number.isFinite(n)?n.toLocaleString("en-US",{maximumFractionDigits:d}):String(v);
 }
-function money(value){
-  value=unwrap(value);
-  if(value===undefined||value===null||value==="") return "—";
-  const n=Number(value);
-  if(!Number.isFinite(n)) return String(value);
-  return "$"+n.toLocaleString("en-US",{maximumFractionDigits:2});
+function money(v){
+ if(v===null||v===undefined||v==="")return "—";
+ const n=Number(v);
+ return Number.isFinite(n)?"$"+n.toLocaleString("en-US",{maximumFractionDigits:2}):String(v);
 }
-function compactMoney(value){
-  value=unwrap(value);
-  if(value===undefined||value===null||value==="") return "—";
-  const n=Number(value);
-  if(!Number.isFinite(n)) return String(value);
-  const abs=Math.abs(n);
-  if(abs>=1e12) return "$"+(n/1e12).toFixed(2)+"T";
-  if(abs>=1e9) return "$"+(n/1e9).toFixed(2)+"B";
-  if(abs>=1e6) return "$"+(n/1e6).toFixed(2)+"M";
-  return money(n);
+function compact(v){
+ if(v===null||v===undefined||v==="")return "—";
+ const n=Number(v);
+ if(!Number.isFinite(n))return String(v);
+ if(Math.abs(n)>=1e12)return "$"+(n/1e12).toFixed(2)+"T";
+ if(Math.abs(n)>=1e9)return "$"+(n/1e9).toFixed(2)+"B";
+ if(Math.abs(n)>=1e6)return "$"+(n/1e6).toFixed(2)+"M";
+ return money(n);
 }
-function pct(value){
-  value=unwrap(value);
-  if(value===undefined||value===null||value==="") return "—";
-  const n=Number(value);
-  return Number.isFinite(n)?n.toFixed(2)+"%":String(value);
+function percent(v){
+ if(v===null||v===undefined||v==="")return "—";
+ const n=Number(v);
+ return Number.isFinite(n)?n.toFixed(2)+"%":String(v);
 }
-function timestamp(value){
-  if(!value) return "সময় পাওয়া যায়নি";
-  const d=new Date(value);
-  return Number.isNaN(d.getTime())?String(value):d.toLocaleString("bn-BD",{dateStyle:"medium",timeStyle:"short"});
+function date(v){
+ if(!v)return "সময় পাওয়া যায়নি";
+ const d=new Date(v);
+ return Number.isNaN(d.getTime())?String(v):d.toLocaleString("bn-BD",{dateStyle:"medium",timeStyle:"short"});
 }
-function setStatus(id,text,kind){
-  const el=byId(id);if(!el)return;
-  el.textContent=text;
-  el.className="pill"+(kind?" "+kind:"");
+function status(id,label,kind){
+ if(!el(id))return;
+ el(id).textContent=label;
+ el(id).className="pill "+(kind||"");
 }
-async function loadJSON(path){
-  const response=await fetch(path+"?t="+Date.now(),{cache:"no-store"});
-  if(!response.ok) throw new Error(path+" HTTP "+response.status);
-  return await response.json();
+function ageLabel(metric){
+ if(!metric)return "আপডেট তথ্য নেই";
+ const dt=metric.observation_date||metric.source_updated_at||metric.fetched_at;
+ return dt?"Observation: "+date(dt):"সময় পাওয়া যায়নি";
 }
-function setAction(id,text){setText(id,text)}
-function directionAction(value,positive,negative,neutral){
-  const n=Number(value);
-  if(!Number.isFinite(n)) return "ডেটা যাচাই প্রয়োজন।";
-  if(n>0) return positive;
-  if(n<0) return negative;
-  return neutral;
+async function load(path){
+ const r=await fetch(path+"?t="+Date.now(),{cache:"no-store"});
+ if(!r.ok)throw new Error(path+" HTTP "+r.status);
+ return r.json();
 }
 
 function renderMarket(){
-  const m=DATA.market||{};
-  const global=m.global_market||{};
-  const assets=m.major_assets||{};
-  const btc=assets.bitcoin||{};
-  const eth=assets.ethereum||{};
-  const fg=m.fear_greed||{};
-  const technical=m.technical||{};
-  const btcPrice=first(btc,["price_usd","price","current_price"]) ??
-    first(technical,["BTC.price_usdt","BTC.price"]);
-  const ethPrice=first(eth,["price_usd","price","current_price"]) ??
-    first(technical,["ETH.price_usdt","ETH.price"]);
-  setText("btcPrice",money(btcPrice));
-  setText("ethPrice",money(ethPrice));
-  setText("btcChange", "২৪ ঘণ্টা: "+pct(first(btc,["change_24h_pct","price_change_percentage_24h"])));
-  setText("ethChange", "২৪ ঘণ্টা: "+pct(first(eth,["change_24h_pct","price_change_percentage_24h"])));
-  setText("marketCap",compactMoney(first(global,["total_market_cap_usd","market_cap","total_market_cap"])));
-  setText("btcDom",pct(first(global,["btc_dominance","market_cap_percentage_btc"])));
-  setText("ethDom",pct(first(global,["eth_dominance","market_cap_percentage_eth"])));
-  setText("globalVolume",compactMoney(first(global,["total_volume_24h_usd","total_volume_24h","volume_24h"])));
-  const fgValue=first(fg,["value","value_now","index","score"]);
-  const fgLabel=first(fg,["classification","value_classification","label","sentiment"]);
-  setText("fearGreed",fgValue===undefined?"—":fmt(fgValue,0)+"/100");
-  setText("fearLabel",fgLabel||"Fear & Greed");
-  const fgn=Number(fgValue);
-  if(Number.isFinite(fgn)){
-    setText("fearAction",fgn<=20?"করণীয়: Extreme Fear। আতঙ্কে কেনাবেচা নয়; BTC ট্রেন্ড ও ফান্ডামেন্টাল যাচাই করুন।":
-      fgn<=40?"করণীয়: Fear। নতুন কেনাকাটায় সতর্ক থাকুন, একসঙ্গে বড় অঙ্ক বিনিয়োগ নয়।":
-      fgn<=60?"করণীয়: Neutral। নিশ্চিত ট্রেন্ড ও সাপোর্টের অপেক্ষা করুন।":
-      fgn<=80?"করণীয়: Greed। অতিরিক্ত দামে কেনা এড়িয়ে চলুন, লাভ সুরক্ষার পরিকল্পনা রাখুন।":
-      "করণীয়: Extreme Greed। FOMO এড়িয়ে চলুন; ঝুঁকি ও লাভের লক্ষ্য পর্যালোচনা করুন।");
-  }else setText("fearAction","করণীয়: Fear & Greed ডেটা পাওয়া যায়নি।");
-  const quality=first(m,["data_quality","status"]);
-  setText("dataQuality",quality||"যাচাই চলছে");
-  setText("dataStatus",first(m,["update_mode","generated_at"])||"Market JSON");
-  setText("marketUpdated","আপডেট: "+timestamp(m.generated_at));
-  setText("fearAlert",Number.isFinite(fgn)?
-    "Fear & Greed "+fmt(fgn,0)+"/100 — "+(fgn>=80?"অতিরিক্ত লোভ; সতর্ক থাকুন।":fgn<=20?"চরম ভয়; আতঙ্কে বিক্রি করবেন না।":"সেন্টিমেন্ট পর্যবেক্ষণ করুন।"):
-    "Fear & Greed Alert: ডেটা পাওয়া যায়নি।");
-  setText("marketSentiment",fgLabel|| (fgValue!==undefined?fmt(fgValue,0)+"/100":"—"));
-  setText("sentimentAction",Number.isFinite(fgn)?(fgn>=80?"অতিরিক্ত লোভ; FOMO এড়িয়ে চলুন।":fgn<=20?"চরম ভয়; ধাপে ধাপে ঝুঁকি যাচাই করুন।":"নিরপেক্ষভাবে ট্রেন্ড পর্যবেক্ষণ করুন।"):"ডেটা প্রয়োজন।");
-  setStatus("sentimentStatus",fgValue!==undefined?"পাওয়া গেছে":"অনুপলব্ধ",fgValue!==undefined?"ok":"warn");
+ const m=DATA.market||{};
+ const g=m.global_market||{};
+ const btc=m.major_assets?.bitcoin||{};
+ const eth=m.major_assets?.ethereum||{};
+ const fg=m.fear_greed||{};
+ const f=pick(fg,["value"]);
+ const fn=Number(f);
+ text("btcPrice",money(pick(btc,["price_usd"])));
+ text("ethPrice",money(pick(eth,["price_usd"])));
+ text("btcChange","২৪ ঘণ্টা: "+percent(pick(btc,["change_24h_pct"])));
+ text("ethChange","২৪ ঘণ্টা: "+percent(pick(eth,["change_24h_pct"])));
+ text("marketCap",compact(pick(g,["total_market_cap_usd"])));
+ text("btcDom",percent(pick(g,["btc_dominance_pct"])));
+ text("ethDom",percent(pick(g,["eth_dominance_pct"])));
+ text("globalVolume",compact(pick(g,["total_volume_24h_usd"])));
+ text("fearGreed",f===undefined?"—":num(f,0)+"/100");
+ text("fearLabel",fg.classification||"");
+ text("fearAction",Number.isFinite(fn)?(
+  fn<=20?"করণীয়: Extreme Fear। আতঙ্কে কেনাবেচা নয়; BTC trend ও support যাচাই করুন।":
+  fn<=40?"করণীয়: Fear। নতুন কেনাকাটায় সতর্ক থাকুন।":
+  fn<=60?"করণীয়: Neutral। নিশ্চিত trend-এর অপেক্ষা করুন।":
+  fn<=80?"করণীয়: Greed। FOMO এড়িয়ে লাভ সুরক্ষার পরিকল্পনা রাখুন।":
+  "করণীয়: Extreme Greed। অতিরিক্ত ঝুঁকি নেবেন না।"
+ ):"করণীয়: Fear & Greed ডেটা অনুপলব্ধ।");
+ text("dataQuality",m.update_mode==="scheduled_snapshot_not_realtime"?"Scheduled Snapshot":"যাচাই প্রয়োজন");
+ text("dataStatus",m.data_policy||"");
+ text("marketUpdated","Market Data: "+date(m.generated_at));
+ text("fearAlert",Number.isFinite(fn)?"Fear & Greed "+num(fn,0)+"/100 — "+(fn<=20?"Extreme Fear":fn>=80?"Extreme Greed":"পর্যবেক্ষণ করুন"):"Fear & Greed ডেটা অনুপলব্ধ");
+ text("marketSentiment",fg.classification||num(f,0));
+ text("sentimentAction",Number.isFinite(fn)?(fn<=20?"চরম ভয়; আতঙ্কে বিক্রি নয়।":fn>=80?"অতিরিক্ত লোভ; FOMO এড়িয়ে চলুন।":"সেন্টিমেন্ট পর্যবেক্ষণ করুন।"):"ডেটা নেই");
+ status("sentimentStatus",f===undefined?"অনুপলব্ধ":"পাওয়া গেছে",f===undefined?"warn":"ok");
 }
 
 function renderDecision(){
-  const d=DATA.decision||{};
-  const cm=d.crypto_market||{};
-  const btc=cm.btc||{};
-  const final=d.final_decision||{};
-  const macro=d.macro_analysis||{};
-  const support=first(btc,["support_20d","support"]);
-  const resistance=first(btc,["resistance_20d","resistance"]);
-  setText("btcSupport",money(support));
-  setText("btcResistance",money(resistance));
-  setText("supportAction",support!==undefined?"সাপোর্টের কাছে মূল্য আচরণ পর্যবেক্ষণ করুন।":"সাপোর্ট ডেটা নেই।");
-  setText("resistanceAction",resistance!==undefined?"রেজিস্ট্যান্সে ব্রেকআউট ও ভলিউম নিশ্চিত করুন।":"রেজিস্ট্যান্স ডেটা নেই।");
-  setStatus("supportStatus",support!==undefined?"পাওয়া গেছে":"অনুপলব্ধ",support!==undefined?"ok":"warn");
-  setStatus("resistanceStatus",resistance!==undefined?"পাওয়া গেছে":"অনুপলব্ধ",resistance!==undefined?"ok":"warn");
-  const stage=first(final,["cycle_stage","market_cycle","cycle"])||first(macro,["cycle_stage","market_cycle"]);
-  setText("cycleStage",stage||"যাচাই প্রয়োজন");
-  setText("cycleAction",stage?"করণীয়: অন্যান্য মার্কেট ও ম্যাক্রো ডেটার সঙ্গে মিলিয়ে সিদ্ধান্ত নিন।":"করণীয়: Cycle Stage নির্ধারণের জন্য প্রয়োজনীয় ডেটা এখনো যুক্ত হয়নি।");
-  setText("weeklyOutlook",first(final,["weekly_outlook","outlook"])||first(macro,["weekly_outlook","outlook"])||"সাপ্তাহিক আউটলুকের নির্দিষ্ট ডেটা পাওয়া যায়নি।");
-  const decision=first(final,["decision"])||"WAIT";
-  setText("finalDecision",decision);
-  setText("finalData",first(final,["market_context"])||d.data_quality||"Decision data পরীক্ষা করুন।");
-  setText("finalAnalysis",Array.isArray(final.reasons)?final.reasons.join(" · "):first(final,["analysis","summary"])||"বিশ্লেষণের বিস্তারিত পাওয়া যায়নি।");
-  setText("finalAction",Array.isArray(final.actions)?final.actions.join(" · "):first(final,["action","important_note"])||"ডেটা যাচাই না করে নতুন সিদ্ধান্ত নেবেন না।");
-  setText("finalRisk",first(final,["risk"])||first(d,["limitations"])||"অসম্পূর্ণ ডেটার ঝুঁকি রয়েছে।");
-  setText("decisionUpdated","সর্বশেষ সিদ্ধান্ত: "+timestamp(d.generated_at));
-  const generated=first(d,["generated_at"]);
-  setText("weeklyOutlook",first(final,["weekly_outlook","outlook"])||first(macro,["weekly_outlook","outlook"])||"সাপ্তাহিক আউটলুকের নির্দিষ্ট ডেটা পাওয়া যায়নি।");
-  const btcTrend=first(btc,["trend"]);
-  if(btcTrend) setText("finalAnalysis",(byId("finalAnalysis").textContent+" BTC Trend: "+btcTrend));
-  setText("riskAlert","Market Risk: "+(first(final,["risk"])||"ঝুঁকি মূল্যায়নের ডেটা অসম্পূর্ণ।"));
+ const d=DATA.decision||{};
+ const cm=d.crypto_market||{};
+ const btc=cm.btc||{};
+ const final=d.final_decision||{};
+ const ma=d.macro_analysis||{};
+ const support=btc.support_20d;
+ const resistance=btc.resistance_20d;
+ text("btcSupport",money(support));
+ text("btcResistance",money(resistance));
+ text("supportAction",support!==undefined?"সাপোর্টের কাছে price action পর্যবেক্ষণ করুন।":"সাপোর্ট ডেটা নেই।");
+ text("resistanceAction",resistance!==undefined?"রেজিস্ট্যান্স ব্রেক ও volume confirmation দেখুন।":"রেজিস্ট্যান্স ডেটা নেই।");
+ status("supportStatus",support===undefined?"অনুপলব্ধ":"পাওয়া গেছে",support===undefined?"warn":"ok");
+ status("resistanceStatus",resistance===undefined?"অনুপলব্ধ":"পাওয়া গেছে",resistance===undefined?"warn":"ok");
+ text("cycleStage","যাচাই প্রয়োজন");
+ text("cycleAction","করণীয়: Cycle Stage নির্ধারণের জন্য অতিরিক্ত cycle data প্রয়োজন।");
+ text("weeklyOutlook","সাপ্তাহিক পূর্বাভাসের নির্দিষ্ট field এখনো যুক্ত হয়নি।");
+ text("finalData","BTC: "+(btc.trend||"—")+" | Fear & Greed: "+(cm.fear_greed?.classification||"—")+" | Data quality: "+(d.data_quality?.market?.status||"—"));
+ text("finalAnalysis",(final.reasons||[]).join(" "));
+ text("finalDecision",final.decision||"WAIT");
+ text("finalAction",(final.actions||[]).join(" "));
+ text("finalRisk",(final.risk||[]).join(" "));
+ text("decisionUpdated","Decision updated: "+date(d.generated_at));
+ text("riskAlert","Market Risk: "+((final.risk||[]).join(" ")||"ঝুঁকির তথ্য নেই।"));
+ text("btcTrendAlert","BTC Daily Trend: "+(btc.trend||"যাচাই প্রয়োজন")+" | RSI: "+num(btc.rsi14));
 }
 
 function renderMacro(){
-  const m=DATA.macro||{};
-  const metrics=m.metrics||{};
-  const inflation=m.inflation||{};
-  const liquidity=m.liquidity||{};
-  const yields=m.yield_curve||{};
-  const dxy=first(metrics,["dxy","usd_broad_index","dollar_index"]);
-  const y10=first(metrics,["yield_10y","us_10y_yield","treasury_10y"]) ?? first(yields,["10y","yield_10y"]);
-  const vix=first(metrics,["vix"]);
-  const m2=first(liquidity,["global_m2","m2_global","global_m2_supply"]) ?? first(metrics,["global_m2","m2"]);
-  const fed=first(metrics,["fed_rate","federal_funds_rate"]) ?? first(inflation,["fed_rate"]);
-  setText("dxy",fmt(dxy));setText("yield10y",pct(y10));setText("vix",fmt(vix));
-  setText("globalM2",m2===undefined?"—":compactMoney(m2));
-  setText("fedRate",pct(fed));
-  setText("dxyAction",dxy===undefined?"করণীয়: DXY ডেটা পাওয়া যায়নি।":"করণীয়: Dollar Index-এর ট্রেন্ড ও BTC-এর সঙ্গে সম্পর্ক পর্যবেক্ষণ করুন।");
-  setText("yieldAction",y10===undefined?"করণীয়: 10Y Yield ডেটা পাওয়া যায়নি।":"করণীয়: Yield বাড়লে ঝুঁকিপূর্ণ সম্পদে চাপ তৈরি হতে পারে; BTC trend যাচাই করুন।");
-  const vn=Number(vix);
-  setText("vixAction",Number.isFinite(vn)?(vn>=30?"করণীয়: উচ্চ অস্থিরতা; নতুন Spot কেনাকাটায় সতর্ক থাকুন।":vn>=20?"করণীয়: বাজারে চাপ আছে; ঝুঁকি কম রাখুন।":"করণীয়: VIX তুলনামূলক শান্ত; তবুও BTC trend যাচাই করুন।"):"করণীয়: VIX ডেটা পাওয়া যায়নি।");
-  setText("m2Action",m2===undefined?"করণীয়: Global M2 ডেটা সংযুক্ত হয়নি।":"করণীয়: M2-এর ধারাবাহিক পরিবর্তন ও আপডেটের তারিখ দেখুন।");
-  setText("vixAlert",Number.isFinite(vn)?("VIX "+fmt(vn)+" — "+(vn>=30?"উচ্চ অস্থিরতার সতর্কতা।":vn>=20?"বাজারে চাপ রয়েছে।":"VIX তুলনামূলক কম।")):"VIX Alert: ডেটা পাওয়া যায়নি।");
+ const m=DATA.macro||{};
+ const x=m.metrics||{};
+ const liq=m.liquidity||{};
+ const dxy=x.usd_broad_index;
+ const y10=x.yield_10y;
+ const vix=x.vix;
+ const sp=x.sp500;
+ const oil=x.oil;
+ const gold=x.gold;
+ const m2=x.m2_money_supply;
+ const fed=x.fed_funds_rate;
+ const y30=x.yield_30y;
+ const jpy=x.usd_jpy;
+
+ text("dxy",num(dxy?.value));
+ text("yield10y",percent(y10?.value));
+ text("vix",num(vix?.value));
+ text("sp500",num(sp?.value));
+ text("sp500Note",ageLabel(sp));
+ text("brent",num(oil?.value));
+ text("oilNote","WTI Crude Oil · "+ageLabel(oil));
+ text("gold",gold?.value==null?"অনুপলব্ধ":num(gold.value));
+ text("goldNote",ageLabel(gold));
+ text("globalM2",m2?.value==null?"—":num(m2.value)+" বিলিয়ন USD");
+ text("fedRate",percent(fed?.value));
+ text("yield30y",percent(y30?.value));
+ text("usdJpy",num(jpy?.value));
+ text("netLiquidity",liq.trend||"অনুপলব্ধ");
+ text("liquidityNote",liq.current==null?"Liquidity data unavailable":"বর্তমান: "+num(liq.current)+" বিলিয়ন USD | "+(liq.observation_date||""));
+ text("macroUpdated",date(m.fetched_at));
+ text("dxyAction",dxy?"এটি Dollar Broad Index; প্রকৃত DXY নয়। Trend পর্যবেক্ষণ করুন।":"ডেটা অনুপলব্ধ।");
+ text("yieldAction",y10?"10Y yield বৃদ্ধি পেলে risk assets-এ চাপ আসতে পারে।":"ডেটা অনুপলব্ধ।");
+ const vn=Number(vix?.value);
+ text("vixAction",Number.isFinite(vn)?(vn>=30?"উচ্চ অস্থিরতা; নতুন Spot কেনাকাটায় সতর্ক থাকুন।":vn>=20?"অস্থিরতা elevated; ঝুঁকি কম রাখুন।":"VIX তুলনামূলক কম; BTC trend যাচাই করুন।"):"VIX ডেটা অনুপলব্ধ।");
+ text("m2Action",m2?"US M2; Global M2 নয়। Observation date দেখুন।":"M2 ডেটা অনুপলব্ধ।");
+ text("vixAlert",Number.isFinite(vn)?"VIX "+num(vn)+" — "+(vn>=30?"উচ্চ অস্থিরতা":vn>=20?"বাজারে চাপ":"তুলনামূলক শান্ত"):"VIX ডেটা অনুপলব্ধ");
 }
 
 function renderAdvanced(){
-  const a=DATA.advanced||{};
-  const deriv=a.derivatives||a.market_derivatives||{};
-  const funding=first(deriv,["funding_rate","fundingRate","btc_funding_rate"]);
-  const oi=first(deriv,["open_interest","openInterest","btc_open_interest"]);
-  const ls=first(deriv,["long_short_ratio","longShortRatio"]);
-  const taker=first(deriv,["taker_buy_sell_ratio","taker_ratio","takerBuySellRatio"]);
-  const order=first(a,["order_book_imbalance","orderbook.imbalance","order_book.imbalance"]);
-  setText("fundingRate",funding===undefined?"—":pct(funding));
-  setText("openInterest",oi===undefined?"—":fmt(oi));
-  setText("longShort",ls===undefined?"—":fmt(ls,3));
-  setText("takerRatio",taker===undefined?"—":fmt(taker,3));
-  setText("orderImbalance",order===undefined?"—":fmt(order,3));
-  setText("fundingAction",funding===undefined?"Derivatives ডেটা অনুপলব্ধ।":"Funding একা Buy/Sell সংকেত নয়; অতিরিক্ত লিভারেজের ঝুঁকি দেখুন।");
-  setText("oiAction",oi===undefined?"Open Interest ডেটা অনুপলব্ধ।":"OI বৃদ্ধি ও মূল্য পরিবর্তন একসঙ্গে বিশ্লেষণ করুন।");
-  setText("longShortAction",ls===undefined?"Long/Short ডেটা অনুপলব্ধ।":"একপাশে অতিরিক্ত পজিশন জমলে বিপরীতমুখী ঝুঁকি বাড়ে।");
-  setText("takerAction",taker===undefined?"Taker Ratio ডেটা অনুপলব্ধ।":"১-এর ওপরে হলে Taker Buy বেশি; নিচে হলে Sell বেশি হতে পারে।");
-  setText("orderAction",order===undefined?"Spot Order Book Imbalance ডেটা সংযুক্ত নয়।":"Order Book গভীরতা ও স্প্রেডের সঙ্গে মিলিয়ে দেখুন।");
-  setStatus("fundingStatus",funding!==undefined?"পাওয়া গেছে":"অনুপলব্ধ",funding!==undefined?"ok":"warn");
-  setStatus("oiStatus",oi!==undefined?"পাওয়া গেছে":"অনুপলব্ধ",oi!==undefined?"ok":"warn");
-  setText("etfFlow",first(a,["etf.net_flow","etf_flows.net_flow","etf_net_flow"])??"সংযুক্ত নয়");
-  setText("marketUpdated","আপডেট: "+timestamp(first(a,["generated_at"])||first(DATA.market||{},["generated_at"])));
+ const a=DATA.advanced||{};
+ const on=a.on_chain||{};
+ const der=a.derivatives?.BTCUSDT||{};
+ const spot=a.spot_market_activity||{};
+ const breadth=spot.breadth||{};
+
+ text("etfFlow",a.etf_flows?.value==null?"অনুপলব্ধ":num(a.etf_flows.value));
+ text("mvrv",on.mvrv_z_score?.value==null?"অনুপলব্ধ":num(on.mvrv_z_score.value));
+ text("sopr",on.sth_sopr?.value==null?"অনুপলব্ধ":num(on.sth_sopr.value));
+ text("netflow",on.exchange_netflow?.value==null?"অনুপলব্ধ":num(on.exchange_netflow.value));
+ text("stablecoin",on.stablecoin_supply?.value==null?"অনুপলব্ধ":num(on.stablecoin_supply.value));
+ text("liquidation",a.liquidation_heatmap?.value==null?"অনুপলব্ধ":num(a.liquidation_heatmap.value));
+ text("altseason",a.altcoin_season_index?.value==null?"অনুপলব্ধ":num(a.altcoin_season_index.value));
+ text("hashrate",on.hashrate?.value==null?"অনুপলব্ধ":num(on.hashrate.value));
+ text("difficulty",on.mining_difficulty?.value==null?"অনুপলব্ধ":num(on.mining_difficulty.value));
+ text("whales",on.whale_activity?.value==null?"অনুপলব্ধ":num(on.whale_activity.value));
+
+ const funding=der.last_funding_rate;
+ const oi=der.open_interest_contracts;
+ text("fundingRate",funding?.value==null?"অনুপলব্ধ":percent(Number(funding.value)*100));
+ text("openInterest",oi?.value==null?"অনুপলব্ধ":num(oi.value));
+ text("fundingAction",funding?.value==null?"Binance Futures API unavailable।":"Funding rate derivatives sentiment; Spot signal নয়।");
+ text("oiAction",oi?.value==null?"Open Interest ডেটা unavailable।":"OI-কে price ও volume-এর সঙ্গে বিশ্লেষণ করুন।");
+ status("fundingStatus",funding?.value==null?"অনুপলব্ধ":"পাওয়া গেছে",funding?.value==null?"warn":"ok");
+ status("oiStatus",oi?.value==null?"অনুপলব্ধ":"পাওয়া গেছে",oi?.value==null?"warn":"ok");
+
+ text("longShort","অনুপলব্ধ");
+ text("longShortAction","Long/Short Ratio API যুক্ত হয়নি।");
+ text("takerRatio","অনুপলব্ধ");
+ text("takerAction","Taker Buy/Sell Ratio API যুক্ত হয়নি।");
+ text("orderImbalance","অনুপলব্ধ");
+ text("orderAction","Spot Order Book Imbalance API যুক্ত হয়নি।");
+ text("advancing",breadth.advancing_pairs==null?"—":num(breadth.advancing_pairs,0));
+ text("declining",breadth.declining_pairs==null?"—":num(breadth.declining_pairs,0));
+ text("advanceRatio",breadth.advance_decline_ratio==null?"—":num(breadth.advance_decline_ratio,3));
 }
 
 async function refreshAll(){
-  setText("connectionStatus","ডেটা আপডেট হচ্ছে");
-  const names=Object.keys(DATA_FILES);
-  const results=await Promise.allSettled(names.map(name=>loadJSON(DATA_FILES[name])));
-  let success=0;
-  results.forEach((result,index)=>{
-    const name=names[index];
-    if(result.status==="fulfilled"){DATA[name]=result.value;success++;}
-    else console.warn("Data load failed:",name,result.reason);
-  });
-  if(DATA.market) renderMarket();
-  if(DATA.decision) renderDecision();
-  if(DATA.macro) renderMacro();
-  if(DATA.advanced) renderAdvanced();
-  setText("connectionStatus",success===names.length?"ডেটা সংযুক্ত":"আংশিক ডেটা সংযুক্ত");
-  byId("connectionStatus").style.color=success===names.length?"var(--green)":"var(--yellow)";
-  setText("lastRefresh","সর্বশেষ রিফ্রেশ: "+new Date().toLocaleString("bn-BD"));
+ text("connectionStatus","ডেটা আপডেট হচ্ছে");
+ const names=Object.keys(FILES);
+ const results=await Promise.allSettled(names.map(k=>load(FILES[k])));
+ let ok=0;
+ results.forEach((r,i)=>{
+  if(r.status==="fulfilled"){DATA[names[i]]=r.value;ok++;}
+  else console.error(names[i],r.reason);
+ });
+ if(DATA.market)renderMarket();
+ if(DATA.decision)renderDecision();
+ if(DATA.macro)renderMacro();
+ if(DATA.advanced)renderAdvanced();
+ text("connectionStatus",ok===4?"চারটি JSON সংযুক্ত":"আংশিক ডেটা সংযুক্ত");
+ if(el("connectionStatus"))el("connectionStatus").style.color=ok===4?"var(--green)":"var(--yellow)";
+ text("lastRefresh","ব্রাউজার রিফ্রেশ: "+new Date().toLocaleString("bn-BD"));
 }
 refreshAll();
 setInterval(refreshAll,5*60*1000);
