@@ -4,7 +4,7 @@
 
 """
 FREE ADVANCED CRYPTO INTELLIGENCE ENGINE
-Version: 2.4.0
+Version: 2.5.0
 
 Free public data sources:
 - Binance Spot API
@@ -40,7 +40,7 @@ COINBOSS = "https://www.coinboss.com/api"
 MEMPOOL = "https://mempool.space/api"
 COINMETRICS = "https://community-api.coinmetrics.io/v4"
 
-USER_AGENT = "CryptoMacroDashboard-FreeEngine/2.4.0"
+USER_AGENT = "CryptoMacroDashboard-FreeEngine/2.5.0"
 HALVING_INTERVAL = 210000
 
 
@@ -101,8 +101,10 @@ def fetch_text(url):
 def finite(value):
     try:
         number = float(value)
+
         if math.isfinite(number):
             return number
+
     except (TypeError, ValueError, OverflowError):
         pass
 
@@ -359,7 +361,7 @@ def get_coinboss_open_interest(coin):
             "total_usd": unavailable(error),
             "total_change_24h_pct": unavailable(error),
             "exchange_count": unavailable(error),
-            "contract_count": unavailable(error),
+            "instrument_count": unavailable(error),
             "coverage": None,
             "asof": None
         }
@@ -386,9 +388,11 @@ def get_coinboss_open_interest(coin):
             "exchanges",
             "CoinBoss"
         ),
-        "contract_count": metric(
+        # n_contracts represents the number of listed instruments
+        # in the aggregate response, not total contract quantity.
+        "instrument_count": metric(
             data.get("n_contracts"),
-            "contracts",
+            "instruments",
             "CoinBoss"
         ),
         "coverage": data.get("coverage"),
@@ -398,6 +402,10 @@ def get_coinboss_open_interest(coin):
     }
 
 
+# ============================================================
+# COINBOSS FUNDING RATE AND APR
+# ============================================================
+
 def get_coinboss_funding(coin):
     data, error = coinboss_fetch("/sd/funding", coin)
 
@@ -406,14 +414,53 @@ def get_coinboss_funding(coin):
             "avg_8h": unavailable(error),
             "oi_weighted_8h": unavailable(error),
             "apr_pct": unavailable(error),
+            "provider_apr_pct": unavailable(error),
+            "apr_difference_percentage_points": unavailable(error),
+            "apr_consistency": "UNAVAILABLE",
             "exchange_count": unavailable(error),
             "coverage": None,
             "asof": None
         }
 
+    avg_rate = finite(data.get("avg_8h"))
+    provider_apr = finite(data.get("apr_pct"))
+
+    # Three 8-hour funding periods per day.
+    # Calculated APR = average 8h rate * 3 * 365 * 100.
+    calculated_apr = (
+        avg_rate * 3 * 365 * 100
+        if avg_rate is not None
+        else None
+    )
+
+    provider_apr_metric = metric(
+        provider_apr,
+        "% per year",
+        "CoinBoss provider-reported APR"
+    )
+
+    calculated_apr_metric = metric(
+        calculated_apr,
+        "% per year",
+        "Calculated from CoinBoss average 8h funding"
+    )
+
+    apr_difference = (
+        abs(provider_apr - calculated_apr)
+        if provider_apr is not None and calculated_apr is not None
+        else None
+    )
+
+    if apr_difference is None:
+        consistency = "NOT_VERIFIABLE"
+    elif apr_difference <= 0.05:
+        consistency = "MATCH"
+    else:
+        consistency = "MISMATCH"
+
     return {
         "avg_8h": metric(
-            data.get("avg_8h"),
+            avg_rate,
             "fraction per 8h",
             "CoinBoss Cross-exchange Funding"
         ),
@@ -422,11 +469,15 @@ def get_coinboss_funding(coin):
             "fraction per 8h",
             "CoinBoss Cross-exchange Funding"
         ),
-        "apr_pct": metric(
-            data.get("apr_pct"),
-            "% per year",
-            "CoinBoss Cross-exchange Funding"
+        "apr_pct": calculated_apr_metric,
+        "provider_apr_pct": provider_apr_metric,
+        "apr_difference_percentage_points": metric(
+            apr_difference,
+            "percentage points",
+            "Comparison of calculated and provider APR"
         ),
+        "apr_consistency": consistency,
+        "apr_formula": "average_8h_rate × 3 × 365 × 100",
         "exchange_count": metric(
             data.get("n_exchanges"),
             "exchanges",
@@ -438,13 +489,14 @@ def get_coinboss_funding(coin):
         "provider": "CoinBoss",
         "unit_note": (
             "Funding rate is a fraction; 0.0001 = 0.01%. "
-            "OI-weighted 8h rate is preferred."
+            "APR is calculated from average 8h funding using 3 periods/day. "
+            "Provider APR is preserved separately for comparison."
         )
     }
 
 
 # ============================================================
-# COINBOSS LONG / SHORT - CORRECT RESPONSE STRUCTURE
+# COINBOSS LONG / SHORT
 # ============================================================
 
 def get_coinboss_long_short(coin):
@@ -476,9 +528,7 @@ def get_coinboss_long_short(coin):
 
         if not isinstance(block, dict):
             return {
-                "ratio": unavailable(
-                    f"{label} ratio unavailable"
-                ),
+                "ratio": unavailable(f"{label} ratio unavailable"),
                 "long_pct": unavailable(
                     f"{label} long percentage unavailable"
                 ),
@@ -600,7 +650,7 @@ def get_coinboss_long_short(coin):
 
 
 # ============================================================
-# DERIVATIVES OUTPUT - DASHBOARD COMPATIBLE
+# DERIVATIVES OUTPUT
 # ============================================================
 
 def get_derivatives(symbol):
@@ -622,12 +672,17 @@ def get_derivatives(symbol):
         "open_interest_change_24h_pct": (
             oi["total_change_24h_pct"]
         ),
-        "open_interest_contracts": oi["contract_count"],
+        "open_interest_instrument_count": oi["instrument_count"],
         "open_interest_exchange_count": oi["exchange_count"],
 
         "last_funding_rate": funding["oi_weighted_8h"],
         "funding_avg_8h": funding["avg_8h"],
         "funding_apr_pct": funding["apr_pct"],
+        "funding_provider_apr_pct": funding["provider_apr_pct"],
+        "funding_apr_consistency": funding["apr_consistency"],
+        "funding_apr_difference_percentage_points": (
+            funding["apr_difference_percentage_points"]
+        ),
         "funding_exchange_count": funding["exchange_count"],
 
         "global_long_short_ratio": (
@@ -855,25 +910,113 @@ def get_spot_activity():
             "breadth": unavailable(error)
         }
 
+    # Exchange metadata is required to identify base assets correctly.
+    info, info_error = safe_fetch(
+        f"{BINANCE}/api/v3/exchangeInfo"
+    )
+
+    if (
+        not isinstance(info, dict)
+        or not isinstance(info.get("symbols"), list)
+    ):
+        return {
+            "status": "PARTIAL",
+            "reason": (
+                "Ticker data fetched, but exchangeInfo base-asset "
+                "metadata was unavailable; breadth classification "
+                "is withheld. "
+                + str(info_error or "")
+            )[:250],
+            "volume_leaders_24h": [],
+            "breadth": unavailable(
+                "Cannot reliably classify base assets without exchangeInfo"
+            )
+        }
+
+    stablecoins = {
+        "USDT", "USDC", "FDUSD", "TUSD", "USDP", "DAI", "BUSD",
+        "USDE", "USDS", "USDD", "USTC", "EUR", "EURI", "AEUR",
+        "USD1", "RLUSD", "PYUSD", "UST"
+    }
+
+    # Known Binance tokenized equity / ETF representations.
+    tokenized_equities = {
+        "NVDAB", "SOXLB", "TSLAB", "AAPLX", "MSFTX",
+        "AMZNX", "GOOGLX", "METAX", "MSTRX", "COINX",
+        "SPYX", "QQQX", "CRCLX", "HOODX", "PLTRX"
+    }
+
+    leveraged_suffixes = (
+        "UP",
+        "DOWN",
+        "BULL",
+        "BEAR"
+    )
+
+    symbol_meta = {}
+
+    for item in info["symbols"]:
+        if not isinstance(item, dict):
+            continue
+
+        symbol = item.get("symbol")
+
+        if not isinstance(symbol, str):
+            continue
+
+        if item.get("quoteAsset") != "USDT":
+            continue
+
+        if item.get("status") != "TRADING":
+            continue
+
+        permissions = item.get("permissions")
+
+        if (
+            isinstance(permissions, list)
+            and permissions
+            and "SPOT" not in permissions
+        ):
+            continue
+
+        symbol_meta[symbol] = item.get("baseAsset")
+
     valid = []
+
     advancing = 0
     declining = 0
     unchanged = 0
 
-    excluded = (
-        "UPUSDT",
-        "DOWNUSDT",
-        "BULLUSDT",
-        "BEARUSDT"
-    )
+    excluded_stablecoins = 0
+    excluded_tokenized_equities = 0
+    excluded_leveraged = 0
+    unmatched_symbols = 0
 
     for item in rows:
         symbol = item.get("symbol", "")
 
-        if not symbol.endswith("USDT"):
+        if (
+            not isinstance(symbol, str)
+            or not symbol.endswith("USDT")
+        ):
             continue
 
-        if any(tag in symbol for tag in excluded):
+        base_asset = symbol_meta.get(symbol)
+
+        if not base_asset:
+            unmatched_symbols += 1
+            continue
+
+        if base_asset in stablecoins:
+            excluded_stablecoins += 1
+            continue
+
+        if base_asset in tokenized_equities:
+            excluded_tokenized_equities += 1
+            continue
+
+        if base_asset.endswith(leveraged_suffixes):
+            excluded_leveraged += 1
             continue
 
         quote_volume = finite(item.get("quoteVolume"))
@@ -890,6 +1033,7 @@ def get_spot_activity():
 
         valid.append({
             "symbol": symbol,
+            "base_asset": base_asset,
             "quote_volume_24h": quote_volume,
             "change_24h_pct": change,
             "trades": int(trades)
@@ -912,10 +1056,10 @@ def get_spot_activity():
     if measured == 0:
         return {
             "status": "UNAVAILABLE",
-            "reason": "No valid USDT Spot pairs returned",
+            "reason": "No eligible crypto Spot USDT pairs returned",
             "volume_leaders_24h": [],
             "breadth": unavailable(
-                "No valid Spot breadth observations"
+                "No eligible crypto Spot breadth observations"
             )
         }
 
@@ -924,13 +1068,26 @@ def get_spot_activity():
         "declining_pairs": declining,
         "unchanged_pairs": unchanged,
         "measured_pairs": measured,
+
         "advance_decline_ratio": (
             round(advancing / declining, 3)
             if declining > 0
             else None
         ),
+
+        "excluded_stablecoin_pairs": excluded_stablecoins,
+        "excluded_tokenized_equity_pairs": excluded_tokenized_equities,
+        "excluded_leveraged_token_pairs": excluded_leveraged,
+        "unmatched_symbol_count": unmatched_symbols,
+
+        "classification": (
+            "Trading Binance Spot USDT pairs only; stablecoins, "
+            "known tokenized equity/ETF assets, leveraged tokens, "
+            "and symbols without exchange metadata excluded."
+        ),
+
         "status": "OK",
-        "source": "Binance Spot 24h ticker",
+        "source": "Binance Spot 24h ticker + exchangeInfo",
         "fetched_at": utc_now()
     }
 
@@ -939,8 +1096,8 @@ def get_spot_activity():
         "volume_leaders_24h": valid[:12],
         "breadth": breadth,
         "note": (
-            "২৪ ঘণ্টার Spot Market Breadth; "
-            "USDT trading pairs-এর উপর ভিত্তি করে।"
+            "২৪ ঘণ্টার Crypto Spot Market Breadth; stablecoin, "
+            "tokenized equity/ETF এবং leveraged token বাদ।"
         )
     }
 
@@ -952,7 +1109,7 @@ def get_spot_activity():
 def main():
     DATA_DIR.mkdir(parents=True, exist_ok=True)
 
-    print("Starting Free Advanced Crypto Engine v2.4.0")
+    print("Starting Free Advanced Crypto Engine v2.5.0")
 
     print("Fetching Spot Order Books...")
     order_books = {
@@ -975,7 +1132,7 @@ def main():
     print("Fetching MVRV...")
     mvrv = get_mvrv()
 
-    print("Fetching Spot Market Breadth...")
+    print("Fetching filtered Crypto Spot Market Breadth...")
     spot_activity = get_spot_activity()
 
     print("Fetching CoinBoss Cross-exchange Derivatives...")
@@ -987,7 +1144,7 @@ def main():
     result = {
         "schema_version": 2,
         "engine": "Free Advanced Crypto Intelligence",
-        "engine_version": "2.4.0",
+        "engine_version": "2.5.0",
         "generated_at": utc_now(),
 
         "data_policy": (
@@ -1072,7 +1229,7 @@ def main():
     print("----------------------------------")
     print("FREE ADVANCED ENGINE SUCCESS")
     print("Output:", OUTPUT_FILE)
-    print("Version: 2.4.0")
+    print("Version: 2.5.0")
     print("----------------------------------")
 
 
