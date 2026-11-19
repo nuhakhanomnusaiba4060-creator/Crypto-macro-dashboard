@@ -2,19 +2,19 @@
   "schema_version": 1,
   "engine": "Crypto Final Decision Engine",
   "engine_version": "1.0.0",
-  "generated_at": "2026-11-19T13:41:14Z",
+  "generated_at": "2026-11-19T15:14:04Z",
   "status": "OK",
   "data_quality": {
     "macro": {
       "name": "macro_data",
-      "timestamp": "2026-11-19T13:41:14Z",
+      "timestamp": "2026-11-19T15:14:04Z",
       "age_hours": 0.0,
       "max_age_hours": 72,
       "status": "FRESH"
     },
     "market": {
       "name": "market_data",
-      "timestamp": "2026-11-19T13:40:47Z",
+      "timestamp": "2026-11-19T15:13:42Z",
       "age_hours": 0.01,
       "max_age_hours": 36,
       "status": "FRESH"
@@ -22,14 +22,14 @@
     "btc_technical": {
       "name": "BTC last closed daily candle",
       "timestamp": "2026-11-18T23:59:59Z",
-      "age_hours": 13.69,
+      "age_hours": 15.23,
       "max_age_hours": 60,
       "status": "FRESH"
     },
     "eth_technical": {
       "name": "ETH last closed daily candle",
       "timestamp": "2026-11-18T23:59:59Z",
-      "age_hours": 13.69,
+      "age_hours": 15.23,
       "max_age_hours": 60,
       "status": "FRESH"
     },
@@ -41,7 +41,7 @@
   },
   "macro_analysis": {
     "decision": "WAIT",
-    "risk_score": 2.0,
+    "risk_score": 1.0,
     "support_score": 1.0,
     "data_quality": "GOOD_WITH_OPTIONAL_GAPS",
     "critical_series_available": 18,
@@ -50,7 +50,7 @@
     "key_metrics": {
       "cpi_yoy_percent": 4.081,
       "core_pce_yoy_percent": 3.121,
-      "vix": 25.46,
+      "vix": 24.56,
       "sp500_daily_change_percent": -0.2302,
       "nasdaq_daily_change_percent": 0.4172,
       "yield_10y_daily_change_pp": -0.02,
@@ -64,16 +64,16 @@
     ]
   },
   "crypto_market": {
-    "global_market_cap_usd": 2202110320908.608,
-    "global_volume_24h_usd": 74462127221.38121,
-    "btc_dominance_percent": 58.115333248843406,
+    "global_market_cap_usd": 2207527473687.795,
+    "global_volume_24h_usd": 72216235846.24759,
+    "btc_dominance_percent": 58.11640259940343,
     "fear_greed": {
       "value": 10.0,
       "classification": "Extreme Fear",
       "unit": "/100",
       "source": "Alternative.me Fear & Greed API",
       "source_updated_at": "2026-11-19T00:00:00Z",
-      "fetched_at": "2026-11-19T13:40:48Z",
+      "fetched_at": "2026-11-19T15:13:43Z",
       "status": "OK",
       "error": null
     },
@@ -145,9 +145,9 @@
     "market_context": {
       "fear_greed_value": 10.0,
       "fear_greed_classification": "Extreme Fear",
-      "btc_dominance_percent": 58.115333248843406,
-      "total_market_cap_usd": 2202110320908.608,
-      "total_volume_24h_usd": 74462127221.38121
+      "btc_dominance_percent": 58.11640259940343,
+      "total_market_cap_usd": 2207527473687.795,
+      "total_volume_24h_usd": 72216235846.24759
     },
     "important_note": "এটি সামগ্রিক market-regime guidance; ব্যক্তিগত portfolio holdings-এর coin-by-coin SELL signal নয়।"
   },
