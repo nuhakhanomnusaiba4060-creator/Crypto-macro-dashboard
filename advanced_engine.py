@@ -4,7 +4,7 @@
 
 """
 FREE ADVANCED CRYPTO INTELLIGENCE ENGINE
-Version: 2.3.0
+Version: 2.4.0
 
 Free public data sources:
 - Binance Spot API
@@ -40,9 +40,13 @@ COINBOSS = "https://www.coinboss.com/api"
 MEMPOOL = "https://mempool.space/api"
 COINMETRICS = "https://community-api.coinmetrics.io/v4"
 
-USER_AGENT = "CryptoMacroDashboard-FreeEngine/2.3.0"
+USER_AGENT = "CryptoMacroDashboard-FreeEngine/2.4.0"
 HALVING_INTERVAL = 210000
 
+
+# ============================================================
+# COMMON HELPERS
+# ============================================================
 
 def utc_now():
     return (
@@ -105,6 +109,15 @@ def finite(value):
     return None
 
 
+def unavailable(reason):
+    return {
+        "value": None,
+        "status": "UNAVAILABLE",
+        "reason": str(reason or "Data unavailable")[:250],
+        "fetched_at": utc_now()
+    }
+
+
 def metric(value, unit, source, observed_at=None):
     number = finite(value)
 
@@ -125,21 +138,17 @@ def metric(value, unit, source, observed_at=None):
     return result
 
 
-def unavailable(reason):
-    return {
-        "value": None,
-        "status": "UNAVAILABLE",
-        "reason": str(reason or "Data unavailable")[:250],
-        "fetched_at": utc_now()
-    }
-
-
 def safe_fetch(url):
     try:
         data = fetch_json(url)
 
         if isinstance(data, dict) and data.get("success") is False:
-            return None, data.get("error") or data.get("code") or "API returned success=false"
+            return (
+                None,
+                data.get("error")
+                or data.get("code")
+                or "API returned success=false"
+            )
 
         return data, None
 
@@ -150,6 +159,7 @@ def safe_fetch(url):
 def unix_ms_to_iso(value):
     try:
         number = finite(value)
+
         if number is None:
             return None
 
@@ -162,6 +172,7 @@ def unix_ms_to_iso(value):
             .isoformat()
             .replace("+00:00", "Z")
         )
+
     except (ValueError, OverflowError, OSError):
         return None
 
@@ -214,13 +225,19 @@ def get_order_book(symbol):
         return {
             "symbol": symbol,
             "imbalance_percent": metric(
-                imbalance, "%", "Binance Spot Order Book"
+                imbalance,
+                "%",
+                "Binance Spot Order Book"
             ),
             "bid_value_usdt": metric(
-                bid_value, "USDT", "Binance Spot Order Book"
+                bid_value,
+                "USDT",
+                "Binance Spot Order Book"
             ),
             "ask_value_usdt": metric(
-                ask_value, "USDT", "Binance Spot Order Book"
+                ask_value,
+                "USDT",
+                "Binance Spot Order Book"
             ),
             "last_update_id": data.get("lastUpdateId")
         }
@@ -347,6 +364,11 @@ def get_coinboss_open_interest(coin):
             "asof": None
         }
 
+    change = data.get("change")
+
+    if not isinstance(change, dict):
+        change = {}
+
     return {
         "total_usd": metric(
             data.get("total_usd"),
@@ -355,7 +377,7 @@ def get_coinboss_open_interest(coin):
             unix_ms_to_iso(data.get("asof"))
         ),
         "total_change_24h_pct": metric(
-            (data.get("change") or {}).get("pct_24h"),
+            change.get("pct_24h"),
             "%",
             "CoinBoss Cross-exchange Open Interest"
         ),
@@ -421,106 +443,165 @@ def get_coinboss_funding(coin):
     }
 
 
+# ============================================================
+# COINBOSS LONG / SHORT - CORRECT RESPONSE STRUCTURE
+# ============================================================
+
 def get_coinboss_long_short(coin):
+    """
+    CoinBoss /api/sd/ls returns separate top-level objects:
+    account, top_account, top_position, position_all and taker.
+
+    These are different trader populations and must remain separate.
+    """
+
     data, error = coinboss_fetch("/sd/ls", coin)
 
     if data is None:
+        reason = error or "CoinBoss Long/Short data unavailable"
+
         return {
-            "account": unavailable(error),
-            "position": unavailable(error),
-            "taker": unavailable(error),
+            "account": unavailable(reason),
+            "top_account": unavailable(reason),
+            "position": unavailable(reason),
+            "all_position": unavailable(reason),
+            "taker": unavailable(reason),
             "coverage": None,
-            "provider": "CoinBoss"
+            "provider": "CoinBoss",
+            "asof": None
         }
 
-    # The endpoint keeps account, position and taker measures separate.
-    # Do not mix different ratio types into one figure.
-    result = {
-        "account": unavailable("Account ratio not present in response"),
-        "position": unavailable("Position ratio not present in response"),
-        "taker": unavailable("Taker ratio not present in response"),
+    def parse_flavour(name, label):
+        block = data.get(name)
+
+        if not isinstance(block, dict):
+            return {
+                "ratio": unavailable(
+                    f"{label} ratio unavailable"
+                ),
+                "long_pct": unavailable(
+                    f"{label} long percentage unavailable"
+                ),
+                "short_pct": unavailable(
+                    f"{label} short percentage unavailable"
+                ),
+                "exchange_count": unavailable(
+                    f"{label} exchange count unavailable"
+                ),
+                "by_exchange": []
+            }
+
+        long_pct = finite(block.get("long_pct"))
+        short_pct = finite(block.get("short_pct"))
+        ratio = finite(block.get("ratio"))
+        exchange_count = finite(block.get("n_exchanges"))
+
+        if long_pct is not None and not 0 <= long_pct <= 100:
+            long_pct = None
+
+        if short_pct is not None and not 0 <= short_pct <= 100:
+            short_pct = None
+
+        if ratio is not None and ratio <= 0:
+            ratio = None
+
+        if (
+            ratio is None
+            and long_pct is not None
+            and short_pct is not None
+            and short_pct > 0
+        ):
+            ratio = long_pct / short_pct
+
+        source = f"CoinBoss Cross-exchange {label}"
+        observed_at = unix_ms_to_iso(data.get("now"))
+
+        exchanges = []
+        raw_exchanges = block.get("by_exchange")
+
+        if isinstance(raw_exchanges, list):
+            for row in raw_exchanges:
+                if not isinstance(row, dict):
+                    continue
+
+                row_long = finite(row.get("long_pct"))
+                row_short = finite(row.get("short_pct"))
+                row_ratio = finite(row.get("ratio"))
+
+                if (
+                    row_ratio is None
+                    and row_long is not None
+                    and row_short is not None
+                    and row_short > 0
+                ):
+                    row_ratio = row_long / row_short
+
+                exchanges.append({
+                    "exchange": row.get("exchange"),
+                    "long_pct": row_long,
+                    "short_pct": row_short,
+                    "ratio": row_ratio,
+                    "timestamp": unix_ms_to_iso(
+                        row.get("timestamp")
+                    )
+                })
+
+        return {
+            "ratio": metric(
+                ratio,
+                "long/short ratio",
+                source,
+                observed_at
+            ),
+            "long_pct": metric(
+                long_pct,
+                "%",
+                source,
+                observed_at
+            ),
+            "short_pct": metric(
+                short_pct,
+                "%",
+                source,
+                observed_at
+            ),
+            "exchange_count": metric(
+                exchange_count,
+                "exchanges",
+                source,
+                observed_at
+            ),
+            "by_exchange": exchanges
+        }
+
+    return {
+        "account": parse_flavour("account", "Account"),
+        "top_account": parse_flavour(
+            "top_account",
+            "Top Trader Account"
+        ),
+        "position": parse_flavour(
+            "top_position",
+            "Top Trader Position"
+        ),
+        "all_position": parse_flavour(
+            "position_all",
+            "All Trader Position"
+        ),
+        "taker": parse_flavour("taker", "Taker Buy/Sell"),
+        "definitions": data.get("definitions", {}),
+        "method": data.get("method", {}),
         "coverage": data.get("coverage"),
         "provider": "CoinBoss",
         "asof": unix_ms_to_iso(data.get("now")),
-        "raw_schema": data.get("schema")
+        "schema": data.get("schema"),
+        "fetched_at": utc_now()
     }
 
-    rows = data.get("data", [])
 
-    if isinstance(rows, list):
-        account_rows = []
-        position_rows = []
-        taker_rows = []
-
-        for row in rows:
-            if not isinstance(row, dict):
-                continue
-
-            flavour = str(
-                row.get("flavour")
-                or row.get("type")
-                or row.get("kind")
-                or ""
-            ).lower()
-
-            exchange = row.get("exchange")
-            long_ratio = finite(row.get("long_ratio"))
-            short_ratio = finite(row.get("short_ratio"))
-            ratio = finite(row.get("long_short_ratio"))
-
-            if ratio is None and long_ratio is not None and short_ratio:
-                if short_ratio > 0:
-                    ratio = long_ratio / short_ratio
-
-            item = {
-                "exchange": exchange,
-                "ratio": ratio,
-                "long_ratio": long_ratio,
-                "short_ratio": short_ratio,
-                "timestamp": unix_ms_to_iso(
-                    row.get("timestamp")
-                    or row.get("observed_at")
-                )
-            }
-
-            if "account" in flavour:
-                account_rows.append(item)
-            elif "position" in flavour:
-                position_rows.append(item)
-            elif "taker" in flavour:
-                taker_rows.append(item)
-
-        def summarize(rows, label):
-            valid = [
-                row for row in rows
-                if finite(row.get("ratio")) is not None
-            ]
-
-            if not valid:
-                return unavailable(
-                    f"No verified {label} ratio rows returned"
-                )
-
-            ratios = [row["ratio"] for row in valid]
-
-            return {
-                "value": sum(ratios) / len(ratios),
-                "unit": "long/short ratio",
-                "status": "OK",
-                "source": "CoinBoss Cross-exchange Long/Short",
-                "exchange_count": len(valid),
-                "exchanges": valid,
-                "fetched_at": utc_now()
-            }
-
-        result["account"] = summarize(account_rows, "account")
-        result["position"] = summarize(position_rows, "position")
-        result["taker"] = summarize(taker_rows, "taker")
-
-    # Some schema revisions may expose separate arrays or aggregate
-    # fields. Do not guess their meaning; leave unavailable if unrecognised.
-    return result
-
+# ============================================================
+# DERIVATIVES OUTPUT - DASHBOARD COMPATIBLE
+# ============================================================
 
 def get_derivatives(symbol):
     coin = symbol.replace("USDT", "")
@@ -537,9 +618,10 @@ def get_derivatives(symbol):
             "not Spot market data"
         ),
 
-        # Compatible field names for existing dashboard consumers.
         "open_interest_usd": oi["total_usd"],
-        "open_interest_change_24h_pct": oi["total_change_24h_pct"],
+        "open_interest_change_24h_pct": (
+            oi["total_change_24h_pct"]
+        ),
         "open_interest_contracts": oi["contract_count"],
         "open_interest_exchange_count": oi["exchange_count"],
 
@@ -548,12 +630,42 @@ def get_derivatives(symbol):
         "funding_apr_pct": funding["apr_pct"],
         "funding_exchange_count": funding["exchange_count"],
 
-        "global_long_short_ratio": long_short["account"],
-        "position_long_short_ratio": long_short["position"],
-        "taker_long_short_ratio": long_short["taker"],
+        "global_long_short_ratio": (
+            long_short["account"]["ratio"]
+        ),
+        "global_long_percent": (
+            long_short["account"]["long_pct"]
+        ),
+        "global_short_percent": (
+            long_short["account"]["short_pct"]
+        ),
 
-        # Legacy fields remain explicitly unavailable because
-        # CoinBoss aggregate does not provide these Binance fields.
+        "top_account_long_short_ratio": (
+            long_short["top_account"]["ratio"]
+        ),
+        "top_position_long_short_ratio": (
+            long_short["position"]["ratio"]
+        ),
+        "position_long_short_ratio": (
+            long_short["position"]["ratio"]
+        ),
+        "all_position_long_short_ratio": (
+            long_short["all_position"]["ratio"]
+        ),
+        "taker_long_short_ratio": (
+            long_short["taker"]["ratio"]
+        ),
+
+        "long_short_detail": {
+            "account": long_short["account"],
+            "top_account": long_short["top_account"],
+            "top_position": long_short["position"],
+            "all_position": long_short["all_position"],
+            "taker": long_short["taker"],
+            "definitions": long_short.get("definitions", {}),
+            "method": long_short.get("method", {})
+        },
+
         "mark_price": unavailable(
             "Not included in selected CoinBoss aggregate endpoint"
         ),
@@ -626,7 +738,9 @@ def get_mining_data():
 
 def get_halving():
     try:
-        height = int(fetch_text(f"{MEMPOOL}/blocks/tip/height"))
+        height = int(
+            fetch_text(f"{MEMPOOL}/blocks/tip/height")
+        )
 
         if height < 0:
             raise ValueError("Invalid Bitcoin block height")
@@ -642,7 +756,9 @@ def get_halving():
             "current_block_height": height,
             "next_halving_block": next_halving,
             "blocks_remaining": remaining,
-            "estimated_days_remaining": round(estimated_days, 2),
+            "estimated_days_remaining": round(
+                estimated_days, 2
+            ),
             "estimated_years_remaining": round(
                 estimated_days / 365.25, 2
             ),
@@ -836,7 +952,7 @@ def get_spot_activity():
 def main():
     DATA_DIR.mkdir(parents=True, exist_ok=True)
 
-    print("Starting Free Advanced Crypto Engine v2.3.0")
+    print("Starting Free Advanced Crypto Engine v2.4.0")
 
     print("Fetching Spot Order Books...")
     order_books = {
@@ -871,7 +987,7 @@ def main():
     result = {
         "schema_version": 2,
         "engine": "Free Advanced Crypto Intelligence",
-        "engine_version": "2.3.0",
+        "engine_version": "2.4.0",
         "generated_at": utc_now(),
 
         "data_policy": (
@@ -956,7 +1072,7 @@ def main():
     print("----------------------------------")
     print("FREE ADVANCED ENGINE SUCCESS")
     print("Output:", OUTPUT_FILE)
-    print("Version: 2.3.0")
+    print("Version: 2.4.0")
     print("----------------------------------")
 
 
