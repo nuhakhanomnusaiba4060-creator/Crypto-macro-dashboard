@@ -4,7 +4,7 @@
 
 """
 FREE ADVANCED CRYPTO INTELLIGENCE ENGINE
-Version: 2.1.0
+Version: 2.2.0
 
 Free public data sources:
 - Binance Spot API
@@ -32,12 +32,14 @@ DATA_DIR = BASE_DIR / "data"
 OUTPUT_FILE = DATA_DIR / "advanced_data.json"
 
 TIMEOUT = 20
+RETRIES = 3
+
 BINANCE = "https://data-api.binance.vision"
 FUTURES_API = "https://fapi.binance.com"
 MEMPOOL = "https://mempool.space/api"
 COINMETRICS = "https://community-api.coinmetrics.io/v4"
 
-USER_AGENT = "CryptoMacroDashboard-FreeEngine/2.1.0"
+USER_AGENT = "CryptoMacroDashboard-FreeEngine/2.2.0"
 HALVING_INTERVAL = 210000
 
 
@@ -50,8 +52,7 @@ def utc_now():
     )
 
 
-def fetch_json(url):
-
+def fetch_url(url):
     request = Request(
         url,
         headers={
@@ -62,42 +63,41 @@ def fetch_json(url):
 
     last_error = None
 
-    for attempt in range(3):
+    for attempt in range(RETRIES):
         try:
             with urlopen(request, timeout=TIMEOUT) as response:
-                return json.loads(
-                    response.read().decode("utf-8")
-                )
+                return response.read().decode("utf-8")
 
         except (
             HTTPError,
             URLError,
             TimeoutError,
-            OSError,
-            json.JSONDecodeError
+            OSError
         ) as error:
-
             last_error = str(error)
 
-            if attempt < 2:
+            if attempt < RETRIES - 1:
                 time.sleep(attempt + 1)
 
-    raise RuntimeError(last_error or "API request failed")
+    raise RuntimeError(last_error or "Request failed")
+
+
+def fetch_json(url):
+    raw = fetch_url(url)
+
+    try:
+        return json.loads(raw)
+    except json.JSONDecodeError as error:
+        raise RuntimeError(
+            f"Invalid JSON response: {error}"
+        )
 
 
 def fetch_text(url):
-
-    request = Request(
-        url,
-        headers={"User-Agent": USER_AGENT}
-    )
-
-    with urlopen(request, timeout=TIMEOUT) as response:
-        return response.read().decode("utf-8").strip()
+    return fetch_url(url).strip()
 
 
 def finite(value):
-
     try:
         number = float(value)
 
@@ -111,7 +111,6 @@ def finite(value):
 
 
 def metric(value, unit, source):
-
     number = finite(value)
 
     if number is None:
@@ -127,7 +126,6 @@ def metric(value, unit, source):
 
 
 def unavailable(reason):
-
     return {
         "value": None,
         "status": "UNAVAILABLE",
@@ -137,10 +135,8 @@ def unavailable(reason):
 
 
 def safe_fetch(url):
-
     try:
         return fetch_json(url), None
-
     except Exception as error:
         return None, str(error)[:250]
 
@@ -150,7 +146,6 @@ def safe_fetch(url):
 # ============================================================
 
 def get_order_book(symbol):
-
     url = (
         f"{BINANCE}/api/v3/depth"
         f"?symbol={symbol}&limit=100"
@@ -170,15 +165,26 @@ def get_order_book(symbol):
         bids = data.get("bids", [])
         asks = data.get("asks", [])
 
-        bid_value = sum(
-            float(price) * float(quantity)
-            for price, quantity in bids
-        )
+        bid_value = 0.0
+        ask_value = 0.0
 
-        ask_value = sum(
-            float(price) * float(quantity)
-            for price, quantity in asks
-        )
+        for price, quantity in bids:
+            p = finite(price)
+            q = finite(quantity)
+
+            if p is None or q is None or p < 0 or q < 0:
+                raise ValueError("Invalid bid order book data")
+
+            bid_value += p * q
+
+        for price, quantity in asks:
+            p = finite(price)
+            q = finite(quantity)
+
+            if p is None or q is None or p < 0 or q < 0:
+                raise ValueError("Invalid ask order book data")
+
+            ask_value += p * q
 
         total = bid_value + ask_value
 
@@ -192,13 +198,19 @@ def get_order_book(symbol):
         return {
             "symbol": symbol,
             "imbalance_percent": metric(
-                imbalance, "%", "Binance Spot Order Book"
+                imbalance,
+                "%",
+                "Binance Spot Order Book"
             ),
             "bid_value_usdt": metric(
-                bid_value, "USDT", "Binance Spot Order Book"
+                bid_value,
+                "USDT",
+                "Binance Spot Order Book"
             ),
             "ask_value_usdt": metric(
-                ask_value, "USDT", "Binance Spot Order Book"
+                ask_value,
+                "USDT",
+                "Binance Spot Order Book"
             ),
             "last_update_id": data.get("lastUpdateId")
         }
@@ -219,7 +231,6 @@ def get_order_book(symbol):
 # ============================================================
 
 def get_taker_ratio(symbol):
-
     url = (
         f"{BINANCE}/api/v3/klines"
         f"?symbol={symbol}&interval=15m&limit=3"
@@ -237,34 +248,49 @@ def get_taker_ratio(symbol):
         }
 
     try:
-        # শেষ সম্পূর্ণ বন্ধ হওয়া Candle
+        # সর্বশেষ সম্পূর্ণ বন্ধ হওয়া Candle
         candle = data[-2]
 
-        total_quote = float(candle[7])
-        taker_buy_quote = float(candle[10])
-        taker_sell_quote = total_quote - taker_buy_quote
+        total_quote = finite(candle[7])
+        taker_buy_quote = finite(candle[10])
 
-        if total_quote <= 0 or taker_sell_quote < 0:
+        if total_quote is None or taker_buy_quote is None:
             raise ValueError("Invalid candle volume")
 
-        ratio = (
-            taker_buy_quote / taker_sell_quote
-            if taker_sell_quote > 0
-            else None
-        )
+        taker_sell_quote = total_quote - taker_buy_quote
+
+        if (
+            total_quote <= 0
+            or taker_buy_quote < 0
+            or taker_sell_quote < 0
+        ):
+            raise ValueError("Invalid taker volume")
+
+        if taker_sell_quote == 0:
+            ratio_metric = unavailable(
+                "Sell volume is zero; ratio cannot be calculated"
+            )
+        else:
+            ratio_metric = metric(
+                taker_buy_quote / taker_sell_quote,
+                "ratio",
+                "Binance Spot 15m Kline"
+            )
 
         return {
             "symbol": symbol,
             "interval": "15m",
             "candle_close_time": candle[6],
-            "taker_buy_sell_ratio": metric(
-                ratio, "ratio", "Binance Spot 15m Kline"
-            ),
+            "taker_buy_sell_ratio": ratio_metric,
             "taker_buy_quote_volume": metric(
-                taker_buy_quote, "USDT", "Binance Spot 15m Kline"
+                taker_buy_quote,
+                "USDT",
+                "Binance Spot 15m Kline"
             ),
             "taker_sell_quote_volume": metric(
-                taker_sell_quote, "USDT", "Binance Spot 15m Kline"
+                taker_sell_quote,
+                "USDT",
+                "Binance Spot 15m Kline"
             )
         }
 
@@ -285,10 +311,11 @@ def get_taker_ratio(symbol):
 # ============================================================
 
 def get_derivatives(symbol):
-
     base = f"{FUTURES_API}/fapi/v1"
 
     result = {
+        "symbol": symbol,
+        "data_type": "Futures sentiment only; not Spot market data",
         "mark_price": unavailable("Not fetched"),
         "index_price": unavailable("Not fetched"),
         "last_funding_rate": unavailable("Not fetched"),
@@ -350,18 +377,31 @@ def get_derivatives(symbol):
             "Binance USD-M Futures"
         )
 
-        ratio["long_account_percent"] = finite(
-            latest.get("longAccount")
+        long_fraction = finite(latest.get("longAccount"))
+        short_fraction = finite(latest.get("shortAccount"))
+
+        # Binance returns fractions, not percentage values.
+        long_percent = (
+            long_fraction * 100
+            if long_fraction is not None
+            and 0 <= long_fraction <= 1
+            else None
         )
 
-        ratio["short_account_percent"] = finite(
-            latest.get("shortAccount")
+        short_percent = (
+            short_fraction * 100
+            if short_fraction is not None
+            and 0 <= short_fraction <= 1
+            else None
         )
 
+        ratio["long_account_percent"] = long_percent
+        ratio["short_account_percent"] = short_percent
         ratio["period"] = "15m"
         ratio["observation_time"] = latest.get("timestamp")
 
         result["global_long_short_ratio"] = ratio
+
     else:
         result["global_long_short_ratio"] = unavailable(error)
 
@@ -402,7 +442,6 @@ def get_derivatives(symbol):
 # ============================================================
 
 def get_mining_data():
-
     url = f"{MEMPOOL}/v1/mining/hashrate/3d"
     data, error = safe_fetch(url)
 
@@ -437,11 +476,13 @@ def get_mining_data():
 # ============================================================
 
 def get_halving():
-
     try:
         height = int(
             fetch_text(f"{MEMPOOL}/blocks/tip/height")
         )
+
+        if height < 0:
+            raise ValueError("Invalid Bitcoin block height")
 
         next_halving = (
             (height // HALVING_INTERVAL) + 1
@@ -475,8 +516,10 @@ def get_halving():
             "next_halving_block": None,
             "blocks_remaining": None,
             "estimated_days_remaining": None,
+            "estimated_years_remaining": None,
             "status": "UNAVAILABLE",
-            "reason": str(error)[:250]
+            "reason": str(error)[:250],
+            "fetched_at": utc_now()
         }
 
 
@@ -485,7 +528,6 @@ def get_halving():
 # ============================================================
 
 def get_mvrv():
-
     url = (
         f"{COINMETRICS}/timeseries/asset-metrics"
         "?assets=btc"
@@ -539,7 +581,6 @@ def get_mvrv():
 # ============================================================
 
 def get_spot_activity():
-
     rows, error = safe_fetch(
         f"{BINANCE}/api/v3/ticker/24hr"
     )
@@ -573,30 +614,31 @@ def get_spot_activity():
         if any(tag in symbol for tag in excluded):
             continue
 
-        try:
-            quote_volume = float(item.get("quoteVolume", 0))
-            change = float(item.get("priceChangePercent", 0))
-            trades = int(item.get("count", 0))
+        quote_volume = finite(item.get("quoteVolume"))
+        change = finite(item.get("priceChangePercent"))
+        trades = finite(item.get("count"))
 
-            if quote_volume <= 0:
-                continue
-
-            valid.append({
-                "symbol": symbol,
-                "quote_volume_24h": quote_volume,
-                "change_24h_pct": change,
-                "trades": trades
-            })
-
-            if change > 0:
-                advancing += 1
-            elif change < 0:
-                declining += 1
-            else:
-                unchanged += 1
-
-        except (TypeError, ValueError):
+        if (
+            quote_volume is None
+            or change is None
+            or trades is None
+            or quote_volume <= 0
+        ):
             continue
+
+        valid.append({
+            "symbol": symbol,
+            "quote_volume_24h": quote_volume,
+            "change_24h_pct": change,
+            "trades": int(trades)
+        })
+
+        if change > 0:
+            advancing += 1
+        elif change < 0:
+            declining += 1
+        else:
+            unchanged += 1
 
     valid.sort(
         key=lambda item: item["quote_volume_24h"],
@@ -604,6 +646,16 @@ def get_spot_activity():
     )
 
     measured = advancing + declining + unchanged
+
+    if measured == 0:
+        return {
+            "status": "UNAVAILABLE",
+            "reason": "No valid USDT Spot pairs returned",
+            "volume_leaders_24h": [],
+            "breadth": unavailable(
+                "No valid Spot breadth observations"
+            )
+        }
 
     breadth = {
         "advancing_pairs": advancing,
@@ -626,7 +678,8 @@ def get_spot_activity():
         "breadth": breadth,
         "note": (
             "২৪ ঘণ্টার Spot Market Breadth; "
-            "এটি স্বল্পমেয়াদি volume spike নয়।"
+            "এটি স্বল্পমেয়াদি volume spike নয়। "
+            "USDT trading pairs-এর উপর ভিত্তি করে গণনা করা।"
         )
     }
 
@@ -636,46 +689,38 @@ def get_spot_activity():
 # ============================================================
 
 def main():
-
     DATA_DIR.mkdir(
         parents=True,
         exist_ok=True
     )
 
-    print("Starting Free Advanced Crypto Engine v2.1.0")
+    print("Starting Free Advanced Crypto Engine v2.2.0")
 
     print("Fetching Spot Order Books...")
-
     order_books = {
         "BTCUSDT": get_order_book("BTCUSDT"),
         "ETHUSDT": get_order_book("ETHUSDT")
     }
 
     print("Fetching Spot Taker Ratios...")
-
     taker_ratios = {
         "BTCUSDT": get_taker_ratio("BTCUSDT"),
         "ETHUSDT": get_taker_ratio("ETHUSDT")
     }
 
     print("Fetching Bitcoin Mining Data...")
-
     mining = get_mining_data()
 
     print("Fetching Bitcoin Halving...")
-
     halving = get_halving()
 
     print("Fetching MVRV...")
-
     mvrv = get_mvrv()
 
     print("Fetching Spot Market Breadth...")
-
     spot_activity = get_spot_activity()
 
     print("Fetching Futures Sentiment...")
-
     derivatives = {
         "BTCUSDT": get_derivatives("BTCUSDT"),
         "ETHUSDT": get_derivatives("ETHUSDT")
@@ -684,7 +729,7 @@ def main():
     result = {
         "schema_version": 2,
         "engine": "Free Advanced Crypto Intelligence",
-        "engine_version": "2.1.0",
+        "engine_version": "2.2.0",
         "generated_at": utc_now(),
 
         "data_policy": (
@@ -768,7 +813,7 @@ def main():
     print("----------------------------------")
     print("FREE ADVANCED ENGINE SUCCESS")
     print("Output:", OUTPUT_FILE)
-    print("Version: 2.1.0")
+    print("Version: 2.2.0")
     print("----------------------------------")
 
 
