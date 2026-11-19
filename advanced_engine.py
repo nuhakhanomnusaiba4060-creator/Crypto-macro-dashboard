@@ -4,17 +4,18 @@
 
 """
 FREE ADVANCED CRYPTO INTELLIGENCE ENGINE
-Version: 2.2.0
+Version: 2.3.0
 
 Free public data sources:
 - Binance Spot API
-- Binance USD-M Futures Public API
+- CoinBoss public derivatives API
 - Mempool.space
 - Coin Metrics Community API
 
 No API key required.
 No synthetic data.
 Unavailable data remains explicitly unavailable.
+Futures data is sentiment context only, never a Spot trade signal.
 """
 
 import json
@@ -35,11 +36,11 @@ TIMEOUT = 20
 RETRIES = 3
 
 BINANCE = "https://data-api.binance.vision"
-FUTURES_API = "https://fapi.binance.com"
+COINBOSS = "https://www.coinboss.com/api"
 MEMPOOL = "https://mempool.space/api"
 COINMETRICS = "https://community-api.coinmetrics.io/v4"
 
-USER_AGENT = "CryptoMacroDashboard-FreeEngine/2.2.0"
+USER_AGENT = "CryptoMacroDashboard-FreeEngine/2.3.0"
 HALVING_INTERVAL = 210000
 
 
@@ -83,14 +84,10 @@ def fetch_url(url):
 
 
 def fetch_json(url):
-    raw = fetch_url(url)
-
     try:
-        return json.loads(raw)
+        return json.loads(fetch_url(url))
     except json.JSONDecodeError as error:
-        raise RuntimeError(
-            f"Invalid JSON response: {error}"
-        )
+        raise RuntimeError(f"Invalid JSON: {error}")
 
 
 def fetch_text(url):
@@ -100,29 +97,32 @@ def fetch_text(url):
 def finite(value):
     try:
         number = float(value)
-
         if math.isfinite(number):
             return number
-
     except (TypeError, ValueError, OverflowError):
         pass
 
     return None
 
 
-def metric(value, unit, source):
+def metric(value, unit, source, observed_at=None):
     number = finite(value)
 
     if number is None:
-        return unavailable("Valid data unavailable")
+        return unavailable("Valid numeric data unavailable")
 
-    return {
+    result = {
         "value": number,
         "unit": unit,
         "status": "OK",
         "source": source,
         "fetched_at": utc_now()
     }
+
+    if observed_at is not None:
+        result["observed_at"] = observed_at
+
+    return result
 
 
 def unavailable(reason):
@@ -136,9 +136,34 @@ def unavailable(reason):
 
 def safe_fetch(url):
     try:
-        return fetch_json(url), None
+        data = fetch_json(url)
+
+        if isinstance(data, dict) and data.get("success") is False:
+            return None, data.get("error") or data.get("code") or "API returned success=false"
+
+        return data, None
+
     except Exception as error:
         return None, str(error)[:250]
+
+
+def unix_ms_to_iso(value):
+    try:
+        number = finite(value)
+        if number is None:
+            return None
+
+        return (
+            datetime.fromtimestamp(
+                number / 1000,
+                tz=timezone.utc
+            )
+            .replace(microsecond=0)
+            .isoformat()
+            .replace("+00:00", "Z")
+        )
+    except (ValueError, OverflowError, OSError):
+        return None
 
 
 # ============================================================
@@ -146,11 +171,7 @@ def safe_fetch(url):
 # ============================================================
 
 def get_order_book(symbol):
-    url = (
-        f"{BINANCE}/api/v3/depth"
-        f"?symbol={symbol}&limit=100"
-    )
-
+    url = f"{BINANCE}/api/v3/depth?symbol={symbol}&limit=100"
     data, error = safe_fetch(url)
 
     if not isinstance(data, dict):
@@ -162,27 +183,24 @@ def get_order_book(symbol):
         }
 
     try:
-        bids = data.get("bids", [])
-        asks = data.get("asks", [])
-
         bid_value = 0.0
         ask_value = 0.0
 
-        for price, quantity in bids:
+        for price, quantity in data.get("bids", []):
             p = finite(price)
             q = finite(quantity)
 
             if p is None or q is None or p < 0 or q < 0:
-                raise ValueError("Invalid bid order book data")
+                raise ValueError("Invalid bid data")
 
             bid_value += p * q
 
-        for price, quantity in asks:
+        for price, quantity in data.get("asks", []):
             p = finite(price)
             q = finite(quantity)
 
             if p is None or q is None or p < 0 or q < 0:
-                raise ValueError("Invalid ask order book data")
+                raise ValueError("Invalid ask data")
 
             ask_value += p * q
 
@@ -191,26 +209,18 @@ def get_order_book(symbol):
         if total <= 0:
             raise ValueError("Empty order book")
 
-        imbalance = (
-            (bid_value - ask_value) / total
-        ) * 100
+        imbalance = ((bid_value - ask_value) / total) * 100
 
         return {
             "symbol": symbol,
             "imbalance_percent": metric(
-                imbalance,
-                "%",
-                "Binance Spot Order Book"
+                imbalance, "%", "Binance Spot Order Book"
             ),
             "bid_value_usdt": metric(
-                bid_value,
-                "USDT",
-                "Binance Spot Order Book"
+                bid_value, "USDT", "Binance Spot Order Book"
             ),
             "ask_value_usdt": metric(
-                ask_value,
-                "USDT",
-                "Binance Spot Order Book"
+                ask_value, "USDT", "Binance Spot Order Book"
             ),
             "last_update_id": data.get("lastUpdateId")
         }
@@ -248,7 +258,6 @@ def get_taker_ratio(symbol):
         }
 
     try:
-        # সর্বশেষ সম্পূর্ণ বন্ধ হওয়া Candle
         candle = data[-2]
 
         total_quote = finite(candle[7])
@@ -266,31 +275,33 @@ def get_taker_ratio(symbol):
         ):
             raise ValueError("Invalid taker volume")
 
-        if taker_sell_quote == 0:
-            ratio_metric = unavailable(
-                "Sell volume is zero; ratio cannot be calculated"
-            )
-        else:
-            ratio_metric = metric(
+        ratio = (
+            metric(
                 taker_buy_quote / taker_sell_quote,
                 "ratio",
-                "Binance Spot 15m Kline"
+                "Binance Spot 15m Kline",
+                candle[6]
             )
+            if taker_sell_quote > 0
+            else unavailable("Sell volume is zero")
+        )
 
         return {
             "symbol": symbol,
             "interval": "15m",
             "candle_close_time": candle[6],
-            "taker_buy_sell_ratio": ratio_metric,
+            "taker_buy_sell_ratio": ratio,
             "taker_buy_quote_volume": metric(
                 taker_buy_quote,
                 "USDT",
-                "Binance Spot 15m Kline"
+                "Binance Spot 15m Kline",
+                candle[6]
             ),
             "taker_sell_quote_volume": metric(
                 taker_sell_quote,
                 "USDT",
-                "Binance Spot 15m Kline"
+                "Binance Spot 15m Kline",
+                candle[6]
             )
         }
 
@@ -307,134 +318,271 @@ def get_taker_ratio(symbol):
 
 
 # ============================================================
-# BINANCE USD-M FUTURES SENTIMENT
+# COINBOSS CROSS-EXCHANGE DERIVATIVES
 # ============================================================
 
-def get_derivatives(symbol):
-    base = f"{FUTURES_API}/fapi/v1"
+def coinboss_fetch(path, coin):
+    url = f"{COINBOSS}{path}?coin={coin}"
+    data, error = safe_fetch(url)
 
-    result = {
-        "symbol": symbol,
-        "data_type": "Futures sentiment only; not Spot market data",
-        "mark_price": unavailable("Not fetched"),
-        "index_price": unavailable("Not fetched"),
-        "last_funding_rate": unavailable("Not fetched"),
-        "open_interest_contracts": unavailable("Not fetched"),
-        "global_long_short_ratio": unavailable("Not fetched"),
-        "liquidation_clusters": unavailable(
-            "No verified free liquidation heatmap source"
+    if not isinstance(data, dict):
+        return None, error or "Invalid CoinBoss response"
+
+    if data.get("success") is not True:
+        return None, data.get("error") or "CoinBoss request unsuccessful"
+
+    return data, None
+
+
+def get_coinboss_open_interest(coin):
+    data, error = coinboss_fetch("/sd/oi", coin)
+
+    if data is None:
+        return {
+            "total_usd": unavailable(error),
+            "total_change_24h_pct": unavailable(error),
+            "exchange_count": unavailable(error),
+            "contract_count": unavailable(error),
+            "coverage": None,
+            "asof": None
+        }
+
+    return {
+        "total_usd": metric(
+            data.get("total_usd"),
+            "USD",
+            "CoinBoss Cross-exchange Open Interest",
+            unix_ms_to_iso(data.get("asof"))
+        ),
+        "total_change_24h_pct": metric(
+            (data.get("change") or {}).get("pct_24h"),
+            "%",
+            "CoinBoss Cross-exchange Open Interest"
+        ),
+        "exchange_count": metric(
+            data.get("n_exchanges"),
+            "exchanges",
+            "CoinBoss"
+        ),
+        "contract_count": metric(
+            data.get("n_contracts"),
+            "contracts",
+            "CoinBoss"
+        ),
+        "coverage": data.get("coverage"),
+        "method": data.get("method"),
+        "asof": unix_ms_to_iso(data.get("asof")),
+        "provider": "CoinBoss"
+    }
+
+
+def get_coinboss_funding(coin):
+    data, error = coinboss_fetch("/sd/funding", coin)
+
+    if data is None:
+        return {
+            "avg_8h": unavailable(error),
+            "oi_weighted_8h": unavailable(error),
+            "apr_pct": unavailable(error),
+            "exchange_count": unavailable(error),
+            "coverage": None,
+            "asof": None
+        }
+
+    return {
+        "avg_8h": metric(
+            data.get("avg_8h"),
+            "fraction per 8h",
+            "CoinBoss Cross-exchange Funding"
+        ),
+        "oi_weighted_8h": metric(
+            data.get("oi_weighted_8h"),
+            "fraction per 8h",
+            "CoinBoss Cross-exchange Funding"
+        ),
+        "apr_pct": metric(
+            data.get("apr_pct"),
+            "% per year",
+            "CoinBoss Cross-exchange Funding"
+        ),
+        "exchange_count": metric(
+            data.get("n_exchanges"),
+            "exchanges",
+            "CoinBoss"
+        ),
+        "coverage": data.get("coverage"),
+        "method": data.get("method"),
+        "asof": unix_ms_to_iso(data.get("now")),
+        "provider": "CoinBoss",
+        "unit_note": (
+            "Funding rate is a fraction; 0.0001 = 0.01%. "
+            "OI-weighted 8h rate is preferred."
         )
     }
 
-    # Funding Rate
-    data, error = safe_fetch(
-        f"{base}/fundingRate?symbol={symbol}&limit=1"
-    )
 
-    if isinstance(data, list) and data:
-        latest = data[-1]
+def get_coinboss_long_short(coin):
+    data, error = coinboss_fetch("/sd/ls", coin)
 
-        result["last_funding_rate"] = metric(
-            latest.get("fundingRate"),
-            "rate",
-            "Binance USD-M Futures"
-        )
+    if data is None:
+        return {
+            "account": unavailable(error),
+            "position": unavailable(error),
+            "taker": unavailable(error),
+            "coverage": None,
+            "provider": "CoinBoss"
+        }
 
-        result["last_funding_rate"]["funding_time"] = (
-            latest.get("fundingTime")
-        )
-    else:
-        result["last_funding_rate"] = unavailable(error)
+    # The endpoint keeps account, position and taker measures separate.
+    # Do not mix different ratio types into one figure.
+    result = {
+        "account": unavailable("Account ratio not present in response"),
+        "position": unavailable("Position ratio not present in response"),
+        "taker": unavailable("Taker ratio not present in response"),
+        "coverage": data.get("coverage"),
+        "provider": "CoinBoss",
+        "asof": unix_ms_to_iso(data.get("now")),
+        "raw_schema": data.get("schema")
+    }
 
-    # Open Interest
-    data, error = safe_fetch(
-        f"{base}/openInterest?symbol={symbol}"
-    )
+    rows = data.get("data", [])
 
-    if isinstance(data, dict):
-        result["open_interest_contracts"] = metric(
-            data.get("openInterest"),
-            "contracts",
-            "Binance USD-M Futures"
-        )
+    if isinstance(rows, list):
+        account_rows = []
+        position_rows = []
+        taker_rows = []
 
-        result["open_interest_contracts"]["time"] = data.get("time")
-    else:
-        result["open_interest_contracts"] = unavailable(error)
+        for row in rows:
+            if not isinstance(row, dict):
+                continue
 
-    # Global Long / Short Account Ratio
-    data, error = safe_fetch(
-        f"{base}/globalLongShortAccountRatio"
-        f"?symbol={symbol}&period=15m&limit=1"
-    )
+            flavour = str(
+                row.get("flavour")
+                or row.get("type")
+                or row.get("kind")
+                or ""
+            ).lower()
 
-    if isinstance(data, list) and data:
-        latest = data[-1]
+            exchange = row.get("exchange")
+            long_ratio = finite(row.get("long_ratio"))
+            short_ratio = finite(row.get("short_ratio"))
+            ratio = finite(row.get("long_short_ratio"))
 
-        ratio = metric(
-            latest.get("longShortRatio"),
-            "ratio",
-            "Binance USD-M Futures"
-        )
+            if ratio is None and long_ratio is not None and short_ratio:
+                if short_ratio > 0:
+                    ratio = long_ratio / short_ratio
 
-        long_fraction = finite(latest.get("longAccount"))
-        short_fraction = finite(latest.get("shortAccount"))
+            item = {
+                "exchange": exchange,
+                "ratio": ratio,
+                "long_ratio": long_ratio,
+                "short_ratio": short_ratio,
+                "timestamp": unix_ms_to_iso(
+                    row.get("timestamp")
+                    or row.get("observed_at")
+                )
+            }
 
-        # Binance returns fractions, not percentage values.
-        long_percent = (
-            long_fraction * 100
-            if long_fraction is not None
-            and 0 <= long_fraction <= 1
-            else None
-        )
+            if "account" in flavour:
+                account_rows.append(item)
+            elif "position" in flavour:
+                position_rows.append(item)
+            elif "taker" in flavour:
+                taker_rows.append(item)
 
-        short_percent = (
-            short_fraction * 100
-            if short_fraction is not None
-            and 0 <= short_fraction <= 1
-            else None
-        )
+        def summarize(rows, label):
+            valid = [
+                row for row in rows
+                if finite(row.get("ratio")) is not None
+            ]
 
-        ratio["long_account_percent"] = long_percent
-        ratio["short_account_percent"] = short_percent
-        ratio["period"] = "15m"
-        ratio["observation_time"] = latest.get("timestamp")
+            if not valid:
+                return unavailable(
+                    f"No verified {label} ratio rows returned"
+                )
 
-        result["global_long_short_ratio"] = ratio
+            ratios = [row["ratio"] for row in valid]
 
-    else:
-        result["global_long_short_ratio"] = unavailable(error)
+            return {
+                "value": sum(ratios) / len(ratios),
+                "unit": "long/short ratio",
+                "status": "OK",
+                "source": "CoinBoss Cross-exchange Long/Short",
+                "exchange_count": len(valid),
+                "exchanges": valid,
+                "fetched_at": utc_now()
+            }
 
-    # Mark Price and Index Price
-    data, error = safe_fetch(
-        f"{base}/premiumIndex?symbol={symbol}"
-    )
+        result["account"] = summarize(account_rows, "account")
+        result["position"] = summarize(position_rows, "position")
+        result["taker"] = summarize(taker_rows, "taker")
 
-    if isinstance(data, dict):
-        result["mark_price"] = metric(
-            data.get("markPrice"),
-            "USDT",
-            "Binance USD-M Futures"
-        )
-
-        result["index_price"] = metric(
-            data.get("indexPrice"),
-            "USDT",
-            "Binance USD-M Futures"
-        )
-
-        result["mark_price"]["time"] = data.get("time")
-        result["index_price"]["time"] = data.get("time")
-
-        result["last_funding_rate"]["next_funding_time"] = (
-            data.get("nextFundingTime")
-        )
-
-    else:
-        result["mark_price"] = unavailable(error)
-        result["index_price"] = unavailable(error)
-
+    # Some schema revisions may expose separate arrays or aggregate
+    # fields. Do not guess their meaning; leave unavailable if unrecognised.
     return result
+
+
+def get_derivatives(symbol):
+    coin = symbol.replace("USDT", "")
+
+    oi = get_coinboss_open_interest(coin)
+    funding = get_coinboss_funding(coin)
+    long_short = get_coinboss_long_short(coin)
+
+    return {
+        "symbol": symbol,
+        "provider": "CoinBoss",
+        "data_type": (
+            "Cross-exchange Futures sentiment only; "
+            "not Spot market data"
+        ),
+
+        # Compatible field names for existing dashboard consumers.
+        "open_interest_usd": oi["total_usd"],
+        "open_interest_change_24h_pct": oi["total_change_24h_pct"],
+        "open_interest_contracts": oi["contract_count"],
+        "open_interest_exchange_count": oi["exchange_count"],
+
+        "last_funding_rate": funding["oi_weighted_8h"],
+        "funding_avg_8h": funding["avg_8h"],
+        "funding_apr_pct": funding["apr_pct"],
+        "funding_exchange_count": funding["exchange_count"],
+
+        "global_long_short_ratio": long_short["account"],
+        "position_long_short_ratio": long_short["position"],
+        "taker_long_short_ratio": long_short["taker"],
+
+        # Legacy fields remain explicitly unavailable because
+        # CoinBoss aggregate does not provide these Binance fields.
+        "mark_price": unavailable(
+            "Not included in selected CoinBoss aggregate endpoint"
+        ),
+        "index_price": unavailable(
+            "Not included in selected CoinBoss aggregate endpoint"
+        ),
+
+        "liquidation_clusters": unavailable(
+            "Verified liquidation heatmap integration not configured"
+        ),
+
+        "coverage": {
+            "open_interest": oi.get("coverage"),
+            "funding": funding.get("coverage"),
+            "long_short": long_short.get("coverage")
+        },
+
+        "asof": {
+            "open_interest": oi.get("asof"),
+            "funding": funding.get("asof"),
+            "long_short": long_short.get("asof")
+        },
+
+        "provider_note": (
+            "CoinBoss aggregates data from multiple derivatives venues. "
+            "Long/short measures are kept separate. "
+            "Futures metrics are context only, not Spot signals."
+        )
+    }
 
 
 # ============================================================
@@ -442,8 +590,9 @@ def get_derivatives(symbol):
 # ============================================================
 
 def get_mining_data():
-    url = f"{MEMPOOL}/v1/mining/hashrate/3d"
-    data, error = safe_fetch(url)
+    data, error = safe_fetch(
+        f"{MEMPOOL}/v1/mining/hashrate/3d"
+    )
 
     if not isinstance(data, dict):
         return {
@@ -477,9 +626,7 @@ def get_mining_data():
 
 def get_halving():
     try:
-        height = int(
-            fetch_text(f"{MEMPOOL}/blocks/tip/height")
-        )
+        height = int(fetch_text(f"{MEMPOOL}/blocks/tip/height"))
 
         if height < 0:
             raise ValueError("Invalid Bitcoin block height")
@@ -495,9 +642,7 @@ def get_halving():
             "current_block_height": height,
             "next_halving_block": next_halving,
             "blocks_remaining": remaining,
-            "estimated_days_remaining": round(
-                estimated_days, 2
-            ),
+            "estimated_days_remaining": round(estimated_days, 2),
             "estimated_years_remaining": round(
                 estimated_days / 365.25, 2
             ),
@@ -542,7 +687,7 @@ def get_mvrv():
         return {
             "mvrv_ratio": unavailable(error),
             "mvrv_z_score": unavailable(
-                "Community endpoint unavailable"
+                "MVRV Z-Score unavailable"
             )
         }
 
@@ -554,7 +699,7 @@ def get_mvrv():
                 "No MVRV observation returned"
             ),
             "mvrv_z_score": unavailable(
-                "MVRV Z-Score is not supplied by this metric"
+                "MVRV Z-Score not supplied by this metric"
             )
         }
 
@@ -563,7 +708,8 @@ def get_mvrv():
     ratio = metric(
         latest.get("CapMVRVCur"),
         "ratio",
-        "Coin Metrics Community API"
+        "Coin Metrics Community API",
+        latest.get("time")
     )
 
     ratio["observation_date"] = latest.get("time")
@@ -678,8 +824,7 @@ def get_spot_activity():
         "breadth": breadth,
         "note": (
             "২৪ ঘণ্টার Spot Market Breadth; "
-            "এটি স্বল্পমেয়াদি volume spike নয়। "
-            "USDT trading pairs-এর উপর ভিত্তি করে গণনা করা।"
+            "USDT trading pairs-এর উপর ভিত্তি করে।"
         )
     }
 
@@ -689,12 +834,9 @@ def get_spot_activity():
 # ============================================================
 
 def main():
-    DATA_DIR.mkdir(
-        parents=True,
-        exist_ok=True
-    )
+    DATA_DIR.mkdir(parents=True, exist_ok=True)
 
-    print("Starting Free Advanced Crypto Engine v2.2.0")
+    print("Starting Free Advanced Crypto Engine v2.3.0")
 
     print("Fetching Spot Order Books...")
     order_books = {
@@ -720,7 +862,7 @@ def main():
     print("Fetching Spot Market Breadth...")
     spot_activity = get_spot_activity()
 
-    print("Fetching Futures Sentiment...")
+    print("Fetching CoinBoss Cross-exchange Derivatives...")
     derivatives = {
         "BTCUSDT": get_derivatives("BTCUSDT"),
         "ETHUSDT": get_derivatives("ETHUSDT")
@@ -729,24 +871,25 @@ def main():
     result = {
         "schema_version": 2,
         "engine": "Free Advanced Crypto Intelligence",
-        "engine_version": "2.2.0",
+        "engine_version": "2.3.0",
         "generated_at": utc_now(),
 
         "data_policy": (
             "Free public APIs only. "
             "Unavailable data remains null. "
-            "No synthetic values."
+            "No synthetic values. "
+            "Futures data is sentiment context only."
         ),
 
         "data_sources": [
             "Binance Spot Public API",
-            "Binance USD-M Futures Public API",
+            "CoinBoss Public Derivatives API",
             "Mempool.space",
             "Coin Metrics Community API"
         ],
 
         "etf_flows": unavailable(
-            "No reliable free ETF flow API configured"
+            "ETF flow integration not configured"
         ),
 
         "on_chain": {
@@ -785,7 +928,7 @@ def main():
         "derivatives": derivatives,
 
         "liquidation_heatmap": unavailable(
-            "No free verified liquidation heatmap source configured"
+            "Verified liquidation heatmap integration not configured"
         ),
 
         "portfolio": {
@@ -813,7 +956,7 @@ def main():
     print("----------------------------------")
     print("FREE ADVANCED ENGINE SUCCESS")
     print("Output:", OUTPUT_FILE)
-    print("Version: 2.2.0")
+    print("Version: 2.3.0")
     print("----------------------------------")
 
 
