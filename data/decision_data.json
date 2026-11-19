@@ -2,39 +2,38 @@
   "schema_version": 1,
   "engine": "Crypto Final Decision Engine",
   "engine_version": "1.0.0",
-  "generated_at": "2026-11-18T23:05:49Z",
+  "generated_at": "2026-11-19T00:02:34Z",
   "status": "OK",
   "data_quality": {
     "macro": {
       "name": "macro_data",
-      "timestamp": "2026-11-18T23:05:49Z",
+      "timestamp": "2026-11-19T00:02:34Z",
       "age_hours": 0.0,
       "max_age_hours": 72,
       "status": "FRESH"
     },
     "market": {
       "name": "market_data",
-      "timestamp": "2026-11-18T23:05:22Z",
+      "timestamp": "2026-11-19T00:02:05Z",
       "age_hours": 0.01,
       "max_age_hours": 36,
       "status": "FRESH"
     },
     "btc_technical": {
       "name": "BTC last closed daily candle",
-      "timestamp": "2026-11-17T23:59:59Z",
-      "age_hours": 23.1,
+      "timestamp": "2026-11-18T23:59:59Z",
+      "age_hours": 0.04,
       "max_age_hours": 60,
       "status": "FRESH"
     },
     "eth_technical": {
       "name": "ETH last closed daily candle",
-      "timestamp": "2026-11-17T23:59:59Z",
-      "age_hours": 23.1,
+      "timestamp": "2026-11-18T23:59:59Z",
+      "age_hours": 0.04,
       "max_age_hours": 60,
       "status": "FRESH"
     },
     "issues": [
-      "BTC price source discrepancy: CoinGecko snapshot ও Binance technical price-এর পার্থক্য 4.2%। ভিন্ন source/timestamp হওয়ায় কোনো একটি value auto-correct করা হয়নি।",
       "Net Liquidity RRP mismatch: metrics.reverse_repo=0.331B, liquidity.components.reverse_repo=0.152B। Liquidity formula-এর aligned component আলাদা করে দেখানো হয়েছে।",
       "Macro data quality GOOD_WITH_OPTIONAL_GAPS; optional Gold data unavailable।",
       "Market data scheduled snapshot; realtime feed নয়।"
@@ -65,68 +64,66 @@
     ]
   },
   "crypto_market": {
-    "global_market_cap_usd": 2157153272471.9993,
-    "global_volume_24h_usd": 70495533533.74214,
-    "btc_dominance_percent": 57.96312606575352,
+    "global_market_cap_usd": 2171477198178.2087,
+    "global_volume_24h_usd": 70910553086.12317,
+    "btc_dominance_percent": 58.09187365697731,
     "fear_greed": {
-      "value": 11.0,
+      "value": 10.0,
       "classification": "Extreme Fear",
       "unit": "/100",
       "source": "Alternative.me Fear & Greed API",
-      "source_updated_at": "2026-11-18T00:00:00Z",
-      "fetched_at": "2026-11-18T23:05:22Z",
+      "source_updated_at": "2026-11-19T00:00:00Z",
+      "fetched_at": "2026-11-19T00:02:05Z",
       "status": "OK",
       "error": null
     },
     "btc": {
       "symbol": "BTC",
-      "price_usdt": 64947.35,
-      "ma20": 73550.326,
-      "ma50": 79080.93359999999,
-      "ma200": 72854.73509999998,
-      "rsi14": 23.9751415160717,
-      "macd": -3968.7128973891813,
-      "macd_signal": -2915.9734345442857,
-      "adx14": 36.677509103167544,
-      "volume_ratio_20d": 1.524166486288279,
+      "price_usdt": 63068.22,
+      "ma20": 72804.1425,
+      "ma50": 78669.02479999998,
+      "ma200": 72776.64194999998,
+      "rsi14": 21.613838468520072,
+      "macd": -4207.245009989376,
+      "macd_signal": -3174.2277430379045,
+      "adx14": 39.21090987356643,
+      "volume_ratio_20d": 1.0206199272354513,
       "support_20d": 62006.0,
-      "resistance_20d": 81971.0,
-      "bollinger_lower": 63482.9738832706,
-      "last_closed_candle_at": "2026-11-17T23:59:59Z",
+      "resistance_20d": 81196.01,
+      "bollinger_lower": 61980.380193604185,
+      "last_closed_candle_at": "2026-11-18T23:59:59Z",
       "candle_count": 249,
       "trend": "BEARISH",
       "signals": [
         "দাম MA20-এর নিচে।",
         "MA20 < MA50; short/mid-term trend দুর্বল।",
         "RSI 30-এর নিচে; oversold, কিন্তু reversal নিশ্চিত নয়।",
-        "MACD signal line-এর নিচে।",
-        "শেষ দিনের volume 20D average-এর তুলনায় বেশি।"
+        "MACD signal line-এর নিচে।"
       ],
       "data_complete": true
     },
     "eth": {
       "symbol": "ETH",
-      "price_usdt": 1824.88,
-      "ma20": 2113.560999999999,
-      "ma50": 2345.7684000000004,
-      "ma200": 2139.5590500000003,
-      "rsi14": 25.98288281353547,
-      "macd": -149.24022236915357,
-      "macd_signal": -118.4141172461357,
-      "adx14": 36.373931591792754,
-      "volume_ratio_20d": 1.2923906754979122,
+      "price_usdt": 1777.19,
+      "ma20": 2089.7639999999997,
+      "ma50": 2327.7526000000003,
+      "ma200": 2136.8601500000004,
+      "rsi14": 24.18660373719949,
+      "macd": -154.0693280565922,
+      "macd_signal": -125.54515934468797,
+      "adx14": 38.11266780876188,
+      "volume_ratio_20d": 1.0638321267514066,
       "support_20d": 1711.08,
       "resistance_20d": 2450.0,
-      "bollinger_lower": 1742.6350256654964,
-      "last_closed_candle_at": "2026-11-17T23:59:59Z",
+      "bollinger_lower": 1697.2667664097487,
+      "last_closed_candle_at": "2026-11-18T23:59:59Z",
       "candle_count": 249,
       "trend": "BEARISH",
       "signals": [
         "দাম MA20-এর নিচে।",
         "MA20 < MA50; short/mid-term trend দুর্বল।",
         "RSI 30-এর নিচে; oversold, কিন্তু reversal নিশ্চিত নয়।",
-        "MACD signal line-এর নিচে।",
-        "শেষ দিনের volume 20D average-এর তুলনায় বেশি।"
+        "MACD signal line-এর নিচে।"
       ],
       "data_complete": true
     }
@@ -146,11 +143,11 @@
       "BTC MA20 < MA50; short/mid-term trend দুর্বল।"
     ],
     "market_context": {
-      "fear_greed_value": 11.0,
+      "fear_greed_value": 10.0,
       "fear_greed_classification": "Extreme Fear",
-      "btc_dominance_percent": 57.96312606575352,
-      "total_market_cap_usd": 2157153272471.9993,
-      "total_volume_24h_usd": 70495533533.74214
+      "btc_dominance_percent": 58.09187365697731,
+      "total_market_cap_usd": 2171477198178.2087,
+      "total_volume_24h_usd": 70910553086.12317
     },
     "important_note": "এটি সামগ্রিক market-regime guidance; ব্যক্তিগত portfolio holdings-এর coin-by-coin SELL signal নয়।"
   },
