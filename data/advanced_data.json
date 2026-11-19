@@ -1,11 +1,12 @@
 {
   "schema_version": 2,
   "engine": "Free Advanced Crypto Intelligence",
-  "engine_version": "2.0.0",
-  "generated_at": "2026-11-19T05:24:40Z",
+  "engine_version": "2.1.0",
+  "generated_at": "2026-11-19T07:38:26Z",
   "data_policy": "Free public APIs only. Unavailable data remains null. No synthetic values.",
   "data_sources": [
     "Binance Spot Public API",
+    "Binance USD-M Futures Public API",
     "Mempool.space",
     "Coin Metrics Community API"
   ],
@@ -13,7 +14,7 @@
     "value": null,
     "status": "UNAVAILABLE",
     "reason": "No reliable free ETF flow API configured",
-    "fetched_at": "2026-11-19T05:24:40Z"
+    "fetched_at": "2026-11-19T07:38:26Z"
   },
   "on_chain": {
     "mvrv_ratio": {
@@ -21,162 +22,162 @@
       "unit": "ratio",
       "status": "OK",
       "source": "Coin Metrics Community API",
-      "fetched_at": "2026-11-19T05:24:38Z",
+      "fetched_at": "2026-11-19T07:37:59Z",
       "observation_date": "2026-11-18T00:00:00.000000000Z"
     },
     "mvrv_z_score": {
       "value": null,
       "status": "UNAVAILABLE",
-      "reason": "Coin Metrics CapMVRVCur is MVRV Ratio, not MVRV Z-Score",
-      "fetched_at": "2026-11-19T05:24:38Z"
+      "reason": "CapMVRVCur is MVRV Ratio, not MVRV Z-Score",
+      "fetched_at": "2026-11-19T07:37:59Z"
     },
     "sth_sopr": {
       "value": null,
       "status": "UNAVAILABLE",
       "reason": "No verified free STH SOPR source configured",
-      "fetched_at": "2026-11-19T05:24:40Z"
+      "fetched_at": "2026-11-19T07:38:26Z"
     },
     "nupl": {
       "value": null,
       "status": "UNAVAILABLE",
       "reason": "No verified free NUPL source configured",
-      "fetched_at": "2026-11-19T05:24:40Z"
+      "fetched_at": "2026-11-19T07:38:26Z"
     },
     "exchange_netflow": {
       "value": null,
       "status": "UNAVAILABLE",
       "reason": "No verified free exchange flow source configured",
-      "fetched_at": "2026-11-19T05:24:40Z"
+      "fetched_at": "2026-11-19T07:38:26Z"
     },
     "stablecoin_supply": {
       "value": null,
       "status": "UNAVAILABLE",
       "reason": "No verified free stablecoin supply source configured",
-      "fetched_at": "2026-11-19T05:24:40Z"
+      "fetched_at": "2026-11-19T07:38:26Z"
     },
     "whale_activity": {
       "value": null,
       "status": "UNAVAILABLE",
       "reason": "Entity-labelled whale data unavailable",
-      "fetched_at": "2026-11-19T05:24:40Z"
+      "fetched_at": "2026-11-19T07:38:26Z"
     },
     "hashrate": {
-      "value": 9.906822875792331e+20,
+      "value": 1.006176561431491e+21,
       "unit": "H/s",
       "status": "OK",
       "source": "Mempool.space",
-      "fetched_at": "2026-11-19T05:24:38Z"
+      "fetched_at": "2026-11-19T07:37:59Z"
     },
     "mining_difficulty": {
       "value": 134823837323272.7,
       "unit": "difficulty",
       "status": "OK",
       "source": "Mempool.space",
-      "fetched_at": "2026-11-19T05:24:38Z"
+      "fetched_at": "2026-11-19T07:37:59Z"
     },
     "estimated_hashrate": {
       "value": null,
       "status": "UNAVAILABLE",
       "reason": "Valid data unavailable",
-      "fetched_at": "2026-11-19T05:24:38Z"
+      "fetched_at": "2026-11-19T07:37:59Z"
     }
   },
   "halving": {
-    "current_block_height": 976534,
+    "current_block_height": 976550,
     "next_halving_block": 1050000,
-    "blocks_remaining": 73466,
-    "estimated_days_remaining": 510.18,
+    "blocks_remaining": 73450,
+    "estimated_days_remaining": 510.07,
     "estimated_years_remaining": 1.4,
     "status": "OK",
     "source": "Mempool.space",
     "note": "আনুমানিক সময়; প্রকৃত Halving নির্ধারিত হবে Block Height অনুযায়ী।",
-    "fetched_at": "2026-11-19T05:24:38Z"
+    "fetched_at": "2026-11-19T07:37:59Z"
   },
   "spot_market_activity": {
     "status": "OK",
     "volume_leaders_24h": [
       {
         "symbol": "USDCUSDT",
-        "quote_volume_24h": 2064115895.65058,
-        "change_24h_pct": -0.003,
-        "trades": 858023
+        "quote_volume_24h": 1985664434.99855,
+        "change_24h_pct": 0.003,
+        "trades": 838596
       },
       {
         "symbol": "BTCUSDT",
-        "quote_volume_24h": 1204746365.8715143,
-        "change_24h_pct": -2.006,
-        "trades": 3869490
+        "quote_volume_24h": 1216935875.2603805,
+        "change_24h_pct": -1.373,
+        "trades": 3853802
       },
       {
         "symbol": "ETHUSDT",
-        "quote_volume_24h": 545187508.625714,
-        "change_24h_pct": -0.851,
-        "trades": 2502730
+        "quote_volume_24h": 533059139.558359,
+        "change_24h_pct": -0.21,
+        "trades": 2444855
       },
       {
         "symbol": "USD1USDT",
-        "quote_volume_24h": 166250368.79457,
-        "change_24h_pct": -0.001,
-        "trades": 223909
+        "quote_volume_24h": 166549600.56369,
+        "change_24h_pct": 0.02,
+        "trades": 227994
       },
       {
         "symbol": "SOLUSDT",
-        "quote_volume_24h": 162304009.21261,
-        "change_24h_pct": -1.088,
-        "trades": 668361
+        "quote_volume_24h": 158256172.35924,
+        "change_24h_pct": 0.027,
+        "trades": 661610
       },
       {
         "symbol": "ZECUSDT",
-        "quote_volume_24h": 128416401.53615,
-        "change_24h_pct": -2.785,
-        "trades": 491994
+        "quote_volume_24h": 128940603.71694,
+        "change_24h_pct": -1.249,
+        "trades": 531113
       },
       {
         "symbol": "NVDABUSDT",
-        "quote_volume_24h": 115292071.78619,
-        "change_24h_pct": -3.686,
-        "trades": 435842
+        "quote_volume_24h": 114707825.86549,
+        "change_24h_pct": -4.295,
+        "trades": 439008
       },
       {
         "symbol": "XRPUSDT",
-        "quote_volume_24h": 109008353.47363,
-        "change_24h_pct": -1.277,
-        "trades": 450316
+        "quote_volume_24h": 105712478.85082,
+        "change_24h_pct": -1.25,
+        "trades": 449181
       },
       {
         "symbol": "RLUSDUSDT",
-        "quote_volume_24h": 96060588.5932,
-        "change_24h_pct": 0.01,
-        "trades": 3596
+        "quote_volume_24h": 96079371.3055,
+        "change_24h_pct": 0.0,
+        "trades": 3563
       },
       {
         "symbol": "NEARUSDT",
-        "quote_volume_24h": 70255972.2592,
-        "change_24h_pct": 0.325,
-        "trades": 244939
+        "quote_volume_24h": 70963189.4924,
+        "change_24h_pct": 1.397,
+        "trades": 246353
       },
       {
         "symbol": "BNBUSDT",
-        "quote_volume_24h": 64342079.96776,
-        "change_24h_pct": -0.997,
-        "trades": 571197
+        "quote_volume_24h": 63359856.77324,
+        "change_24h_pct": -0.434,
+        "trades": 570071
       },
       {
-        "symbol": "MMTUSDT",
-        "quote_volume_24h": 47803054.99604,
-        "change_24h_pct": 20.629,
-        "trades": 723704
+        "symbol": "SOXLBUSDT",
+        "quote_volume_24h": 42609126.30542,
+        "change_24h_pct": 3.103,
+        "trades": 98736
       }
     ],
     "breadth": {
-      "advancing_pairs": 224,
-      "declining_pairs": 397,
-      "unchanged_pairs": 81,
+      "advancing_pairs": 237,
+      "declining_pairs": 385,
+      "unchanged_pairs": 80,
       "measured_pairs": 702,
-      "advance_decline_ratio": 0.564,
+      "advance_decline_ratio": 0.616,
       "status": "OK",
       "source": "Binance Spot 24h ticker",
-      "fetched_at": "2026-11-19T05:24:40Z"
+      "fetched_at": "2026-11-19T07:38:01Z"
     },
     "note": "২৪ ঘণ্টার Spot Market Breadth; এটি স্বল্পমেয়াদি volume spike নয়।"
   },
@@ -184,105 +185,105 @@
     "BTCUSDT": {
       "symbol": "BTCUSDT",
       "imbalance_percent": {
-        "value": 10.429626179472292,
+        "value": 0.7324890603263076,
         "unit": "%",
         "status": "OK",
         "source": "Binance Spot Order Book",
-        "fetched_at": "2026-11-19T05:24:35Z"
+        "fetched_at": "2026-11-19T07:37:56Z"
       },
       "bid_value_usdt": {
-        "value": 1482429.368858,
+        "value": 1244305.9620507003,
         "unit": "USDT",
         "status": "OK",
         "source": "Binance Spot Order Book",
-        "fetched_at": "2026-11-19T05:24:35Z"
+        "fetched_at": "2026-11-19T07:37:56Z"
       },
       "ask_value_usdt": {
-        "value": 1202410.5969112006,
+        "value": 1226209.7050555,
         "unit": "USDT",
         "status": "OK",
         "source": "Binance Spot Order Book",
-        "fetched_at": "2026-11-19T05:24:35Z"
+        "fetched_at": "2026-11-19T07:37:56Z"
       },
-      "last_update_id": 103174667089
+      "last_update_id": 103178577756
     },
     "ETHUSDT": {
       "symbol": "ETHUSDT",
       "imbalance_percent": {
-        "value": 13.955468652628147,
+        "value": 3.4583829614706114,
         "unit": "%",
         "status": "OK",
         "source": "Binance Spot Order Book",
-        "fetched_at": "2026-11-19T05:24:36Z"
+        "fetched_at": "2026-11-19T07:37:57Z"
       },
       "bid_value_usdt": {
-        "value": 2049472.9927679994,
+        "value": 1717361.4511530006,
         "unit": "USDT",
         "status": "OK",
         "source": "Binance Spot Order Book",
-        "fetched_at": "2026-11-19T05:24:36Z"
+        "fetched_at": "2026-11-19T07:37:57Z"
       },
       "ask_value_usdt": {
-        "value": 1547498.7313629996,
+        "value": 1602546.3262429996,
         "unit": "USDT",
         "status": "OK",
         "source": "Binance Spot Order Book",
-        "fetched_at": "2026-11-19T05:24:36Z"
+        "fetched_at": "2026-11-19T07:37:57Z"
       },
-      "last_update_id": 83578048540
+      "last_update_id": 83581201722
     }
   },
   "spot_taker_activity": {
     "BTCUSDT": {
       "symbol": "BTCUSDT",
       "interval": "15m",
-      "candle_close_time": 1795065299999,
+      "candle_close_time": 1795073399999,
       "taker_buy_sell_ratio": {
-        "value": 1.0628755983962463,
+        "value": 0.4830601847519593,
         "unit": "ratio",
         "status": "OK",
         "source": "Binance Spot 15m Kline",
-        "fetched_at": "2026-11-19T05:24:37Z"
+        "fetched_at": "2026-11-19T07:37:58Z"
       },
       "taker_buy_quote_volume": {
-        "value": 3026974.887677,
+        "value": 2045432.1676643,
         "unit": "USDT",
         "status": "OK",
         "source": "Binance Spot 15m Kline",
-        "fetched_at": "2026-11-19T05:24:37Z"
+        "fetched_at": "2026-11-19T07:37:58Z"
       },
       "taker_sell_quote_volume": {
-        "value": 2847910.7924242,
+        "value": 4234321.586066101,
         "unit": "USDT",
         "status": "OK",
         "source": "Binance Spot 15m Kline",
-        "fetched_at": "2026-11-19T05:24:37Z"
+        "fetched_at": "2026-11-19T07:37:58Z"
       }
     },
     "ETHUSDT": {
       "symbol": "ETHUSDT",
       "interval": "15m",
-      "candle_close_time": 1795065299999,
+      "candle_close_time": 1795073399999,
       "taker_buy_sell_ratio": {
-        "value": 0.5230731458181229,
+        "value": 1.254758248107978,
         "unit": "ratio",
         "status": "OK",
         "source": "Binance Spot 15m Kline",
-        "fetched_at": "2026-11-19T05:24:37Z"
+        "fetched_at": "2026-11-19T07:37:58Z"
       },
       "taker_buy_quote_volume": {
-        "value": 1177328.679904,
+        "value": 1252391.772062,
         "unit": "USDT",
         "status": "OK",
         "source": "Binance Spot 15m Kline",
-        "fetched_at": "2026-11-19T05:24:37Z"
+        "fetched_at": "2026-11-19T07:37:58Z"
       },
       "taker_sell_quote_volume": {
-        "value": 2250791.670948,
+        "value": 998113.998414,
         "unit": "USDT",
         "status": "OK",
         "source": "Binance Spot 15m Kline",
-        "fetched_at": "2026-11-19T05:24:37Z"
+        "fetched_at": "2026-11-19T07:37:58Z"
       }
     }
   },
@@ -291,64 +292,76 @@
       "mark_price": {
         "value": null,
         "status": "UNAVAILABLE",
-        "reason": "Paid or restricted derivatives source not configured",
-        "fetched_at": "2026-11-19T05:24:40Z"
+        "reason": "HTTP Error 451: ",
+        "fetched_at": "2026-11-19T07:38:14Z"
       },
       "index_price": {
         "value": null,
         "status": "UNAVAILABLE",
-        "reason": "Paid or restricted derivatives source not configured",
-        "fetched_at": "2026-11-19T05:24:40Z"
+        "reason": "HTTP Error 451: ",
+        "fetched_at": "2026-11-19T07:38:14Z"
       },
       "last_funding_rate": {
         "value": null,
         "status": "UNAVAILABLE",
-        "reason": "No free derivatives connection configured",
-        "fetched_at": "2026-11-19T05:24:40Z"
+        "reason": "HTTP Error 451: ",
+        "fetched_at": "2026-11-19T07:38:04Z"
       },
       "open_interest_contracts": {
         "value": null,
         "status": "UNAVAILABLE",
-        "reason": "No free derivatives connection configured",
-        "fetched_at": "2026-11-19T05:24:40Z"
+        "reason": "HTTP Error 451: ",
+        "fetched_at": "2026-11-19T07:38:07Z"
+      },
+      "global_long_short_ratio": {
+        "value": null,
+        "status": "UNAVAILABLE",
+        "reason": "HTTP Error 451: ",
+        "fetched_at": "2026-11-19T07:38:11Z"
       },
       "liquidation_clusters": {
         "value": null,
         "status": "UNAVAILABLE",
-        "reason": "No free liquidation heatmap provider",
-        "fetched_at": "2026-11-19T05:24:40Z"
+        "reason": "No verified free liquidation heatmap source",
+        "fetched_at": "2026-11-19T07:38:01Z"
       }
     },
     "ETHUSDT": {
       "mark_price": {
         "value": null,
         "status": "UNAVAILABLE",
-        "reason": "Paid or restricted derivatives source not configured",
-        "fetched_at": "2026-11-19T05:24:40Z"
+        "reason": "HTTP Error 451: ",
+        "fetched_at": "2026-11-19T07:38:26Z"
       },
       "index_price": {
         "value": null,
         "status": "UNAVAILABLE",
-        "reason": "Paid or restricted derivatives source not configured",
-        "fetched_at": "2026-11-19T05:24:40Z"
+        "reason": "HTTP Error 451: ",
+        "fetched_at": "2026-11-19T07:38:26Z"
       },
       "last_funding_rate": {
         "value": null,
         "status": "UNAVAILABLE",
-        "reason": "No free derivatives connection configured",
-        "fetched_at": "2026-11-19T05:24:40Z"
+        "reason": "HTTP Error 451: ",
+        "fetched_at": "2026-11-19T07:38:17Z"
       },
       "open_interest_contracts": {
         "value": null,
         "status": "UNAVAILABLE",
-        "reason": "No free derivatives connection configured",
-        "fetched_at": "2026-11-19T05:24:40Z"
+        "reason": "HTTP Error 451: ",
+        "fetched_at": "2026-11-19T07:38:20Z"
+      },
+      "global_long_short_ratio": {
+        "value": null,
+        "status": "UNAVAILABLE",
+        "reason": "HTTP Error 451: ",
+        "fetched_at": "2026-11-19T07:38:23Z"
       },
       "liquidation_clusters": {
         "value": null,
         "status": "UNAVAILABLE",
-        "reason": "No free liquidation heatmap provider",
-        "fetched_at": "2026-11-19T05:24:40Z"
+        "reason": "No verified free liquidation heatmap source",
+        "fetched_at": "2026-11-19T07:38:14Z"
       }
     }
   },
@@ -356,7 +369,7 @@
     "value": null,
     "status": "UNAVAILABLE",
     "reason": "No free verified liquidation heatmap source configured",
-    "fetched_at": "2026-11-19T05:24:40Z"
+    "fetched_at": "2026-11-19T07:38:26Z"
   },
   "portfolio": {
     "status": "LOCAL_ONLY",
