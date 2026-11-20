@@ -2,11 +2,9 @@
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
-    <!-- মোবাইলে অর্ধেক হওয়া ঠিক করার মেটা ট্যাগ -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crypto Macro Dashboard</title>
+    <title>ক্রিপ্টো ম্যাক্রো ড্যাশবোর্ড</title>
     <style>
-        /* ================= CSS স্টাইল ================= */
         :root {
             --bg-color: #0d1117;
             --card-bg: #161b22;
@@ -18,271 +16,127 @@
             --accent-red: #f85149;
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
 
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-        }
+        body { background-color: var(--bg-color); color: var(--text-main); display: flex; flex-direction: column; min-height: 100vh; }
 
-        /* হেডার */
-        header {
-            background-color: #000;
-            padding: 15px 20px;
-            display: flex;
-            align-items: center;
-            border-bottom: 1px solid var(--border-color);
-        }
-        header h1 {
-            color: var(--accent-yellow);
-            font-size: 20px;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-        }
+        header { background-color: #000; padding: 15px 20px; display: flex; align-items: center; border-bottom: 1px solid var(--border-color); }
+        header h1 { color: var(--accent-yellow); font-size: 18px; letter-spacing: 1px; text-transform: uppercase; }
 
-        /* মেইন লেআউট (মোবাইলে কলাম, ডেস্কটপে রো) */
-        .layout {
-            display: flex;
-            flex-direction: column;
-            flex: 1;
-        }
+        .layout { display: flex; flex-direction: column; flex: 1; }
+        @media (min-width: 768px) { .layout { flex-direction: row; } }
 
-        @media (min-width: 768px) {
-            .layout {
-                flex-direction: row;
-            }
-        }
-
-        /* সাইডবার */
-        .sidebar {
-            background-color: var(--bg-color);
-            border-right: 1px solid var(--border-color);
-            padding: 20px 0;
-            width: 100%;
-        }
-        @media (min-width: 768px) {
-            .sidebar { width: 250px; min-height: calc(100vh - 60px); }
-        }
+        .sidebar { background-color: var(--bg-color); border-right: 1px solid var(--border-color); padding: 20px 0; width: 100%; }
+        @media (min-width: 768px) { .sidebar { width: 250px; min-height: calc(100vh - 60px); } }
         
-        .sidebar-item {
-            padding: 12px 20px;
-            color: var(--text-muted);
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        .sidebar-item:hover, .sidebar-item.active {
-            background-color: #21262d;
-            color: var(--accent-yellow);
-            border-left: 3px solid var(--accent-yellow);
-        }
+        .sidebar-item { padding: 12px 20px; color: var(--text-muted); font-size: 14px; cursor: pointer; border-left: 3px solid transparent; }
+        .sidebar-item:hover, .sidebar-item.active { background-color: #21262d; color: var(--accent-yellow); border-left: 3px solid var(--accent-yellow); }
 
-        /* মূল কনটেন্ট এরিয়া */
-        .main-content {
-            flex: 1;
-            padding: 15px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
+        .main-content { flex: 1; padding: 15px; display: flex; flex-direction: column; gap: 15px; }
 
-        /* টপ কার্ড এরিয়া */
-        .top-cards {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 15px;
-        }
-        @media (min-width: 992px) {
-            .top-cards { grid-template-columns: 1fr 1fr 1fr; }
-        }
+        .top-cards { display: grid; grid-template-columns: 1fr; gap: 15px; }
+        @media (min-width: 992px) { .top-cards { grid-template-columns: 1fr 1fr 1fr; } }
 
-        .card {
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 15px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
+        .card { background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 15px; display: flex; flex-direction: column; }
+        .card-center { text-align: center; border: 1px solid var(--accent-yellow); background: linear-gradient(180deg, #161b22 0%, #0d1117 100%); justify-content: center;}
+        .card-center h2 { color: var(--accent-yellow); font-size: 20px; margin-bottom: 10px; line-height: 1.3; }
+        .card-center p { font-size: 13px; color: var(--text-muted); line-height: 1.5; }
 
-        .card-center {
-            text-align: center;
-            border: 1px solid var(--accent-yellow);
-            background: linear-gradient(180deg, #161b22 0%, #0d1117 100%);
-        }
-
-        .card-center h2 {
-            color: var(--accent-yellow);
-            font-size: 22px;
-            margin-bottom: 10px;
-            line-height: 1.2;
-        }
-
-        .card-center p {
-            font-size: 12px;
-            color: var(--text-muted);
-            line-height: 1.5;
-        }
-
-        /* চার্ট প্লেসহোল্ডার */
-        .chart-box {
-            height: 150px;
-            background: repeating-linear-gradient(
-                0deg,
-                #161b22,
-                #161b22 20px,
-                #21262d 20px,
-                #21262d 21px
-            );
-            border-radius: 4px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--accent-red);
-            font-size: 12px;
-            position: relative;
-        }
-
+        /* চার্ট স্টাইল */
+        .chart-box { height: 120px; margin-top: 10px; border-bottom: 1px solid var(--border-color); position: relative; }
+        
         /* সিগন্যাল টেবিল */
-        .table-container {
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            overflow-x: auto; /* মোবাইলে টেবিল স্ক্রল হবে */
-        }
+        .table-container { background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; overflow-x: auto; }
+        .table-header { padding: 10px 15px; border-bottom: 1px solid var(--border-color); color: var(--accent-green); font-size: 13px; font-weight: bold; }
         
-        .table-header {
-            padding: 10px 15px;
-            border-bottom: 1px solid var(--border-color);
-            color: var(--accent-green);
-            font-size: 12px;
-            font-weight: bold;
-            letter-spacing: 0.5px;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: left;
-            font-size: 12px;
-            min-width: 600px; /* মোবাইলে টেবিল চেপে যাওয়া রোধ করতে */
-        }
-
-        th, td {
-            padding: 12px 15px;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        th {
-            color: var(--text-muted);
-            font-weight: normal;
-            background-color: #0d1117;
-        }
+        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 12px; min-width: 600px; }
+        th, td { padding: 12px 15px; border-bottom: 1px solid var(--border-color); }
+        th { color: var(--text-muted); font-weight: normal; background-color: #0d1117; }
 
         /* স্ট্যাটাস ব্যাজ */
-        .badge {
-            padding: 3px 8px;
-            border-radius: 12px;
-            font-size: 10px;
-            font-weight: bold;
-            border: 1px solid;
-        }
+        .badge { padding: 3px 8px; border-radius: 12px; font-size: 10px; font-weight: bold; border: 1px solid; display: inline-block;}
         .badge.neutral { color: #f2cc0d; border-color: #f2cc0d; background: rgba(242, 204, 13, 0.1); }
         .badge.bearish { color: var(--accent-red); border-color: var(--accent-red); background: rgba(248, 81, 73, 0.1); }
         .badge.bullish { color: var(--accent-green); border-color: var(--accent-green); background: rgba(63, 185, 80, 0.1); }
 
-        .live-dot {
-            display: inline-block;
-            width: 8px;
-            height: 8px;
-            background-color: var(--accent-green);
-            border-radius: 50%;
-            margin-right: 5px;
-            animation: blink 1s infinite alternate;
-        }
+        .live-dot { display: inline-block; width: 8px; height: 8px; background-color: var(--accent-green); border-radius: 50%; margin-right: 5px; animation: blink 1s infinite alternate; }
         @keyframes blink { from { opacity: 0.3; } to { opacity: 1; } }
-
     </style>
 </head>
 <body>
 
-    <!-- হেডার -->
     <header>
-        <h1><span class="live-dot"></span> CRYPTO MACRO DASHBOARD</h1>
+        <h1><span class="live-dot"></span> ক্রিপ্টো ম্যাক্রো ড্যাশবোর্ড</h1>
     </header>
 
     <div class="layout">
-        <!-- সাইডবার -->
         <aside class="sidebar">
-            <div class="sidebar-item">📊 Overview</div>
-            <div class="sidebar-item">📈 Signals</div>
-            <div class="sidebar-item">💳 Subscription</div>
-            <div class="sidebar-item">📖 Orderbook</div>
-            <div class="sidebar-item">💸 Transactions</div>
-            <div class="sidebar-item active">⚡ Premium Gadgets</div>
-            <div class="sidebar-item">📁 Portfolio Assistant</div>
+            <div class="sidebar-item">📊 ওভারভিউ</div>
+            <div class="sidebar-item">📈 সিগন্যাল</div>
+            <div class="sidebar-item">💳 সাবস্ক্রিপশন</div>
+            <div class="sidebar-item">📖 অর্ডারবুক</div>
+            <div class="sidebar-item active">⚡ প্রিমিয়াম গ্যাজেটস</div>
+            <div class="sidebar-item">📁 পোর্টফোলিও অ্যাসিস্ট্যান্ট</div>
         </aside>
 
-        <!-- মূল কনটেন্ট -->
         <main class="main-content">
             
-            <!-- উপরের ৩টি কার্ড -->
             <div class="top-cards">
-                <!-- বাম দিকের কার্ড (চার্ট) -->
+                <!-- বাম দিকের কার্ড -->
                 <div class="card">
-                    <div style="color: var(--accent-red); font-size: 12px; margin-bottom: 10px;">🔴 Key Resistance: $71,000</div>
-                    <div class="chart-box">[ Chart Placeholder ]</div>
-                    <div style="font-size: 11px; margin-top: 10px; color: var(--text-muted);">Grinding near $72.7k support in a tight range</div>
+                    <div style="color: var(--accent-red); font-size: 12px; font-weight: bold;">🔴 মূল রেজিস্ট্যান্স: $৭১,০০০</div>
+                    
+                    <!-- SVG চার্ট ১ (লাইভ ফিল) -->
+                    <div class="chart-box">
+                        <svg viewBox="0 0 100 50" preserveAspectRatio="none" style="width:100%; height:100%;">
+                            <path id="chart1-line" d="M0,40 L10,35 L20,38 L30,25 L40,30 L50,20 L60,22 L70,15 L80,18 L90,10 L100,12" fill="none" stroke="var(--accent-green)" stroke-width="1.5" />
+                        </svg>
+                    </div>
+                    
+                    <div style="font-size: 11px; margin-top: 10px; color: var(--text-muted);">$৭২.৭ হাজার সাপোর্টের কাছে সংকীর্ণ পরিসরে ঘুরছে</div>
                 </div>
 
-                <!-- মাঝের কার্ড (বড় টেক্সট) -->
+                <!-- মাঝের কার্ড -->
                 <div class="card card-center">
-                    <h2>AMID PERSISTENT<br>ETF DISTRIBUTION</h2>
-                    <p>Price hovers near $73.6k as institutional outflows persist for a second consecutive week.</p>
+                    <h2>সংস্থাগত ওটিসি বিতরণের মধ্যেও<br>বাজার স্থিতিশীল</h2>
+                    <p>প্রাতিষ্ঠানিক আউটফ্লো সত্ত্বেও দাম $৭৩.৬ হাজারের কাছাকাছি রয়েছে।</p>
                 </div>
 
-                <!-- ডান দিকের কার্ড (চার্ট) -->
+                <!-- ডান দিকের কার্ড -->
                 <div class="card">
-                    <div style="display: flex; justify-content: space-between; font-size: 10px; margin-bottom: 10px; color: var(--text-muted);">
-                        <span>Accumulation</span> <span>Markup</span> <span>Distribution</span>
+                    <div style="display: flex; justify-content: space-between; font-size: 10px; margin-bottom: 5px; color: var(--text-muted);">
+                        <span>সঞ্চয়</span> <span>মার্কআপ</span> <span>বিতরণ</span>
                     </div>
-                    <div class="chart-box" style="color: var(--accent-red);">
-                        <!-- ডেমো লাইন চার্টের মতো দেখানোর জন্য -->
-                        ⬇ [ Distribution Chart ] ⬇
+
+                    <!-- SVG চার্ট ২ (লাইভ ফিল) -->
+                    <div class="chart-box">
+                        <svg viewBox="0 0 100 50" preserveAspectRatio="none" style="width:100%; height:100%;">
+                            <path id="chart2-line" d="M0,10 L10,25 L20,15 L30,35 L40,20 L50,45 L60,30 L70,40 L80,25 L90,48 L100,40" fill="none" stroke="var(--accent-red)" stroke-width="1.5" />
+                        </svg>
                     </div>
+                    
                     <div style="color: var(--accent-red); font-size: 11px; margin-top: 10px; font-weight: bold;">
-                        CAUTION: DISTRIBUTION
+                        সতর্কতা: বিতরণ চলছে
                     </div>
                 </div>
             </div>
 
-            <!-- নিচের সিগন্যাল টেবিল -->
+            <!-- টেবিল -->
             <div class="table-container">
-                <div class="table-header">≡ SIGNAL TABLE (CORE OF DASHBOARD)</div>
+                <div class="table-header">≡ সিগন্যাল টেবিল (ড্যাশবোর্ডের মূল অংশ)</div>
                 <table>
                     <thead>
                         <tr>
                             <th>#</th>
-                            <th>Signal</th>
-                            <th>What to Watch</th>
-                            <th>Top Warning Level</th>
-                            <th>Current Read (Live)</th>
-                            <th>Status</th>
+                            <th>সিগন্যাল</th>
+                            <th>কী দেখবেন</th>
+                            <th>সতর্কতা লেভেল</th>
+                            <th>বর্তমান অবস্থা (লাইভ)</th>
+                            <th>স্ট্যাটাস</th>
                         </tr>
                     </thead>
                     <tbody id="live-table-body">
-                        <!-- জাভাস্ক্রিপ্ট দিয়ে ডেটা এখানে বসবে -->
+                        <!-- জাভাস্ক্রিপ্ট ডেটা -->
                     </tbody>
                 </table>
             </div>
@@ -290,33 +144,33 @@
         </main>
     </div>
 
-    <!-- ================= JAVASCRIPT (লাইভ ডেটা) ================= -->
     <script>
-        // সিগন্যাল টেবিলের ডেটা
+        // বাংলা টেবিল ডেটা
         const signals = [
-            { id: 1, name: "Price Structure", watch: "Slow-off move / vertical trend", warning: "Parabolic breakout", read: "Holding $72.7k Support", status: "neutral" },
-            { id: 2, name: "ETF Flows", watch: "Sustained spot demand", warning: "Large outflows", read: "$58.1M Distribution", status: "bearish" },
-            { id: 3, name: "Funding Rates", watch: "Overheated longs", warning: "Strong positive spike", read: "0.009% (Neutral)", status: "neutral" },
-            { id: 4, name: "Open Interest (OI)", watch: "Leverage buildup", warning: "OI exploding higher", read: "163.5k BTC (Stable)", status: "neutral" },
-            { id: 5, name: "Futures Premium", watch: "Excessive bullish bias", warning: "Premium sharply elevated", read: "1.04% (Warning)", status: "bullish" },
-            { id: 6, name: "MVRV Z-Score", watch: "Valuation overheating", warning: "High top-zone valuation", read: "0.087 (Low)", status: "neutral" },
-            { id: 7, name: "RSI", watch: "Euphoria", warning: "Euphoric zone", read: "0.671 (High Point)", status: "bearish" },
-            { id: 8, name: "Retail Mania", watch: "Euphoric crowd behavior", warning: "COMD mania everywhere", read: "39 (Extreme Fear)", status: "bullish" }
+            { id: 1, name: "প্রাইস স্ট্রাকচার", watch: "ধীর গতির মুভ / ভার্টিক্যাল ট্রেন্ড", warning: "প্যারাবলিক ব্রেকআউট", read: "$৭২.৭ হাজার সাপোর্ট ধরে রেখেছে", status: "neutral" },
+            { id: 2, name: "ইটিএফ ফ্লো", watch: "স্পট ডিমান্ড বজায় রাখা", warning: "বড় আউটফ্লো", read: "$৫৮.১ মিলিয়ন বিতরণ", status: "bearish" },
+            { id: 3, name: "ফান্ডিং রেট", watch: "অতিরিক্ত লং পজিশন", warning: "শক্তিশালী পজিটিভ স্পাইক", read: "০.০০৯% (নিরপেক্ষ)", status: "neutral" },
+            { id: 4, name: "ওপেন ইন্টারেস্ট (OI)", watch: "লিভারেজ বৃদ্ধি", warning: "OI আকস্মিক বৃদ্ধি", read: "১৬৩.৫ হাজার BTC (স্থিতিশীল)", status: "neutral" },
+            { id: 5, name: "ফিউচার্স প্রিমিয়াম", watch: "অতিরিক্ত বুলিশ প্রবণতা", warning: "প্রিমিয়াম তীব্রভাবে বৃদ্ধি", read: "১.০৪% (সতর্কতা)", status: "bullish" },
+            { id: 6, name: "এমভিআরভি জেড-স্কোর", watch: "ভ্যালুয়েশন অতিরিক্ত গরম", warning: "উচ্চ শীর্ষ-অঞ্চল ভ্যালুয়েশন", read: "০.০৮৭ (নিম্ন)", status: "neutral" },
+            { id: 7, name: "আরএসআই (RSI)", watch: "ইউফোরিয়া", warning: "ইউফোরিক অঞ্চল", read: "০.৬৭১ (উচ্চ বিন্দু)", status: "bearish" },
+            { id: 8, name: "রিটেইল ম্যানিয়া", watch: "আবেগপূর্ণ ভিড়ের আচরণ", warning: "সর্বত্র ম্যানিয়া", read: "৩৯ (চরম ভয়)", status: "bullish" }
         ];
 
-        // টেবিল রেন্ডার করা
         function renderTable() {
             const tbody = document.getElementById('live-table-body');
             tbody.innerHTML = '';
             
             signals.forEach(sig => {
-                let badgeClass = sig.status;
-                let statusText = sig.status.toUpperCase();
+                let statusText = "";
+                if(sig.status === 'neutral') statusText = "নিরপেক্ষ";
+                if(sig.status === 'bearish') statusText = "বিয়ারিশ";
+                if(sig.status === 'bullish') statusText = "বুলিশ";
 
-                // লাইভ ডেটা সিমুলেশন: রিডমে রিডমলি পরিবর্তন হবে
                 let liveRead = sig.read;
-                if(sig.id === 1) liveRead = `Holding $${(72700 + Math.random() * 100).toFixed(0)} Support`;
-                if(sig.id === 4) liveRead = `${(163 + Math.random()).toFixed(1)}k BTC (Live)`;
+                // লাইভ ডেটা আপডেট (দাম পরিবর্তন হবে)
+                if(sig.id === 1) liveRead = `$${(72700 + Math.random() * 100).toFixed(0)} সাপোর্ট ধরে রেখেছে`;
+                if(sig.id === 4) liveRead = `${(163 + Math.random()).toFixed(1)}k BTC (লাইভ)`;
                 
                 const row = `
                     <tr>
@@ -325,19 +179,42 @@
                         <td>${sig.watch}</td>
                         <td>${sig.warning}</td>
                         <td style="color: var(--accent-yellow);">${liveRead}</td>
-                        <td><span class="badge ${badgeClass}">${statusText}</span></td>
+                        <td><span class="badge ${sig.status}">${statusText}</span></td>
                     </tr>
                 `;
                 tbody.innerHTML += row;
             });
         }
 
+        // চার্ট লাইভ আপডেট করার ফাংশন
+        function updateCharts() {
+            const chart1 = document.getElementById('chart1-line');
+            const chart2 = document.getElementById('chart2-line');
+            
+            // র্যান্ডম পাথ জেনারেট
+            let path1 = "M0,40 ";
+            let path2 = "M0,10 ";
+            let y1 = 40, y2 = 10;
+            
+            for(let i=10; i<=100; i+=10) {
+                y1 = Math.max(5, Math.min(45, y1 + (Math.random() * 20 - 10)));
+                y2 = Math.max(5, Math.min(45, y2 + (Math.random() * 20 - 10)));
+                path1 += `L${i},${y1} `;
+                path2 += `L${i},${y2} `;
+            }
+            
+            chart1.setAttribute('d', path1);
+            chart2.setAttribute('d', path2);
+        }
+
         // প্রথমবার রেন্ডার
         renderTable();
+        updateCharts();
 
-        // প্রতি ৫ সেকেন্ডে টেবিলের কিছু ডেটা আপডেট হবে (লাইভ ফিল)
+        // প্রতি ৫ সেকেন্ডে ডেটা এবং চার্ট আপডেট হবে
         setInterval(() => {
             renderTable();
+            updateCharts();
         }, 5000);
     </script>
 </body>
