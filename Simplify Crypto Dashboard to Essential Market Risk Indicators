@@ -1,0 +1,543 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Crypto Market Risk Dashboard</title>
+<style>
+:root{
+ --bg:#07111f;--panel:#101e30;--panel2:#14243a;
+ --text:#e8f0fa;--muted:#91a4bb;--line:#263951;
+ --green:#16c784;--red:#ea3943;--yellow:#f0b90b;
+ --grey:#75869b;--blue:#3988ff;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);
+ font-family:Arial,sans-serif;font-size:14px}
+header{padding:20px 16px;background:#0b192b;
+ border-bottom:1px solid var(--line)}
+h1{font-size:22px;margin:0 0 7px}
+h2{font-size:17px;margin:25px 0 12px}
+h3{font-size:14px;margin:0 0 10px}
+p{line-height:1.5}
+small,.muted{color:var(--muted)}
+main{max-width:1250px;margin:auto;padding:14px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(205px,1fr));gap:10px}
+.card{background:var(--panel);border:1px solid var(--line);
+ border-radius:10px;padding:13px;min-width:0}
+.card .name{font-size:12px;color:var(--muted)}
+.value{font-size:22px;font-weight:700;margin:9px 0}
+.status{font-size:11px;font-weight:bold;letter-spacing:.4px}
+.green{color:var(--green)}.red{color:var(--red)}
+.yellow{color:var(--yellow)}.grey{color:var(--grey)}
+.blue{color:var(--blue)}
+.detail{font-size:12px;color:#c2d0df;line-height:1.5;margin-top:8px}
+.pill{display:inline-block;border:1px solid var(--line);
+ padding:5px 8px;border-radius:5px;font-size:11px}
+.section{margin-bottom:22px}
+.banner{background:var(--panel2);padding:15px;border-radius:10px;
+ border:1px solid var(--line);margin:12px 0}
+.banner strong{font-size:19px}
+table{width:100%;border-collapse:collapse;font-size:12px}
+td,th{text-align:left;padding:10px;border-bottom:1px solid var(--line)}
+th{color:var(--muted)}
+.news{padding:11px 0;border-bottom:1px solid var(--line)}
+.news:last-child{border:0}
+button{background:var(--blue);color:white;border:0;
+ padding:9px 13px;border-radius:6px;font-weight:bold}
+footer{padding:20px;color:var(--muted);font-size:11px;text-align:center}
+@media(max-width:500px){
+ h1{font-size:19px}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .card{padding:10px}.value{font-size:18px}
+}
+</style>
+</head>
+<body>
+<header>
+<h1>Crypto Market Risk Dashboard</h1>
+<div class="muted">Macro • BTC/ETH • Liquidity • On-chain • Market Signals</div>
+<p><span id="connection" class="pill">Connecting...</span>
+ <span id="updated" class="muted">Waiting for data</span></p>
+<button onclick="loadAll()">Refresh Data</button>
+</header>
+
+<main>
+<section class="section">
+<h2>1. Global Crypto Market</h2>
+<div id="overview" class="grid"></div>
+</section>
+
+<section class="section">
+<h2>2. BTC & ETH Market Trend</h2>
+<div id="technical" class="grid"></div>
+</section>
+
+<section class="section">
+<h2>3. Macro Economic Risk</h2>
+<div id="macro" class="grid"></div>
+</section>
+
+<section class="section">
+<h2>4. Global Liquidity</h2>
+<div id="liquidity" class="grid"></div>
+</section>
+
+<section class="section">
+<h2>5. Institutional & On-chain Signals</h2>
+<div id="onchain" class="grid"></div>
+</section>
+
+<section class="section">
+<h2>6. Spot Market Activity</h2>
+<div id="activity" class="grid"></div>
+</section>
+
+<section class="section">
+<h2>7. Derivatives & Leverage Risk</h2>
+<div id="derivatives" class="grid"></div>
+</section>
+
+<section class="section">
+<h2>8. Market Zone</h2>
+<div id="zone" class="grid"></div>
+</section>
+
+<section class="section">
+<h2>9. Macro News & Reports</h2>
+<div class="card">
+ <div id="news"><span class="grey">No verified news feed available in current data.</span></div>
+</div>
+</section>
+
+<section class="section">
+<h2>10. Final Market Decision</h2>
+<div id="decision" class="banner">
+ <span class="grey">Waiting for decision data...</span>
+</div>
+</section>
+
+<section class="section">
+<h2>Data Quality & Limitations</h2>
+<div id="quality" class="card"></div>
+</section>
+</main>
+
+<footer>
+Data-driven monitoring dashboard. Not a guaranteed price prediction.
+Unavailable data is never replaced with invented values.
+</footer>
+
+<script>
+const BASE = "./data/";
+
+const files = {
+ market:"market_data.json",
+ macro:"macro_data.json",
+ decision:"decision_data.json",
+ advanced:"advanced_data.json",
+ zone:"market_zone_data.json"
+};
+
+let D = {};
+
+const $ = id => document.getElementById(id);
+
+function path(obj,p){
+ return p.split(".").reduce((v,k)=>v==null?undefined:v[k],obj);
+}
+
+function raw(v){
+ if(v && typeof v==="object" && "value" in v) return v.value;
+ return v;
+}
+
+function get(obj,p){
+ return raw(path(obj,p));
+}
+
+function valid(v){
+ return v!==undefined && v!==null && v!=="" &&
+ Number.isFinite(Number(v));
+}
+
+function fmt(v,unit="",digits=2){
+ if(!valid(v)) return "UNAVAILABLE";
+ return Number(v).toLocaleString("en-US",{
+  maximumFractionDigits:digits
+ })+(unit ? " "+unit:"");
+}
+
+function money(v){
+ if(!valid(v)) return "UNAVAILABLE";
+ return "$"+Number(v).toLocaleString("en-US",{
+  maximumFractionDigits:2
+ });
+}
+
+function statusClass(s){
+ s=String(s||"").toUpperCase();
+ if(["BULLISH","GOOD","SUPPORTIVE","LOW_RISK","GREEN","POSITIVE","OK"].includes(s))return "green";
+ if(["BEARISH","DANGER","HIGH_RISK","RED","NEGATIVE","CRITICAL"].includes(s))return "red";
+ if(["CAUTION","WARNING","MIXED","MEDIUM","YELLOW"].includes(s))return "yellow";
+ return "grey";
+}
+
+function card(title,value,status,detail){
+ const c=document.createElement("div");
+ c.className="card";
+
+ const n=document.createElement("div");
+ n.className="name";n.textContent=title;
+
+ const v=document.createElement("div");
+ v.className="value";v.textContent=value;
+
+ const s=document.createElement("div");
+ s.className="status "+statusClass(status);
+ s.textContent=status||"DATA INSUFFICIENT";
+
+ const d=document.createElement("div");
+ d.className="detail";d.textContent=detail||"No verified interpretation available.";
+
+ c.append(n,v,s,d);
+ return c;
+}
+
+function add(target,title,value,status,detail){
+ $(target).appendChild(card(title,value,status,detail));
+}
+
+function clear(){
+ ["overview","technical","macro","liquidity","onchain",
+ "activity","derivatives","zone"].forEach(id=>$(id).replaceChildren());
+}
+
+function metricCard(target,title,obj,unit="",explain=""){
+ if(!obj || typeof obj!=="object" || !("value" in obj)){
+  add(target,title,"UNAVAILABLE","UNAVAILABLE",
+   "এই ডেটা বর্তমান JSON-এ পাওয়া যায়নি।");
+  return;
+ }
+ const value=fmt(obj.value,unit);
+ const st=obj.status||"DATA";
+ const extra=[
+  explain,
+  obj.change!==undefined?"Change: "+fmt(obj.change,obj.unit||unit):"",
+  obj.observation_date?"Date: "+obj.observation_date:""
+ ].filter(Boolean).join(" | ");
+ add(target,title,value,st,extra);
+}
+
+function overview(){
+ const m=D.market||{};
+ const g=m.global_market||{};
+ const f=m.fear_greed||{};
+ const items=[
+  ["Total Market Cap",g.total_market_cap_usd,"USD","Total crypto market valuation."],
+  ["24H Market Volume",g.total_volume_24h_usd,"USD","Reported 24-hour trading volume."],
+  ["BTC Dominance",g.btc_dominance_pct,"%","Bitcoin share of total crypto market cap."],
+  ["ETH Dominance",g.eth_dominance_pct,"%","Ethereum share of total crypto market cap."]
+ ];
+ items.forEach(x=>metricCard("overview",x[0],x[1],x[2],x[3]));
+ add("overview","Fear & Greed",
+  valid(f.value)?String(f.value)+"/100":"UNAVAILABLE",
+  f.classification||"UNAVAILABLE",
+  "Classification: "+(f.classification||"Not available"));
+}
+
+function technical(){
+ const t=path(D.market,"technical")||{};
+ ["BTC","ETH"].forEach(symbol=>{
+  const a=t[symbol]||{};
+  const prefix=symbol+" ";
+  const indicators=a.indicators||{};
+  const price=get(a,"price");
+  const fields=[
+   ["Price",price,"USD"],
+   ["MA20",indicators.ma20,"USD"],
+   ["MA50",indicators.ma50,"USD"],
+   ["MA200",indicators.ma200,"USD"],
+   ["RSI 14",indicators.rsi14,""],
+   ["MACD",indicators.macd,""],
+   ["MACD Signal",indicators.macd_signal,""],
+   ["ADX 14",indicators.adx14,""],
+   ["Volume Ratio",indicators.volume_ratio_20d,"x"],
+   ["Support 20D",indicators.support_20d,"USD"],
+   ["Resistance 20D",indicators.resistance_20d,"USD"]
+  ];
+  fields.forEach(x=>{
+   const val=raw(x[1]);
+   const shown=x[2]==="USD"?money(val):fmt(val,x[2]);
+   let st="DATA";
+   if(x[0]==="RSI 14" && valid(val)){
+    st=Number(val)>=70?"CAUTION":Number(val)<=30?"OVERSOLD":"NEUTRAL";
+   }
+   add("technical",prefix+x[0],shown,st,
+    x[0]==="RSI 14"?"RSI is a momentum measure; not a standalone buy/sell signal.":"");
+  });
+  add("technical",prefix+"Trend",a.trend||"UNAVAILABLE",
+   a.trend||"UNAVAILABLE","Technical trend reported by market data engine.");
+ });
+}
+
+function macro(){
+ const m=D.macro||{};
+ const x=m.metrics||{};
+ const fields=[
+  ["CPI","cpi","%","Inflation measure."],
+  ["Core CPI","core_cpi","%","Underlying inflation measure."],
+  ["PCE","pce","%","Fed-preferred inflation measure."],
+  ["Core PCE","core_pce","%","Underlying PCE inflation."],
+  ["Nonfarm Payrolls","nonfarm_payrolls","","Employment change."],
+  ["Unemployment","unemployment","%","Labour market condition."],
+  ["Fed Funds Rate","fed_funds_rate","%","US monetary policy rate."],
+  ["USD Broad Index","usd_broad_index","","Broad US dollar index; not DXY."],
+  ["VIX","vix","","US equity implied volatility."],
+  ["US 2Y Yield","yield_2y","%","Short-term Treasury yield."],
+  ["US 10Y Yield","yield_10y","%","Long-term Treasury yield."],
+  ["US 30Y Yield","yield_30y","%","Long-term Treasury yield."],
+  ["10Y-2Y Spread","yield_curve_10y_2y","pp","Yield curve spread."],
+  ["S&P 500","sp500","","US equity market."],
+  ["Nasdaq","nasdaq","","US technology equity market."],
+  ["Oil","oil","USD","Energy price."],
+  ["Gold","gold","USD","Gold price; unavailable if not supplied."],
+  ["USD/JPY","usd_jpy","","Currency pair."]
+ ];
+ fields.forEach(f=>metricCard("macro",f[0],x[f[1]],f[2],f[3]));
+}
+
+function liquidity(){
+ const m=D.macro||{};
+ const l=m.liquidity||{};
+ const components=l.components||{};
+ add("liquidity","Net Liquidity",
+  valid(l.current)?fmt(l.current,"B"): "UNAVAILABLE",
+  l.trend||"UNAVAILABLE",
+  "Net liquidity reported by macro engine.");
+ add("liquidity","7D Change",
+  fmt(l.change_7d,"B"),"DATA","Seven-day liquidity change.");
+ add("liquidity","30D Change",
+  fmt(l.change_30d,"B"),"DATA","Thirty-day liquidity change.");
+ add("liquidity","Fed Assets",
+  fmt(components.fed_assets,"B"),"DATA","Federal Reserve assets.");
+ add("liquidity","Treasury General Account",
+  fmt(components.tga,"B"),"DATA","US Treasury cash balance.");
+ add("liquidity","Reverse Repo",
+  fmt(components.rrp,"B"),"DATA","Reverse repurchase facility.");
+ metricCard("liquidity","M2 Money Supply",
+  m.metrics?.m2_money_supply,"B","Broad money supply.");
+}
+
+function advanced(){
+ const a=D.advanced||{};
+ const chain=a.on_chain||{};
+ const spot=a.spot_market_activity||{};
+ const etf=a.etf_flows||{};
+ const deriv=a.derivatives||{};
+
+ const on=[
+  ["MVRV",chain.mvrv,""],
+  ["MVRV Z-Score",chain.mvrv_z_score,""],
+  ["SOPR",chain.sopr,""],
+  ["NUPL",chain.nupl,""],
+  ["Exchange Netflow",chain.exchange_netflow,"BTC"],
+  ["Whale Activity",chain.whale_activity,""],
+  ["Hashrate",chain.hashrate,"H/s"],
+  ["Mining Difficulty",chain.difficulty,""]
+ ];
+ on.forEach(x=>metricCard("onchain",x[0],x[1],x[2],
+  "Only verified source data is displayed."));
+
+ const eItems=[
+  ["BTC ETF Netflow",etf.btc_netflow,"USD"],
+  ["ETH ETF Netflow",etf.eth_netflow,"USD"]
+ ];
+ eItems.forEach(x=>metricCard("onchain",x[0],x[1],x[2],
+  "Institutional ETF flow; unavailable if not integrated."));
+
+ const sItems=[
+  ["Advancing Coins",spot.advancing,""],
+  ["Declining Coins",spot.declining,""],
+  ["Unchanged Coins",spot.unchanged,""],
+  ["Advance/Decline Ratio",spot.advance_decline_ratio,""]
+ ];
+ sItems.forEach(x=>metricCard("activity",x[0],x[1],x[2],
+  "Spot market breadth."));
+
+ const order=a.spot_order_book||{};
+ const taker=a.spot_taker_activity||{};
+ metricCard("activity","Spot Order Book Imbalance",
+  order.imbalance,"","Order book pressure.");
+ metricCard("activity","Spot Taker Buy/Sell",
+  taker.buy_sell_ratio,"","Aggressive spot buying versus selling.");
+
+ const oi=deriv.open_interest||{};
+ metricCard("derivatives","Open Interest",oi.total||oi,"USD",
+  "Aggregate derivatives exposure.");
+ metricCard("derivatives","Funding Rate",deriv.funding_rate,"",
+  "Positive/negative funding indicates positioning cost.");
+ metricCard("derivatives","Taker Long/Short",
+  deriv.taker_long_short_ratio,"",
+  "Keep taker ratio separate from account and position ratios.");
+
+ const ratios=deriv.cross_exchange_long_short_ratio||{};
+ ["account","top_account","top_position","all_position","taker"].forEach(k=>{
+  metricCard("derivatives","Long/Short "+k,ratios[k],"",
+   "Different trader groups; not interchangeable.");
+ });
+ metricCard("derivatives","Liquidation Heatmap",
+  deriv.liquidation_heatmap,"",
+  "Requires real liquidation cluster data.");
+}
+
+function zone(){
+ const z=D.zone?.market_zone||{};
+ add("zone","Current Zone",z.current_zone||"UNAVAILABLE",
+  z.risk_level||"UNAVAILABLE",z.reason||"No verified reason supplied.");
+ add("zone","Zone Confidence",
+  valid(z.confidence)?fmt(z.confidence,"%"):"UNAVAILABLE",
+  z.confidence_label||"UNAVAILABLE",
+  "Classification confidence, NOT profit probability.");
+ add("zone","Market Position",z.market_position||"UNAVAILABLE",
+  "DATA","Reported position in current zone.");
+ add("zone","Next Zone",z.next_zone||"UNAVAILABLE",
+  "DATA","Possible next classification, not a forecast.");
+ add("zone","Zone Spot Action",z.spot_action||"UNAVAILABLE",
+  z.risk_level||"UNAVAILABLE",
+  "Must be cross-checked against final market decision.");
+}
+
+function reports(){
+ const box=$("news");
+ box.replaceChildren();
+ const r=D.macro?.reports;
+ const list=Array.isArray(r)?r:[];
+ if(!list.length){
+  box.textContent="বর্তমান Backend-এ যাচাইকৃত News Feed বা Economic Calendar নেই। Macro reports data না থাকায় এখানে কোনো সংবাদ বানিয়ে দেখানো হচ্ছে না।";
+  return;
+ }
+ list.forEach(item=>{
+  const div=document.createElement("div");
+  div.className="news";
+  const title=document.createElement("strong");
+  title.textContent=item.title||item.name||"Macro Report";
+  const desc=document.createElement("p");
+  desc.className="detail";
+  desc.textContent=item.summary||item.description||item.value||"";
+  div.append(title,desc);
+  box.append(div);
+ });
+}
+
+function decision(){
+ const d=D.decision||{};
+ const f=d.final_decision||{};
+ const box=$("decision");
+ box.replaceChildren();
+ const title=document.createElement("strong");
+ title.textContent=f.decision||"DATA INSUFFICIENT";
+ title.className=statusClass(f.decision);
+ box.append(title);
+ const reasons=document.createElement("p");
+ reasons.textContent="Reasons: "+(Array.isArray(f.reasons)?f.reasons.join(" | "):"No verified reasons.");
+ box.append(reasons);
+ const actions=document.createElement("p");
+ actions.textContent="Action: "+(Array.isArray(f.actions)?f.actions.join(" | "):"No action supplied.");
+ box.append(actions);
+ const risk=document.createElement("p");
+ risk.textContent="Risk: "+(f.risk||"Review source data and market conditions.");
+ box.append(risk);
+ const note=document.createElement("p");
+ note.className="detail";
+ note.textContent=f.important_note||"Rule-based assessment; not a guaranteed prediction.";
+ box.append(note);
+}
+
+function quality(){
+ const box=$("quality");
+ const d=D.decision||{};
+ const issues=d.issues||[];
+ const parts=[
+  "Market: "+(d.data_quality?.market||"Unknown"),
+  "Macro: "+(d.data_quality?.macro||"Unknown"),
+  "BTC Technical: "+(d.data_quality?.btc_technical||"Unknown"),
+  "ETH Technical: "+(d.data_quality?.eth_technical||"Unknown")
+ ];
+ box.replaceChildren();
+ parts.forEach(t=>{
+  const p=document.createElement("p");p.textContent=t;box.append(p);
+ });
+ if(issues.length){
+  const h=document.createElement("h3");h.textContent="Data Issues";
+  box.append(h);
+  issues.forEach(i=>{
+   const p=document.createElement("p");
+   p.textContent=typeof i==="string"?i:JSON.stringify(i);
+   box.append(p);
+  });
+ }
+ const limitations=d.limitations||[];
+ limitations.forEach(i=>{
+  const p=document.createElement("p");
+  p.textContent=typeof i==="string"?i:JSON.stringify(i);
+  box.append(p);
+ });
+}
+
+async function fetchJSON(file){
+ const res=await fetch(BASE+file+"?t="+Date.now(),{cache:"no-store"});
+ if(!res.ok)throw new Error(file+" HTTP "+res.status);
+ return res.json();
+}
+
+async function loadAll(){
+ $("connection").textContent="Updating...";
+ $("connection").className="pill yellow";
+ try{
+  const names=Object.keys(files);
+  const results=await Promise.allSettled(
+   names.map(k=>fetchJSON(files[k]))
+  );
+  D={};
+  results.forEach((r,i)=>{
+   if(r.status==="fulfilled")D[names[i]]=r.value;
+  });
+  clear();
+  if(D.market)overview();
+  if(D.market)technical();
+  if(D.macro)macro();
+  if(D.macro)liquidity();
+  if(D.advanced)advanced();
+  if(D.zone)zone();
+  if(D.macro)reports();
+  if(D.decision)decision();
+  if(D.decision)quality();
+
+  const failures=results.filter(x=>x.status==="rejected").length;
+  $("connection").textContent=failures===0?"DATA CONNECTED":
+   failures+" DATA SOURCE(S) UNAVAILABLE";
+  $("connection").className="pill "+(failures===0?"green":"yellow");
+
+  const times=[
+   D.market?.generated_at,
+   D.macro?.fetched_at,
+   D.decision?.generated_at,
+   D.advanced?.generated_at,
+   D.zone?.generated_at
+  ].filter(Boolean);
+  $("updated").textContent=times.length?
+   " | Source timestamps: "+times.join(" / "):
+   " | Source timestamp unavailable";
+ }catch(e){
+  $("connection").textContent="CONNECTION ERROR";
+  $("connection").className="pill red";
+  $("updated").textContent=e.message;
+ }
+}
+
+loadAll();
+setInterval(loadAll,300000);
+</script>
+</body>
+</html>
