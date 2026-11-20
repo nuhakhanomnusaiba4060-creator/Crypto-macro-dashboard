@@ -374,5 +374,112 @@ el("updated").textContent=
 loadAll();
 setInterval(loadAll,300000);
 </script>
+ 
+<script>
+// বাংলা অনুবাদ ব্যবস্থা
+const BANGLA = {
+"Crypto Market Risk Dashboard":"ক্রিপ্টো বাজার ঝুঁকি ড্যাশবোর্ড",
+"Global Crypto Market":"সামগ্রিক ক্রিপ্টো বাজার",
+"BTC & ETH Technical Analysis":"BTC ও ETH টেকনিক্যাল বিশ্লেষণ",
+"Macro Economic Data":"সামষ্টিক অর্থনৈতিক তথ্য",
+"Global Liquidity":"বৈশ্বিক তারল্য",
+"Verified On-chain Data":"যাচাইকৃত অন-চেইন তথ্য",
+"Spot Market Activity":"স্পট বাজারের কার্যক্রম",
+"Derivatives Sentiment":"ডেরিভেটিভ বাজারের অবস্থান",
+"Market Zone":"বাজারের বর্তমান পর্যায়",
+"Final Market Decision":"সামগ্রিক বাজার সিদ্ধান্ত",
+"Data Quality & Limitations":"তথ্যের মান ও সীমাবদ্ধতা",
+"Refresh Data":"তথ্য রিফ্রেশ করুন",
+"Total Crypto Market Cap":"মোট ক্রিপ্টো বাজারমূল্য",
+"24H Market Volume":"২৪ ঘণ্টার লেনদেন",
+"BTC Dominance":"BTC বাজার আধিপত্য",
+"ETH Dominance":"ETH বাজার আধিপত্য",
+"Fear & Greed":"ভয় ও লোভ সূচক",
+"Reference Price":"বর্তমান মূল্য",
+"24H Change":"২৪ ঘণ্টায় পরিবর্তন",
+"MA20":"২০ দিনের মুভিং অ্যাভারেজ",
+"MA50":"৫০ দিনের মুভিং অ্যাভারেজ",
+"MA200":"২০০ দিনের মুভিং অ্যাভারেজ",
+"RSI14":"RSI সূচক",
+"MACD":"MACD সূচক",
+"MACD Signal":"MACD সিগন্যাল",
+"MACD Histogram":"MACD হিস্টোগ্রাম",
+"ADX14":"ADX সূচক",
+"Support 20D":"২০ দিনের সাপোর্ট",
+"Resistance 20D":"২০ দিনের রেজিস্ট্যান্স",
+"CPI":"ভোক্তা মূল্যস্ফীতি",
+"Core CPI":"মূল CPI",
+"PCE":"PCE মূল্যসূচক",
+"Core PCE":"মূল PCE",
+"Fed Funds Rate":"ফেড সুদের হার",
+"VIX":"VIX ভোলাটিলিটি সূচক",
+"US 2Y Yield":"মার্কিন ২ বছর মেয়াদি বন্ড",
+"US 10Y Yield":"মার্কিন ১০ বছর মেয়াদি বন্ড",
+"US 30Y Yield":"মার্কিন ৩০ বছর মেয়াদি বন্ড",
+"S&P 500":"এসঅ্যান্ডপি ৫০০",
+"NASDAQ":"ন্যাসডাক",
+"WTI Oil":"অপরিশোধিত তেলের দাম",
+"USD/JPY":"ডলার/ইয়েন",
+"Net Liquidity":"নিট তারল্য",
+"7D Change":"৭ দিনের পরিবর্তন",
+"30D Change":"৩০ দিনের পরিবর্তন",
+"Fed Assets":"ফেডের সম্পদ",
+"Treasury General Account":"ট্রেজারি সাধারণ হিসাব",
+"Reverse Repo":"রিভার্স রেপো",
+"M2 Money Supply":"M2 অর্থ সরবরাহ",
+"MVRV Ratio":"MVRV অনুপাত",
+"Bitcoin Hashrate":"বিটকয়েন হ্যাশরেট",
+"Mining Difficulty":"মাইনিং জটিলতা",
+"Open Interest":"ওপেন ইন্টারেস্ট",
+"Funding Rate":"ফান্ডিং রেট",
+"Advancing Spot Pairs":"দাম বাড়ছে এমন কয়েন",
+"Declining Spot Pairs":"দাম কমছে এমন কয়েন",
+"Advance/Decline Ratio":"বৃদ্ধি ও পতনের অনুপাত",
+"Spot Order Book Imbalance":"অর্ডার বুকের ভারসাম্য",
+"Spot Bid Value":"ক্রয় অর্ডারের মূল্য",
+"Spot Ask Value":"বিক্রয় অর্ডারের মূল্য",
+"Current Zone: ":"বর্তমান বাজার পর্যায়: ",
+"Spot Action: ":"স্পট করণীয়: ",
+"Confidence: ":"নির্ভরযোগ্যতার স্তর: ",
+"DECISION: ":"সিদ্ধান্ত: ",
+"ACTION: ":"করণীয়: ",
+"RISK: ":"ঝুঁকি: ",
+"REDUCE RISK":"ঝুঁকি কমান",
+"WAIT":"অপেক্ষা করুন",
+"CONTRACTING":"তারল্য সংকুচিত হচ্ছে",
+"EXPANDING":"তারল্য বাড়ছে",
+"Accumulation Zone":"সঞ্চয় পর্যায়",
+"Early Bull Zone":"প্রাথমিক বুলিশ পর্যায়",
+"HIGH":"উচ্চ",
+"LOW":"নিম্ন",
+"Loading...":"তথ্য লোড হচ্ছে...",
+"All data files loaded":"সব তথ্য লোড হয়েছে",
+"Verified source":"যাচাইকৃত উৎস"
+};
+
+function translateDashboard(root=document.body){
+const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);
+let node;
+while(node=walker.nextNode()){
+let value=node.nodeValue.trim();
+if(BANGLA[value]){
+node.nodeValue=node.nodeValue.replace(value,BANGLA[value]);
+}
+}
+}
+
+translateDashboard();
+
+const banglaObserver=new MutationObserver(()=>{
+translateDashboard();
+});
+
+banglaObserver.observe(document.body,{
+childList:true,
+subtree:true,
+characterData:true
+});
+</script>
+ 
 </body>
 </html>
