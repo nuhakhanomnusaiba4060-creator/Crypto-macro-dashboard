@@ -6,255 +6,371 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Crypto Market Risk Dashboard</title>
 <style>
-:root{--bg:#07111f;--panel:#101e30;--line:#263951;--text:#e8f0fa;--muted:#91a4bb;--green:#16c784;--red:#ea3943;--yellow:#f0b90b;--grey:#75869b}
+:root{--bg:#07111f;--panel:#101e30;--line:#263951;--text:#e8f0fa;--muted:#91a4bb;--green:#16c784;--red:#ea3943;--yellow:#f0b90b}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--text);font:14px Arial,sans-serif}
-header{padding:18px;background:#0b192b;border-bottom:1px solid var(--line)}
+header{padding:16px;background:#0b192b;border-bottom:1px solid var(--line)}
 main{max-width:1200px;margin:auto;padding:14px}
-h1{font-size:21px;margin:0 0 8px}
-h2{font-size:17px;margin:24px 0 12px}
-small,.muted{color:var(--muted)}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px}
-.card{background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:13px;min-width:0}
-.name{font-size:12px;color:var(--muted)}
-.value{font-size:21px;font-weight:bold;margin:9px 0;overflow-wrap:anywhere}
-.detail{font-size:12px;color:#bdcada;line-height:1.5;margin-top:8px}
-.green{color:var(--green)}.red{color:var(--red)}.yellow{color:var(--yellow)}.grey{color:var(--grey)}
+h1{font-size:21px}h2{font-size:17px;margin:24px 0 12px}
+.muted,.name{color:var(--muted)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
+.card,.banner{background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:13px;min-width:0}
+.name{font-size:12px}
+.value{font-size:20px;font-weight:bold;margin:9px 0;overflow-wrap:anywhere}
+.detail{font-size:11px;color:#bdcada;line-height:1.5;margin-top:7px}
+.green{color:var(--green)}.red{color:var(--red)}.yellow{color:var(--yellow)}
 .pill{display:inline-block;padding:5px 8px;border:1px solid var(--line);border-radius:5px;font-size:11px}
-.banner{background:var(--panel);padding:15px;border:1px solid var(--line);border-radius:9px;line-height:1.6}
 button{background:#3988ff;color:white;border:0;border-radius:6px;padding:9px 14px;font-weight:bold}
-.news{padding:10px 0;border-bottom:1px solid var(--line)}
+.banner{line-height:1.7;white-space:pre-line}
+table{width:100%;border-collapse:collapse;font-size:12px}
+td,th{padding:8px;border-bottom:1px solid var(--line);text-align:left}
 footer{text-align:center;padding:20px;color:var(--muted);font-size:11px}
-@media(max-width:480px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.card{padding:10px}.value{font-size:17px}}
+@media(max-width:480px){
+.grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+.card{padding:10px}.value{font-size:16px}
+}
 </style>
 </head>
 <body>
 <header>
 <h1>Crypto Market Risk Dashboard</h1>
-<div class="muted">Macro • Bitcoin • Ethereum • Liquidity • On-chain • Market Risk</div>
-<p><span id="connection" class="pill">Connecting...</span></p>
-<p class="muted" id="updated">Loading data...</p>
+<div class="muted">Verified Macro • BTC/ETH • Liquidity • Spot Activity • Derivatives Risk</div>
+<p><span id="connection" class="pill">Loading...</span></p>
+<p class="muted" id="updated">—</p>
 <button onclick="loadAll()">Refresh Data</button>
 </header>
+
 <main>
-<h2>1. Global Crypto Market</h2>
-<div id="overview" class="grid"></div>
-
-<h2>2. BTC & ETH Technical Analysis</h2>
-<div id="technical" class="grid"></div>
-
-<h2>3. Macro Economic Risk</h2>
-<div id="macro" class="grid"></div>
-
-<h2>4. Global Liquidity</h2>
-<div id="liquidity" class="grid"></div>
-
-<h2>5. Institutional & On-chain Data</h2>
-<div id="onchain" class="grid"></div>
-
-<h2>6. Spot Market Activity</h2>
-<div id="activity" class="grid"></div>
-
-<h2>7. Derivatives & Leverage Risk</h2>
-<div id="derivatives" class="grid"></div>
-
-<h2>8. Market Zone</h2>
-<div id="zone" class="grid"></div>
-
-<h2>9. Macro Reports</h2>
-<div id="news" class="banner"></div>
-
-<h2>10. Final Market Decision</h2>
-<div id="decision" class="banner">Waiting for data...</div>
-
-<h2>11. Data Quality</h2>
-<div id="quality" class="banner"></div>
+<h2>1. Global Crypto Market</h2><div id="overview" class="grid"></div>
+<h2>2. BTC & ETH Technical Analysis</h2><div id="technical" class="grid"></div>
+<h2>3. Macro Economic Data</h2><div id="macro" class="grid"></div>
+<h2>4. Global Liquidity</h2><div id="liquidity" class="grid"></div>
+<h2>5. Verified On-chain Data</h2><div id="onchain" class="grid"></div>
+<h2>6. Spot Market Activity</h2><div id="activity" class="grid"></div>
+<h2>7. Derivatives Sentiment (Futures Context Only)</h2><div id="derivatives" class="grid"></div>
+<h2>8. Market Zone</h2><div id="zone" class="banner"></div>
+<h2>9. Final Market Decision</h2><div id="decision" class="banner"></div>
+<h2>10. Data Quality & Limitations</h2><div id="quality" class="banner"></div>
 </main>
-<footer>Data-driven monitoring. Unavailable data is never invented.</footer>
+
+<footer>শুধু status=OK এবং valid numeric ডেটা দেখানো হয়। কোনো dummy data ব্যবহার করা হয় না।</footer>
 
 <script>
-const BASE="./data/";
-const files={
- market:"market_data.json",
- macro:"macro_data.json",
- decision:"decision_data.json",
- advanced:"advanced_data.json",
- zone:"market_zone_data.json"
+const FILES={
+market:"market_data.json",
+macro:"macro_data.json",
+advanced:"advanced_data.json",
+decision:"decision_data.json",
+zone:"market_zone_data.json"
 };
-let D={};
-const $=id=>document.getElementById(id);
+let DATA={};
 
-function get(o,p){
- return p.split(".").reduce((a,k)=>a==null?undefined:a[k],o);
+const el=id=>document.getElementById(id);
+
+function n(x){
+if(x&&typeof x==="object"&&"value"in x)x=x.value;
+return x===null||x===undefined||x===""||!Number.isFinite(Number(x))?null:Number(x);
 }
-function val(v){
- return v&&typeof v==="object"&&"value" in v?v.value:v;
+
+function f(x,d=2){
+return n(x)===null?"—":n(x).toLocaleString("en-US",{maximumFractionDigits:d});
 }
-function fmt(v,u="",digits=2){
- v=val(v);
- if(v===undefined||v===null||v===""||!Number.isFinite(Number(v)))return "UNAVAILABLE";
- return Number(v).toLocaleString("en-US",{maximumFractionDigits:digits})+(u?" "+u:"");
+
+function card(id,label,value,detail="",tone=""){
+if(value===null||value===undefined||value==="—")return;
+let c=document.createElement("div");
+c.className="card";
+let a=document.createElement("div");
+a.className="name";a.textContent=label;
+let b=document.createElement("div");
+b.className="value "+tone;b.textContent=value;
+let d=document.createElement("div");
+d.className="detail";d.textContent=detail;
+c.append(a,b,d);el(id).append(c);
 }
-function money(v){
- v=val(v);
- return Number.isFinite(Number(v))&&v!==null?"$"+Number(v).toLocaleString("en-US",{maximumFractionDigits:2}):"UNAVAILABLE";
+
+function metric(id,label,x,unit=""){
+if(!x||x.status!=="OK"||n(x)===null)return;
+card(id,label,f(x)+(unit?" "+unit:""),
+(x.source||"Verified source")+
+(x.observation_date?" • "+x.observation_date:"")+
+(x.source_updated_at?" • "+x.source_updated_at:""));
 }
-function cls(s){
- s=String(s||"").toUpperCase();
- if(/BULLISH|GOOD|SUPPORTIVE|POSITIVE|GREEN|LOW_RISK/.test(s))return "green";
- if(/BEARISH|DANGER|NEGATIVE|CRITICAL|HIGH_RISK|RED/.test(s))return "red";
- if(/CAUTION|WARNING|MIXED|MEDIUM/.test(s))return "yellow";
- return "grey";
+
+function metricObj(id,label,x,unit=""){
+if(x&&x.status==="OK"&&n(x.value)!==null)
+card(id,label,f(x.value)+(unit||x.unit?" "+(unit||x.unit):""),
+(x.source||"Verified source")+
+(x.observed_at?" • "+x.observed_at:""));
 }
-function card(target,title,value,status,detail){
- const c=document.createElement("div");c.className="card";
- const n=document.createElement("div");n.className="name";n.textContent=title;
- const v=document.createElement("div");v.className="value";v.textContent=value;
- const s=document.createElement("div");s.className=cls(status);s.textContent=status||"DATA INSUFFICIENT";
- const d=document.createElement("div");d.className="detail";d.textContent=detail||"No additional verified interpretation.";
- c.append(n,v,s,d);$(target).append(c);
-}
-function metric(target,title,obj,unit="",note=""){
- if(!obj){card(target,title,"UNAVAILABLE","UNAVAILABLE","Data not supplied by the source.");return}
- card(target,title,fmt(obj,unit),obj.status||"DATA",note);
-}
+
 function reset(){
- ["overview","technical","macro","liquidity","onchain","activity","derivatives","zone"].forEach(x=>$(x).replaceChildren());
+["overview","technical","macro","liquidity","onchain","activity","derivatives"].forEach(k=>el(k).replaceChildren());
 }
-function renderOverview(){
- const g=D.market?.global_market||{};
- metric("overview","Total Market Cap",g.total_market_cap_usd,"USD");
- metric("overview","24H Trading Volume",g.total_volume_24h_usd,"USD");
- metric("overview","BTC Dominance",g.btc_dominance_pct,"%");
- metric("overview","ETH Dominance",g.eth_dominance_pct,"%");
- const f=D.market?.fear_greed||{};
- card("overview","Fear & Greed",fmt(f.value,"/100"),f.classification||"DATA","Market sentiment: "+(f.classification||"Unavailable"));
-}
-function renderTechnical(){
- const t=D.market?.technical||{};
- ["BTC","ETH"].forEach(sym=>{
-  const a=t[sym]||{},i=a.indicators||{};
-  card("technical",sym+" Price",money(a.price), "DATA","Current source price.");
-  ["ma20","ma50","ma200"].forEach(k=>card("technical",sym+" "+k.toUpperCase(),money(i[k]),"DATA","Moving average."));
-  ["rsi14","macd","macd_signal","adx14","volume_ratio_20d"].forEach(k=>card("technical",sym+" "+k.toUpperCase(),fmt(i[k]),"DATA","Technical indicator."));
-  ["support_20d","resistance_20d"].forEach(k=>card("technical",sym+" "+k.replace("_"," ").toUpperCase(),money(i[k]),"DATA","20-day market level."));
-  card("technical",sym+" Trend",a.trend||"UNAVAILABLE",a.trend||"DATA","Source trend classification.");
- });
-}
-function renderMacro(){
- const x=D.macro?.metrics||{};
- const fields=[
- ["CPI","cpi","%"],["Core CPI","core_cpi","%"],["PCE","pce","%"],["Core PCE","core_pce","%"],
- ["Nonfarm Payrolls","nonfarm_payrolls",""],["Unemployment","unemployment","%"],
- ["Fed Funds Rate","fed_funds_rate","%"],["USD Broad Index","usd_broad_index",""],
- ["VIX","vix",""],["US 2Y Yield","yield_2y","%"],["US 10Y Yield","yield_10y","%"],
- ["US 30Y Yield","yield_30y","%"],["10Y-2Y Spread","yield_curve_10y_2y","pp"],
- ["S&P 500","sp500",""],["Nasdaq","nasdaq",""],["Oil","oil","USD"],
- ["Gold","gold","USD"],["USD/JPY","usd_jpy",""]
- ];
- fields.forEach(f=>metric("macro",f[0],x[f[1]],f[2],"Macroeconomic data."));
-}
-function renderLiquidity(){
- const l=D.macro?.liquidity||{},c=l.components||{};
- card("liquidity","Net Liquidity",fmt(l.current,"B"),l.trend||"DATA","Reported net liquidity.");
- card("liquidity","7D Change",fmt(l.change_7d,"B"),"DATA","Seven-day change.");
- card("liquidity","30D Change",fmt(l.change_30d,"B"),"DATA","Thirty-day change.");
- card("liquidity","Fed Assets",fmt(c.fed_assets,"B"),"DATA","Fed balance sheet assets.");
- card("liquidity","TGA",fmt(c.tga,"B"),"DATA","Treasury General Account.");
- card("liquidity","Reverse Repo",fmt(c.rrp,"B"),"DATA","Reverse Repo balance.");
- metric("liquidity","M2 Money Supply",D.macro?.metrics?.m2_money_supply,"B");
-}
-function renderAdvanced(){
- const a=D.advanced||{},o=a.on_chain||{};
- [["MVRV","mvrv",""],["MVRV Z-Score","mvrv_z_score",""],
- ["SOPR","sopr",""],["NUPL","nupl",""],
- ["Exchange Netflow","exchange_netflow","BTC"],
- ["Whale Activity","whale_activity",""],
- ["Hashrate","hashrate","H/s"],["Mining Difficulty","difficulty",""]]
- .forEach(x=>metric("onchain",x[0],o[x[1]],x[2]));
- const etf=a.etf_flows||{};
- metric("onchain","BTC ETF Netflow",etf.btc_netflow,"USD");
- metric("onchain","ETH ETF Netflow",etf.eth_netflow,"USD");
 
- const s=a.spot_market_activity||{};
- [["Advancing Coins","advancing"],["Declining Coins","declining"],
- ["Unchanged Coins","unchanged"],["Advance/Decline Ratio","advance_decline_ratio"]]
- .forEach(x=>metric("activity",x[0],s[x[1]]));
- metric("activity","Spot Order Book",a.spot_order_book?.imbalance);
- metric("activity","Spot Taker Buy/Sell",a.spot_taker_activity?.buy_sell_ratio);
+function render(){
+const m=DATA.market||{};
+const g=m.global_market||{};
+const assets=m.major_assets||{};
+const fg=m.fear_greed||{};
 
- const d=a.derivatives||{};
- metric("derivatives","Open Interest",d.open_interest,"USD");
- metric("derivatives","Funding Rate",d.funding_rate);
- const ratios=d.cross_exchange_long_short_ratio||{};
- ["account","top_account","top_position","all_position","taker"].forEach(k=>metric("derivatives","L/S "+k,ratios[k]));
- metric("derivatives","Taker Long/Short",d.taker_long_short_ratio);
- metric("derivatives","Liquidation Heatmap",d.liquidation_heatmap);
+for(const [k,l] of [
+["total_market_cap_usd","Total Crypto Market Cap"],
+["total_volume_24h_usd","24H Market Volume"],
+["btc_dominance_pct","BTC Dominance"],
+["eth_dominance_pct","ETH Dominance"]
+])metric("overview",l,g[k]);
+
+for(const [k,l] of [["bitcoin","BTC"],["ethereum","ETH"]]){
+metricObj("overview",l+" Reference Price",assets[k]?.price_usd);
+metricObj("overview",l+" 24H Change",assets[k]?.change_24h_pct,"%");
 }
-function renderZone(){
- const z=D.zone?.market_zone||{};
- card("zone","Current Zone",z.current_zone||"UNAVAILABLE",z.risk_level,z.reason);
- card("zone","Confidence",fmt(z.confidence,"%"),z.confidence_label,"Classification confidence, not profit probability.");
- card("zone","Market Position",z.market_position||"UNAVAILABLE","DATA","Reported market position.");
- card("zone","Next Zone",z.next_zone||"UNAVAILABLE","DATA","Possible next classification.");
- card("zone","Zone Spot Action",z.spot_action||"UNAVAILABLE",z.risk_level,"Must be checked against final decision.");
+
+if(fg.status==="OK")
+card("overview","Fear & Greed",f(fg.value,0)+"/100",
+fg.classification+" • "+(fg.source_updated_at||""));
+
+const t=m.technical||{};
+
+for(const s of ["BTC","ETH"]){
+const a=t[s]||{};
+const i=a.indicators||{};
+
+metricObj("technical",s+" Price (USDT)",a.price_usdt);
+
+for(const [k,l] of [
+["ma20","MA20"],["ma50","MA50"],["ma200","MA200"],
+["rsi14","RSI14"],["macd","MACD"],
+["macd_signal","MACD Signal"],
+["macd_histogram","MACD Histogram"],
+["adx14","ADX14"],["volume_ratio_20d","Volume Ratio 20D"],
+["support_20d","Support 20D"],
+["resistance_20d","Resistance 20D"],
+["bollinger_lower","Bollinger Lower"]
+]){
+metricObj("technical",s+" "+l,i[k],i[k]?.unit==="x"?"x":"");
 }
-function renderReports(){
- const r=D.macro?.reports;
- $("news").replaceChildren();
- if(!Array.isArray(r)||!r.length){
-  $("news").textContent="Verified macro news feed is not integrated. No fabricated headlines will be displayed.";
-  return;
- }
- r.forEach(x=>{
-  const p=document.createElement("p");p.className="news";
-  p.textContent=(x.title||x.name||"Macro Report")+" — "+(x.summary||x.description||"");
-  $("news").append(p);
- });
+
+card("technical",s+" Last Closed Candle",
+a.last_closed_candle_at||"—",
+a.candle_interval+" • "+a.candle_count+" candles");
 }
-function renderDecision(){
- const f=D.decision?.final_decision||{};
- $("decision").replaceChildren();
- const h=document.createElement("h2");h.textContent=f.decision||"DATA INSUFFICIENT";h.className=cls(f.decision);
- const p=document.createElement("p");p.textContent="Reasons: "+(Array.isArray(f.reasons)?f.reasons.join(" | "):"Unavailable");
- const a=document.createElement("p");a.textContent="Actions: "+(Array.isArray(f.actions)?f.actions.join(" | "):"Unavailable");
- const r=document.createElement("p");r.textContent="Risk: "+(f.risk||"Not supplied");
- const n=document.createElement("p");n.textContent=f.important_note||"Rule-based assessment; not a guaranteed forecast.";
- $("decision").append(h,p,a,r,n);
+
+const mm=DATA.macro?.metrics||{};
+
+const macroFields=[
+["cpi","CPI"],["core_cpi","Core CPI"],
+["pce","PCE"],["core_pce","Core PCE"],
+["nonfarm_payrolls","Nonfarm Payrolls"],
+["unemployment","Unemployment"],
+["fed_funds_rate","Fed Funds Rate"],
+["usd_broad_index","US Dollar Broad Index (DXY নয়)"],
+["vix","VIX"],["yield_2y","US 2Y Yield"],
+["yield_10y","US 10Y Yield"],["yield_30y","US 30Y Yield"],
+["yield_curve_10y_2y","10Y–2Y Spread"],
+["sp500","S&P 500"],["nasdaq","NASDAQ"],
+["oil","WTI Oil"],["usd_jpy","USD/JPY"]
+];
+
+for(const [k,l] of macroFields){
+const x=mm[k];
+if(x?.status==="OK"&&n(x.value)!==null)
+card("macro",l,f(x.value)+(x.unit?" "+x.unit:""),
+"Observation: "+(x.observation_date||"—")+" • "+(x.source||"FRED"));
 }
-function renderQuality(){
- const d=D.decision||{};
- const lines=[
- "Market: "+(d.data_quality?.market||"Unknown"),
- "Macro: "+(d.data_quality?.macro||"Unknown"),
- "BTC Technical: "+(d.data_quality?.btc_technical||"Unknown"),
- "ETH Technical: "+(d.data_quality?.eth_technical||"Unknown")
- ];
- $("quality").textContent=lines.join(" | ")+
- (d.issues?.length?" | Issues: "+JSON.stringify(d.issues):"");
+
+const li=DATA.macro?.liquidity||{};
+
+if(li.status==="OK"){
+card("liquidity","Net Liquidity",f(li.current)+" B USD",
+"WALCL − TGA − RRP • "+li.observation_date);
+
+card("liquidity","7D Change",f(li.change_7d)+" B USD");
+card("liquidity","30D Change",f(li.change_30d)+" B USD","",
+n(li.change_30d)<0?"red":"green");
+
+card("liquidity","Liquidity Trend",li.trend,
+"Aligned observation dates",
+li.trend==="CONTRACTING"?"red":"green");
+
+const c=li.components||{};
+
+for(const [k,l] of [
+["fed_assets","Fed Assets"],
+["treasury_general_account","Treasury General Account"],
+["reverse_repo","Reverse Repo"]
+]){
+if(n(c[k])!==null)
+card("liquidity",l,f(c[k])+" B USD",
+"As of "+(li.observation_date||""));
 }
-async function fetchFile(file){
- const r=await fetch(BASE+file+"?t="+Date.now(),{cache:"no-store"});
- if(!r.ok)throw Error(file+" HTTP "+r.status);
- return r.json();
 }
+
+metric("liquidity","M2 Money Supply",mm.m2_money_supply);
+
+const on=DATA.advanced?.on_chain||{};
+
+for(const [k,l] of [
+["mvrv_ratio","MVRV Ratio"],
+["hashrate","Bitcoin Hashrate"],
+["mining_difficulty","Mining Difficulty"]
+])metricObj("onchain",l,on[k]);
+
+const sp=DATA.advanced?.spot_market_activity||{};
+const br=sp.breadth||{};
+
+if(br.status==="OK"){
+for(const [k,l] of [
+["advancing_pairs","Advancing Spot Pairs"],
+["declining_pairs","Declining Spot Pairs"],
+["unchanged_pairs","Unchanged Pairs"],
+["measured_pairs","Measured Pairs"]
+]){
+if(n(br[k])!==null)
+card("activity",l,f(br[k],0),"Binance Spot USDT pairs");
+}
+
+if(n(br.advance_decline_ratio)!==null)
+card("activity","Advance/Decline Ratio",
+f(br.advance_decline_ratio,3),"",
+n(br.advance_decline_ratio)<1?"red":"green");
+}
+
+const book=DATA.advanced?.spot_order_book||{};
+const tk=DATA.advanced?.spot_taker_activity||{};
+
+for(const s of ["BTCUSDT","ETHUSDT"]){
+metricObj("activity",s+" Spot Order Book Imbalance",
+book[s]?.imbalance_percent,"%");
+metricObj("activity",s+" Spot Bid Value",
+book[s]?.bid_value_usdt,"USDT");
+metricObj("activity",s+" Spot Ask Value",
+book[s]?.ask_value_usdt,"USDT");
+metricObj("activity",s+" 15m Taker Buy/Sell",
+tk[s]?.taker_buy_sell_ratio,"ratio");
+}
+
+const leaders=sp.volume_leaders_24h||[];
+
+if(leaders.length){
+let c=document.createElement("div");
+c.className="card";
+
+let title=document.createElement("div");
+title.className="name";
+title.textContent="Binance Spot 24H Volume Leaders";
+
+let table=document.createElement("table");
+table.innerHTML="<tr><th>Pair</th><th>Quote Volume</th><th>24H Change</th></tr>";
+
+let body=document.createElement("tbody");
+
+leaders.slice(0,10).forEach(x=>{
+let tr=document.createElement("tr");
+[f(x.quote_volume_24h,0)+" USDT",
+x.symbol,f(x.change_24h_pct)+"%"].forEach(v=>{
+let td=document.createElement("td");
+td.textContent=v;tr.append(td);
+});
+body.append(tr);
+});
+
+table.append(body);c.append(title,table);
+el("activity").append(c);
+}
+
+const deriv=DATA.advanced?.derivatives||{};
+
+for(const s of ["BTCUSDT","ETHUSDT"]){
+const d=deriv[s]||{};
+
+metricObj("derivatives",s+" Open Interest",d.open_interest_usd,"USD");
+metricObj("derivatives",s+" OI 24H Change",d.open_interest_change_24h_pct,"%");
+metricObj("derivatives",s+" Funding Rate",d.funding_avg_8h,"fraction / 8h");
+
+for(const [k,l] of [
+["global_long_short_ratio","Global Account L/S"],
+["top_account_long_short_ratio","Top Account L/S"],
+["top_position_long_short_ratio","Top Position L/S"],
+["all_position_long_short_ratio","All Position L/S"],
+["taker_long_short_ratio","Futures Taker L/S"]
+]){
+const z=d[k];
+if(z&&z.status==="OK"&&n(z.value)!==null)
+card("derivatives",s+" "+l,f(z.value,4),z.source||"CoinBoss cross-exchange");
+}
+}
+
+const z=DATA.zone?.market_zone||{};
+
+el("zone").textContent=[
+"Current Zone: "+(z.current_zone||"—"),
+"Spot Action: "+(z.spot_action||"—")+" • Risk: "+(z.risk_level||"—"),
+"Confidence: "+(z.confidence??"—")+"% ("+(z.confidence_label||"—")+")",
+"কারণ: "+((z.reason||[]).join(" | ")||"—"),
+"Verified BTC price: "+(z.verified_inputs?.btc_price??"—"),
+"Support: "+(z.verified_inputs?.support_20d??"—"),
+"Resistance: "+(z.verified_inputs?.resistance_20d??"—"),
+"পরবর্তী Zone: "+(z.next_zone||"—")
+].join("\n");
+
+const dec=DATA.decision?.final_decision||{};
+
+el("decision").textContent=[
+"DECISION: "+(dec.decision||"—"),
+"কারণ: "+((dec.reasons||[]).join(" | ")||"—"),
+"ACTION: "+((dec.actions||[]).join(" | ")||"—"),
+"RISK: "+((dec.risk||[]).join(" | ")||"—"),
+dec.important_note||""
+].join("\n");
+
+const q=DATA.macro?.summary||{};
+
+el("quality").textContent=[
+"Market snapshot: "+(m.generated_at||"missing"),
+"Macro snapshot: "+(DATA.macro?.fetched_at||"missing"),
+"Advanced snapshot: "+(DATA.advanced?.generated_at||"missing"),
+"Decision snapshot: "+(DATA.decision?.generated_at||"missing"),
+"Market Data Quality: "+(q.data_quality||"—"),
+"Macro series OK: "+(q.ok??"—")+"/"+(q.total_series??"—"),
+"Macro unavailable: "+(q.unavailable??"—"),
+"অনুপলব্ধ ডেটা ইচ্ছাকৃতভাবে দেখানো হয়নি।"
+].join("\n");
+}
+
 async function loadAll(){
- $("connection").textContent="Loading...";
- const keys=Object.keys(files);
- const results=await Promise.allSettled(keys.map(k=>fetchFile(files[k])));
- D={};
- results.forEach((r,i)=>{if(r.status==="fulfilled")D[keys[i]]=r.value});
- reset();
- if(D.market){renderOverview();renderTechnical()}
- if(D.macro){renderMacro();renderLiquidity();renderReports()}
- if(D.advanced)renderAdvanced();
- if(D.zone)renderZone();
- if(D.decision){renderDecision();renderQuality()}
- const failed=results.filter(x=>x.status==="rejected").length;
- $("connection").textContent=failed?"Some data unavailable":"Data connected";
- $("connection").className="pill "+(failed?"yellow":"green");
- $("updated").textContent="Updated: "+new Date().toLocaleString();
+el("connection").textContent="Loading...";
+
+const entries=await Promise.allSettled(
+Object.entries(FILES).map(async([k,file])=>{
+const r=await fetch("./data/"+file+"?v="+Date.now(),{cache:"no-store"});
+if(!r.ok)throw Error(file+" HTTP "+r.status);
+return [k,await r.json()];
+})
+);
+
+DATA={};
+let failed=[];
+
+entries.forEach((r,i)=>{
+if(r.status==="fulfilled")DATA[r.value[0]]=r.value[1];
+else failed.push(Object.keys(FILES)[i]);
+});
+
+reset();
+render();
+
+el("connection").textContent=failed.length?
+"Partial: "+failed.join(", ")+" unavailable":
+"All data files loaded";
+
+el("connection").className="pill "+(failed.length?"yellow":"green");
+
+el("updated").textContent=
+"Browser refresh: "+new Date().toLocaleString()+
+" • GitHub Actions data snapshots are hourly, not real-time tick data.";
 }
+
 loadAll();
 setInterval(loadAll,300000);
 </script>
