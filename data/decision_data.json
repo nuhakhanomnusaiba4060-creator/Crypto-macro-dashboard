@@ -2,47 +2,46 @@
   "schema_version": 1,
   "engine": "Crypto Final Decision Engine",
   "engine_version": "1.0.0",
-  "generated_at": "2026-11-20T17:14:36Z",
+  "generated_at": "2026-11-20T18:14:09Z",
   "status": "OK",
   "data_quality": {
     "macro": {
       "name": "macro_data",
-      "timestamp": "2026-11-20T17:14:36Z",
+      "timestamp": "2026-11-20T18:14:09Z",
       "age_hours": 0.0,
       "max_age_hours": 72,
       "status": "FRESH"
     },
     "market": {
       "name": "market_data",
-      "timestamp": "2026-11-20T17:14:07Z",
-      "age_hours": 0.01,
+      "timestamp": "2026-11-20T18:13:52Z",
+      "age_hours": 0.0,
       "max_age_hours": 36,
       "status": "FRESH"
     },
     "btc_technical": {
       "name": "BTC last closed daily candle",
       "timestamp": "2026-11-19T23:59:59Z",
-      "age_hours": 17.24,
+      "age_hours": 18.24,
       "max_age_hours": 60,
       "status": "FRESH"
     },
     "eth_technical": {
       "name": "ETH last closed daily candle",
       "timestamp": "2026-11-19T23:59:59Z",
-      "age_hours": 17.24,
+      "age_hours": 18.24,
       "max_age_hours": 60,
       "status": "FRESH"
     },
     "issues": [
-      "BTC price source discrepancy: CoinGecko snapshot ও Binance technical price-এর পার্থক্য 4.39%। ভিন্ন source/timestamp হওয়ায় কোনো একটি value auto-correct করা হয়নি।",
-      "Net Liquidity RRP mismatch: metrics.reverse_repo=0.405B, liquidity.components.reverse_repo=0.331B। Liquidity formula-এর aligned component আলাদা করে দেখানো হয়েছে।",
+      "BTC price source discrepancy: CoinGecko snapshot ও Binance technical price-এর পার্থক্য 5.33%। ভিন্ন source/timestamp হওয়ায় কোনো একটি value auto-correct করা হয়নি।",
       "Macro data quality GOOD_WITH_OPTIONAL_GAPS; optional Gold data unavailable।",
       "Market data scheduled snapshot; realtime feed নয়।"
     ]
   },
   "macro_analysis": {
-    "decision": "WAIT",
-    "risk_score": 2.0,
+    "decision": "REDUCE RISK",
+    "risk_score": 3.0,
     "support_score": 1.0,
     "data_quality": "GOOD_WITH_OPTIONAL_GAPS",
     "critical_series_available": 18,
@@ -52,29 +51,31 @@
       "cpi_yoy_percent": 4.081,
       "core_pce_yoy_percent": 3.121,
       "vix": 28.44,
-      "sp500_daily_change_percent": -0.2302,
+      "sp500_daily_change_percent": -2.0181,
       "nasdaq_daily_change_percent": -2.2541,
       "yield_10y_daily_change_pp": -0.03,
       "net_liquidity_trend": "CONTRACTING"
     },
     "risk_flags": [
+      "Macro engine-এর সামগ্রিক সিদ্ধান্ত REDUCE RISK।",
       "CPI YoY উচ্চ; inflation pressure রয়েছে।",
       "Core PCE YoY 3% বা তার বেশি।",
       "VIX 20-এর ওপরে; equity volatility elevated।",
+      "S&P 500 ও Nasdaq উভয়ই সর্বশেষ session-এ 1.5% বা বেশি কমেছে।",
       "US Net Liquidity proxy-এর trend CONTRACTING।"
     ]
   },
   "crypto_market": {
-    "global_market_cap_usd": 2051363808176.5686,
-    "global_volume_24h_usd": 102825792501.64894,
-    "btc_dominance_percent": 57.92697839165175,
+    "global_market_cap_usd": 2045313068710.1528,
+    "global_volume_24h_usd": 103890553678.90956,
+    "btc_dominance_percent": 57.79509549549775,
     "fear_greed": {
       "value": 12.0,
       "classification": "Extreme Fear",
       "unit": "/100",
       "source": "Alternative.me Fear & Greed API",
       "source_updated_at": "2026-11-20T00:00:00Z",
-      "fetched_at": "2026-11-20T17:14:07Z",
+      "fetched_at": "2026-11-20T18:13:52Z",
       "status": "OK",
       "error": null
     },
@@ -130,25 +131,26 @@
     }
   },
   "final_decision": {
-    "decision": "WAIT",
+    "decision": "REDUCE RISK",
     "confidence_label": "RULE_BASED_NOT_PROBABILITY",
     "reasons": [
-      "BTC daily trend bearish; oversold RSI একা buy signal নয়।",
+      "Macro REDUCE RISK এবং BTC daily trend bearish।",
       "Fear & Greed Extreme Fear; এটি একা market bottom signal নয়।"
     ],
     "actions": [
-      "নতুন BUY/DCA এড়িয়ে চলুন। Daily trend recovery নিশ্চিত না হওয়া পর্যন্ত অপেক্ষা করুন।"
+      "নতুন Altcoin BUY/DCA বন্ধ রাখুন। দুর্বল ও অতিরিক্ত ওজনের holdings পর্যালোচনা করুন।"
     ],
     "risk": [
       "BTC RSI oversold; আরও পতন বা consolidation সম্ভব। Oversold মানেই reversal নয়।",
-      "BTC MA20 < MA50; short/mid-term trend দুর্বল।"
+      "BTC MA20 < MA50; short/mid-term trend দুর্বল।",
+      "Macro risk elevated; এটি coin-specific fundamental sell analysis নয়।"
     ],
     "market_context": {
       "fear_greed_value": 12.0,
       "fear_greed_classification": "Extreme Fear",
-      "btc_dominance_percent": 57.92697839165175,
-      "total_market_cap_usd": 2051363808176.5686,
-      "total_volume_24h_usd": 102825792501.64894
+      "btc_dominance_percent": 57.79509549549775,
+      "total_market_cap_usd": 2045313068710.1528,
+      "total_volume_24h_usd": 103890553678.90956
     },
     "important_note": "এটি সামগ্রিক market-regime guidance; ব্যক্তিগত portfolio holdings-এর coin-by-coin SELL signal নয়।"
   },
