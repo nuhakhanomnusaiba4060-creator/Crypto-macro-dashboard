@@ -2,7 +2,7 @@
   "schema_version": 1,
   "engine": "Crypto Market Zone Engine",
   "engine_version": "1.1.0",
-  "generated_at": "2026-11-20T13:35:34Z",
+  "generated_at": "2026-11-20T15:12:28Z",
   "status": "OK",
   "market_zone": {
     "current_zone": "Accumulation Zone",
@@ -10,11 +10,12 @@
     "confidence": 60,
     "confidence_label": "LOW",
     "market_position": "EARLY",
-    "spot_action": "DCA",
-    "risk_level": "MEDIUM",
+    "spot_action": "WAIT",
+    "risk_level": "HIGH",
     "next_zone": "Early Bull Zone",
     "reason": [
-      "Extreme Fear ও oversold condition আছে; পর্যবেক্ষিত support এখনো অক্ষত।"
+      "Extreme Fear ও oversold condition আছে; পর্যবেক্ষিত support এখনো অক্ষত।",
+      "VIX / US Treasury yield-এ macro stress বেশি; নতুন DCA আপাতত স্থগিত।"
     ],
     "missing_data": [],
     "verified_inputs": {
@@ -26,17 +27,17 @@
       "macd": -4432.456033882248,
       "macd_signal": -3425.8733900561515,
       "fear_greed": 12.0,
-      "btc_dominance": 58.14042230529761,
-      "vix": 24.56,
+      "btc_dominance": 58.10857813972362,
+      "vix": 28.44,
       "usd_broad_index": 122.6503,
       "us_10y_yield": 5.07,
       "mvrv_ratio": 1.158746124163798,
-      "market_breadth_ratio": 0.084,
+      "market_breadth_ratio": 0.095,
       "volume_ratio_20d": 1.0982568933568495,
       "support_20d": 61428.26,
       "resistance_20d": 81196.01
     },
-    "macro_risk_score": 2,
+    "macro_risk_score": 3,
     "data_limitations": [
       "BTC weekly trend আলাদা timeframe data দিয়ে এখনো যাচাই করা হয়নি।",
       "USD Broad Index হলো DXY নয়।",
