@@ -1,485 +1,474 @@
-
 <!DOCTYPE html>
 <html lang="bn">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Crypto Market Risk Dashboard</title>
+<title>ক্রিপ্টো বাজার বিশ্লেষণ ড্যাশবোর্ড</title>
 <style>
-:root{--bg:#07111f;--panel:#101e30;--line:#263951;--text:#e8f0fa;--muted:#91a4bb;--green:#16c784;--red:#ea3943;--yellow:#f0b90b}
+:root{--bg:#07111f;--panel:#101e30;--line:#263951;--text:#e8f0fa;--muted:#91a4bb;--green:#16c784;--red:#ea3943;--yellow:#f0b90b;--blue:#3988ff}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);font:14px Arial,sans-serif}
+body{margin:0;background:var(--bg);color:var(--text);font:14px Arial,"Noto Sans Bengali",sans-serif}
 header{padding:16px;background:#0b192b;border-bottom:1px solid var(--line)}
 main{max-width:1200px;margin:auto;padding:14px}
-h1{font-size:21px}h2{font-size:17px;margin:24px 0 12px}
+h1{font-size:21px;margin:0 0 8px}h2{font-size:18px;margin:25px 0 12px}
+h3{font-size:15px;margin:0 0 8px}
 .muted,.name{color:var(--muted)}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
-.card,.banner{background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:13px;min-width:0}
-.name{font-size:12px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px}
+.card,.banner{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:13px;min-width:0}
+.name{font-size:13px;line-height:1.5}
 .value{font-size:20px;font-weight:bold;margin:9px 0;overflow-wrap:anywhere}
-.detail{font-size:11px;color:#bdcada;line-height:1.5;margin-top:7px}
+.detail{font-size:11px;color:#bdcada;line-height:1.6;margin-top:7px;overflow-wrap:anywhere}
 .green{color:var(--green)}.red{color:var(--red)}.yellow{color:var(--yellow)}
 .pill{display:inline-block;padding:5px 8px;border:1px solid var(--line);border-radius:5px;font-size:11px}
-button{background:#3988ff;color:white;border:0;border-radius:6px;padding:9px 14px;font-weight:bold}
-.banner{line-height:1.7;white-space:pre-line}
+button{background:var(--blue);color:white;border:0;border-radius:6px;padding:10px 14px;font-weight:bold;cursor:pointer}
+.banner{line-height:1.8;white-space:pre-line;margin-bottom:12px}
+.insight{border-top:1px solid var(--line);margin-top:10px;padding-top:9px;font-size:12px;line-height:1.7}
+.insight div{margin:3px 0}.insight b{color:#dce9f8}
+.tag{font-size:11px;padding:3px 7px;border-radius:5px;background:#1c3049;display:inline-block;margin:2px 0}
+.tag.good{color:var(--green)}.tag.bad{color:var(--red)}.tag.warn{color:var(--yellow)}
 table{width:100%;border-collapse:collapse;font-size:12px}
 td,th{padding:8px;border-bottom:1px solid var(--line);text-align:left}
-footer{text-align:center;padding:20px;color:var(--muted);font-size:11px}
-@media(max-width:480px){
-.grid{grid-template-columns:repeat(2,minmax(0,1fr))}
-.card{padding:10px}.value{font-size:16px}
-}
+footer{text-align:center;padding:20px;color:var(--muted);font-size:11px;line-height:1.7}
+@media(max-width:520px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.card{padding:10px}.value{font-size:16px}.detail{font-size:10px}.insight{font-size:11px}}
+@media(max-width:350px){.grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
 <header>
-<h1>Crypto Market Risk Dashboard</h1>
-<div class="muted">Verified Macro • BTC/ETH • Liquidity • Spot Activity • Derivatives Risk</div>
-<p><span id="connection" class="pill">Loading...</span></p>
+<h1>ক্রিপ্টো বাজার ঝুঁকি ও সিদ্ধান্ত ড্যাশবোর্ড</h1>
+<div class="muted">বৈশ্বিক বাজার • BTC/ETH • অর্থনীতি • তারল্য • অন-চেইন • স্পট • ডেরিভেটিভ ঝুঁকি</div>
+<p><span id="connection" class="pill">তথ্য লোড হচ্ছে...</span></p>
 <p class="muted" id="updated">—</p>
-<button onclick="loadAll()">Refresh Data</button>
+<button onclick="loadAll()">তথ্য রিফ্রেশ করুন</button>
 </header>
-
 <main>
-<h2>1. Global Crypto Market</h2><div id="overview" class="grid"></div>
-<h2>2. BTC & ETH Technical Analysis</h2><div id="technical" class="grid"></div>
-<h2>3. Macro Economic Data</h2><div id="macro" class="grid"></div>
-<h2>4. Global Liquidity</h2><div id="liquidity" class="grid"></div>
-<h2>5. Verified On-chain Data</h2><div id="onchain" class="grid"></div>
-<h2>6. Spot Market Activity</h2><div id="activity" class="grid"></div>
-<h2>7. Derivatives Sentiment (Futures Context Only)</h2><div id="derivatives" class="grid"></div>
-<h2>8. Market Zone</h2><div id="zone" class="banner"></div>
-<h2>9. Final Market Decision</h2><div id="decision" class="banner"></div>
-<h2>10. Data Quality & Limitations</h2><div id="quality" class="banner"></div>
+<h2>১. সামগ্রিক ক্রিপ্টো বাজার</h2><div id="overview" class="grid"></div>
+<h2>২. BTC ও ETH টেকনিক্যাল বিশ্লেষণ</h2><div id="technical" class="grid"></div>
+<h2>৩. সামষ্টিক অর্থনৈতিক অবস্থা</h2><div id="macro" class="grid"></div>
+<h2>৪. বৈশ্বিক তারল্য</h2><div id="liquidity" class="grid"></div>
+<h2>৫. যাচাইকৃত অন-চেইন তথ্য</h2><div id="onchain" class="grid"></div>
+<h2>৬. স্পট বাজারের কার্যক্রম</h2><div id="activity" class="grid"></div>
+<h2>৭. ডেরিভেটিভ বাজারের ঝুঁকি (শুধু পর্যবেক্ষণ)</h2><div id="derivatives" class="grid"></div>
+<h2>৮. বাজারের বর্তমান পর্যায়</h2><div id="zone" class="banner"></div>
+<h2>৯. চূড়ান্ত বাজার সিদ্ধান্ত ও করণীয়</h2><div id="decision" class="banner"></div>
+<h2>১০. তথ্যের মান ও সীমাবদ্ধতা</h2><div id="quality" class="banner"></div>
 </main>
-
-<footer>শুধু status=OK এবং valid numeric ডেটা দেখানো হয়। কোনো dummy data ব্যবহার করা হয় না।</footer>
+<footer>শুধু status=OK এবং বৈধ সংখ্যাগত তথ্য দেখানো হয়। অনুপস্থিত তথ্য অনুমান করে পূরণ করা হয় না।<br>স্বল্পমেয়াদি: কয়েক ঘণ্টা–কয়েক দিন। দীর্ঘমেয়াদি: কয়েক সপ্তাহ–কয়েক মাস। এটি Spot বাজার পর্যবেক্ষণের সহায়ক, নিশ্চিত ভবিষ্যদ্বাণী নয়।</footer>
 
 <script>
-const FILES={
-market:"market_data.json",
-macro:"macro_data.json",
-advanced:"advanced_data.json",
-decision:"decision_data.json",
-zone:"market_zone_data.json"
-};
+const FILES={market:"market_data.json",macro:"macro_data.json",advanced:"advanced_data.json",decision:"decision_data.json",zone:"market_zone_data.json"};
 let DATA={};
-
 const el=id=>document.getElementById(id);
 
-function n(x){
-if(x&&typeof x==="object"&&"value"in x)x=x.value;
-return x===null||x===undefined||x===""||!Number.isFinite(Number(x))?null:Number(x);
+function num(x){
+ if(x&&typeof x==="object"&&"value"in x)x=x.value;
+ return x===null||x===undefined||x===""||!Number.isFinite(Number(x))?null:Number(x);
+}
+function fmt(x,d=2){
+ return num(x)===null?"—":num(x).toLocaleString("en-US",{maximumFractionDigits:d});
+}
+function toneFor(s){
+ return /বুলিশ|ইতিবাচক|বাড়ছে|শক্তিশালী|কম ঝুঁকি|ক্রয় চাপ/.test(s)?"green":
+ /বিয়ারিশ|নেতিবাচক|কমছে|সংকুচিত|বিক্রির চাপ|উচ্চ ঝুঁকি/.test(s)?"red":"yellow";
 }
 
-function f(x,d=2){
-return n(x)===null?"—":n(x).toLocaleString("en-US",{maximumFractionDigits:d});
+function explain(label,value,unit=""){
+ const v=num(value),L=label.toLowerCase();
+ let meaning="এই তথ্যটি বাজারের একটি নির্দিষ্ট দিক পরিমাপ করে। একে একা ব্যবহার করে কেনাবেচার সিদ্ধান্ত নেওয়া উচিত নয়।";
+ let short="একক এই মান থেকে নির্ভরযোগ্য স্বল্পমেয়াদি দিক নির্ধারণ করা যাচ্ছে না।";
+ let long="একক এই মান থেকে দীর্ঘমেয়াদি প্রবণতা নিশ্চিত করা যায় না।";
+ let action="অন্যান্য বাজার-তথ্যের সঙ্গে মিলিয়ে পর্যবেক্ষণ করুন।";
+ let status="নিরপেক্ষ / পর্যবেক্ষণ";
+
+ if(v===null)return {meaning,short,long,action,status};
+
+ if(L.includes("rsi")){
+  meaning="RSI হলো দামের গতি বা অতিরিক্ত কেনা-বেচার পরিমাপক (০–১০০)।";
+  short=v<30?"RSI ৩০-এর নিচে: অতিরিক্ত বিক্রির অবস্থা; সাময়িক বাউন্স হতে পারে, তবে পতন থেমেছে এমন প্রমাণ নয়।":v>70?"RSI ৭০-এর ওপরে: অতিরিক্ত কেনার ঝুঁকি; স্বল্পমেয়াদি সংশোধন হতে পারে।":"RSI মাঝামাঝি অঞ্চলে; একে একা শক্তিশালী সংকেত বলা যায় না।";
+  long="দীর্ঘমেয়াদি দিক বুঝতে RSI-এর সঙ্গে MA20/৫০/২০০ ও সাপ্তাহিক প্রবণতা মিলিয়ে দেখুন।";
+  action=v<30?"শুধু RSI কম বলে DCA নয়; দাম সাপোর্ট ধরে ও পুনরুদ্ধার নিশ্চিত হলে বিবেচনা করুন।":v>70?"নতুন কেনাকাটায় সতর্ক থাকুন; লাভ থাকলে ঝুঁকি পর্যালোচনা করুন।":"অন্যান্য সংকেতের অপেক্ষা করুন।";
+  status=v<30?"অতিরিক্ত বিক্রি":v>70?"অতিরিক্ত কেনা":"মধ্যবর্তী";
+
+ }else if(L.includes("ma20")||L.includes("ma50")||L.includes("ma200")){
+  meaning="মুভিং অ্যাভারেজ নির্দিষ্ট সময়ের গড় মূল্য; বাজারের প্রবণতা ও ডায়নামিক সাপোর্ট/রেজিস্ট্যান্স বুঝতে সাহায্য করে।";
+  short="বর্তমান মূল্য এই গড়ের ওপরে না নিচে—তা দেখে স্বল্পমেয়াদি গতি বিচার করতে হবে।";
+  long="MA20, MA50 ও MA200-এর ক্রম এবং মূল্য এগুলোর কোন পাশে আছে—এগুলো মিলিয়ে দীর্ঘমেয়াদি প্রবণতা নির্ধারণ করুন।";
+  action="MA20-এর নিচে দুর্বলতা; MA50-এর নিচে আরও সতর্কতা; MA200-এর নিচে দীর্ঘমেয়াদি ঝুঁকি বেশি।";
+
+ }else if(L.includes("macd")){
+  meaning="MACD দামের গতি ও প্রবণতার পরিবর্তন শনাক্ত করে। MACD ও Signal-এর ক্রস এবং Histogram গুরুত্বপূর্ণ।";
+  short="MACD Signal-এর তুলনায় MACD উপরে/নিচে আছে কি না এবং Histogram বাড়ছে না কমছে তা দেখুন।";
+  long="সাপ্তাহিক ও দৈনিক MACD একই দিকে থাকলে দীর্ঘমেয়াদি সংকেত তুলনামূলক শক্তিশালী হয়।";
+  action="শুধু MACD-এর ঋণাত্মক মান দেখে SELL নয়; ক্রস, মূল্য ও সাপোর্ট একসঙ্গে যাচাই করুন।";
+
+ }else if(L.includes("adx")){
+  meaning="ADX প্রবণতার শক্তি মাপে; দিক নয়। সাধারণভাবে ২৫-এর বেশি হলে প্রবণতা শক্তিশালী হতে পারে।";
+  short=v>=25?"প্রবণতা শক্তিশালী; দিক জানতে দাম ও অন্যান্য সূচক দেখুন।":"প্রবণতা দুর্বল বা সীমাবদ্ধ থাকতে পারে।";
+  long="ADX দীর্ঘস্থায়ী প্রবণতার শক্তি যাচাইয়ে সহায়ক, কিন্তু একা Bullish/Bearish বলে না।";
+  action="ADX-কে MA ও MACD-এর সঙ্গে মিলিয়ে সিদ্ধান্ত নিন।";
+  status=v>=25?"প্রবণতা শক্তিশালী":"প্রবণতা দুর্বল";
+
+ }else if(L.includes("volume ratio")){
+  meaning="২০ দিনের তুলনায় বর্তমান লেনদেনের পরিমাণ কত গুণ তা বোঝায়।";
+  short=v>=1.5?"স্বাভাবিকের তুলনায় বেশি ভলিউম; দামের দিকের সঙ্গে মিললে মুভমেন্টের গুরুত্ব বাড়ে।":"লেনদেনের পরিমাণ উল্লেখযোগ্যভাবে বেশি নয়।";
+  long="দীর্ঘমেয়াদি নিশ্চিতকরণে ধারাবাহিক ভলিউম দরকার।";
+  action="ভলিউম বাড়লেও দাম কোন দিকে যাচ্ছে তা যাচাই করুন।";
+
+ }else if(L.includes("support")){
+  meaning="সাপোর্ট হলো এমন সম্ভাব্য মূল্যাঞ্চল যেখানে ক্রেতার আগ্রহ বাড়তে পারে।";
+  short="বর্তমান দাম সাপোর্টের কত কাছে এবং সাপোর্ট ধরে রাখতে পারছে কি না দেখুন।";
+  long="সাপোর্ট ভাঙলে পরবর্তী নিম্ন মূল্যাঞ্চল পরীক্ষা হতে পারে।";
+  action="সাপোর্টের নিচে দৈনিক ক্লোজ হলে ঝুঁকি কমানোর পরিকল্পনা করুন।";
+
+ }else if(L.includes("resistance")){
+  meaning="রেজিস্ট্যান্স হলো এমন মূল্যাঞ্চল যেখানে বিক্রির চাপ বাড়তে পারে।";
+  short="রেজিস্ট্যান্স ভাঙার সঙ্গে ভলিউম ও ক্লোজিং নিশ্চিত হওয়া প্রয়োজন।";
+  long="রেজিস্ট্যান্সের ওপরে স্থায়ী অবস্থান প্রবণতা উন্নতির প্রমাণ হতে পারে।";
+  action="ব্রেকআউট নিশ্চিত না হওয়া পর্যন্ত ধাওয়া করে কিনবেন না।";
+
+ }else if(L.includes("fear")||L.includes("greed")||L.includes("ভয় ও লোভ")){
+  meaning="বাজারের সামগ্রিক বিনিয়োগকারী মনোভাবের সূচক (০–১০০)।";
+  short=v<=25?"চরম ভয়; আতঙ্কজনিত বিক্রি চলছে, তবে আরও পতন অসম্ভব নয়।":v>=75?"চরম লোভ; অতিরিক্ত আশাবাদ ও সংশোধনের ঝুঁকি।":"মনোভাব মধ্যবর্তী।";
+  long="মনোভাব একা দীর্ঘমেয়াদি বাজারচক্র নির্ধারণ করে না।";
+  action=v<=25?"ধাপে ধাপে সুযোগ খুঁজুন, তবে BTC trend ও liquidity নিশ্চিত না করে DCA নয়।":v>=75?"নতুন কেনাকাটায় সংযমী থাকুন; লাভ ও ঝুঁকি পর্যালোচনা করুন।":"পর্যবেক্ষণ চালিয়ে যান।";
+  status=v<=25?"চরম ভয়":v>=75?"চরম লোভ":"মধ্যবর্তী";
+
+ }else if(L.includes("dominance")){
+  meaning="বিটকয়েন/ইথেরিয়ামের মোট ক্রিপ্টো বাজারমূল্যে অংশের হার।";
+  short="BTC Dominance বাড়লে অনেক সময় Altcoin তুলনামূলক দুর্বল হয়; কমলে Altcoin-এ অর্থপ্রবাহের সম্ভাবনা বাড়ে।";
+  long="ধারাবাহিক dominance trend Altcoin season বোঝার একটি উপাদান।";
+  action="Altcoin কেনার আগে BTC Dominance ও TOTAL3/Altcoin breadth দেখুন।";
+
+ }else if(L.includes("market cap")||L.includes("বাজারমূল্য")||L.includes("volume")){
+  meaning="বাজারমূল্য মোট বাজারের আকার; ২৪ ঘণ্টার ভলিউম লেনদেনের কার্যক্রম বোঝায়।";
+  short="বাজারমূল্য ও ভলিউম একসঙ্গে বাড়লে বাজারে অংশগ্রহণ বাড়ার ইঙ্গিত হতে পারে।";
+  long="ধারাবাহিক বাজারমূল্য বৃদ্ধি ও স্বাস্থ্যকর ভলিউম বাজারের বিস্তৃতি বোঝাতে পারে।";
+  action="ভলিউমের গুণমান, BTC trend এবং stablecoin liquidity মিলিয়ে দেখুন।";
+
+ }else if(L.includes("liquidity")||L.includes("তারল্য")){
+  meaning="নিট তারল্য সাধারণত Fed Assets − TGA − Reverse Repo দিয়ে আনুমানিক করা হয়; এটি আর্থিক ব্যবস্থায় ডলারের তারল্যের একটি সূচক।";
+  short=v<0?"তারল্য কমার চাপ স্বল্পমেয়াদে ঝুঁকিপূর্ণ সম্পদে চাপ তৈরি করতে পারে।":"তারল্য বৃদ্ধি ঝুঁকিপূর্ণ সম্পদের জন্য সহায়ক হতে পারে।";
+  long="দীর্ঘমেয়াদি তারল্য প্রবণতা ক্রিপ্টো বাজারের জন্য গুরুত্বপূর্ণ macro পটভূমি।";
+  action="৭ দিন ও ৩০ দিনের পরিবর্তন একসঙ্গে দেখুন; একটি snapshot দিয়ে সিদ্ধান্ত নেবেন না।";
+
+ }else if(L.includes("vix")){
+  meaning="VIX শেয়ারবাজারের প্রত্যাশিত অস্থিরতার সূচক; এটি সরাসরি ক্রিপ্টো সূচক নয়।";
+  short=v>=30?"উচ্চ ভয় ও অস্থিরতার পরিবেশ; ক্রিপ্টোতেও ঝুঁকি বাড়তে পারে।":v>=20?"সতর্কতার পরিবেশ।":"তুলনামূলক শান্ত পরিবেশ।";
+  long="দীর্ঘমেয়াদি ঝুঁকি বুঝতে VIX-এর ধারাবাহিকতা ও macro পরিস্থিতি দেখুন।";
+  action=v>=30?"নতুন কেনাকাটা সীমিত করুন এবং নগদ সংরক্ষণ করুন।":"BTC ও liquidity-র সঙ্গে মিলিয়ে পর্যবেক্ষণ করুন।";
+  status=v>=30?"উচ্চ অস্থিরতা":v>=20?"সতর্কতা":"তুলনামূলক শান্ত";
+
+ }else if(L.includes("yield")||L.includes("বন্ড")||L.includes("spread")||L.includes("সুদের হার")){
+  meaning="সরকারি বন্ডের ফলন ও সুদের হার ডলারের খরচ, বিনিয়োগের বিকল্প রিটার্ন এবং আর্থিক শর্ত বোঝায়।";
+  short="বন্ডের ফলন দ্রুত বাড়লে ডলার ও ঝুঁকিপূর্ণ সম্পদের ওপর চাপ আসতে পারে।";
+  long="দীর্ঘমেয়াদি উচ্চ সুদের হার liquidity ও valuation-এর জন্য প্রতিকূল হতে পারে।";
+  action="DXY, Fed নীতি ও শেয়ারবাজারের সঙ্গে মিলিয়ে বিচার করুন।";
+
+ }else if(L.includes("cpi")||L.includes("pce")||L.includes("inflation")||L.includes("মূল্যস্ফীতি")){
+  meaning="মূল্যস্ফীতির সূচক; Fed-এর সুদের হার নির্ধারণে গুরুত্বপূর্ণ।";
+  short="প্রত্যাশার চেয়ে বেশি মূল্যস্ফীতি সুদের হার কমানোর সম্ভাবনা কমাতে পারে।";
+  long="মূল্যস্ফীতি স্থায়ীভাবে কমলে monetary easing-এর সুযোগ বাড়তে পারে।";
+  action="আগের মাসের তুলনা ও বাজারের প্রত্যাশার সঙ্গে ফল মিলিয়ে দেখুন।";
+
+ }else if(L.includes("unemployment")||L.includes("payroll")||L.includes("কর্মসংস্থান")){
+  meaning="মার্কিন শ্রমবাজারের অবস্থা পরিমাপ করে; অর্থনীতি ও Fed নীতিতে প্রভাব ফেলে।";
+  short="অত্যন্ত শক্তিশালী চাকরির তথ্য সুদের হার দীর্ঘদিন উঁচু রাখার চাপ তৈরি করতে পারে; দুর্বল তথ্য recession ভয় বাড়াতে পারে।";
+  long="শ্রমবাজারের ধারাবাহিক অবনতি অর্থনৈতিক মন্দার ঝুঁকি বাড়াতে পারে।";
+  action="একটি রিপোর্ট নয়, কয়েক মাসের প্রবণতা দেখুন।";
+
+ }else if(L.includes("mvrv")){
+  meaning="MVRV বাজারমূল্য ও realized value তুলনা করে; লাভ/ক্ষতির সামগ্রিক অবস্থা বোঝার একটি অন-চেইন মেট্রিক।";
+  short="MVRV ১-এর নিচে থাকলে বাজারমূল্য realized value-এর নিচে; এটি সম্ভাব্য undervaluation বোঝাতে পারে, নিশ্চয়তা নয়।";
+  long="চক্রের উচ্চ MVRV অতিরিক্ত মূল্যায়নের ঝুঁকি নির্দেশ করতে পারে; ঐতিহাসিক সীমা ও সংস্করণ যাচাই জরুরি।";
+  action="MVRV-এর উৎস, সংজ্ঞা ও ঐতিহাসিক সীমা যাচাই করে BTC trend-এর সঙ্গে ব্যবহার করুন।";
+
+ }else if(L.includes("hashrate")||L.includes("হ্যাশরেট")){
+  meaning="Bitcoin নেটওয়ার্কে mining computation power-এর আনুমানিক পরিমাপ।";
+  short="হ্যাশরেট নেটওয়ার্কের mining অংশগ্রহণ বোঝায়; স্বল্পমেয়াদি দামের সংকেত নয়।";
+  long="দীর্ঘমেয়াদে নেটওয়ার্ক নিরাপত্তা ও miner participation-এর একটি সূচক।";
+  action="দামের BUY/SELL সিদ্ধান্তে একে একা ব্যবহার করবেন না।";
+
+ }else if(L.includes("difficulty")||L.includes("জটিলতা")){
+  meaning="Bitcoin block খুঁজে পাওয়ার mining difficulty; নেটওয়ার্কের mining প্রতিযোগিতার সঙ্গে সমন্বিত হয়।";
+  short="এটি স্বল্পমেয়াদি দামের দিক নির্দেশ করে না।";
+  long="নেটওয়ার্কের mining অবস্থা বোঝার সহায়ক সূচক।";
+  action="নেটওয়ার্ক স্বাস্থ্য হিসেবে দেখুন, ট্রেডিং সংকেত হিসেবে নয়।";
+
+ }else if(L.includes("order book")||L.includes("bid value")||L.includes("ask value")||L.includes("imbalance")||L.includes("অর্ডার বুক")){
+  meaning="অর্ডার বুকের Bid হলো ক্রয় অর্ডার, Ask হলো বিক্রয় অর্ডার; Imbalance দুই পাশের আপেক্ষিক চাপ দেখায়।";
+  short=v<0?"এই snapshot-এ বিক্রয় অর্ডারের চাপ বেশি।":"এই snapshot-এ ক্রয় অর্ডারের চাপ বেশি বা ভারসাম্য ইতিবাচক।";
+  long="অর্ডার বুক দ্রুত বদলায়; দীর্ঘমেয়াদি সংকেত হিসেবে ব্যবহারযোগ্য নয়।";
+  action="একাধিক সময়ের snapshot ও spot volume দিয়ে নিশ্চিত করুন; spoofing/বাতিল অর্ডার হতে পারে।";
+
+ }else if(L.includes("funding")){
+  meaning="Futures funding rate দীর্ঘ/শর্ট অবস্থানের মধ্যে পর্যায়ক্রমিক অর্থপ্রদানের হার; এটি sentiment মাপে।";
+  short=v>0.0005?"ইতিবাচক funding: Long অবস্থান বেশি crowded হতে পারে।":v< -0.0005?"ঋণাত্মক funding: Short অবস্থান বেশি crowded হতে পারে।":"Funding প্রায় নিরপেক্ষ।";
+  long="দীর্ঘমেয়াদি Spot সিদ্ধান্তে funding সহায়ক sentiment মাত্র।";
+  action="Funding একা BUY/SELL নয়; Open Interest ও Spot trend মিলিয়ে দেখুন।";
+
+ }else if(L.includes("open interest")){
+  meaning="Open Interest হলো খোলা Futures চুক্তির মোট মূল্য/পরিমাণ; এটি leverage-ভিত্তিক অবস্থানের আকার বোঝায়।";
+  short="দাম বাড়ার সঙ্গে OI বাড়লে নতুন leverage ঢুকতে পারে; দাম কমার সঙ্গে OI বাড়লে short positioning হতে পারে।";
+  long="উচ্চ OI বাজারে liquidation volatility বাড়াতে পারে; এটি Spot demand নয়।";
+  action="OI পরিবর্তন, funding ও spot volume একসঙ্গে দেখুন; Futures ট্রেডের সংকেত হিসেবে নেবেন না।";
+
+ }else if(L.includes("long/short")||L.includes("l/s")||L.includes("taker")){
+  meaning="Long/Short অনুপাত Futures অংশগ্রহণকারীদের অবস্থানের ভারসাম্য দেখায়; এটি Spot ক্রয়-বিক্রয়ের সরাসরি পরিমাপ নয়।";
+  short=v>1?"Long পক্ষ বেশি; ভিড় জমলে long squeeze ঝুঁকি থাকতে পারে।":v<1?"Short পক্ষ বেশি; short squeeze সম্ভব, তবে নিশ্চিত নয়।":"Long ও Short প্রায় ভারসাম্যে।";
+  long="দীর্ঘমেয়াদি Spot প্রবণতা নির্ধারণে এই অনুপাতের গুরুত্ব সীমিত।";
+  action="এটিকে শুধু leverage crowding সতর্কতা হিসেবে ব্যবহার করুন।";
+
+ }else if(L.includes("advance/decline")||L.includes("advancing")||L.includes("declining")||L.includes("দাম বাড়ছে")||L.includes("দাম কমছে")){
+  meaning="কতগুলো Binance Spot USDT pair বাড়ছে ও কমছে তা দিয়ে বাজারের breadth বোঝায়।";
+  short="বাড়তে থাকা pair বেশি হলে বাজারের অংশগ্রহণ বিস্তৃত; কমতে থাকা pair বেশি হলে দুর্বলতা বিস্তৃত।";
+  long="ধারাবাহিক breadth উন্নতি Altcoin বাজারের স্বাস্থ্যের পক্ষে ইতিবাচক।";
+  action="শুধু BTC নয়, বাজারের অধিকাংশ কয়েন একই দিকে যাচ্ছে কি না দেখুন।";
+
+ }else if(L.includes("usd/jpy")||L.includes("dxy")||L.includes("dollar")){
+  meaning="ডলারের শক্তি ও ইয়েনের বিনিময় হার বৈশ্বিক liquidity এবং ঝুঁকি গ্রহণে প্রভাব ফেলতে পারে।";
+  short="ডলার শক্তিশালী হলে সাধারণত ঝুঁকিপূর্ণ সম্পদের ওপর চাপ বাড়তে পারে।";
+  long="দীর্ঘমেয়াদি ডলার প্রবণতা macro risk-এর একটি অংশ।";
+  action="DXY, USD/JPY ও বন্ডের ফলন একসঙ্গে পর্যবেক্ষণ করুন।";
+ }
+ return {meaning,short,long,action,status};
 }
 
-function card(id,label,value,detail="",tone=""){
-if(value===null||value===undefined||value==="—")return;
-let c=document.createElement("div");
-c.className="card";
-let a=document.createElement("div");
-a.className="name";a.textContent=label;
-let b=document.createElement("div");
-b.className="value "+tone;b.textContent=value;
-let d=document.createElement("div");
-d.className="detail";d.textContent=detail;
-c.append(a,b,d);el(id).append(c);
+function card(id,label,value,detail="",tone="",ins=null){
+ if(value===null||value===undefined||value==="—")return;
+ const c=document.createElement("div");c.className="card";
+ const a=document.createElement("div");a.className="name";a.textContent=label;
+ const b=document.createElement("div");b.className="value "+tone;b.textContent=value;
+ const d=document.createElement("div");d.className="detail";d.textContent=detail;
+ c.append(a,b,d);
+ if(ins){
+  const box=document.createElement("div");box.className="insight";
+  const rows=[["এটি কী?",ins.meaning],["স্বল্পমেয়াদি সংকেত",ins.short],["দীর্ঘমেয়াদি সংকেত",ins.long],["করণীয়",ins.action]];
+  rows.forEach(([k,v])=>{
+   const line=document.createElement("div");
+   const strong=document.createElement("b");strong.textContent=k+" ";
+   line.append(strong,document.createTextNode(v));box.append(line);
+  });
+  const tag=document.createElement("span");tag.className="tag "+toneFor(ins.status);
+  tag.textContent="অবস্থা: "+ins.status;box.append(tag);c.append(box);
+ }
+ el(id).append(c);
 }
 
 function metric(id,label,x,unit=""){
-if(!x||x.status!=="OK"||n(x)===null)return;
-card(id,label,f(x)+(unit?" "+unit:""),
-(x.source||"Verified source")+
-(x.observation_date?" • "+x.observation_date:"")+
-(x.source_updated_at?" • "+x.source_updated_at:""));
+ if(!x||x.status!=="OK"||num(x)===null)return;
+ const val=num(x),ins=explain(label,val,unit);
+ card(id,label,fmt(val)+(unit?" "+unit:""),
+ (x.source||"যাচাইকৃত উৎস")+
+ (x.observation_date?" • তথ্যের তারিখ: "+x.observation_date:"")+
+ (x.source_updated_at?" • হালনাগাদ: "+x.source_updated_at:""),
+ toneFor(ins.status),ins);
 }
-
 function metricObj(id,label,x,unit=""){
-if(x&&x.status==="OK"&&n(x.value)!==null)
-card(id,label,f(x.value)+(unit||x.unit?" "+(unit||x.unit):""),
-(x.source||"Verified source")+
-(x.observed_at?" • "+x.observed_at:""));
+ if(!x||x.status!=="OK"||num(x.value)===null)return;
+ const val=num(x.value),ins=explain(label,val,unit||x.unit||"");
+ card(id,label,fmt(val)+(unit||x.unit?" "+(unit||x.unit):""),
+ (x.source||"যাচাইকৃত উৎস")+(x.observed_at?" • পর্যবেক্ষণ: "+x.observed_at:""),
+ toneFor(ins.status),ins);
 }
-
 function reset(){
-["overview","technical","macro","liquidity","onchain","activity","derivatives"].forEach(k=>el(k).replaceChildren());
+ ["overview","technical","macro","liquidity","onchain","activity","derivatives"].forEach(k=>el(k).replaceChildren());
+}
+function statusText(x){
+ const map={OK:"তথ্য ঠিক আছে",UNAVAILABLE:"তথ্য পাওয়া যায়নি",CONTRACTING:"সংকুচিত হচ্ছে",EXPANDING:"বাড়ছে",BULLISH:"বুলিশ / ঊর্ধ্বমুখী",BEARISH:"বিয়ারিশ / নিম্নমুখী",NEUTRAL:"নিরপেক্ষ",WAIT:"অপেক্ষা করুন",HOLD:"ধরে রাখুন",BUY:"কেনার সংকেত",DCA:"ধাপে ধাপে কেনা",SELL:"বিক্রি",REDUCE_RISK:"ঝুঁকি কমান"};
+ return map[x]||x||"—";
 }
 
 function render(){
-const m=DATA.market||{};
-const g=m.global_market||{};
-const assets=m.major_assets||{};
-const fg=m.fear_greed||{};
+ const m=DATA.market||{},g=m.global_market||{},assets=m.major_assets||{},fg=m.fear_greed||{};
+ for(const [k,l] of [["total_market_cap_usd","মোট ক্রিপ্টো বাজারমূল্য"],["total_volume_24h_usd","২৪ ঘণ্টার মোট লেনদেন"],["btc_dominance_pct","BTC বাজার আধিপত্য"],["eth_dominance_pct","ETH বাজার আধিপত্য"]])metric("overview",l,g[k]);
+ for(const [k,l] of [["bitcoin","বিটকয়েন"],["ethereum","ইথেরিয়াম"]]){
+  metricObj("overview",l+" রেফারেন্স মূল্য",assets[k]?.price_usd);
+  metricObj("overview",l+" ২৪ ঘণ্টায় পরিবর্তন",assets[k]?.change_24h_pct,"%");
+ }
+ if(fg.status==="OK")card("overview","ভয় ও লোভ সূচক",fmt(fg.value,0)+"/১০০",statusText(fg.classification)+" • "+(fg.source_updated_at||""),toneFor(fg.classification),explain("fear greed",fg.value));
 
-for(const [k,l] of [
-["total_market_cap_usd","Total Crypto Market Cap"],
-["total_volume_24h_usd","24H Market Volume"],
-["btc_dominance_pct","BTC Dominance"],
-["eth_dominance_pct","ETH Dominance"]
-])metric("overview",l,g[k]);
+ const t=m.technical||{};
+ for(const s of ["BTC","ETH"]){
+  const a=t[s]||{},i=a.indicators||{},name=s==="BTC"?"বিটকয়েন":"ইথেরিয়াম";
+  metricObj("technical",name+" বর্তমান মূল্য (USDT)",a.price_usdt);
+  for(const [k,l] of [
+   ["ma20","MA20 — ২০ দিনের গড়"],["ma50","MA50 — ৫০ দিনের গড়"],["ma200","MA200 — ২০০ দিনের গড়"],
+   ["rsi14","RSI14 — দামের গতি"],["macd","MACD — প্রবণতার গতি"],["macd_signal","MACD সিগন্যাল লাইন"],
+   ["macd_histogram","MACD হিস্টোগ্রাম"],["adx14","ADX14 — প্রবণতার শক্তি"],
+   ["volume_ratio_20d","২০ দিনের তুলনায় ভলিউম"],["support_20d","২০ দিনের সাপোর্ট"],
+   ["resistance_20d","২০ দিনের রেজিস্ট্যান্স"],["bollinger_lower","বলিঞ্জার নিম্নসীমা"]
+  ])metricObj("technical",name+" "+l,i[k],i[k]?.unit==="x"?"গুণ":"");
 
-for(const [k,l] of [["bitcoin","BTC"],["ethereum","ETH"]]){
-metricObj("overview",l+" Reference Price",assets[k]?.price_usd);
-metricObj("overview",l+" 24H Change",assets[k]?.change_24h_pct,"%");
-}
+  if(a.last_closed_candle_at)card("technical",name+" সর্বশেষ সম্পূর্ণ ক্যান্ডেল",a.last_closed_candle_at,(a.candle_interval||"")+" • "+(a.candle_count||"")+"টি ক্যান্ডেল");
 
-if(fg.status==="OK")
-card("overview","Fear & Greed",f(fg.value,0)+"/100",
-fg.classification+" • "+(fg.source_updated_at||""));
+  const price=num(a.price_usdt?.value),ma20=num(i.ma20?.value),ma50=num(i.ma50?.value),ma200=num(i.ma200?.value),rsi=num(i.rsi14?.value);
+  if(price!==null&&ma20!==null&&ma50!==null&&ma200!==null){
+   const below=[price<ma20,price<ma50,price<ma200].filter(Boolean).length;
+   const trend=below===3?"তিনটি গড়ের নিচে: প্রবণতা দুর্বল":below===0?"তিনটি গড়ের ওপরে: প্রবণতা তুলনামূলক শক্তিশালী":"মিশ্র প্রবণতা: কিছু গড়ের ওপরে, কিছু গড়ের নিচে";
+   card("technical",name+" সম্মিলিত প্রবণতা",trend,"দাম বনাম MA20 / MA50 / MA200",below===3?"red":below===0?"green":"yellow",{
+    meaning:"তিনটি গুরুত্বপূর্ণ মুভিং অ্যাভারেজের তুলনায় বর্তমান দামের অবস্থান।",
+    short:trend+".",
+    long:"দৈনিক ও সাপ্তাহিক ক্লোজিং দিয়ে প্রবণতা নিশ্চিত করতে হবে।",
+    action:below===3?"নতুন কেনাকাটায় অপেক্ষা করুন; পুনরুদ্ধারের প্রমাণ না পাওয়া পর্যন্ত ঝুঁকি বাড়াবেন না।":below===0?"স্পট বাজারে ধাপে ধাপে সুযোগ মূল্যায়ন করুন; valuation ও BTC trend যাচাই করুন।":"HOLD/WAIT; স্পষ্ট দিকের জন্য অপেক্ষা করুন।",
+    status:below===3?"বিয়ারিশ":below===0?"ইতিবাচক":"মিশ্র"
+   });
+  }
+  if(rsi!==null&&rsi<30)card("technical",name+" RSI সতর্কতা","অতিরিক্ত বিক্রি","এটি নিজে থেকে BUY সংকেত নয়।","yellow",{
+   meaning:"RSI ৩০-এর নিচে নেমেছে।",
+   short:"সাময়িক বাউন্স হতে পারে, কিন্তু পতন চলতেও পারে।",
+   long:"প্রবণতা পরিবর্তনের নিশ্চয়তা নেই।",
+   action:"সাপোর্ট ধরে রাখা ও RSI পুনরুদ্ধার না হওয়া পর্যন্ত WAIT।",
+   status:"অতিরিক্ত বিক্রি"
+  });
+ }
 
-const t=m.technical||{};
+ const mm=DATA.macro?.metrics||{};
+ const fields=[
+  ["cpi","ভোক্তা মূল্যস্ফীতি (CPI)"],["core_cpi","মূল CPI"],["pce","PCE মূল্যসূচক"],["core_pce","মূল PCE"],
+  ["nonfarm_payrolls","কৃষি-বহির্ভূত কর্মসংস্থান"],["unemployment","বেকারত্বের হার"],["fed_funds_rate","ফেডের সুদের হার"],
+  ["usd_broad_index","মার্কিন ডলার সূচক (DXY নয়)"],["vix","VIX — বাজার অস্থিরতা"],
+  ["yield_2y","মার্কিন ২ বছর মেয়াদি বন্ড"],["yield_10y","মার্কিন ১০ বছর মেয়াদি বন্ড"],
+  ["yield_30y","মার্কিন ৩০ বছর মেয়াদি বন্ড"],["yield_curve_10y_2y","১০ বছর–২ বছর বন্ড ব্যবধান"],
+  ["sp500","এসঅ্যান্ডপি ৫০০ সূচক"],["nasdaq","ন্যাসডাক সূচক"],["oil","WTI অপরিশোধিত তেল"],["usd_jpy","ডলার/ইয়েন বিনিময় হার"]
+ ];
+ for(const [k,l] of fields){
+  const x=mm[k];
+  if(x?.status==="OK"&&num(x.value)!==null)metricObj("macro",l,x,x.unit||"");
+ }
 
-for(const s of ["BTC","ETH"]){
-const a=t[s]||{};
-const i=a.indicators||{};
+ const li=DATA.macro?.liquidity||{};
+ if(li.status==="OK"){
+  const current=num(li.current),c7=num(li.change_7d),c30=num(li.change_30d);
+  card("liquidity","নিট বৈশ্বিক তারল্য",fmt(current)+" বিলিয়ন USD","WALCL − TGA − RRP • তথ্যের তারিখ: "+(li.observation_date||"—"),"",explain("liquidity",current));
+  if(c7!==null)card("liquidity","৭ দিনের তারল্য পরিবর্তন",fmt(c7)+" বিলিয়ন USD","",c7<0?"red":"green",explain("liquidity",c7));
+  if(c30!==null)card("liquidity","৩০ দিনের তারল্য পরিবর্তন",fmt(c30)+" বিলিয়ন USD","",c30<0?"red":"green",explain("liquidity",c30));
+  const trend=statusText(li.trend);
+  card("liquidity","তারল্যের প্রবণতা",trend,"একই তারিখের তথ্য মিলিয়ে গণনা করা",li.trend==="CONTRACTING"?"red":"green",{
+   meaning:"নিট তারল্যের সাম্প্রতিক দিক।",
+   short:li.trend==="CONTRACTING"?"তারল্য সংকোচন ঝুঁকিপূর্ণ সম্পদের জন্য প্রতিকূল হতে পারে।":"তারল্য সম্প্রসারণ ঝুঁকিপূর্ণ সম্পদের জন্য সহায়ক হতে পারে।",
+   long:"৭ দিন ও ৩০ দিনের ধারাবাহিক পরিবর্তন গুরুত্বপূর্ণ।",
+   action:li.trend==="CONTRACTING"?"নতুন Altcoin কেনাকাটায় সতর্ক থাকুন; নগদ সংরক্ষণ করুন।":"BTC trend ও মূল্যায়ন ঠিক থাকলে সুযোগ মূল্যায়ন করুন।",
+   status:li.trend==="CONTRACTING"?"তারল্য সংকুচিত":"তারল্য সম্প্রসারিত"
+  });
+  const c=li.components||{};
+  for(const [k,l] of [["fed_assets","ফেডের সম্পদ"],["treasury_general_account","ট্রেজারি সাধারণ হিসাব (TGA)"],["reverse_repo","রিভার্স রেপো"]]){
+   if(num(c[k])!==null)card("liquidity",l,fmt(c[k])+" বিলিয়ন USD","তথ্যের তারিখ: "+(li.observation_date||"—"),"",{
+    meaning:"নিট তারল্য হিসাবের একটি উপাদান।",
+    short:"উপাদানটির পরিবর্তন নিট তারল্যকে প্রভাবিত করে।",
+    long:"একক মান নয়, WALCL−TGA−RRP সমন্বিত পরিবর্তন দেখুন।",
+    action:"নিট তারল্যের সঙ্গে তুলনা করুন।",
+    status:"পর্যবেক্ষণ"
+   });
+  }
+ }
+ metric("liquidity","M2 অর্থ সরবরাহ",mm.m2_money_supply);
 
-metricObj("technical",s+" Price (USDT)",a.price_usdt);
+ const on=DATA.advanced?.on_chain||{};
+ for(const [k,l] of [["mvrv_ratio","MVRV অনুপাত"],["hashrate","বিটকয়েন নেটওয়ার্ক হ্যাশরেট"],["mining_difficulty","মাইনিং জটিলতা"]])metricObj("onchain",l,on[k]);
 
-for(const [k,l] of [
-["ma20","MA20"],["ma50","MA50"],["ma200","MA200"],
-["rsi14","RSI14"],["macd","MACD"],
-["macd_signal","MACD Signal"],
-["macd_histogram","MACD Histogram"],
-["adx14","ADX14"],["volume_ratio_20d","Volume Ratio 20D"],
-["support_20d","Support 20D"],
-["resistance_20d","Resistance 20D"],
-["bollinger_lower","Bollinger Lower"]
-]){
-metricObj("technical",s+" "+l,i[k],i[k]?.unit==="x"?"x":"");
-}
+ const sp=DATA.advanced?.spot_market_activity||{},br=sp.breadth||{};
+ if(br.status==="OK"){
+  for(const [k,l] of [["advancing_pairs","দাম বাড়ছে এমন স্পট কয়েন"],["declining_pairs","দাম কমছে এমন স্পট কয়েন"],["unchanged_pairs","অপরিবর্তিত কয়েন"],["measured_pairs","পরিমাপ করা মোট কয়েন"]]){
+   if(num(br[k])!==null)card("activity",l,fmt(br[k],0),"Binance Spot USDT Pair","",explain(l,br[k]));
+  }
+  if(num(br.advance_decline_ratio)!==null)card("activity","বৃদ্ধি-পতনের অনুপাত",fmt(br.advance_decline_ratio,3),"১-এর বেশি হলে বাড়তে থাকা কয়েন বেশি","",explain("advance/decline",br.advance_decline_ratio));
+ }
 
-card("technical",s+" Last Closed Candle",
-a.last_closed_candle_at||"—",
-a.candle_interval+" • "+a.candle_count+" candles");
-}
+ const book=DATA.advanced?.spot_order_book||{},tk=DATA.advanced?.spot_taker_activity||{};
+ for(const s of ["BTCUSDT","ETHUSDT"]){
+  const nm=s==="BTCUSDT"?"বিটকয়েন":"ইথেরিয়াম";
+  metricObj("activity",nm+" স্পট অর্ডার বুক ভারসাম্য",book[s]?.imbalance_percent,"%");
+  metricObj("activity",nm+" ক্রয় অর্ডারের মূল্য",book[s]?.bid_value_usdt,"USDT");
+  metricObj("activity",nm+" বিক্রয় অর্ডারের মূল্য",book[s]?.ask_value_usdt,"USDT");
+  metricObj("activity",nm+" ১৫ মিনিটের ক্রয়/বিক্রয় অনুপাত",tk[s]?.taker_buy_sell_ratio,"অনুপাত");
+ }
 
-const mm=DATA.macro?.metrics||{};
+ const leaders=sp.volume_leaders_24h||[];
+ if(leaders.length){
+  const c=document.createElement("div");c.className="card";
+  const title=document.createElement("div");title.className="name";title.textContent="Binance স্পট ২৪ ঘণ্টার সর্বোচ্চ লেনদেনের কয়েন";
+  const table=document.createElement("table");
+  const head=document.createElement("tr");
+  ["জোড়া","লেনদেনের পরিমাণ","২৪ ঘণ্টার পরিবর্তন"].forEach(x=>{const th=document.createElement("th");th.textContent=x;head.append(th)});
+  table.append(head);
+  leaders.slice(0,10).forEach(x=>{
+   const tr=document.createElement("tr");
+   [x.symbol,fmt(x.quote_volume_24h,0)+" USDT",fmt(x.change_24h_pct)+"%"].forEach(v=>{const td=document.createElement("td");td.textContent=v;tr.append(td)});
+   table.append(tr);
+  });
+  c.append(title,table);el("activity").append(c);
+ }
 
-const macroFields=[
-["cpi","CPI"],["core_cpi","Core CPI"],
-["pce","PCE"],["core_pce","Core PCE"],
-["nonfarm_payrolls","Nonfarm Payrolls"],
-["unemployment","Unemployment"],
-["fed_funds_rate","Fed Funds Rate"],
-["usd_broad_index","US Dollar Broad Index (DXY নয়)"],
-["vix","VIX"],["yield_2y","US 2Y Yield"],
-["yield_10y","US 10Y Yield"],["yield_30y","US 30Y Yield"],
-["yield_curve_10y_2y","10Y–2Y Spread"],
-["sp500","S&P 500"],["nasdaq","NASDAQ"],
-["oil","WTI Oil"],["usd_jpy","USD/JPY"]
-];
+ const deriv=DATA.advanced?.derivatives||{};
+ for(const s of ["BTCUSDT","ETHUSDT"]){
+  const nm=s==="BTCUSDT"?"বিটকয়েন":"ইথেরিয়াম",d=deriv[s]||{};
+  metricObj("derivatives",nm+" Futures ওপেন ইন্টারেস্ট",d.open_interest_usd,"USD");
+  metricObj("derivatives",nm+" ওপেন ইন্টারেস্ট ২৪ ঘণ্টায় পরিবর্তন",d.open_interest_change_24h_pct,"%");
+  metricObj("derivatives",nm+" ফান্ডিং রেট",d.funding_avg_8h,"প্রতি ৮ ঘণ্টায়");
+  for(const [k,l] of [
+   ["global_long_short_ratio","সামগ্রিক অ্যাকাউন্ট Long/Short অনুপাত"],
+   ["top_account_long_short_ratio","শীর্ষ অ্যাকাউন্ট Long/Short"],
+   ["top_position_long_short_ratio","শীর্ষ পজিশন Long/Short"],
+   ["all_position_long_short_ratio","সব পজিশনের Long/Short"],
+   ["taker_long_short_ratio","Futures ক্রেতা/বিক্রেতা অনুপাত"]
+  ])metricObj("derivatives",nm+" "+l,d[k]);
+ }
 
-for(const [k,l] of macroFields){
-const x=mm[k];
-if(x?.status==="OK"&&n(x.value)!==null)
-card("macro",l,f(x.value)+(x.unit?" "+x.unit:""),
-"Observation: "+(x.observation_date||"—")+" • "+(x.source||"FRED"));
-}
+ const z=DATA.zone?.market_zone||{};
+ el("zone").textContent=[
+  "বর্তমান বাজার পর্যায়: "+statusText(z.current_zone),
+  "স্পট করণীয়: "+statusText(z.spot_action)+" • ঝুঁকি: "+statusText(z.risk_level),
+  "বিশ্বাসযোগ্যতার স্কোর: "+(z.confidence??"—")+"% ("+(z.confidence_label||"—")+")",
+  "সিদ্ধান্তের কারণ: "+((z.reason||[]).join(" | ")||"—"),
+  "যাচাইকৃত BTC মূল্য: "+(z.verified_inputs?.btc_price??"—"),
+  "সাপোর্ট: "+(z.verified_inputs?.support_20d??"—"),
+  "রেজিস্ট্যান্স: "+(z.verified_inputs?.resistance_20d??"—"),
+  "পরবর্তী সম্ভাব্য পর্যায়: "+statusText(z.next_zone)
+ ].join("\n");
 
-const li=DATA.macro?.liquidity||{};
+ const dec=DATA.decision?.final_decision||{};
+ el("decision").textContent=[
+  "সিদ্ধান্ত: "+statusText(dec.decision),
+  "কারণ: "+((dec.reasons||[]).join(" | ")||"—"),
+  "করণীয়: "+((dec.actions||[]).join(" | ")||"—"),
+  "ঝুঁকি: "+((dec.risk||[]).join(" | ")||"—"),
+  dec.important_note||""
+ ].join("\n");
 
-if(li.status==="OK"){
-card("liquidity","Net Liquidity",f(li.current)+" B USD",
-"WALCL − TGA − RRP • "+li.observation_date);
-
-card("liquidity","7D Change",f(li.change_7d)+" B USD");
-card("liquidity","30D Change",f(li.change_30d)+" B USD","",
-n(li.change_30d)<0?"red":"green");
-
-card("liquidity","Liquidity Trend",li.trend,
-"Aligned observation dates",
-li.trend==="CONTRACTING"?"red":"green");
-
-const c=li.components||{};
-
-for(const [k,l] of [
-["fed_assets","Fed Assets"],
-["treasury_general_account","Treasury General Account"],
-["reverse_repo","Reverse Repo"]
-]){
-if(n(c[k])!==null)
-card("liquidity",l,f(c[k])+" B USD",
-"As of "+(li.observation_date||""));
-}
-}
-
-metric("liquidity","M2 Money Supply",mm.m2_money_supply);
-
-const on=DATA.advanced?.on_chain||{};
-
-for(const [k,l] of [
-["mvrv_ratio","MVRV Ratio"],
-["hashrate","Bitcoin Hashrate"],
-["mining_difficulty","Mining Difficulty"]
-])metricObj("onchain",l,on[k]);
-
-const sp=DATA.advanced?.spot_market_activity||{};
-const br=sp.breadth||{};
-
-if(br.status==="OK"){
-for(const [k,l] of [
-["advancing_pairs","Advancing Spot Pairs"],
-["declining_pairs","Declining Spot Pairs"],
-["unchanged_pairs","Unchanged Pairs"],
-["measured_pairs","Measured Pairs"]
-]){
-if(n(br[k])!==null)
-card("activity",l,f(br[k],0),"Binance Spot USDT pairs");
-}
-
-if(n(br.advance_decline_ratio)!==null)
-card("activity","Advance/Decline Ratio",
-f(br.advance_decline_ratio,3),"",
-n(br.advance_decline_ratio)<1?"red":"green");
-}
-
-const book=DATA.advanced?.spot_order_book||{};
-const tk=DATA.advanced?.spot_taker_activity||{};
-
-for(const s of ["BTCUSDT","ETHUSDT"]){
-metricObj("activity",s+" Spot Order Book Imbalance",
-book[s]?.imbalance_percent,"%");
-metricObj("activity",s+" Spot Bid Value",
-book[s]?.bid_value_usdt,"USDT");
-metricObj("activity",s+" Spot Ask Value",
-book[s]?.ask_value_usdt,"USDT");
-metricObj("activity",s+" 15m Taker Buy/Sell",
-tk[s]?.taker_buy_sell_ratio,"ratio");
-}
-
-const leaders=sp.volume_leaders_24h||[];
-
-if(leaders.length){
-let c=document.createElement("div");
-c.className="card";
-
-let title=document.createElement("div");
-title.className="name";
-title.textContent="Binance Spot 24H Volume Leaders";
-
-let table=document.createElement("table");
-table.innerHTML="<tr><th>Pair</th><th>Quote Volume</th><th>24H Change</th></tr>";
-
-let body=document.createElement("tbody");
-
-leaders.slice(0,10).forEach(x=>{
-let tr=document.createElement("tr");
-[f(x.quote_volume_24h,0)+" USDT",
-x.symbol,f(x.change_24h_pct)+"%"].forEach(v=>{
-let td=document.createElement("td");
-td.textContent=v;tr.append(td);
-});
-body.append(tr);
-});
-
-table.append(body);c.append(title,table);
-el("activity").append(c);
-}
-
-const deriv=DATA.advanced?.derivatives||{};
-
-for(const s of ["BTCUSDT","ETHUSDT"]){
-const d=deriv[s]||{};
-
-metricObj("derivatives",s+" Open Interest",d.open_interest_usd,"USD");
-metricObj("derivatives",s+" OI 24H Change",d.open_interest_change_24h_pct,"%");
-metricObj("derivatives",s+" Funding Rate",d.funding_avg_8h,"fraction / 8h");
-
-for(const [k,l] of [
-["global_long_short_ratio","Global Account L/S"],
-["top_account_long_short_ratio","Top Account L/S"],
-["top_position_long_short_ratio","Top Position L/S"],
-["all_position_long_short_ratio","All Position L/S"],
-["taker_long_short_ratio","Futures Taker L/S"]
-]){
-const z=d[k];
-if(z&&z.status==="OK"&&n(z.value)!==null)
-card("derivatives",s+" "+l,f(z.value,4),z.source||"CoinBoss cross-exchange");
-}
-}
-
-const z=DATA.zone?.market_zone||{};
-
-el("zone").textContent=[
-"Current Zone: "+(z.current_zone||"—"),
-"Spot Action: "+(z.spot_action||"—")+" • Risk: "+(z.risk_level||"—"),
-"Confidence: "+(z.confidence??"—")+"% ("+(z.confidence_label||"—")+")",
-"কারণ: "+((z.reason||[]).join(" | ")||"—"),
-"Verified BTC price: "+(z.verified_inputs?.btc_price??"—"),
-"Support: "+(z.verified_inputs?.support_20d??"—"),
-"Resistance: "+(z.verified_inputs?.resistance_20d??"—"),
-"পরবর্তী Zone: "+(z.next_zone||"—")
-].join("\n");
-
-const dec=DATA.decision?.final_decision||{};
-
-el("decision").textContent=[
-"DECISION: "+(dec.decision||"—"),
-"কারণ: "+((dec.reasons||[]).join(" | ")||"—"),
-"ACTION: "+((dec.actions||[]).join(" | ")||"—"),
-"RISK: "+((dec.risk||[]).join(" | ")||"—"),
-dec.important_note||""
-].join("\n");
-
-const q=DATA.macro?.summary||{};
-
-el("quality").textContent=[
-"Market snapshot: "+(m.generated_at||"missing"),
-"Macro snapshot: "+(DATA.macro?.fetched_at||"missing"),
-"Advanced snapshot: "+(DATA.advanced?.generated_at||"missing"),
-"Decision snapshot: "+(DATA.decision?.generated_at||"missing"),
-"Market Data Quality: "+(q.data_quality||"—"),
-"Macro series OK: "+(q.ok??"—")+"/"+(q.total_series??"—"),
-"Macro unavailable: "+(q.unavailable??"—"),
-"অনুপলব্ধ ডেটা ইচ্ছাকৃতভাবে দেখানো হয়নি।"
-].join("\n");
+ const q=DATA.macro?.summary||{};
+ el("quality").textContent=[
+  "বাজার ডেটা তৈরি: "+(m.generated_at||"তথ্য নেই"),
+  "Macro ডেটা সংগ্রহ: "+(DATA.macro?.fetched_at||"তথ্য নেই"),
+  "Advanced ডেটা তৈরি: "+(DATA.advanced?.generated_at||"তথ্য নেই"),
+  "Decision ডেটা তৈরি: "+(DATA.decision?.generated_at||"তথ্য নেই"),
+  "বাজার ডেটার মান: "+statusText(q.data_quality||"—"),
+  "Macro সিরিজ সচল: "+(q.ok??"—")+"/"+(q.total_series??"—"),
+  "অনুপলব্ধ Macro তথ্য: "+(q.unavailable??"—"),
+  "নোট: পুরোনো বা অনুপলব্ধ ডেটাকে লাইভ সংকেত হিসেবে ধরা যাবে না।"
+ ].join("\n");
 }
 
 async function loadAll(){
-el("connection").textContent="Loading...";
-
-const entries=await Promise.allSettled(
-Object.entries(FILES).map(async([k,file])=>{
-const r=await fetch("./data/"+file+"?v="+Date.now(),{cache:"no-store"});
-if(!r.ok)throw Error(file+" HTTP "+r.status);
-return [k,await r.json()];
-})
-);
-
-DATA={};
-let failed=[];
-
-entries.forEach((r,i)=>{
-if(r.status==="fulfilled")DATA[r.value[0]]=r.value[1];
-else failed.push(Object.keys(FILES)[i]);
-});
-
-reset();
-render();
-
-el("connection").textContent=failed.length?
-"Partial: "+failed.join(", ")+" unavailable":
-"All data files loaded";
-
-el("connection").className="pill "+(failed.length?"yellow":"green");
-
-el("updated").textContent=
-"Browser refresh: "+new Date().toLocaleString()+
-" • GitHub Actions data snapshots are hourly, not real-time tick data.";
+ el("connection").textContent="তথ্য লোড হচ্ছে...";
+ const entries=await Promise.allSettled(
+  Object.entries(FILES).map(async([k,file])=>{
+   const r=await fetch("./data/"+file+"?v="+Date.now(),{cache:"no-store"});
+   if(!r.ok)throw Error(file+" HTTP "+r.status);
+   return [k,await r.json()];
+  })
+ );
+ DATA={};let failed=[];
+ entries.forEach((r,i)=>{
+  if(r.status==="fulfilled")DATA[r.value[0]]=r.value[1];
+  else failed.push(Object.keys(FILES)[i]);
+ });
+ reset();render();
+ el("connection").textContent=failed.length?"কিছু তথ্য ফাইল পাওয়া যায়নি: "+failed.join(", "):"সব তথ্য ফাইল সফলভাবে লোড হয়েছে";
+ el("connection").className="pill "+(failed.length?"yellow":"green");
+ el("updated").textContent="এই পৃষ্ঠা রিফ্রেশ: "+new Date().toLocaleString("bn-BD")+" • ডেটা সোর্সের নিজস্ব আপডেট সময় কার্ডে দেওয়া আছে।";
 }
-
 loadAll();
 setInterval(loadAll,300000);
 </script>
- 
-<script>
-// বাংলা অনুবাদ ব্যবস্থা
-const BANGLA = {
-"Crypto Market Risk Dashboard":"ক্রিপ্টো বাজার ঝুঁকি ড্যাশবোর্ড",
-"Global Crypto Market":"সামগ্রিক ক্রিপ্টো বাজার",
-"BTC & ETH Technical Analysis":"BTC ও ETH টেকনিক্যাল বিশ্লেষণ",
-"Macro Economic Data":"সামষ্টিক অর্থনৈতিক তথ্য",
-"Global Liquidity":"বৈশ্বিক তারল্য",
-"Verified On-chain Data":"যাচাইকৃত অন-চেইন তথ্য",
-"Spot Market Activity":"স্পট বাজারের কার্যক্রম",
-"Derivatives Sentiment":"ডেরিভেটিভ বাজারের অবস্থান",
-"Market Zone":"বাজারের বর্তমান পর্যায়",
-"Final Market Decision":"সামগ্রিক বাজার সিদ্ধান্ত",
-"Data Quality & Limitations":"তথ্যের মান ও সীমাবদ্ধতা",
-"Refresh Data":"তথ্য রিফ্রেশ করুন",
-"Total Crypto Market Cap":"মোট ক্রিপ্টো বাজারমূল্য",
-"24H Market Volume":"২৪ ঘণ্টার লেনদেন",
-"BTC Dominance":"BTC বাজার আধিপত্য",
-"ETH Dominance":"ETH বাজার আধিপত্য",
-"Fear & Greed":"ভয় ও লোভ সূচক",
-"Reference Price":"বর্তমান মূল্য",
-"24H Change":"২৪ ঘণ্টায় পরিবর্তন",
-"MA20":"২০ দিনের মুভিং অ্যাভারেজ",
-"MA50":"৫০ দিনের মুভিং অ্যাভারেজ",
-"MA200":"২০০ দিনের মুভিং অ্যাভারেজ",
-"RSI14":"RSI সূচক",
-"MACD":"MACD সূচক",
-"MACD Signal":"MACD সিগন্যাল",
-"MACD Histogram":"MACD হিস্টোগ্রাম",
-"ADX14":"ADX সূচক",
-"Support 20D":"২০ দিনের সাপোর্ট",
-"Resistance 20D":"২০ দিনের রেজিস্ট্যান্স",
-"CPI":"ভোক্তা মূল্যস্ফীতি",
-"Core CPI":"মূল CPI",
-"PCE":"PCE মূল্যসূচক",
-"Core PCE":"মূল PCE",
-"Fed Funds Rate":"ফেড সুদের হার",
-"VIX":"VIX ভোলাটিলিটি সূচক",
-"US 2Y Yield":"মার্কিন ২ বছর মেয়াদি বন্ড",
-"US 10Y Yield":"মার্কিন ১০ বছর মেয়াদি বন্ড",
-"US 30Y Yield":"মার্কিন ৩০ বছর মেয়াদি বন্ড",
-"S&P 500":"এসঅ্যান্ডপি ৫০০",
-"NASDAQ":"ন্যাসডাক",
-"WTI Oil":"অপরিশোধিত তেলের দাম",
-"USD/JPY":"ডলার/ইয়েন",
-"Net Liquidity":"নিট তারল্য",
-"7D Change":"৭ দিনের পরিবর্তন",
-"30D Change":"৩০ দিনের পরিবর্তন",
-"Fed Assets":"ফেডের সম্পদ",
-"Treasury General Account":"ট্রেজারি সাধারণ হিসাব",
-"Reverse Repo":"রিভার্স রেপো",
-"M2 Money Supply":"M2 অর্থ সরবরাহ",
-"MVRV Ratio":"MVRV অনুপাত",
-"Bitcoin Hashrate":"বিটকয়েন হ্যাশরেট",
-"Mining Difficulty":"মাইনিং জটিলতা",
-"Open Interest":"ওপেন ইন্টারেস্ট",
-"Funding Rate":"ফান্ডিং রেট",
-"Advancing Spot Pairs":"দাম বাড়ছে এমন কয়েন",
-"Declining Spot Pairs":"দাম কমছে এমন কয়েন",
-"Advance/Decline Ratio":"বৃদ্ধি ও পতনের অনুপাত",
-"Spot Order Book Imbalance":"অর্ডার বুকের ভারসাম্য",
-"Spot Bid Value":"ক্রয় অর্ডারের মূল্য",
-"Spot Ask Value":"বিক্রয় অর্ডারের মূল্য",
-"Current Zone: ":"বর্তমান বাজার পর্যায়: ",
-"Spot Action: ":"স্পট করণীয়: ",
-"Confidence: ":"নির্ভরযোগ্যতার স্তর: ",
-"DECISION: ":"সিদ্ধান্ত: ",
-"ACTION: ":"করণীয়: ",
-"RISK: ":"ঝুঁকি: ",
-"REDUCE RISK":"ঝুঁকি কমান",
-"WAIT":"অপেক্ষা করুন",
-"CONTRACTING":"তারল্য সংকুচিত হচ্ছে",
-"EXPANDING":"তারল্য বাড়ছে",
-"Accumulation Zone":"সঞ্চয় পর্যায়",
-"Early Bull Zone":"প্রাথমিক বুলিশ পর্যায়",
-"HIGH":"উচ্চ",
-"LOW":"নিম্ন",
-"Loading...":"তথ্য লোড হচ্ছে...",
-"All data files loaded":"সব তথ্য লোড হয়েছে",
-"Verified source":"যাচাইকৃত উৎস"
-};
-
-function translateDashboard(root=document.body){
-const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);
-let node;
-while(node=walker.nextNode()){
-let value=node.nodeValue.trim();
-if(BANGLA[value]){
-node.nodeValue=node.nodeValue.replace(value,BANGLA[value]);
-}
-}
-}
-
-translateDashboard();
-
-const banglaObserver=new MutationObserver(()=>{
-translateDashboard();
-});
-
-banglaObserver.observe(document.body,{
-childList:true,
-subtree:true,
-characterData:true
-});
-</script>
- 
 </body>
-</html>
+</html> 
