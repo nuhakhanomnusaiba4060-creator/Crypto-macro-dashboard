@@ -2,19 +2,19 @@
   "schema_version": 1,
   "engine": "Crypto Final Decision Engine",
   "engine_version": "1.0.0",
-  "generated_at": "2026-11-21T19:15:44Z",
+  "generated_at": "2026-11-21T19:56:12Z",
   "status": "OK",
   "data_quality": {
     "macro": {
       "name": "macro_data",
       "timestamp": "2026-11-21T18:25:42Z",
-      "age_hours": 0.83,
+      "age_hours": 1.51,
       "max_age_hours": 72,
       "status": "FRESH"
     },
     "market": {
       "name": "market_data",
-      "timestamp": "2026-11-21T19:15:29Z",
+      "timestamp": "2026-11-21T19:56:01Z",
       "age_hours": 0.0,
       "max_age_hours": 36,
       "status": "FRESH"
@@ -22,19 +22,19 @@
     "btc_technical": {
       "name": "BTC last closed daily candle",
       "timestamp": "2026-11-20T23:59:59Z",
-      "age_hours": 19.26,
+      "age_hours": 19.94,
       "max_age_hours": 60,
       "status": "FRESH"
     },
     "eth_technical": {
       "name": "ETH last closed daily candle",
       "timestamp": "2026-11-20T23:59:59Z",
-      "age_hours": 19.26,
+      "age_hours": 19.94,
       "max_age_hours": 60,
       "status": "FRESH"
     },
     "issues": [
-      "BTC price source discrepancy: CoinGecko snapshot ও Binance technical price-এর পার্থক্য 2.08%। ভিন্ন source/timestamp হওয়ায় কোনো একটি value auto-correct করা হয়নি।",
+      "BTC price source discrepancy: CoinGecko snapshot ও Binance technical price-এর পার্থক্য 2.19%। ভিন্ন source/timestamp হওয়ায় কোনো একটি value auto-correct করা হয়নি।",
       "Net Liquidity RRP mismatch: metrics.reverse_repo=0.401B, liquidity.components.reverse_repo=0.331B। Liquidity formula-এর aligned component আলাদা করে দেখানো হয়েছে।",
       "Macro data quality GOOD_WITH_OPTIONAL_GAPS; optional Gold data unavailable।",
       "Market data scheduled snapshot; realtime feed নয়।"
@@ -67,16 +67,16 @@
     ]
   },
   "crypto_market": {
-    "global_market_cap_usd": 2083192293792.2249,
-    "global_volume_24h_usd": 127608671529.67133,
-    "btc_dominance_percent": 57.93203401133689,
+    "global_market_cap_usd": 2088719525813.203,
+    "global_volume_24h_usd": 123367404747.01482,
+    "btc_dominance_percent": 57.9667167407755,
     "fear_greed": {
       "value": 12.0,
       "classification": "Extreme Fear",
       "unit": "/100",
       "source": "Alternative.me Fear & Greed API",
       "source_updated_at": "2026-11-21T00:00:00Z",
-      "fetched_at": "2026-11-21T19:15:29Z",
+      "fetched_at": "2026-11-21T19:56:01Z",
       "status": "OK",
       "error": null
     },
@@ -91,7 +91,7 @@
       "macd_signal": -3700.802078331073,
       "adx14": 44.27721782281161,
       "volume_ratio_20d": 1.9360137865525127,
-      "support_20d": 57778.35,
+      "support_20d": 61428.26,
       "resistance_20d": 81196.01,
       "bollinger_lower": 58508.48123896466,
       "last_closed_candle_at": "2026-11-20T23:59:59Z",
@@ -102,6 +102,7 @@
         "MA20 < MA50; short/mid-term trend দুর্বল।",
         "RSI 30-এর নিচে; oversold, কিন্তু reversal নিশ্চিত নয়।",
         "MACD signal line-এর নিচে।",
+        "দাম 20D support-এর নিচে; support breakdown।",
         "শেষ দিনের volume 20D average-এর তুলনায় বেশি।"
       ],
       "data_complete": true
@@ -117,7 +118,7 @@
       "macd_signal": -139.46273825262426,
       "adx14": 41.84494891941189,
       "volume_ratio_20d": 2.237459303578145,
-      "support_20d": 1581.47,
+      "support_20d": 1711.08,
       "resistance_20d": 2450.0,
       "bollinger_lower": 1590.10802801209,
       "last_closed_candle_at": "2026-11-20T23:59:59Z",
@@ -128,20 +129,21 @@
         "MA20 < MA50; short/mid-term trend দুর্বল।",
         "RSI 30-এর নিচে; oversold, কিন্তু reversal নিশ্চিত নয়।",
         "MACD signal line-এর নিচে।",
+        "দাম 20D support-এর নিচে; support breakdown।",
         "শেষ দিনের volume 20D average-এর তুলনায় বেশি।"
       ],
       "data_complete": true
     }
   },
   "final_decision": {
-    "decision": "REDUCE RISK",
+    "decision": "SELL",
     "confidence_label": "RULE_BASED_NOT_PROBABILITY",
     "reasons": [
-      "Macro REDUCE RISK এবং BTC daily trend bearish।",
+      "BTC bearish structure, 20D support breakdown এবং Macro REDUCE RISK একসঙ্গে রয়েছে।",
       "Fear & Greed Extreme Fear; এটি একা market bottom signal নয়।"
     ],
     "actions": [
-      "নতুন Altcoin BUY/DCA বন্ধ রাখুন। দুর্বল ও অতিরিক্ত ওজনের holdings পর্যালোচনা করুন।"
+      "ঝুঁকিপূর্ণ Altcoin exposure কমান। Macro signal একা সব asset sell করার নির্দেশ নয়।"
     ],
     "risk": [
       "BTC RSI oversold; আরও পতন বা consolidation সম্ভব। Oversold মানেই reversal নয়।",
@@ -151,9 +153,9 @@
     "market_context": {
       "fear_greed_value": 12.0,
       "fear_greed_classification": "Extreme Fear",
-      "btc_dominance_percent": 57.93203401133689,
-      "total_market_cap_usd": 2083192293792.2249,
-      "total_volume_24h_usd": 127608671529.67133
+      "btc_dominance_percent": 57.9667167407755,
+      "total_market_cap_usd": 2088719525813.203,
+      "total_volume_24h_usd": 123367404747.01482
     },
     "important_note": "এটি সামগ্রিক market-regime guidance; ব্যক্তিগত portfolio holdings-এর coin-by-coin SELL signal নয়।"
   },
