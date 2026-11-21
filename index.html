@@ -3,1011 +3,1544 @@
 <html lang="bn">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#07111f">
-<title>Crypto Spot Market Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0b1220">
+<title>Crypto Macro Intelligence Dashboard</title>
+
 <style>
 :root{
---bg:#07111f;--panel:#101e30;--panel2:#14243a;
---line:#263951;--text:#e8f0fa;--muted:#91a4bb;
---green:#16c784;--red:#ea3943;--yellow:#f0b90b;
---blue:#3988ff;--purple:#a78bfa;--cyan:#22d3ee;
+  --bg:#080e19;
+  --panel:#111c2d;
+  --panel2:#16243a;
+  --border:#263750;
+  --text:#e8eef8;
+  --muted:#9aabc2;
+  --green:#26d69a;
+  --red:#ff647c;
+  --yellow:#ffc857;
+  --blue:#62a8ff;
+  --purple:#b69aff;
 }
 *{box-sizing:border-box}
 body{
-margin:0;background:var(--bg);color:var(--text);
-font-family:Arial,"Noto Sans Bengali",sans-serif;font-size:14px;
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:Arial,"Noto Sans Bengali",sans-serif;
+  line-height:1.55;
 }
 header{
-padding:18px;background:#0b192b;border-bottom:1px solid var(--line);
-position:sticky;top:0;z-index:10;
+  padding:20px 16px;
+  background:linear-gradient(120deg,#142944,#101a2c);
+  border-bottom:1px solid var(--border);
 }
-main{max-width:1250px;margin:auto;padding:15px}
-h1{font-size:21px;margin:0 0 8px}
-h2{font-size:18px;margin:27px 0 12px}
-h3{font-size:15px;margin:0 0 10px}
-.grid{
-display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));
-gap:11px;
+.container{max-width:1400px;margin:auto;padding:0 14px}
+.header-row{
+  display:flex;justify-content:space-between;
+  align-items:center;gap:12px;flex-wrap:wrap
 }
-.card,.panel{
-min-width:0;background:var(--panel);border:1px solid var(--line);
-border-radius:12px;padding:14px;
+h1{font-size:23px;margin:0 0 5px}
+h2{font-size:19px;margin:0 0 14px}
+h3{font-size:15px;margin:0 0 9px;color:#dce8fa}
+p{margin:5px 0}
+.small{font-size:12px;color:var(--muted)}
+.muted{color:var(--muted)}
+.status{
+  display:inline-block;padding:4px 9px;border-radius:20px;
+  font-size:11px;font-weight:bold;background:#263750;color:#dce8fa
 }
-.card{overflow-wrap:anywhere}
-.name{font-size:12px;color:var(--muted);line-height:1.7}
-.value{font-size:21px;font-weight:bold;margin:9px 0;overflow-wrap:anywhere}
-.detail{font-size:12px;color:#bdcada;line-height:1.8;overflow-wrap:anywhere}
-.note{
-border-top:1px solid var(--line);margin-top:10px;padding-top:9px;
-font-size:12px;line-height:1.8;color:var(--muted);
-}
-.panel{line-height:1.9;white-space:pre-line;overflow-wrap:anywhere}
-.green{color:var(--green)} .red{color:var(--red)}
-.yellow{color:var(--yellow)} .blue{color:var(--cyan)}
-.purple{color:var(--purple)}
-.tag{
-display:inline-block;padding:6px 10px;border-radius:7px;
-background:#20334a;color:var(--yellow);font-size:12px;
-}
+.good{background:#123c32;color:#6df0bd}
+.bad{background:#48202c;color:#ff9aaa}
+.warn{background:#49391c;color:#ffdb83}
+.info{background:#183653;color:#9ccaff}
 button{
-border:0;border-radius:8px;padding:10px 16px;
-background:var(--blue);color:white;font-weight:bold;cursor:pointer;
+  background:#244a78;color:white;border:0;border-radius:7px;
+  padding:9px 13px;font-weight:bold;cursor:pointer
 }
-button:disabled{opacity:.6;cursor:wait}
+button:active{opacity:.7}
+main{padding:18px 0 40px}
+.section{margin:17px 0}
+.section-head{
+  display:flex;justify-content:space-between;align-items:center;
+  gap:10px;flex-wrap:wrap;margin-bottom:10px
+}
+.grid{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));
+  gap:11px
+}
+.card{
+  background:var(--panel);border:1px solid var(--border);
+  border-radius:11px;padding:14px;min-width:0
+}
+.card.highlight{background:linear-gradient(140deg,#172b43,#111c2d)}
+.metric-label{font-size:12px;color:var(--muted);margin-bottom:5px}
+.metric-value{font-size:21px;font-weight:bold;overflow-wrap:anywhere}
+.metric-unit{font-size:11px;color:var(--muted)}
+.big-value{font-size:25px;font-weight:bold}
+.two-col{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+  gap:12px
+}
+.three-col{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:11px
+}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{padding:9px 7px;text-align:left;border-bottom:1px solid var(--border)}
+th{color:#a9bed9;font-weight:600}
+td{overflow-wrap:anywhere}
 .table-wrap{overflow-x:auto}
-table{width:100%;border-collapse:collapse;font-size:12px;min-width:450px}
-td,th{padding:9px 7px;border-bottom:1px solid var(--line);text-align:left}
-th{color:var(--cyan)}
-.section-note{
-margin:8px 0 12px;padding:10px 12px;background:#10243a;
-border-left:3px solid var(--blue);border-radius:7px;
-font-size:12px;line-height:1.8;color:#c4d4e8;
+.progress{
+  height:8px;background:#263750;border-radius:10px;overflow:hidden;margin-top:8px
 }
-footer{
-text-align:center;color:var(--muted);font-size:11px;
-padding:25px;line-height:1.9;
+.progress>span{display:block;height:100%;background:var(--blue)}
+.notice{
+  padding:11px 12px;border-radius:8px;margin:8px 0;
+  background:#1b2b40;border-left:3px solid var(--blue);font-size:13px
 }
+.notice.warning{background:#352b1b;border-color:var(--yellow)}
+.notice.danger{background:#351e2a;border-color:var(--red)}
+.notice.success{background:#15352d;border-color:var(--green)}
+.report-block{
+  background:#0e1929;border:1px solid var(--border);
+  border-radius:8px;padding:11px;margin:9px 0
+}
+.report-block b{color:#b8d5ff}
+.report-line{margin:7px 0;font-size:13px}
+.report-line strong{color:#b8d5ff}
+.list{padding-left:19px;margin:7px 0}
+.list li{margin:5px 0;font-size:13px}
+.footer{
+  text-align:center;padding:20px;color:var(--muted);
+  border-top:1px solid var(--border);font-size:12px
+}
+#lastUpdate{font-size:12px;color:var(--muted)}
+#errorBox{display:none}
+.hidden{display:none}
+hr{border:0;border-top:1px solid var(--border);margin:12px 0}
 @media(max-width:600px){
-main{padding:11px}.grid{grid-template-columns:minmax(0,1fr)}
-.card,.panel{padding:12px}h2{font-size:17px}
-header{position:relative}
+  h1{font-size:19px}
+  .metric-value{font-size:18px}
+  .big-value{font-size:22px}
+  .card{padding:11px}
 }
 </style>
 </head>
-<body>
 
+<body>
 <header>
-<h1>ক্রিপ্টো Spot Market Dashboard</h1>
-<div class="detail">
-Market Phase • Market Zone • BTC/ETH • Macro • Liquidity • On-chain • Spot Activity
-</div>
-<p><span id="status" class="tag">ডেটা লোড হচ্ছে...</span></p>
-<div class="detail" id="updated">—</div>
-<p><button id="refreshButton" onclick="loadData()">রিফ্রেশ করুন</button></p>
+  <div class="container">
+    <div class="header-row">
+      <div>
+        <h1>ক্রিপ্টো মার্কেট ইন্টেলিজেন্স ড্যাশবোর্ড</h1>
+        <div class="small">বাজার বিশ্লেষণ • Macro • BTC/ETH • On-chain • Spot Market • Market Zone</div>
+      </div>
+      <div>
+        <button onclick="loadAll(true)">এখনই আপডেট করুন</button>
+      </div>
+    </div>
+    <div class="header-row" style="margin-top:12px">
+      <div id="connectionStatus" class="status warn">তথ্য যাচাই হচ্ছে...</div>
+      <div id="lastUpdate">সর্বশেষ আপডেট: অপেক্ষমাণ</div>
+    </div>
+  </div>
 </header>
 
-<main>
+<main class="container">
 
-<h2>১. বর্তমান Market Phase</h2>
-<div id="phase" class="grid"></div>
+  <div id="errorBox" class="notice danger"></div>
 
-<h2>২. Market Zone ও অবস্থান</h2>
-<div id="zone" class="grid"></div>
+  <!-- OVERALL MARKET DECISION -->
+  <section class="section">
+    <div class="section-head">
+      <h2>১. সামগ্রিক বাজার পরিস্থিতি ও সিদ্ধান্ত</h2>
+      <span class="small">Final Decision Engine</span>
+    </div>
+    <div class="grid">
+      <div class="card highlight">
+        <div class="metric-label">সামগ্রিক Spot সিদ্ধান্ত</div>
+        <div class="big-value" id="overallDecision">তথ্য যাচাই হচ্ছে</div>
+        <div class="small" id="overallAction">—</div>
+      </div>
+      <div class="card">
+        <div class="metric-label">Market Zone</div>
+        <div class="metric-value" id="zoneName">—</div>
+        <div class="small" id="zoneCode">—</div>
+      </div>
+      <div class="card">
+        <div class="metric-label">বাজারের ঝুঁকি</div>
+        <div class="metric-value" id="overallRisk">—</div>
+        <div class="small" id="riskCode">—</div>
+      </div>
+      <div class="card">
+        <div class="metric-label">তথ্যের কভারেজ</div>
+        <div class="metric-value" id="confidence">—</div>
+        <div class="progress"><span id="confidenceBar" style="width:0%"></span></div>
+        <div class="small">এটি লাভের সম্ভাবনা নয়</div>
+      </div>
+    </div>
+    <div class="card" style="margin-top:11px">
+      <h3>বর্তমান সিদ্ধান্তের কারণ</h3>
+      <div id="overallReason" class="report-line">তথ্য পাওয়া যায়নি</div>
+      <div id="overallInstruction" class="notice">—</div>
+    </div>
+  </section>
 
-<h2>৩. Global Crypto Market</h2>
-<div id="overview" class="grid"></div>
+  <!-- MARKET ZONE -->
+  <section class="section">
+    <div class="section-head">
+      <h2>২. Market Zone রিপোর্ট</h2>
+      <span class="small">Market Zone Engine v3</span>
+    </div>
+    <div class="grid">
+      <div class="card">
+        <div class="metric-label">বর্তমান Market Zone</div>
+        <div class="metric-value" id="mzZone">—</div>
+        <div class="small" id="mzPosition">—</div>
+      </div>
+      <div class="card">
+        <div class="metric-label">BTC প্রবণতা</div>
+        <div class="metric-value" id="mzTrend">—</div>
+        <div class="small">BTC Technical Analysis</div>
+      </div>
+      <div class="card">
+        <div class="metric-label">Spot করণীয়</div>
+        <div class="metric-value" id="mzAction">—</div>
+        <div class="small" id="mzActionCode">—</div>
+      </div>
+      <div class="card">
+        <div class="metric-label">Market Zone তথ্যের মান</div>
+        <div class="metric-value" id="mzQuality">—</div>
+        <div class="small" id="mzConfidence">—</div>
+      </div>
+    </div>
 
-<h2>৪. BTC ও ETH Spot Technical</h2>
-<div id="technical" class="grid"></div>
+    <div class="two-col" style="margin-top:11px">
+      <div class="card">
+        <h3>Market Zone বিশ্লেষণ</h3>
+        <div id="mzReason" class="report-line">—</div>
+        <div id="mzInstruction" class="notice">—</div>
+        <div class="report-line"><strong>পরবর্তী ধাপ:</strong> <span id="mzNextZone">—</span></div>
+      </div>
+      <div class="card">
+        <h3>Market Zone-এর স্কোর</h3>
+        <div class="grid">
+          <div>
+            <div class="metric-label">Bullish Score</div>
+            <div class="metric-value" id="bullScore">—</div>
+          </div>
+          <div>
+            <div class="metric-label">Bearish Score</div>
+            <div class="metric-value" id="bearScore">—</div>
+          </div>
+        </div>
+        <hr>
+        <div class="metric-label">বাজারের পক্ষে-বিপক্ষে কারণ</div>
+        <div id="mzReasons"></div>
+      </div>
+    </div>
+    <div class="card" style="margin-top:11px">
+      <h3>Market Zone-এর তথ্য যাচাই</h3>
+      <div id="verifiedInputs"></div>
+    </div>
+  </section>
 
-<h2>৫. Macro Economic Risk</h2>
-<div id="macroDecision" class="panel">তথ্য অপেক্ষমাণ...</div>
-<div id="macro" class="grid"></div>
+  <!-- GLOBAL MARKET -->
+  <section class="section">
+    <div class="section-head">
+      <h2>৩. Global Crypto Market</h2>
+      <span class="small">সামগ্রিক বাজারের তথ্য</span>
+    </div>
+    <div class="grid">
+      <div class="card">
+        <div class="metric-label">মোট Market Cap</div>
+        <div class="metric-value" id="globalCap">—</div>
+      </div>
+      <div class="card">
+        <div class="metric-label">২৪ ঘণ্টার মোট Volume</div>
+        <div class="metric-value" id="globalVolume">—</div>
+      </div>
+      <div class="card">
+        <div class="metric-label">BTC Dominance</div>
+        <div class="metric-value" id="globalBtcDom">—</div>
+      </div>
+      <div class="card">
+        <div class="metric-label">ETH Dominance</div>
+        <div class="metric-value" id="globalEthDom">—</div>
+      </div>
+      <div class="card">
+        <div class="metric-label">Fear & Greed</div>
+        <div class="metric-value" id="globalFG">—</div>
+        <div class="small" id="globalFGText">—</div>
+      </div>
+    </div>
+  </section>
 
-<h2>৬. Global Liquidity</h2>
-<div id="liquidity" class="grid"></div>
+  <!-- BTC TECHNICAL -->
+  <section class="section">
+    <div class="section-head">
+      <h2>৪. BTC Technical Analysis</h2>
+      <span class="small">সর্বশেষ বন্ধ হওয়া দৈনিক Candle-এর সূচক</span>
+    </div>
+    <div class="grid">
+      <div class="card">
+        <div class="metric-label">BTC মূল্য</div>
+        <div class="metric-value" id="btcPrice">—</div>
+        <div class="small" id="btcPriceTime">—</div>
+      </div>
+      <div class="card">
+        <div class="metric-label">MA20</div>
+        <div class="metric-value" id="btcMA20">—</div>
+      </div>
+      <div class="card">
+        <div class="metric-label">MA50</div>
+        <div class="metric-value" id="btcMA50">—</div>
+      </div>
+      <div class="card">
+        <div class="metric-label">MA200</div>
+        <div class="metric-value" id="btcMA200">—</div>
+      </div>
+      <div class="card">
+        <div class="metric-label">RSI (১৪)</div>
+        <div class="metric-value" id="btcRSI">—</div>
+        <div class="small" id="btcRSIText">—</div>
+      </div>
+      <div class="card">
+        <div class="metric-label">MACD</div>
+        <div class="metric-value" id="btcMACD">—</div>
+        <div class="small" id="btcMACDText">—</div>
+      </div>
+      <div class="card">
+        <div class="metric-label">MACD Signal</div>
+        <div class="metric-value" id="btcSignal">—</div>
+      </div>
+      <div class="card">
+        <div class="metric-label">Volume Ratio</div>
+        <div class="metric-value" id="btcVolRatio">—</div>
+        <div class="small">২০ দিনের গড়ের তুলনায়</div>
+      </div>
+      <div class="card">
+        <div class="metric-label">২০ দিনের Support</div>
+        <div class="metric-value" id="btcSupport">—</div>
+        <div class="small" id="btcSupportStatus">—</div>
+      </div>
+      <div class="card">
+        <div class="metric-label">২০ দিনের Resistance</div>
+        <div class="metric-value" id="btcResistance">—</div>
+      </div>
+    </div>
+    <div class="card" style="margin-top:11px">
+      <h3>BTC Technical বিশ্লেষণ</h3>
+      <div id="btcAnalysis"></div>
+    </div>
+  </section>
 
-<h2>৭. গুরুত্বপূর্ণ On-chain ও Mining</h2>
-<div id="onchain" class="grid"></div>
+  <!-- ETH TECHNICAL -->
+  <section class="section">
+    <div class="section-head">
+      <h2>৫. ETH Technical Analysis</h2>
+    </div>
+    <div class="grid">
+      <div class="card"><div class="metric-label">ETH মূল্য</div><div class="metric-value" id="ethPrice">—</div></div>
+      <div class="card"><div class="metric-label">MA20</div><div class="metric-value" id="ethMA20">—</div></div>
+      <div class="card"><div class="metric-label">MA50</div><div class="metric-value" id="ethMA50">—</div></div>
+      <div class="card"><div class="metric-label">MA200</div><div class="metric-value" id="ethMA200">—</div></div>
+      <div class="card"><div class="metric-label">RSI (১৪)</div><div class="metric-value" id="ethRSI">—</div></div>
+      <div class="card"><div class="metric-label">MACD</div><div class="metric-value" id="ethMACD">—</div></div>
+    </div>
+  </section>
 
-<h2>৮. Spot Market Activity</h2>
-<div id="spot" class="grid"></div>
+  <!-- MACRO -->
+  <section class="section">
+    <div class="section-head">
+      <h2>৬. Global Macro Economy রিপোর্ট</h2>
+      <span class="small">Macro Engine</span>
+    </div>
+    <div class="grid">
+      <div class="card"><div class="metric-label">Macro সিদ্ধান্ত</div><div class="metric-value" id="macroDecision">—</div></div>
+      <div class="card"><div class="metric-label">Macro Data Quality</div><div class="metric-value" id="macroQuality">—</div></div>
+      <div class="card"><div class="metric-label">Risk Score</div><div class="metric-value" id="macroRiskScore">—</div></div>
+      <div class="card"><div class="metric-label">Support Score</div><div class="metric-value" id="macroSupportScore">—</div></div>
+    </div>
 
-<h2>৯. BTC ও ETH Spot Order Book এবং Taker Activity</h2>
-<div class="section-note">
-Order Book হলো Binance Spot-এর Top 100 Levels-এর Snapshot।
-Taker Activity সর্বশেষ সম্পূর্ণ ১৫ মিনিটের Candle থেকে নেওয়া।
-এগুলো একা BUY/SELL সিদ্ধান্ত নয়।
-</div>
-<div id="orderbook" class="grid"></div>
+    <div class="card" style="margin-top:11px">
+      <h3>Macro সূচকসমূহ</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>সূচক</th><th>বর্তমান মান</th><th>পর্যবেক্ষণের তারিখ</th><th>অবস্থা</th></tr></thead>
+          <tbody id="macroMetricsTable"></tbody>
+        </table>
+      </div>
+    </div>
 
-<h2>১০. Futures Sentiment Context</h2>
-<div class="section-note">
-এগুলো CoinBoss-এর Cross-exchange Futures তথ্য। Futures-এর তথ্যকে
-Spot BUY/SELL সংকেত হিসেবে ব্যবহার করা হয় না। Funding APR-এ
-Provider ও হিসাব করা মানের অমিল থাকলে দুটো আলাদা দেখানো হবে।
-</div>
-<div id="derivatives" class="grid"></div>
+    <div class="card" style="margin-top:11px">
+      <h3>Inflation — মূল্যস্ফীতি</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>সূচক</th><th>মাসিক</th><th>৩ মাস</th><th>বার্ষিক</th><th>অবস্থা</th></tr></thead>
+          <tbody id="inflationTable"></tbody>
+        </table>
+      </div>
+    </div>
 
-<h2>১১. চূড়ান্ত Spot Market সিদ্ধান্ত</h2>
-<div id="decision" class="panel">তথ্য অপেক্ষমাণ...</div>
+    <div class="two-col" style="margin-top:11px">
+      <div class="card">
+        <h3>যুক্তরাষ্ট্রের আর্থিক তারল্য</h3>
+        <div class="metric-value" id="liquidityStatus">—</div>
+        <div class="report-line" id="liquidityCurrent">—</div>
+        <div class="report-line" id="liquidityTrend">—</div>
+        <div class="report-line" id="liquidityChange">—</div>
+      </div>
+      <div class="card">
+        <h3>Bond Yield Curve</h3>
+        <div class="metric-value" id="yieldSpread">—</div>
+        <div class="report-line" id="yieldInverted">—</div>
+        <div class="report-line" id="yieldTrend">—</div>
+      </div>
+    </div>
 
-<h2>১২. Macro Reports</h2>
-<div id="reports" class="grid"></div>
+    <div class="card" style="margin-top:11px">
+      <h3>Macro-এর সামগ্রিক বিশ্লেষণ ও করণীয়</h3>
+      <div id="macroOverallReport"></div>
+    </div>
 
-<h2>১৩. Data Quality ও Update Time</h2>
-<div id="quality" class="panel">তথ্য অপেক্ষমাণ...</div>
+    <div class="card" style="margin-top:11px">
+      <h3>প্রতিটি Macro রিপোর্ট</h3>
+      <div id="macroReports"></div>
+    </div>
+  </section>
+
+  <!-- ADVANCED -->
+  <section class="section">
+    <div class="section-head">
+      <h2>৭. Advanced Crypto Intelligence</h2>
+      <span class="small">On-chain ও Spot Market</span>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <div class="metric-label">MVRV Ratio</div>
+        <div class="metric-value" id="mvrv">—</div>
+        <div class="small" id="mvrvStatus">—</div>
+      </div>
+      <div class="card">
+        <div class="metric-label">MVRV Z-Score</div>
+        <div class="metric-value" id="mvrvZ">—</div>
+        <div class="small">MVRV Ratio থেকে আলাদা সূচক</div>
+      </div>
+      <div class="card">
+        <div class="metric-label">BTC Hashrate</div>
+        <div class="metric-value" id="hashrate">—</div>
+      </div>
+      <div class="card">
+        <div class="metric-label">Mining Difficulty</div>
+        <div class="metric-value" id="difficulty">—</div>
+      </div>
+      <div class="card">
+        <div class="metric-label">পরবর্তী Halving</div>
+        <div class="metric-value" id="halvingDays">—</div>
+        <div class="small" id="halvingBlock">—</div>
+      </div>
+    </div>
+
+    <div class="two-col" style="margin-top:11px">
+      <div class="card">
+        <h3>Spot Market Breadth</h3>
+        <div class="grid">
+          <div><div class="metric-label">উঠেছে</div><div class="metric-value" id="advancing">—</div></div>
+          <div><div class="metric-label">নেমেছে</div><div class="metric-value" id="declining">—</div></div>
+          <div><div class="metric-label">Advance/Decline Ratio</div><div class="metric-value" id="breadthRatio">—</div></div>
+          <div><div class="metric-label">Coverage</div><div class="metric-value" id="breadthCoverage">—</div></div>
+        </div>
+        <div class="report-line" id="breadthAnalysis">—</div>
+      </div>
+      <div class="card">
+        <h3>ETF ও On-chain Data Availability</h3>
+        <div id="advancedAvailability"></div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:11px">
+      <h3>Binance Spot Volume Leaders — ২৪ ঘণ্টা</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Coin</th><th>Quote Volume</th><th>২৪ ঘণ্টার পরিবর্তন</th><th>লেনদেন</th></tr></thead>
+          <tbody id="volumeLeaders"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ORDER BOOK -->
+  <section class="section">
+    <div class="section-head">
+      <h2>৮. Spot Order Book Analysis</h2>
+      <span class="small">Top 100 Levels</span>
+    </div>
+    <div class="two-col">
+      <div class="card">
+        <h3>BTC/USDT Order Book</h3>
+        <div class="metric-label">Bid Value — ক্রয় অর্ডার</div>
+        <div class="metric-value" id="btcBid">—</div>
+        <div class="metric-label" style="margin-top:9px">Ask Value — বিক্রয় অর্ডার</div>
+        <div class="metric-value" id="btcAsk">—</div>
+        <div class="metric-label" style="margin-top:9px">Order Book Imbalance</div>
+        <div class="metric-value" id="btcImbalance">—</div>
+        <div class="small" id="btcBookStatus">—</div>
+      </div>
+      <div class="card">
+        <h3>ETH/USDT Order Book</h3>
+        <div class="metric-label">Bid Value — ক্রয় অর্ডার</div>
+        <div class="metric-value" id="ethBid">—</div>
+        <div class="metric-label" style="margin-top:9px">Ask Value — বিক্রয় অর্ডার</div>
+        <div class="metric-value" id="ethAsk">—</div>
+        <div class="metric-label" style="margin-top:9px">Order Book Imbalance</div>
+        <div class="metric-value" id="ethImbalance">—</div>
+        <div class="small" id="ethBookStatus">—</div>
+      </div>
+    </div>
+    <div class="notice warning">
+      Order Book-এর এই তথ্য শুধু Top 100 Level-এর অর্ডার দেখায়। এটি পুরো বাজারের Liquidity নয় এবং একা BUY/SELL সিদ্ধান্তের ভিত্তি নয়।
+    </div>
+  </section>
+
+  <!-- TAKER -->
+  <section class="section">
+    <div class="section-head">
+      <h2>৯. Spot Taker Activity</h2>
+      <span class="small">শেষ বন্ধ হওয়া ১৫ মিনিটের Candle</span>
+    </div>
+    <div class="two-col">
+      <div class="card">
+        <h3>BTC/USDT</h3>
+        <div class="metric-label">Taker Buy/Sell Ratio</div>
+        <div class="metric-value" id="btcTakerRatio">—</div>
+        <div class="report-line" id="btcTakerAnalysis">—</div>
+        <div class="small" id="btcTakerTime">—</div>
+      </div>
+      <div class="card">
+        <h3>ETH/USDT</h3>
+        <div class="metric-label">Taker Buy/Sell Ratio</div>
+        <div class="metric-value" id="ethTakerRatio">—</div>
+        <div class="report-line" id="ethTakerAnalysis">—</div>
+        <div class="small" id="ethTakerTime">—</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DERIVATIVES -->
+  <section class="section">
+    <div class="section-head">
+      <h2>১০. Futures Market Sentiment</h2>
+      <span class="small">শুধু বাজারের Sentiment — Spot Signal নয়</span>
+    </div>
+    <div class="two-col">
+      <div class="card">
+        <h3>BTC Futures Context</h3>
+        <div id="btcDerivatives"></div>
+      </div>
+      <div class="card">
+        <h3>ETH Futures Context</h3>
+        <div id="ethDerivatives"></div>
+      </div>
+    </div>
+    <div class="notice warning">
+      Funding Rate, Open Interest ও Long/Short Ratio Futures বাজারের তথ্য। এগুলো Spot BUY/SELL সংকেত নয়। APR-এ Provider-এর মান ও নিজস্ব হিসাবের অমিল থাকলে সতর্কতা দেখানো হবে।
+    </div>
+    <div class="card" style="margin-top:11px">
+      <h3>Liquidation Heatmap</h3>
+      <div id="liquidationStatus">যাচাইকৃত Liquidation Heatmap তথ্য পাওয়া যায়নি।</div>
+    </div>
+  </section>
+
+  <!-- DECISION ENGINE -->
+  <section class="section">
+    <div class="section-head">
+      <h2>১১. Final Decision Engine রিপোর্ট</h2>
+    </div>
+    <div class="two-col">
+      <div class="card">
+        <h3>Macro Analysis</h3>
+        <div id="decisionMacro"></div>
+      </div>
+      <div class="card">
+        <h3>Crypto Market Analysis</h3>
+        <div id="decisionCrypto"></div>
+      </div>
+    </div>
+    <div class="card" style="margin-top:11px">
+      <h3>Final Decision ও করণীয়</h3>
+      <div id="decisionFinal"></div>
+    </div>
+  </section>
+
+  <!-- DATA QUALITY -->
+  <section class="section">
+    <div class="section-head">
+      <h2>১২. Data Quality ও তথ্যের সীমাবদ্ধতা</h2>
+    </div>
+    <div class="grid">
+      <div class="card"><div class="metric-label">Market Data</div><div class="metric-value" id="qualityMarket">—</div></div>
+      <div class="card"><div class="metric-label">Macro Data</div><div class="metric-value" id="qualityMacro">—</div></div>
+      <div class="card"><div class="metric-label">Advanced Data</div><div class="metric-value" id="qualityAdvanced">—</div></div>
+      <div class="card"><div class="metric-label">Decision Data</div><div class="metric-value" id="qualityDecision">—</div></div>
+      <div class="card"><div class="metric-label">Market Zone Data</div><div class="metric-value" id="qualityZone">—</div></div>
+    </div>
+    <div class="two-col" style="margin-top:11px">
+      <div class="card">
+        <h3>সতর্কতা ও অনুপস্থিত তথ্য</h3>
+        <div id="missingData"></div>
+      </div>
+      <div class="card">
+        <h3>Data Limitations</h3>
+        <div id="limitations"></div>
+      </div>
+    </div>
+  </section>
 
 </main>
 
-<footer>
-সব তথ্য সংশ্লিষ্ট Source-এর Update Time অনুযায়ী দেখানো হয়।
-<br>পুরোনো, অনুপলব্ধ বা যাচাইহীন তথ্যকে Live হিসেবে দেখানো হয় না।
-<br>Dashboard Refresh এবং Source Update এক বিষয় নয়।
-<br>এটি Spot Market পর্যবেক্ষণের Dashboard; Futures/Margin সংকেত নয়।
+<footer class="footer">
+  Crypto Macro Dashboard • Spot Market Intelligence • স্বয়ংক্রিয় Refresh: ৫ মিনিট
+  <br>ডেটার উৎস ও সময় অনুযায়ী তথ্যের নির্ভরযোগ্যতা পরিবর্তিত হতে পারে।
 </footer>
 
 <script>
 "use strict";
 
-/* ================= CONFIG ================= */
+/* =========================================================
+   1. DATA SOURCES
+========================================================= */
 
-const FILES={
-market:"market_data.json",
-macro:"macro_data.json",
-advanced:"advanced_data.json",
-decision:"decision_data.json",
-zone:"market_zone_data.json"
+const FILES = {
+  market: "./data/market_data.json",
+  macro: "./data/macro_data.json",
+  advanced: "./data/advanced_data.json",
+  decision: "./data/decision_data.json",
+  zone: "./data/market_zone_data.json"
 };
 
-const MAX_AGE={
-market:36,macro:72,advanced:36,decision:36,zone:36
+let DATA = {
+  market:null,
+  macro:null,
+  advanced:null,
+  decision:null,
+  zone:null
 };
 
-let D={};
-let loading=false;
-const $=id=>document.getElementById(id);
+const $ = id => document.getElementById(id);
 
-/* ================= SAFE HELPERS ================= */
-
-function object(x){
-return x!==null && typeof x==="object" && !Array.isArray(x);
+function setText(id,value){
+  const el=$(id);
+  if(el) el.textContent = value===undefined || value===null || value==="" ? "তথ্য পাওয়া যায়নি" : String(value);
 }
 
-function arr(x){return Array.isArray(x)?x:[];}
-
-function get(obj,path,fallback=null){
-if(!object(obj))return fallback;
-let v=obj;
-for(const p of path.split(".")){
-if(v===null || v===undefined || (!object(v)&&!Array.isArray(v)))return fallback;
-v=v[p];
-if(v===null || v===undefined)return fallback;
-}
-return v;
+function number(value){
+  if(value && typeof value==="object"){
+    if("value" in value) return number(value.value);
+    return null;
+  }
+  if(value===null || value===undefined || value==="") return null;
+  const n=Number(value);
+  return Number.isFinite(n)?n:null;
 }
 
-function first(...values){
-for(const v of values){
-if(v!==null && v!==undefined && v!=="")return v;
-}
-return null;
-}
-
-function num(x){
-if(object(x)){
-if(x.status && x.status!=="OK")return null;
-x=x.value;
-}
-if(x===null || x===undefined || x==="")return null;
-const n=Number(x);
-return Number.isFinite(n)?n:null;
+function metric(obj){
+  if(obj===null || obj===undefined) return null;
+  if(typeof obj==="object" && "value" in obj) return number(obj.value);
+  return number(obj);
 }
 
-function fmt(x,d=2){
-const n=num(x);
-return n===null?"তথ্য নেই":n.toLocaleString("en-US",{maximumFractionDigits:d});
+function path(obj,path,fallback=null){
+  try{
+    const result=path.split(".").reduce((v,k)=>v==null?undefined:v[k],obj);
+    return result===undefined?fallback:result;
+  }catch(e){return fallback;}
 }
 
-function money(x){
-const n=num(x);
-if(n===null)return "তথ্য নেই";
-const a=Math.abs(n);
-if(a>=1e12)return "$"+fmt(n/1e12)+"T";
-if(a>=1e9)return "$"+fmt(n/1e9)+"B";
-if(a>=1e6)return "$"+fmt(n/1e6)+"M";
-if(a>=1e3)return "$"+fmt(n/1e3)+"K";
-return "$"+fmt(n);
+function firstValue(...values){
+  for(const v of values){
+    const n=metric(v);
+    if(n!==null) return n;
+  }
+  return null;
 }
 
-function dateText(x){
-if(!x)return "সময় পাওয়া যায়নি";
-const d=new Date(x);
-if(!Number.isFinite(d.getTime()))return String(x);
-return d.toLocaleString("bn-BD",{
-dateStyle:"medium",timeStyle:"short",timeZone:"UTC"
-})+" UTC";
+function fmt(value,digits=2){
+  const n=number(value);
+  if(n===null) return "তথ্য পাওয়া যায়নি";
+  return n.toLocaleString("en-US",{maximumFractionDigits:digits});
 }
 
-function ageHours(x){
-if(!x)return null;
-const d=new Date(x);
-if(!Number.isFinite(d.getTime()))return null;
-const h=(Date.now()-d.getTime())/3600000;
-if(h < -0.0833)return null;
-return Math.max(0,h);
+function usd(value){
+  const n=number(value);
+  if(n===null) return "তথ্য পাওয়া যায়নি";
+  if(Math.abs(n)>=1e12) return "$"+(n/1e12).toFixed(2)+" ট্রিলিয়ন";
+  if(Math.abs(n)>=1e9) return "$"+(n/1e9).toFixed(2)+" বিলিয়ন";
+  if(Math.abs(n)>=1e6) return "$"+(n/1e6).toFixed(2)+" মিলিয়ন";
+  return "$"+n.toLocaleString("en-US",{maximumFractionDigits:2});
 }
 
-function freshness(x,max=36){
-const h=ageHours(x);
-if(h===null)return "UNKNOWN";
-return h>max?"STALE":"FRESH";
+function percent(value,digits=2){
+  const n=number(value);
+  return n===null?"তথ্য পাওয়া যায়নি":n.toFixed(digits)+"%";
 }
 
-function statusText(x){
-const map={
-OK:"যাচাইকৃত",FRESH:"সাম্প্রতিক",STALE:"পুরোনো",
-UNKNOWN:"সময় যাচাই হয়নি",UNAVAILABLE:"অনুপলব্ধ",
-INVALID_DATA:"ভুল তথ্য",PARTIAL:"আংশিক তথ্য",
-POOR:"তথ্যের মান দুর্বল",
-GOOD_WITH_OPTIONAL_GAPS:"ঐচ্ছিক কিছু তথ্য অনুপস্থিত",
-INSUFFICIENT_HISTORY:"পর্যাপ্ত ইতিহাস নেই",
-MISMATCH:"তথ্যের মধ্যে অমিল"
-};
-return map[x]||x||"তথ্য নেই";
+function dateText(value){
+  if(!value) return "সময় পাওয়া যায়নি";
+  const d=new Date(value);
+  if(Number.isNaN(d.getTime())) return String(value);
+  return d.toLocaleString("bn-BD",{dateStyle:"medium",timeStyle:"short"});
 }
 
-function bn(x){
-const map={
-BULLISH:"বুলিশ",BEARISH:"বেয়ারিশ",SIDEWAYS:"সাইডওয়েজ",
-TRANSITION:"পরিবর্তনশীল",WAIT:"অপেক্ষা করুন",
-HOLD:"ধরে রাখুন",BUY:"কেনার সংকেত",DCA:"ধাপে ধাপে কেনা",
-SELL:"বিক্রি",REDUCE_RISK:"ঝুঁকি কমান",
-"REDUCE RISK":"ঝুঁকি কমান",HIGH:"উচ্চ",MEDIUM:"মাঝারি",
-LOW:"নিম্ন",UNKNOWN:"অজানা",EARLY:"শুরুর পর্যায়",
-MID:"মধ্য পর্যায়",LATE:"শেষ পর্যায়",
-ACCUMULATION:"Accumulation",DISTRIBUTION:"Distribution",
-MARKUP:"Markup",MARKDOWN:"Markdown",
-EXPANDING:"তারল্য বাড়ছে",CONTRACTING:"তারল্য কমছে",
-STABLE:"স্থিতিশীল"
-};
-return map[x]||x||"তথ্য নেই";
+function statusBn(status){
+  const s=String(status||"").toUpperCase();
+  const map={
+    OK:"সঠিক",
+    FRESH:"সাম্প্রতিক",
+    STALE:"পুরোনো তথ্য",
+    UNAVAILABLE:"তথ্য পাওয়া যায়নি",
+    ERROR:"ত্রুটি",
+    PARTIAL:"আংশিক তথ্য",
+    GOOD:"ভালো",
+    GOOD_WITH_OPTIONAL_GAPS:"কিছু ঐচ্ছিক তথ্য অনুপস্থিত",
+    POOR:"দুর্বল",
+    UNKNOWN:"অজানা",
+    MISSING:"অনুপস্থিত",
+    VALID:"যাচাইকৃত",
+    INVALID:"অকার্যকর",
+    MISMATCH:"তথ্যে অমিল",
+    HIGH:"উচ্চ",
+    LOW:"নিম্ন",
+    MEDIUM:"মাঝারি"
+  };
+  return map[s]||status||"অজানা";
 }
 
-function tone(x){
-if(/BULL|BUY|EXPAND|MARKUP|ACCUMULATION|HOLD|FRESH|OK/i.test(String(x)))return "green";
-if(/BEAR|REDUCE|SELL|CONTRACT|DISTRIBUTION|MARKDOWN|STALE|MISMATCH/i.test(String(x)))return "red";
-return "yellow";
+function badgeClass(status){
+  const s=String(status||"").toUpperCase();
+  if(["OK","FRESH","GOOD","VALID"].includes(s)) return "good";
+  if(["STALE","PARTIAL","MEDIUM","GOOD_WITH_OPTIONAL_GAPS"].includes(s)) return "warn";
+  if(["ERROR","UNAVAILABLE","INVALID","POOR","HIGH","MISSING"].includes(s)) return "bad";
+  return "info";
 }
 
-function listText(x){
-if(Array.isArray(x))return x.map(v=>String(v)).join(" • ");
-if(typeof x==="string")return x;
-return "";
+function setStatus(id,status){
+  const el=$(id);
+  if(!el)return;
+  el.textContent=statusBn(status);
+  el.className="status "+badgeClass(status);
 }
 
-function metricTime(x){
-if(!object(x))return "";
-return [
-x.source||"",
-x.observation_date||x.observed_at||x.source_updated_at||"",
-x.fetched_at?"সংগ্রহ: "+dateText(x.fetched_at):""
-].filter(Boolean).join(" • ");
+function addNotice(parent,text,type="info"){
+  if(!parent || text===undefined || text===null || text==="") return;
+  const div=document.createElement("div");
+  div.className="notice "+type;
+  div.textContent=String(text);
+  parent.appendChild(div);
 }
 
-/* ================= CARD RENDER ================= */
-
-function card(id,title,value,detail="",note="",color=""){
-const p=$(id);
-if(!p)return;
-const c=document.createElement("div");
-c.className="card";
-const a=document.createElement("div");
-a.className="name";a.textContent=title;
-const b=document.createElement("div");
-b.className="value "+color;b.textContent=value??"তথ্য নেই";
-const d=document.createElement("div");
-d.className="detail";d.textContent=detail||"";
-c.append(a,b,d);
-if(note){
-const e=document.createElement("div");
-e.className="note";e.textContent=note;c.append(e);
-}
-p.append(c);
+function clear(id){
+  const el=$(id);
+  if(el)el.innerHTML="";
 }
 
-function metricCard(id,title,x,kind="number"){
-if(!object(x))return;
-const v=num(x);
-if(v===null){
-if(x.status==="UNAVAILABLE" || x.status==="INSUFFICIENT_HISTORY")return;
-return;
-}
-let out;
-if(kind==="money" || x.unit==="USD" || x.unit==="USDT")out=money(v);
-else if(x.unit==="billions USD")out="$"+fmt(v)+"B";
-else if(x.unit==="millions USD")out="$"+fmt(v)+"M";
-else if(x.unit==="%")out=fmt(v)+"%";
-else if(x.unit==="ratio" || x.unit==="x")out=fmt(v)+"x";
-else out=fmt(v)+(x.unit&&x.unit!=="index"?" "+x.unit:"");
-card(id,title,out,metricTime(x),"Source Status: "+statusText(x.status));
+function addLine(parent,label,value){
+  if(!parent)return;
+  const div=document.createElement("div");
+  div.className="report-line";
+  const strong=document.createElement("strong");
+  strong.textContent=label+" ";
+  const span=document.createElement("span");
+  span.textContent=value===null||value===undefined||value===""?"তথ্য পাওয়া যায়নি":String(value);
+  div.append(strong,span);
+  parent.appendChild(div);
 }
 
-function clear(){
-[
-"phase","zone","overview","technical","macro","liquidity",
-"onchain","spot","orderbook","derivatives","reports"
-].forEach(id=>$(id).replaceChildren());
+function addList(parent,items){
+  if(!parent || !Array.isArray(items) || !items.length)return;
+  const ul=document.createElement("ul");
+  ul.className="list";
+  items.forEach(item=>{
+    const li=document.createElement("li");
+    li.textContent=typeof item==="string"?item:JSON.stringify(item);
+    ul.appendChild(li);
+  });
+  parent.appendChild(ul);
 }
 
-/* ================= PHASE ================= */
+function renderReport(parentId,report){
+  const parent=$(parentId);
+  if(!parent)return;
+  clear(parentId);
+  if(!report || typeof report!=="object"){
+    parent.textContent="এই রিপোর্টের তথ্য পাওয়া যায়নি।";
+    return;
+  }
 
-function phaseAnalysis(){
-const d=get(D,"decision.final_decision",{});
-const m=get(D,"decision.macro_analysis",{});
-const c=get(D,"decision.crypto_market",{});
-const btc=c.btc||{};
-const eth=c.eth||{};
-const macroOverall=get(D,"macro.overall_macro_decision",{});
-const macroLabel=first(m.decision,m.overall_decision,macroOverall.DECISION);
-const btcTrend=btc.trend||"UNKNOWN";
+  const labels={
+    DATA:"তথ্য",
+    ANALYSIS:"বিশ্লেষণ",
+    DECISION:"সিদ্ধান্ত",
+    ACTION:"করণীয়",
+    RISK:"ঝুঁকি"
+  };
 
-let phase="তথ্য অপর্যাপ্ত";
-let reason="BTC ও Macro-এর যাচাইকৃত তথ্য সম্পূর্ণ নয়।";
-let col="yellow";
+  Object.keys(labels).forEach(key=>{
+    if(report[key]===undefined || report[key]===null)return;
+    const block=document.createElement("div");
+    block.className="report-block";
+    const title=document.createElement("b");
+    title.textContent=labels[key];
+    block.appendChild(title);
 
-if(btcTrend==="BEARISH" && /REDUCE|WAIT/i.test(String(macroLabel))){
-phase="BEARISH / HIGH RISK";
-reason="BTC Trend দুর্বল এবং Macro Risk সতর্ক করছে।";
-col="red";
-}else if(btcTrend==="BULLISH" && !/WAIT|REDUCE|INSUFFICIENT/i.test(String(macroLabel))){
-phase="BULLISH";
-reason="BTC Trend বুলিশ; Macro-তে সরাসরি বাধা শনাক্ত হয়নি।";
-col="green";
-}else if(btcTrend!=="UNKNOWN"){
-phase="MIXED / TRANSITION";
-reason="BTC ও Macro সংকেত একই দিকে নেই অথবা নিশ্চিত নয়।";
+    const content=document.createElement("div");
+    content.className="report-line";
+    const value=report[key];
+    if(typeof value==="object"){
+      content.textContent=JSON.stringify(value,null,2);
+      content.style.whiteSpace="pre-wrap";
+      content.style.overflowWrap="anywhere";
+    }else{
+      content.textContent=String(value);
+    }
+    block.appendChild(content);
+    parent.appendChild(block);
+  });
 }
 
-card("phase","বর্তমান Market Phase",phase,reason,
-"এটি Rule-based অবস্থা; ভবিষ্যৎ নিশ্চিত করে না।",col);
-
-card("phase","BTC Daily Trend",bn(btcTrend),
-"শেষ Candle: "+dateText(btc.last_closed_candle_at),
-listText(btc.signals),tone(btcTrend));
-
-card("phase","ETH Daily Trend",bn(eth.trend),
-"শেষ Candle: "+dateText(eth.last_closed_candle_at),
-listText(eth.signals),tone(eth.trend));
-
-card("phase","Macro Decision",bn(macroLabel),
-"Macro Engine-এর সামগ্রিক সিদ্ধান্ত",
-listText(get(D,"macro.overall_macro_decision.RISK",[])),tone(macroLabel));
-
-card("phase","Spot Market Decision",bn(d.decision),
-d.confidence_label||"Rule-based decision",
-listText(d.actions),tone(d.decision));
+function renderMetricTable(parentId,rows){
+  const tbody=$(parentId);
+  if(!tbody)return;
+  tbody.innerHTML="";
+  if(!Array.isArray(rows)||!rows.length){
+    tbody.innerHTML='<tr><td colspan="4">তথ্য পাওয়া যায়নি</td></tr>';
+    return;
+  }
+  rows.forEach(row=>{
+    const tr=document.createElement("tr");
+    [row.name,row.value,row.date,statusBn(row.status)].forEach(v=>{
+      const td=document.createElement("td");
+      td.textContent=v??"তথ্য পাওয়া যায়নি";
+      tr.appendChild(td);
+    });
+    tbody.appendChild(tr);
+  });
 }
 
-/* ================= MARKET ZONE ================= */
+function metricTimestamp(obj){
+  if(!obj || typeof obj!=="object")return null;
+  return obj.source_updated_at||obj.observation_date||obj.fetched_at||obj.timestamp||null;
+}
+
+function metricStatus(obj){
+  if(!obj || typeof obj!=="object")return "UNAVAILABLE";
+  return obj.status||"UNKNOWN";
+}
+
+function metricAge(obj){
+  const timestamp=metricTimestamp(obj);
+  if(!timestamp)return null;
+  const d=new Date(timestamp);
+  if(Number.isNaN(d.getTime()))return null;
+  return Math.max(0,(Date.now()-d.getTime())/3600000);
+}
+
+function metricFreshness(obj,maxHours=36){
+  const age=metricAge(obj);
+  if(age===null)return "সময় যাচাই করা যায়নি";
+  if(age>maxHours)return "পুরোনো তথ্য ("+age.toFixed(1)+" ঘণ্টা)";
+  return "তথ্যের বয়স "+age.toFixed(1)+" ঘণ্টা";
+}
+
+/* =========================================================
+   2. FETCH JSON
+========================================================= */
+
+async function fetchJSON(url){
+  const response=await fetch(url+"?t="+Date.now(),{cache:"no-store"});
+  if(!response.ok)throw new Error("HTTP "+response.status+" — "+url);
+  return await response.json();
+}
+
+async function loadAll(manual=false){
+  const status=$("connectionStatus");
+  if(status){
+    status.textContent="তথ্য সংগ্রহ করা হচ্ছে...";
+    status.className="status warn";
+  }
+
+  const results=await Promise.allSettled([
+    fetchJSON(FILES.market),
+    fetchJSON(FILES.macro),
+    fetchJSON(FILES.advanced),
+    fetchJSON(FILES.decision),
+    fetchJSON(FILES.zone)
+  ]);
+
+  const keys=["market","macro","advanced","decision","zone"];
+  const errors=[];
+
+  results.forEach((result,index)=>{
+    const key=keys[index];
+    if(result.status==="fulfilled"){
+      DATA[key]=result.value;
+    }else{
+      errors.push(key+": "+result.reason.message);
+    }
+  });
+
+  if(errors.length){
+    $("errorBox").style.display="block";
+    $("errorBox").textContent="কিছু JSON ফাইল লোড করা যায়নি: "+errors.join(" | ");
+  }else{
+    $("errorBox").style.display="none";
+  }
+
+  renderAll();
+
+  const available=keys.filter(k=>DATA[k]!==null).length;
+  if(status){
+    status.textContent=available+"/৫টি JSON ফাইল সংযুক্ত";
+    status.className="status "+(available===5?"good":"warn");
+  }
+
+  const times=keys.map(k=>{
+    const d=DATA[k];
+    return d?.generated_at||d?.fetched_at||null;
+  }).filter(Boolean).map(v=>new Date(v).getTime()).filter(Number.isFinite);
+
+  setText("lastUpdate","Dashboard লোড: "+new Date().toLocaleString("bn-BD")+
+    (times.length?" • সর্বশেষ Snapshot: "+dateText(new Date(Math.max(...times)).toISOString()):""));
+
+  if(manual)window.scrollTo({top:0,behavior:"smooth"});
+}
+
+/* =========================================================
+   3. MARKET ZONE — ROOT LEVEL JSON
+========================================================= */
 
 function renderZone(){
-const z=get(D,"zone.market_zone",{});
-const i=z.verified_inputs||{};
-const reasons=arr(z.reasons);
-const missing=arr(z.missing_data);
+  // গুরুত্বপূর্ণ: market_zone_data.json-এর তথ্য Root-level-এ।
+  // এখানে D.zone.market_zone ব্যবহার করা যাবে না।
+  const z=DATA.zone||{};
 
-card("zone","বর্তমান Market Zone",bn(z.current_zone),
-"Zone Code: "+(z.zone_code||"—"),
-listText(reasons),tone(z.zone_code));
+  setText("mzZone",z.current_zone);
+  setText("mzPosition",z.market_position);
+  setText("mzTrend",z.btc_trend_bn||z.btc_trend);
+  setText("mzAction",z.spot_action);
+  setText("mzActionCode",z.spot_action_code);
+  setText("mzQuality",statusBn(z.data_quality));
+  setText("mzConfidence",z.confidence===undefined?"কভারেজ পাওয়া যায়নি":"তথ্যের কভারেজ "+fmt(z.confidence,0)+"%");
+  setText("mzReason",z.reason);
+  setText("mzInstruction",z.action_instruction);
+  setText("mzNextZone",z.next_zone);
+  setText("bullScore",z.bullish_score);
+  setText("bearScore",z.bearish_score);
 
-card("zone","Market Position",bn(z.market_position),
-"Market-এর বর্তমান অবস্থান","Rule-based classification.");
+  const bar=$("confidenceBar");
+  if(bar){
+    const c=Math.max(0,Math.min(100,number(z.confidence)||0));
+    bar.style.width=c+"%";
+  }
 
-card("zone","Zone Confidence",
-num(z.confidence)===null?"তথ্য নেই":fmt(z.confidence,0)+"%",
-z.confidence_label||"—","এটি calibrated probability নয়।");
+  const reasonBox=$("mzReasons");
+  clear("mzReasons");
+  addList(reasonBox,z.reasons||[]);
 
-card("zone","পরবর্তী সম্ভাব্য Zone",bn(z.next_zone),
-"Conditional Outlook","নিশ্চিত ভবিষ্যদ্বাণী নয়।");
+  const verified=$("verifiedInputs");
+  clear("verifiedInputs");
 
-card("zone","Zone Spot Action",bn(z.spot_action),
-"Risk: "+bn(z.risk_level),listText(reasons),tone(z.spot_action));
+  const input=z.verified_inputs||{};
+  const inputNames={
+    market:"Market Data",
+    macro:"Macro Data",
+    advanced:"Advanced Data",
+    decision:"Decision Data"
+  };
 
-if(num(i.support_20d)!==null)
-card("zone","BTC 20D Support",money(i.support_20d),"পর্যবেক্ষিত Support");
+  Object.keys(inputNames).forEach(key=>{
+    const item=input[key];
+    if(!item)return;
+    const line=document.createElement("div");
+    line.className="report-line";
+    const age=item.age_hours===undefined?"":(" • বয়স "+fmt(item.age_hours,2)+" ঘণ্টা");
+    line.textContent=inputNames[key]+": "+statusBn(item.status)+age+
+      (item.reason?" • "+item.reason:"");
+    verified.appendChild(line);
+  });
 
-if(num(i.resistance_20d)!==null)
-card("zone","BTC 20D Resistance",money(i.resistance_20d),"পর্যবেক্ষিত Resistance");
+  const btcCheck=input.btc_technical;
+  if(btcCheck){
+    addLine(verified,"BTC Technical:",btcCheck.valid?"যাচাইকৃত":"যাচাই অসম্পূর্ণ");
+    if(btcCheck.missing?.length)addList(verified,btcCheck.missing.map(x=>"অনুপস্থিত: "+x));
+    if(btcCheck.invalid?.length)addList(verified,btcCheck.invalid.map(x=>"অকার্যকর: "+x));
+    if(btcCheck.stale?.length)addList(verified,btcCheck.stale.map(x=>"পুরোনো: "+x));
+  }
 
-if(missing.length)
-card("zone","অনুপস্থিত প্রয়োজনীয় তথ্য",missing.length+"টি",listText(missing));
+  const policy=input.policy_checks;
+  if(policy){
+    const translations={
+      market_quality_ok:"Market Data মান",
+      macro_quality_ok:"Macro Data মান",
+      advanced_quality_ok:"Advanced Data মান",
+      decision_quality_ok:"Decision Data মান",
+      macro_decision_restrictive:"Macro সিদ্ধান্তে সীমাবদ্ধতা",
+      final_decision_restrictive:"Final Decision-এ সীমাবদ্ধতা"
+    };
+    Object.keys(translations).forEach(k=>{
+      addLine(verified,translations[k]+":",policy[k]?"হ্যাঁ":"না");
+    });
+  }
+
+  // Zone root-level সিদ্ধান্ত
+  setText("zoneName",z.current_zone);
+  setText("zoneCode",z.zone_code);
+  setText("overallRisk",z.risk_level);
+  setText("riskCode",z.risk_code);
+  setText("confidence",z.confidence===undefined?"—":fmt(z.confidence,0)+"%");
+  setText("overallReason",z.reason);
+  setText("overallInstruction",z.action_instruction);
+
+  const decision=z.spot_action||z.final_engine_decision||"WAIT";
+  setText("overallDecision",decision);
+  setText("overallAction",z.action_instruction);
 }
 
-/* ================= GLOBAL MARKET ================= */
+/* =========================================================
+   4. GLOBAL MARKET & BTC/ETH TECHNICAL
+========================================================= */
 
-function overview(){
-const g=get(D,"market.global_market",{});
-const a=get(D,"market.major_assets",{});
-const fg=get(D,"market.fear_greed",{});
+function renderGlobal(){
+  const m=DATA.market||{};
+  const g=m.global_market||{};
+  const fg=m.fear_greed||{};
 
-metricCard("overview","Total Crypto Market Cap",g.total_market_cap_usd,"money");
-metricCard("overview","২৪ ঘণ্টার Market Volume",g.total_volume_24h_usd,"money");
-metricCard("overview","BTC Dominance",g.btc_dominance_pct);
-metricCard("overview","ETH Dominance",g.eth_dominance_pct);
+  setText("globalCap",usd(metric(g.total_market_cap_usd)));
+  setText("globalVolume",usd(metric(g.total_volume_24h_usd)));
+  setText("globalBtcDom",percent(metric(g.btc_dominance_pct)));
+  setText("globalEthDom",percent(metric(g.eth_dominance_pct)));
 
-metricCard("overview","BTC Reference Price",get(a,"bitcoin.price_usd"),"money");
-metricCard("overview","ETH Reference Price",get(a,"ethereum.price_usd"),"money");
-metricCard("overview","BTC ২৪ ঘণ্টার পরিবর্তন",get(a,"bitcoin.change_24h_pct"));
-metricCard("overview","ETH ২৪ ঘণ্টার পরিবর্তন",get(a,"ethereum.change_24h_pct"));
+  const fgValue=metric(fg);
+  setText("globalFG",fgValue===null?"তথ্য পাওয়া যায়নি":fmt(fgValue,0)+"/100");
+  setText("globalFGText",fg.classification||fg.label||fearGreedText(fgValue));
 
-if(object(fg) && num(fg.value)!==null){
-card("overview","Fear & Greed",fmt(fg.value,0)+"/100",
-bn(fg.classification),
-(fg.source||"Source")+" • "+dateText(fg.source_updated_at),
-num(fg.value)<=25?"yellow":num(fg.value)>=75?"red":"");
-}
-}
-
-/* ================= BTC / ETH TECHNICAL ================= */
-
-function technical(){
-const t=get(D,"market.technical",{});
-const fallback=get(D,"decision.crypto_market",{});
-
-for(const s of ["BTC","ETH"]){
-const a=t[s]||{};
-const i=a.indicators||{};
-const f=fallback[s.toLowerCase()]||{};
-
-const price=num(first(a.price_usdt,f.price));
-const ma20=num(i.ma20),ma50=num(i.ma50),ma200=num(i.ma200);
-const rsi=num(i.rsi14),macd=num(i.macd),sig=num(i.macd_signal);
-const adx=num(i.adx14);
-const support=num(i.support_20d),resistance=num(i.resistance_20d);
-const volume=num(i.volume_ratio_20d);
-
-card("technical",s+" Daily Close",money(price),
-"Binance Spot • "+dateText(a.last_closed_candle_at));
-
-card("technical",s+" MA20 / MA50 / MA200",
-[ma20,ma50,ma200].map(x=>x===null?"—":money(x)).join(" / "),
-"Daily Simple Moving Average",
-ma20!==null&&ma50!==null?
-(ma20<ma50?"MA20 < MA50: স্বল্পমেয়াদি Trend দুর্বল।":"MA20 ≥ MA50: স্বল্পমেয়াদি Trend তুলনামূলক শক্তিশালী।"):
-"MA তথ্য অসম্পূর্ণ।",
-ma20!==null&&ma50!==null&&ma20<ma50?"red":"");
-
-card("technical",s+" RSI 14",fmt(rsi),
-rsi===null?"RSI তথ্য নেই":rsi>70?"Overbought":rsi<30?"Oversold":"মধ্যবর্তী",
-rsi!==null&&rsi>70?"RSI 70-এর ওপরে: নতুন Entry-তে সতর্কতা।":
-rsi!==null&&rsi<30?"Oversold মানেই Bottom নিশ্চিত নয়।":"",
-rsi!==null&&rsi>70?"red":rsi!==null&&rsi<30?"yellow":"");
-
-card("technical",s+" MACD",fmt(macd),
-"Signal: "+fmt(sig),
-macd!==null&&sig!==null?
-(macd<sig?"MACD Signal-এর নিচে: Bearish।":"MACD Signal-এর ওপরে: Bullish।"):
-"MACD তথ্য অসম্পূর্ণ।",
-macd!==null&&sig!==null&&macd<sig?"red":"");
-
-if(adx!==null)
-card("technical",s+" ADX 14",fmt(adx),"Trend Strength");
-
-card("technical",s+" Support / Resistance",
-(support===null?"—":money(support))+" / "+
-(resistance===null?"—":money(resistance)),
-"আগের ২০ দিনের পর্যবেক্ষিত Low / High",
-"দৈনিক Candle Close দিয়ে Break নিশ্চিত করতে হবে।");
-
-if(volume!==null)
-card("technical",s+" Volume Strength",fmt(volume)+"x",
-"শেষ সম্পূর্ণ দিনের Volume বনাম ২০ দিনের গড়",
-volume>1?"গড়ের চেয়ে বেশি Volume।":"গড়ের সমান বা কম Volume।");
-}
+  // Market Zone-এর যাচাইকৃত dominance-ও fallback হিসেবে ব্যবহার
+  if(metric(g.btc_dominance_pct)===null){
+    setText("globalBtcDom",percent(DATA.zone?.btc_dominance));
+  }
+  if(fgValue===null){
+    const zfg=number(DATA.zone?.fear_greed);
+    if(zfg!==null){
+      setText("globalFG",fmt(zfg,0)+"/100");
+      setText("globalFGText",fearGreedText(zfg));
+    }
+  }
 }
 
-/* ================= MACRO ================= */
-
-function macro(){
-const m=get(D,"macro.metrics",{});
-const labels=[
-["cpi","CPI Index"],["core_cpi","Core CPI Index"],
-["pce","PCE Index"],["core_pce","Core PCE Index"],
-["fed_funds_rate","Fed Funds Rate"],
-["usd_broad_index","US Dollar Broad Index"],
-["vix","VIX"],["yield_2y","US 2Y Yield"],
-["yield_10y","US 10Y Yield"],["yield_30y","US 30Y Yield"],
-["sp500","S&P 500"],["nasdaq","NASDAQ"],
-["unemployment","Unemployment"],
-["nonfarm_payrolls","Nonfarm Payrolls"],
-["oil","WTI Oil"],["usd_jpy","USD / JPY"],
-["m2_money_supply","M2 Money Supply"]
-];
-
-labels.forEach(([key,label])=>metricCard("macro",label,m[key]));
-
-const inf=get(D,"macro.inflation",{});
-for(const key of ["cpi","core_cpi","pce","core_pce"]){
-const x=inf[key];
-if(!object(x))continue;
-const yoy=num(x.yoy_percent);
-const mom=num(x.mom_percent);
-const three=num(x.three_month_percent);
-if(yoy===null && mom===null && three===null)continue;
-card("macro",key.toUpperCase()+" Inflation",
-yoy===null?"YoY তথ্য নেই":fmt(yoy)+"%",
-"MoM: "+fmt(mom)+"% • 3M: "+fmt(three)+"%",
-"Calculation: "+(x.calculation_method||"Engine output"));
+function fearGreedText(v){
+  if(v===null)return "তথ্য পাওয়া যায়নি";
+  if(v<=20)return "চরম ভয়";
+  if(v<=40)return "ভয়";
+  if(v<=60)return "নিরপেক্ষ";
+  if(v<=80)return "লোভ";
+  return "চরম লোভ";
 }
 
-const spread=get(D,"macro.yield_curve",{});
-if(object(spread))
-card("macro","10Y–2Y Yield Spread",
-fmt(spread.spread)+" "+(spread.unit||""),
-"Trend: "+bn(spread.trend),
-"Observation: "+dateText(spread.observation_date),
-tone(spread.trend));
+function getAsset(symbol){
+  const t=DATA.market?.technical||{};
+  return t[symbol]||t[symbol.toLowerCase()]||{};
 }
 
-/* ================= MACRO DECISION ================= */
+function renderAsset(symbol,prefix){
+  const asset=getAsset(symbol);
+  const indicators=asset.indicators||{};
+  const price=metric(asset.price_usdt);
 
-function macroDecision(){
-const x=get(D,"macro.overall_macro_decision",{});
-const data=x.DATA||{};
-const missing=arr(data.missing_metrics);
-const risks=arr(data.risk_flags);
-const supports=arr(data.supportive_flags);
+  const values={
+    Price:price,
+    MA20:metric(indicators.ma20),
+    MA50:metric(indicators.ma50),
+    MA200:metric(indicators.ma200),
+    RSI:metric(indicators.rsi14),
+    MACD:metric(indicators.macd),
+    Signal:metric(indicators.macd_signal),
+    VolumeRatio:metric(indicators.volume_ratio_20d),
+    Support:metric(indicators.support_20d),
+    Resistance:metric(indicators.resistance_20d)
+  };
 
-const lines=[
-"DATA:",
-"সামগ্রিক Macro Decision: "+(x.DECISION||"তথ্য নেই"),
-"Data Quality: "+statusText(get(D,"macro.summary.data_quality")),
-"Available Series: "+fmt(get(D,"macro.summary.ok"),0)+"/"+fmt(get(D,"macro.summary.total_series"),0),
-"Missing Required Metrics: "+(missing.join(", ")||"কোনোটি তালিকাভুক্ত নেই"),
-"",
-"ANALYSIS:",
-x.ANALYSIS||"বিশ্লেষণ পাওয়া যায়নি।",
-"",
-"DECISION:",
-x.DECISION||"সিদ্ধান্ত পাওয়া যায়নি।",
-"",
-"ACTION:",
-x.ACTION||"নির্দিষ্ট Action পাওয়া যায়নি।",
-"",
-"RISK:",
-x.RISK||"ঝুঁকির বিবরণ পাওয়া যায়নি।",
-"",
-"Risk Flags: "+(risks.join(", ")||"—"),
-"Supportive Flags: "+(supports.join(", ")||"—")
-];
-$("macroDecision").textContent=lines.join("\n");
+  if(prefix==="btc"){
+    setText("btcPrice",price===null?"তথ্য পাওয়া যায়নি":usd(price));
+    setText("btcPriceTime",metricTimestamp(asset.price_usdt)?"তথ্যের সময়: "+dateText(metricTimestamp(asset.price_usdt)):"সময় পাওয়া যায়নি");
+    setText("btcMA20",usd(values.MA20));
+    setText("btcMA50",usd(values.MA50));
+    setText("btcMA200",usd(values.MA200));
+    setText("btcRSI",fmt(values.RSI));
+    setText("btcRSIText",rsiText(values.RSI));
+    setText("btcMACD",fmt(values.MACD));
+    setText("btcSignal",fmt(values.Signal));
+    setText("btcMACDText",values.MACD===null||values.Signal===null?"তথ্য অসম্পূর্ণ":values.MACD<values.Signal?"MACD Signal-এর নিচে":"MACD Signal-এর ওপরে");
+    setText("btcVolRatio",values.VolumeRatio===null?"তথ্য পাওয়া যায়নি":fmt(values.VolumeRatio,2)+"x");
+    setText("btcSupport",usd(values.Support));
+    setText("btcResistance",usd(values.Resistance));
+
+    const supportStatus=price!==null&&values.Support!==null
+      ?(price<values.Support?"Support ইতিমধ্যে ভেঙেছে":"Support এখনো অক্ষত")
+      :"যাচাই করা যাচ্ছে না";
+    setText("btcSupportStatus",supportStatus);
+
+    const box=$("btcAnalysis");
+    clear("btcAnalysis");
+    const notes=[];
+    if(price!==null&&values.MA20!==null)notes.push(price<values.MA20?"BTC মূল্য MA20-এর নিচে":"BTC মূল্য MA20-এর ওপরে");
+    if(price!==null&&values.MA50!==null)notes.push(price<values.MA50?"BTC মূল্য MA50-এর নিচে":"BTC মূল্য MA50-এর ওপরে");
+    if(price!==null&&values.MA200!==null)notes.push(price<values.MA200?"BTC মূল্য MA200-এর নিচে":"BTC মূল্য MA200-এর ওপরে");
+    if(values.MA20!==null&&values.MA50!==null)notes.push(values.MA20<values.MA50?"MA20, MA50-এর নিচে: স্বল্পমেয়াদি প্রবণতা দুর্বল":"MA20, MA50-এর ওপরে: স্বল্পমেয়াদি প্রবণতা তুলনামূলক শক্তিশালী");
+    if(values.MA50!==null&&values.MA200!==null)notes.push(values.MA50<values.MA200?"MA50, MA200-এর নিচে: দীর্ঘমেয়াদি প্রবণতা দুর্বল":"MA50, MA200-এর ওপরে: দীর্ঘমেয়াদি গড় তুলনামূলক ইতিবাচক");
+    if(values.RSI!==null)notes.push(rsiText(values.RSI));
+    if(price!==null&&values.Support!==null&&price<values.Support)notes.push("গুরুত্বপূর্ণ সতর্কতা: মূল্য প্রদত্ত ২০ দিনের Support-এর নিচে রয়েছে।");
+    addList(box,notes);
+  }else{
+    setText("ethPrice",price===null?"তথ্য পাওয়া যায়নি":usd(price));
+    setText("ethMA20",usd(values.MA20));
+    setText("ethMA50",usd(values.MA50));
+    setText("ethMA200",usd(values.MA200));
+    setText("ethRSI",fmt(values.RSI));
+    setText("ethMACD",fmt(values.MACD));
+  }
 }
 
-/* ================= LIQUIDITY ================= */
-
-function liquidity(){
-const l=get(D,"macro.liquidity",{});
-const c=l.components||{};
-
-if(num(l.current)!==null)
-card("liquidity","US Net Liquidity","$"+fmt(l.current)+"B",
-"Observation: "+dateText(l.observation_date),
-"Formula: WALCL − TGA − RRP");
-if(num(l.change_7d)!==null)
-card("liquidity","৭ দিনের পরিবর্তন","$"+fmt(l.change_7d)+"B",
-l.change_7d<0?"তারল্য কমেছে।":"তারল্য বেড়েছে।","Net Liquidity Change",
-l.change_7d<0?"red":"green");
-if(num(l.change_30d)!==null)
-card("liquidity","৩০ দিনের পরিবর্তন","$"+fmt(l.change_30d)+"B",
-l.change_30d<0?"তারল্য কমেছে।":"তারল্য বেড়েছে।","Net Liquidity Change",
-l.change_30d<0?"red":"green");
-
-if(l.trend)
-card("liquidity","Liquidity Trend",bn(l.trend),
-"Status: "+statusText(l.status),
-"Observation: "+dateText(l.observation_date),tone(l.trend));
-
-if(num(c.fed_assets)!==null)
-card("liquidity","Fed Assets","$"+fmt(c.fed_assets)+"B","Federal Reserve Balance Sheet");
-if(num(c.treasury_general_account)!==null)
-card("liquidity","Treasury General Account","$"+fmt(c.treasury_general_account)+"B","TGA");
-if(num(c.reverse_repo)!==null)
-card("liquidity","Reverse Repo","$"+fmt(c.reverse_repo)+"B","RRP");
+function rsiText(v){
+  if(v===null)return "RSI পাওয়া যায়নি";
+  if(v<30)return "অতিরিক্ত বিক্রির অবস্থা; একা BUY সংকেত নয়";
+  if(v<40)return "দুর্বল গতি";
+  if(v<=60)return "মাঝামাঝি গতি";
+  if(v<70)return "তুলনামূলক শক্তিশালী গতি";
+  return "উচ্চ RSI; অতিরিক্ত কেনাকাটার ঝুঁকি";
 }
 
-/* ================= ON-CHAIN & MINING ================= */
+/* =========================================================
+   5. MACRO ENGINE
+========================================================= */
 
-function onchain(){
-const o=get(D,"advanced.on_chain",{});
-const available=[
-["mvrv_ratio","Bitcoin MVRV Ratio","ratio"],
-["hashrate","Bitcoin Hashrate","number"],
-["mining_difficulty","Mining Difficulty","number"]
-];
+const MACRO_NAMES={
+  pce:"PCE মূল্যস্ফীতি",
+  unemployment:"বেকারত্বের হার",
+  core_pce:"Core PCE মূল্যস্ফীতি",
+  core_cpi:"Core CPI মূল্যস্ফীতি",
+  cpi:"CPI মূল্যস্ফীতি",
+  nonfarm_payrolls:"Nonfarm Payrolls — নতুন চাকরি",
+  sp500:"S&P 500 সূচক",
+  usd_broad_index:"যুক্তরাষ্ট্রের Broad USD সূচক",
+  vix:"VIX — বাজারের ভয় সূচক",
+  yield_curve_10y_2y:"১০ বছর ও ২ বছরের বন্ডের ব্যবধান",
+  yield_30y:"৩০ বছর মেয়াদি Treasury Yield",
+  yield_2y:"২ বছর মেয়াদি Treasury Yield",
+  fed_balance_sheet:"Federal Reserve Balance Sheet",
+  treasury_general_account:"Treasury General Account",
+  m2_money_supply:"M2 Money Supply",
+  oil:"তেলের মূল্য",
+  yield_10y:"১০ বছর মেয়াদি Treasury Yield",
+  reverse_repo:"Reverse Repo",
+  nasdaq:"NASDAQ সূচক",
+  usd_jpy:"USD/JPY বিনিময় হার",
+  fed_funds_rate:"Federal Funds Rate",
+  gold:"স্বর্ণের মূল্য"
+};
 
-available.forEach(([key,label])=>{
-const x=o[key];
-if(object(x)&&num(x)!==null)metricCard("onchain",label,x);
-});
-
-const h=get(D,"advanced.halving",{});
-if(object(h)){
-if(num(h.current_block_height)!==null)
-card("onchain","বর্তমান Bitcoin Block Height",
-fmt(h.current_block_height,0),
-"Next Halving Block: "+fmt(h.next_halving_block,0));
-if(num(h.blocks_remaining)!==null)
-card("onchain","পরবর্তী Halving পর্যন্ত Block",
-fmt(h.blocks_remaining,0),
-"আনুমানিক সময়: "+fmt(h.estimated_days_remaining,0)+" দিন",
-h.note||"Block Height অনুযায়ী Halving নির্ধারিত হয়।");
+function macroMetricValue(key,obj){
+  const v=metric(obj);
+  if(v===null)return "তথ্য পাওয়া যায়নি";
+  const unit=obj?.unit||"";
+  if(unit.includes("%")||unit.toLowerCase().includes("percent"))return fmt(v,3)+"%";
+  if(key==="vix")return fmt(v,2);
+  if(["sp500","nasdaq"].includes(key))return fmt(v,2);
+  if(key==="usd_jpy")return fmt(v,3);
+  if(["oil","gold"].includes(key))return "$"+fmt(v,2);
+  if(["fed_balance_sheet","treasury_general_account","m2_money_supply","reverse_repo"].includes(key))return usd(v);
+  return fmt(v,3)+(unit?" "+unit:"");
 }
 
-const unavailable=[
-["mvrv_z_score","MVRV Z-Score"],
-["sth_sopr","STH SOPR"],["nupl","NUPL"],
-["exchange_netflow","Exchange Netflow"],
-["stablecoin_supply","Stablecoin Supply"],
-["whale_activity","Whale Entity Data"]
-];
-const missing=unavailable.filter(([k])=>!object(o[k])||num(o[k])===null);
-if(missing.length){
-card("onchain","যে On-chain Data যুক্ত নেই",
-missing.length+"টি",
-missing.map(x=>x[1]).join(", "),
-"যাচাইকৃত Free Source পাওয়া না যাওয়ায় এগুলো দেখানো হচ্ছে না।");
-}
-}
+function renderMacro(){
+  const m=DATA.macro||{};
+  const metrics=m.metrics||{};
+  const summary=m.summary||{};
+  const overall=m.overall_macro_decision||{};
 
-/* ================= SPOT ACTIVITY ================= */
+  setText("macroDecision",overall.DECISION||"সিদ্ধান্ত পাওয়া যায়নি");
+  setText("macroQuality",statusBn(summary.data_quality||"UNKNOWN"));
+  setText("macroRiskScore",overall.DATA?.risk_score??"—");
+  setText("macroSupportScore",overall.DATA?.support_score??"—");
 
-function spot(){
-const b=get(D,"advanced.spot_market_activity.breadth",{});
-if(object(b)&&b.status==="OK"){
-card("spot","বাড়ছে এমন Spot Pair",fmt(b.advancing_pairs,0),
-"পর্যবেক্ষিত Pair: "+fmt(b.measured_pairs,0));
-card("spot","কমছে এমন Spot Pair",fmt(b.declining_pairs,0),
-"অপরিবর্তিত: "+fmt(b.unchanged_pairs,0));
-card("spot","Advance / Decline Ratio",
-fmt(b.advance_decline_ratio,3),
-"Coverage: "+fmt(b.coverage_pct)+"%",
-"Binance USDT Spot pairs only.",
-num(b.advance_decline_ratio)<1?"red":"green");
-}
+  const rows=[];
+  Object.keys(MACRO_NAMES).forEach(key=>{
+    const obj=metrics[key];
+    if(!obj)return;
+    rows.push({
+      name:MACRO_NAMES[key],
+      value:macroMetricValue(key,obj),
+      date:obj.observation_date||"তারিখ নেই",
+      status:obj.status
+    });
+  });
+  renderMetricTable("macroMetricsTable",rows);
 
-const leaders=get(D,"advanced.spot_market_activity.volume_leaders_24h",[]);
-if(leaders.length){
-const c=document.createElement("div");
-c.className="card";c.style.gridColumn="1/-1";
-const h=document.createElement("h3");h.textContent="২৪ ঘণ্টার Spot Volume Leaders";
-c.append(h);
-const w=document.createElement("div");w.className="table-wrap";
-const t=document.createElement("table");
-const head=document.createElement("tr");
-["Coin","Quote Volume","২৪ ঘণ্টার পরিবর্তন","Trades"].forEach(x=>{
-const th=document.createElement("th");th.textContent=x;head.append(th);
-});
-t.append(head);
-leaders.slice(0,12).forEach(x=>{
-const tr=document.createElement("tr");
-[
-x.symbol||"—",money(x.quote_volume_24h),
-num(x.change_24h_pct)===null?"—":fmt(x.change_24h_pct)+"%",
-fmt(x.trades,0)
-].forEach(v=>{
-const td=document.createElement("td");td.textContent=v;tr.append(td);
-});
-t.append(tr);
-});
-w.append(t);c.append(w);$("spot").append(c);
-}
-}
+  const inf=m.inflation||{};
+  const infRows=[];
+  ["cpi","core_cpi","pce","core_pce"].forEach(key=>{
+    const x=inf[key];
+    if(!x)return;
+    infRows.push({
+      name:x.name||MACRO_NAMES[key],
+      value:percent(x.mom_percent),
+      date: x.three_month_percent===null||x.three_month_percent===undefined
+        ?"৩ মাস: তথ্য নেই":"৩ মাস: "+percent(x.three_month_percent),
+      status:x.status
+    });
+  });
+  const tbody=$("inflationTable");
+  tbody.innerHTML="";
+  if(!infRows.length){
+    tbody.innerHTML='<tr><td colspan="5">মূল্যস্ফীতির তথ্য পাওয়া যায়নি</td></tr>';
+  }else{
+    ["cpi","core_cpi","pce","core_pce"].forEach(key=>{
+      const x=inf[key];
+      if(!x)return;
+      const tr=document.createElement("tr");
+      [
+        x.name||MACRO_NAMES[key],
+        percent(x.mom_percent),
+        percent(x.three_month_percent),
+        percent(x.yoy_percent),
+        statusBn(x.status)
+      ].forEach(v=>{
+        const td=document.createElement("td");
+        td.textContent=v;
+        tr.appendChild(td);
+      });
+      tbody.appendChild(tr);
+    });
+  }
 
-/* ================= ORDER BOOK + TAKER ================= */
+  const li=m.liquidity||{};
+  setText("liquidityStatus",statusBn(li.status));
+  setText("liquidityCurrent",li.current===null||li.current===undefined?"বর্তমান মান পাওয়া যায়নি":"বর্তমান তারল্য: "+fmt(li.current,2)+(li.unit?" "+li.unit:""));
+  setText("liquidityTrend","প্রবণতা: "+(li.trend||"তথ্য পাওয়া যায়নি"));
+  setText("liquidityChange","৭ দিনের পরিবর্তন: "+fmt(li.change_7d,2)+" • ৩০ দিনের পরিবর্তন: "+fmt(li.change_30d,2));
 
-function orderbook(){
-const books=get(D,"advanced.spot_order_book",{});
-const takers=get(D,"advanced.spot_taker_activity",{});
+  const yc=m.yield_curve||{};
+  setText("yieldSpread",yc.spread===null||yc.spread===undefined?"তথ্য পাওয়া যায়নি":fmt(yc.spread,3)+" "+(yc.unit||""));
+  setText("yieldInverted",yc.inverted===true?"Yield Curve উল্টো অবস্থায়":"Yield Curve উল্টো নয় / নিশ্চিত নয়");
+  setText("yieldTrend","প্রবণতা: "+(yc.trend||"তথ্য পাওয়া যায়নি"));
 
-for(const s of ["BTCUSDT","ETHUSDT"]){
-const b=books[s]||{};
-const t=takers[s]||{};
-const label=s.replace("USDT","");
+  const overallBox=$("macroOverallReport");
+  clear("macroOverallReport");
+  renderReport("macroOverallReport",overall);
+  if(overall.DATA){
+    addLine(overallBox,"প্রয়োজনীয় সূচক:",Array.isArray(overall.DATA.required_metrics)?overall.DATA.required_metrics.join(", "):"—");
+    addLine(overallBox,"অনুপস্থিত সূচক:",Array.isArray(overall.DATA.missing_metrics)?overall.DATA.missing_metrics.join(", "):"কোনো তালিকা নেই");
+    if(overall.DATA.risk_flags)addLine(overallBox,"ঝুঁকির সংকেত:",JSON.stringify(overall.DATA.risk_flags));
+    if(overall.DATA.supportive_flags)addLine(overallBox,"সহায়ক সংকেত:",JSON.stringify(overall.DATA.supportive_flags));
+  }
 
-metricCard("orderbook",label+" Bid Value",b.bid_value_usdt);
-metricCard("orderbook",label+" Ask Value",b.ask_value_usdt);
-metricCard("orderbook",label+" Order Book Imbalance",b.imbalance_percent);
-
-if(b.snapshot_retrieved_at)
-card("orderbook",label+" Order Book Snapshot",
-dateText(b.snapshot_retrieved_at),
-"Bid Levels: "+fmt(b.bid_levels_received,0)+
-" • Ask Levels: "+fmt(b.ask_levels_received,0),
-"শুধু Top 100 Levels; সম্পূর্ণ Order Book নয়।");
-
-metricCard("orderbook",label+" 15m Taker Buy/Sell",
-t.taker_buy_sell_ratio);
-
-metricCard("orderbook",label+" 15m Taker Buy Volume",
-t.taker_buy_quote_volume);
-metricCard("orderbook",label+" 15m Taker Sell Volume",
-t.taker_sell_quote_volume);
-
-if(t.candle_close_time)
-card("orderbook",label+" Last Closed 15m Candle",
-dateText(t.candle_close_time),
-"শুধু সম্পূর্ণ বন্ধ Candle-এর তথ্য।");
-}
-}
-
-/* ================= FUTURES CONTEXT ================= */
-
-function derivatives(){
-const root=get(D,"advanced.derivatives",{});
-
-for(const s of ["BTCUSDT","ETHUSDT"]){
-const d=root[s];
-if(!object(d))continue;
-const label=s.replace("USDT","");
-
-metricCard("derivatives",label+" Open Interest",d.open_interest_usd);
-metricCard("derivatives",label+" Open Interest 24h Change",
-d.open_interest_change_24h_pct);
-
-metricCard("derivatives",label+" Last Funding Rate",d.last_funding_rate);
-metricCard("derivatives",label+" Average 8h Funding",d.funding_avg_8h);
-metricCard("derivatives",label+" Calculated Funding APR",d.funding_apr_pct);
-metricCard("derivatives",label+" Provider Funding APR",d.funding_provider_apr_pct);
-
-if(d.funding_apr_consistency==="MISMATCH"){
-card("derivatives",label+" Funding APR Consistency","অমিল পাওয়া গেছে",
-"Calculated APR ও Provider APR এক নয়।",
-"Funding APR-কে নিশ্চিত/নির্ভুল মান হিসেবে ব্যবহার করবেন না।","red");
+  // Macro reports is an OBJECT, not an array.
+  const reports=m.reports||{};
+  const reportNames={
+    cpi:"CPI মূল্যস্ফীতি",
+    core_cpi:"Core CPI মূল্যস্ফীতি",
+    pce:"PCE মূল্যস্ফীতি",
+    core_pce:"Core PCE মূল্যস্ফীতি",
+    fed_rate:"Federal Reserve সুদের হার",
+    labor_market:"শ্রমবাজার",
+    bond_yields:"সরকারি বন্ডের সুদ",
+    yield_curve:"Yield Curve",
+    usd_index:"ডলারের সূচক",
+    vix:"বাজারের ভয় সূচক",
+    equity_market:"শেয়ারবাজার",
+    commodities:"পণ্যবাজার",
+    yen:"জাপানি ইয়েন",
+    liquidity:"বাজারের তারল্য"
+  };
+  const reportBox=$("macroReports");
+  clear("macroReports");
+  Object.keys(reportNames).forEach(key=>{
+    if(!reports[key])return;
+    const wrapper=document.createElement("div");
+    wrapper.className="report-block";
+    const heading=document.createElement("h3");
+    heading.textContent=reportNames[key];
+    wrapper.appendChild(heading);
+    reportBox.appendChild(wrapper);
+    const temp=document.createElement("div");
+    temp.id="macroReport_"+key;
+    wrapper.appendChild(temp);
+    renderReport(temp.id,reports[key]);
+  });
+  if(!reportBox.children.length)reportBox.textContent="Macro-এর বিস্তারিত রিপোর্ট পাওয়া যায়নি।";
 }
 
-const ls=d.long_short_detail||{};
-const rows=[
-["Account",ls.account],
-["Top Trader Account",ls.top_account],
-["Top Trader Position",ls.top_position],
-["All Trader Position",ls.all_position],
-["Taker Buy/Sell",ls.taker]
-];
+/* =========================================================
+   6. ADVANCED ENGINE
+========================================================= */
 
-rows.forEach(([name,x])=>{
-if(!object(x))return;
-const ratio=num(x.ratio);
-const lp=num(x.long_pct);
-const sp=num(x.short_pct);
-if(ratio===null&&lp===null&&sp===null)return;
-card("derivatives",label+" "+name+" L/S",
-ratio===null?"—":fmt(ratio,4),
-"Long: "+fmt(lp)+"% • Short: "+fmt(sp)+"%",
-"Exchange Count: "+fmt(x.exchange_count,0));
-});
-}
-}
+function renderAdvanced(){
+  const a=DATA.advanced||{};
+  const on=a.on_chain||{};
+  const mvrv=on.mvrv_ratio;
+  const mvrvZ=on.mvrv_z_score;
 
-/* ================= FINAL DECISION ================= */
+  setText("mvrv",metric(mvrv)===null?"তথ্য পাওয়া যায়নি":fmt(metric(mvrv),4));
+  setText("mvrvStatus",metricStatus(mvrv)==="UNAVAILABLE"?"তথ্য পাওয়া যায়নি":
+    statusBn(metricStatus(mvrv))+" • "+metricFreshness(mvrv,24));
+  setText("mvrvZ",metric(mvrvZ)===null?"তথ্য পাওয়া যায়নি":fmt(metric(mvrvZ),3));
+  setText("hashrate",metric(on.hashrate)===null?"তথ্য পাওয়া যায়নি":fmt(metric(on.hashrate),2)+" "+(on.hashrate.unit||""));
+  setText("difficulty",metric(on.mining_difficulty)===null?"তথ্য পাওয়া যায়নি":fmt(metric(on.mining_difficulty),2));
 
-function decision(){
-const d=get(D,"decision.final_decision",{});
-const m=get(D,"decision.macro_analysis",{});
-const z=get(D,"zone.market_zone",{});
-const btc=get(D,"decision.crypto_market.btc",{});
-const macroOverall=get(D,"macro.overall_macro_decision",{});
+  const halving=a.halving||{};
+  setText("halvingDays",halving.estimated_days_remaining===null||halving.estimated_days_remaining===undefined
+    ?"তথ্য পাওয়া যায়নি":fmt(halving.estimated_days_remaining,0)+" দিন");
+  setText("halvingBlock",halving.blocks_remaining===undefined?"ব্লক তথ্য নেই":"বাকি ব্লক: "+fmt(halving.blocks_remaining,0));
 
-const reasons=arr(d.reasons);
-const actions=arr(d.actions);
-const risks=arr(d.risk);
+  const spot=a.spot_market_activity||{};
+  const breadth=spot.breadth||{};
+  setText("advancing",breadth.advancing_pairs);
+  setText("declining",breadth.declining_pairs);
+  setText("breadthRatio",fmt(breadth.advance_decline_ratio,3));
+  setText("breadthCoverage",percent(breadth.coverage_pct));
+  setText("breadthAnalysis",breadth.classification||spot.coverage_note||"Breadth বিশ্লেষণ পাওয়া যায়নি");
 
-const macroLabel=first(m.decision,macroOverall.DECISION);
-const macroWait=/WAIT|INSUFFICIENT/i.test(String(macroLabel||""));
+  const availability=$("advancedAvailability");
+  clear("advancedAvailability");
+  const availabilityItems=[
+    ["ETF Flows",a.etf_flows],
+    ["SOPR",on.sth_sopr],
+    ["NUPL",on.nupl],
+    ["Exchange Netflow",on.exchange_netflow],
+    ["Stablecoin Supply",on.stablecoin_supply],
+    ["Whale Activity",on.whale_activity],
+    ["Liquidation Heatmap",a.liquidation_heatmap]
+  ];
+  availabilityItems.forEach(([name,obj])=>{
+    const status=obj?.status||"UNAVAILABLE";
+    addLine(availability,name+":",statusBn(status));
+  });
 
-const lines=[
-"DATA:",
-"সামগ্রিক Market Decision: "+bn(d.decision),
-"Market Zone: "+bn(z.current_zone),
-"Zone Action: "+bn(z.spot_action),
-"Risk Level: "+bn(z.risk_level),
-"Macro Decision: "+(macroLabel||"তথ্য নেই"),
-"BTC Trend: "+bn(btc.trend),
-"",
-"ANALYSIS:",
-...(reasons.length?reasons:["বিশ্লেষণের কারণ পাওয়া যায়নি।"]),
-"",
-"DECISION:",
-bn(d.decision),
-"",
-"ACTION:",
-...(actions.length?actions:["নির্দিষ্ট Action পাওয়া যায়নি।"]),
-"",
-"RISK:",
-...(risks.length?risks:["ঝুঁকির বিবরণ পাওয়া যায়নি।"]),
-"",
-d.important_note||"এটি সামগ্রিক Spot Market বিশ্লেষণ; নির্দিষ্ট Coin-এর BUY/SELL নির্দেশ নয়।"
-];
-
-if(macroWait){
-lines.push("",
-"সতর্কতা:",
-"Macro Engine-এর সিদ্ধান্ত WAIT / INSUFFICIENT DATA।");
-lines.push("Macro-এর প্রয়োজনীয় তথ্য সম্পূর্ণ না হওয়া পর্যন্ত শুধু এই Dashboard দেখে নতুন DCA বা বড় BUY সিদ্ধান্ত নেবেন না।");
-}
-
-$("decision").textContent=lines.join("\n");
+  const leaders=spot.volume_leaders_24h||[];
+  const leaderBody=$("volumeLeaders");
+  leaderBody.innerHTML="";
+  if(!leaders.length){
+    leaderBody.innerHTML='<tr><td colspan="4">Volume Leader তথ্য পাওয়া যায়নি</td></tr>';
+  }else{
+    leaders.slice(0,15).forEach(item=>{
+      const tr=document.createElement("tr");
+      [
+        item.symbol||item.base_asset||"—",
+        usd(item.quote_volume_24h),
+        percent(item.change_24h_pct),
+        fmt(item.trades,0)
+      ].forEach(v=>{
+        const td=document.createElement("td");
+        td.textContent=v;
+        tr.appendChild(td);
+      });
+    leaderBody.appendChild(tr);
+    });
+  }
 }
 
-/* ================= MACRO REPORTS ================= */
+/* =========================================================
+   7. ORDER BOOK & TAKER ACTIVITY
+========================================================= */
 
-function reports(){
-const r=get(D,"macro.reports",{});
-if(!object(r))return;
-
-Object.entries(r).forEach(([key,x])=>{
-if(!object(x))return;
-const title=key.replaceAll("_"," ").toUpperCase();
-const parts=[
-x.DATA?"DATA: "+(typeof x.DATA==="object"?JSON.stringify(x.DATA):x.DATA):"",
-x.ANALYSIS?"ANALYSIS: "+x.ANALYSIS:"",
-x.DECISION?"DECISION: "+x.DECISION:"",
-x.ACTION?"ACTION: "+x.ACTION:"",
-x.RISK?"RISK: "+x.RISK:""
-].filter(Boolean);
-
-if(!parts.length)return;
-card("reports",title,x.DECISION||"Report",
-parts.join("\n"),"",tone(x.DECISION));
-});
+function renderOrderBook(){
+  const book=DATA.advanced?.spot_order_book||{};
+  ["BTCUSDT","ETHUSDT"].forEach(symbol=>{
+    const p=symbol==="BTCUSDT"?"btc":"eth";
+    const x=book[symbol]||{};
+    setText(p+"Bid",usd(metric(x.bid_value_usdt)));
+    setText(p+"Ask",usd(metric(x.ask_value_usdt)));
+    setText(p+"Imbalance",percent(metric(x.imbalance_percent)));
+    setText(p+"BookStatus",statusBn(x.status)+" • Top "+(x.levels_requested||100)+" Level");
+  });
 }
 
-/* ================= DATA QUALITY ================= */
-
-function quality(){
-const files=[
-["Market",D.market,MAX_AGE.market,"generated_at"],
-["Macro",D.macro,MAX_AGE.macro,"fetched_at"],
-["Advanced",D.advanced,MAX_AGE.advanced,"generated_at"],
-["Decision",D.decision,MAX_AGE.decision,"generated_at"],
-["Market Zone",D.zone,MAX_AGE.zone,"generated_at"]
-];
-
-const lines=["SNAPSHOT UPDATE TIME:"];
-files.forEach(([name,obj,max,key])=>{
-const time=first(obj&&obj[key],obj&&obj.generated_at);
-lines.push(name+": "+dateText(time)+" | "+statusText(freshness(time,max)));
-});
-
-const q=get(D,"macro.summary",{});
-lines.push(
-"",
-"MACRO DATA QUALITY:",
-"Status: "+statusText(q.data_quality),
-"Available: "+fmt(q.ok,0)+"/"+fmt(q.total_series,0),
-"Critical Missing: "+arr(q.critical_missing).join(", "),
-"Optional Missing: "+arr(q.optional_unavailable).join(", ")
-);
-
-const advLimit=arr(get(D,"advanced.limitations",[]));
-const macroLimit=arr(get(D,"macro.limitations",[]));
-const marketLimit=arr(get(D,"market.data_policy.limitations",[]));
-
-lines.push("","KNOWN DATA LIMITATIONS:");
-[...macroLimit,...advLimit,...marketLimit].forEach(x=>{
-if(typeof x==="string")lines.push("• "+x);
-});
-
-lines.push(
-"",
-"DATA POLICY:",
-"পুরোনো Snapshot-কে নতুন Source Data হিসেবে দেখানো হয় না।",
-"Dashboard Refresh এবং Source Update এক বিষয় নয়।",
-"FRED Macro Data প্রকাশে বিলম্ব হয়।",
-"Futures Data Spot BUY/SELL সংকেত নয়।",
-"Missing তথ্যকে শূন্য বা Bullish/Bearish ধরে নেওয়া হয় না।"
-);
-
-$("quality").textContent=lines.join("\n");
+function takerText(ratio){
+  if(ratio===null)return "Taker তথ্য পাওয়া যায়নি";
+  if(ratio>1.1)return "ক্রেতাদের Market Order তুলনামূলক বেশি";
+  if(ratio<0.9)return "বিক্রেতাদের Market Order তুলনামূলক বেশি";
+  return "ক্রয়-বিক্রয়ের চাপ কাছাকাছি";
 }
 
-/* ================= RENDER ================= */
-
-function render(){
-clear();
-phaseAnalysis();
-renderZone();
-overview();
-technical();
-macroDecision();
-macro();
-liquidity();
-onchain();
-spot();
-orderbook();
-derivatives();
-decision();
-reports();
-quality();
+function renderTaker(){
+  const taker=DATA.advanced?.spot_taker_activity||{};
+  ["BTCUSDT","ETHUSDT"].forEach(symbol=>{
+    const p=symbol==="BTCUSDT"?"btc":"eth";
+    const x=taker[symbol]||{};
+    const ratio=metric(x.taker_buy_sell_ratio);
+    setText(p+"TakerRatio",ratio===null?"তথ্য পাওয়া যায়নি":fmt(ratio,3));
+    setText(p+"TakerAnalysis",takerText(ratio));
+    setText(p+"TakerTime",x.candle_close_time?"Candle বন্ধের সময়: "+dateText(x.candle_close_time):"Candle সময় পাওয়া যায়নি");
+  });
 }
 
-/* ================= LOAD JSON ================= */
+/* =========================================================
+   8. FUTURES DERIVATIVES CONTEXT
+========================================================= */
 
-async function loadData(){
-if(loading)return;
-loading=true;
+function renderDerivatives(){
+  const derivatives=DATA.advanced?.derivatives||{};
+  ["BTCUSDT","ETHUSDT"].forEach(symbol=>{
+    const id=symbol==="BTCUSDT"?"btcDerivatives":"ethDerivatives";
+    const box=$(id);
+    clear(id);
+    const x=derivatives[symbol];
+    if(!x){
+      box.textContent="Derivatives তথ্য পাওয়া যায়নি";
+      return;
+    }
 
-const button=$("refreshButton");
-button.disabled=true;
-button.textContent="লোড হচ্ছে...";
-$("status").textContent="ডেটা যাচাই ও লোড হচ্ছে...";
-$("status").className="tag";
+    addLine(box,"Open Interest:",usd(x.open_interest_usd));
+    addLine(box,"২৪ ঘণ্টার OI পরিবর্তন:",percent(x.open_interest_change_24h_pct));
+    addLine(box,"Funding Rate:",fmt(x.last_funding_rate,6));
+    addLine(box,"গড় Funding (৮ ঘণ্টা):",fmt(x.funding_avg_8h,6));
+    addLine(box,"Calculated Funding APR:",percent(x.funding_apr_pct));
+    addLine(box,"Provider Funding APR:",percent(x.funding_provider_apr_pct));
+    addLine(box,"APR যাচাই:",statusBn(x.funding_apr_consistency));
+    addLine(box,"Global Long/Short Ratio:",fmt(x.global_long_short_ratio,3));
+    addLine(box,"Long Account:",percent(x.global_long_percent));
+    addLine(box,"Short Account:",percent(x.global_short_percent));
+    addLine(box,"Top Account Ratio:",fmt(x.top_account_long_short_ratio,3));
+    addLine(box,"Top Position Ratio:",fmt(x.top_position_long_short_ratio,3));
+    addLine(box,"Taker Long/Short Ratio:",fmt(x.taker_long_short_ratio,3));
 
-const entries=Object.entries(FILES);
-const results=await Promise.allSettled(entries.map(async([key,file])=>{
-const response=await fetch("./data/"+file+"?v="+Date.now(),{
-cache:"no-store"
-});
-if(!response.ok)throw Error(file+" HTTP "+response.status);
-const data=await response.json();
-if(!object(data))throw Error(file+" invalid JSON structure");
-return [key,data];
-}));
+    if(String(x.funding_apr_consistency||"").toUpperCase()==="MISMATCH"){
+      addNotice(box,"Calculated APR ও Provider APR-এর মধ্যে অমিল রয়েছে। কোনো একটি মানকে নিশ্চিত ধরে সিদ্ধান্ত নেবেন না।","warning");
+    }
 
-D={};
-const errors=[];
-const loaded=[];
+    const detail=x.long_short_detail||{};
+    Object.keys(detail).forEach(key=>{
+      const item=detail[key];
+      if(!item)return;
+      const names={
+        account:"সব Account",
+        top_account:"Top Account",
+        top_position:"Top Position",
+        all_position:"সব Position",
+        taker:"Taker Flow"
+      };
+      addLine(box,(names[key]||key)+" Ratio:",fmt(item.ratio,3));
+    });
+  });
 
-results.forEach((r,i)=>{
-if(r.status==="fulfilled"){
-const [key,data]=r.value;
-D[key]=data;loaded.push(key);
-}else{
-errors.push(entries[i][1]);
-console.error(r.reason);
-}
-});
-
-try{
-render();
-}catch(e){
-console.error("Dashboard render error:",e);
-$("decision").textContent="Dashboard Rendering Error: "+String(e);
-}
-
-const stale=[];
-Object.entries(D).forEach(([key,data])=>{
-const timestamp=first(data.generated_at,data.fetched_at);
-const f=freshness(timestamp,MAX_AGE[key]||36);
-if(f==="STALE"||f==="UNKNOWN")stale.push(key+" ("+statusText(f)+")");
-});
-
-let message;
-if(errors.length){
-message="কিছু Data File লোড হয়নি: "+errors.join(", ");
-}else if(stale.length){
-message="ডেটা লোড হয়েছে; কিছু Snapshot পুরোনো/সময় অজানা।";
-}else{
-message="Data Files লোড হয়েছে; Source Timestamp আলাদাভাবে দেখুন।";
+  const heat=DATA.advanced?.liquidation_heatmap;
+  setText("liquidationStatus",heat?.status&&heat.status!=="UNAVAILABLE"
+    ?"Heatmap Status: "+statusBn(heat.status)
+    :"যাচাইকৃত Liquidation Heatmap তথ্য পাওয়া যায়নি।");
 }
 
-$("status").textContent=message;
-$("status").className="tag "+(errors.length||stale.length?"yellow":"green");
-$("updated").textContent=
-"Dashboard Refresh: "+new Date().toLocaleString("bn-BD")+
-" | Loaded: "+loaded.length+"/"+entries.length+
-(stale.length?" | Stale/Unknown: "+stale.join(", "):"");
+/* =========================================================
+   9. DECISION ENGINE
+========================================================= */
 
-button.disabled=false;
-button.textContent="রিফ্রেশ করুন";
-loading=false;
+function renderDecision(){
+  const d=DATA.decision||{};
+  const macro=d.macro_analysis||{};
+  const crypto=d.crypto_market||{};
+  const final=d.final_decision||{};
+
+  renderReport("decisionMacro",macro);
+  renderReport("decisionCrypto",crypto);
+  renderReport("decisionFinal",final);
+
+  if(final.decision||final.label){
+    setText("overallDecision",final.label||final.decision);
+    if(final.action)setText("overallAction",final.action);
+  }
 }
 
-/* ================= AUTO REFRESH ================= */
+/* =========================================================
+   10. DATA QUALITY & LIMITATIONS
+========================================================= */
 
-loadData();
-setInterval(loadData,300000);
+function snapshotQuality(obj){
+  if(!obj)return "ফাইল পাওয়া যায়নি";
+  const timestamp=obj.generated_at||obj.fetched_at;
+  if(!timestamp)return "Snapshot সময় নেই";
+  const age=(Date.now()-new Date(timestamp).getTime())/3600000;
+  if(!Number.isFinite(age))return "সময় যাচাই করা যায়নি";
+  if(age<0)return "ভবিষ্যতের Timestamp — যাচাই প্রয়োজন";
+  if(age>72)return "পুরোনো Snapshot ("+age.toFixed(1)+" ঘণ্টা)";
+  return "সাম্প্রতিক Snapshot ("+age.toFixed(1)+" ঘণ্টা)";
+}
+
+function renderQuality(){
+  setText("qualityMarket",snapshotQuality(DATA.market));
+  setText("qualityMacro",snapshotQuality(DATA.macro));
+  setText("qualityAdvanced",snapshotQuality(DATA.advanced));
+  setText("qualityDecision",snapshotQuality(DATA.decision));
+  setText("qualityZone",snapshotQuality(DATA.zone));
+
+  const missing=$("missingData");
+  clear("missingData");
+
+  const zone=DATA.zone||{};
+  addList(missing,zone.missing_data||[]);
+  addList(missing,zone.data_errors||[]);
+
+  const macro=DATA.macro||{};
+  const summary=macro.summary||{};
+  if(summary.critical_missing?.length){
+    addNotice(missing,"Macro-এর অনুপস্থিত প্রয়োজনীয় তথ্য: "+summary.critical_missing.join(", "),"danger");
+  }
+  if(summary.optional_unavailable?.length){
+    addNotice(missing,"অনুপস্থিত ঐচ্ছিক তথ্য: "+summary.optional_unavailable.join(", "),"warning");
+  }
+
+  const advanced=DATA.advanced||{};
+  addList(missing,advanced.limitations||[]);
+  if(!missing.children.length)missing.textContent="কোনো অতিরিক্ত সতর্কতা পাওয়া যায়নি।";
+
+  const limitations=$("limitations");
+  clear("limitations");
+  const all=[
+    ...(DATA.market?.data_policy?.limitations||[]),
+    ...(DATA.macro?.limitations||[]),
+    ...(DATA.advanced?.limitations||[]),
+    ...(DATA.decision?.limitations||[]),
+    ...(DATA.zone?.limitations||[])
+  ];
+  const unique=[...new Set(all.filter(Boolean))];
+  addList(limitations,unique);
+  if(!unique.length){
+    limitations.textContent="এই Snapshot-এ আলাদা Limitation তালিকা পাওয়া যায়নি।";
+  }
+}
+
+/* =========================================================
+   11. RENDER ALL
+========================================================= */
+
+function renderAll(){
+  renderZone();
+  renderGlobal();
+  renderAsset("BTC","btc");
+  renderAsset("ETH","eth");
+  renderMacro();
+  renderAdvanced();
+  renderOrderBook();
+  renderTaker();
+  renderDerivatives();
+  renderDecision();
+  renderQuality();
+}
+
+/* =========================================================
+   12. START & AUTO REFRESH
+========================================================= */
+
+loadAll(false);
+setInterval(()=>loadAll(false),5*60*1000);
 
 </script>
 </body>
