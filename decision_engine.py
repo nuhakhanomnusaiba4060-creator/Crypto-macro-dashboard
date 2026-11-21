@@ -4,1248 +4,907 @@
 
 """
 CRYPTO FINAL DECISION ENGINE
-Version: 1.0.0
+Version: 2.0.0
 
-INPUT:
-    data/macro_data.json
+Inputs:
     data/market_data.json
+    data/macro_data.json
 
-OUTPUT:
+Output:
     data/decision_data.json
 
-Spot market only.
-No futures or margin recommendations.
+Purpose:
+    - Validate snapshot and individual metric freshness.
+    - Validate BTC and ETH technical data.
+    - Evaluate macro risk without treating missing data as safe.
+    - Avoid unsupported SELL decisions.
+    - Produce conservative Spot-market guidance.
+    - Preserve dashboard-compatible output structure.
+
+This engine is a broad-market decision aid.
+It does NOT generate coin-specific BUY/SELL recommendations.
 """
 
 import json
 import math
-import sys
+import os
+import tempfile
+
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
 
 
-VERSION = "1.0.0"
+# ============================================================
+# CONFIGURATION
+# ============================================================
 
 BASE_DIR = Path(__file__).resolve().parent
 DATA_DIR = BASE_DIR / "data"
 
-MACRO_FILE = DATA_DIR / "macro_data.json"
 MARKET_FILE = DATA_DIR / "market_data.json"
+MACRO_FILE = DATA_DIR / "macro_data.json"
 OUTPUT_FILE = DATA_DIR / "decision_data.json"
 
-MACRO_MAX_AGE_HOURS = 72
 MARKET_MAX_AGE_HOURS = 36
+MACRO_MAX_AGE_HOURS = 72
 TECHNICAL_MAX_AGE_HOURS = 60
 
+FUTURE_TOLERANCE_MINUTES = 5
 
-# =========================================================
-# TIME AND DATA UTILITIES
-# =========================================================
+VERSION = "2.0.0"
+
+
+# ============================================================
+# TIME FUNCTIONS
+# ============================================================
 
 def utc_now():
     return datetime.now(timezone.utc)
 
 
-def iso_now():
-    return (
-        utc_now()
-        .replace(microsecond=0)
-        .isoformat()
-        .replace("+00:00", "Z")
-    )
-
-
 def parse_time(value):
-
     if not isinstance(value, str) or not value.strip():
         return None
 
     try:
-        parsed = datetime.fromisoformat(
-            value.strip().replace("Z", "+00:00")
-        )
+        value = value.strip().replace("Z", "+00:00")
+        parsed = datetime.fromisoformat(value)
 
         if parsed.tzinfo is None:
             parsed = parsed.replace(tzinfo=timezone.utc)
 
         return parsed.astimezone(timezone.utc)
 
-    except (TypeError, ValueError):
+    except (ValueError, TypeError, OverflowError):
         return None
 
 
 def hours_old(value):
-
     parsed = parse_time(value)
 
     if parsed is None:
         return None
 
-    return max(
-        0.0,
-        (utc_now() - parsed).total_seconds() / 3600.0
+    age = (utc_now() - parsed).total_seconds() / 3600
+
+    if age < -(FUTURE_TOLERANCE_MINUTES / 60):
+        return None
+
+    return max(0.0, age)
+
+
+def timestamp_quality(value, max_age_hours):
+    age = hours_old(value)
+
+    if age is None:
+        return {
+            "status": "INVALID",
+            "age_hours": None,
+        }
+
+    if age > max_age_hours:
+        return {
+            "status": "STALE",
+            "age_hours": round(age, 2),
+        }
+
+    return {
+        "status": "FRESH",
+        "age_hours": round(age, 2),
+    }
+
+
+# ============================================================
+# JSON FUNCTIONS
+# ============================================================
+
+def read_json(path):
+    try:
+        with open(path, "r", encoding="utf-8") as file:
+            result = json.load(file)
+
+        if not isinstance(result, dict):
+            return {}
+
+        return result
+
+    except (OSError, json.JSONDecodeError, UnicodeDecodeError):
+        return {}
+
+
+def atomic_write_json(path, data):
+    path.parent.mkdir(parents=True, exist_ok=True)
+
+    fd, temp_path = tempfile.mkstemp(
+        prefix=path.stem + "_",
+        suffix=".tmp",
+        dir=str(path.parent),
     )
 
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8") as file:
+            json.dump(
+                data,
+                file,
+                ensure_ascii=False,
+                indent=2,
+                allow_nan=False,
+            )
+
+        os.replace(temp_path, path)
+
+    finally:
+        if os.path.exists(temp_path):
+            os.remove(temp_path)
+
+
+# ============================================================
+# SAFE VALUE FUNCTIONS
+# ============================================================
 
 def finite_number(value):
-
     if isinstance(value, bool):
         return None
+
+    if isinstance(value, dict):
+        if value.get("status") not in (None, "OK", "SUCCESS"):
+            return None
+
+        value = value.get("value")
 
     try:
         number = float(value)
 
-    except (TypeError, ValueError, OverflowError):
+        if not math.isfinite(number):
+            return None
+
+        return number
+
+    except (ValueError, TypeError, OverflowError):
         return None
 
-    if not math.isfinite(number):
-        return None
 
-    return number
-
-
-def read_json(path):
-
-    try:
-        with path.open("r", encoding="utf-8") as handle:
-            data = json.load(handle)
-
-        if not isinstance(data, dict):
-            return None, "JSON root must be an object"
-
-        return data, None
-
-    except FileNotFoundError:
-        return None, "File not found"
-
-    except json.JSONDecodeError as exc:
-        return None, "Invalid JSON: " + str(exc)
-
-    except OSError as exc:
-        return None, "File read error: " + str(exc)
-
-
-def nested_value(obj, *keys):
-
-    current = obj
+def nested_value(data, *keys):
+    current = data
 
     for key in keys:
-
         if not isinstance(current, dict):
             return None
 
         current = current.get(key)
 
-    if isinstance(current, dict):
-
-        if current.get("status") not in (None, "OK"):
-            return None
-
-        current = current.get("value")
-
-    return finite_number(current)
+    return current
 
 
-def metric_value(metrics, key):
-
-    item = metrics.get(key)
-
-    if not isinstance(item, dict):
-        return None
-
-    if item.get("status") != "OK":
-        return None
-
-    return finite_number(item.get("value"))
+def metric_value(data, *keys):
+    return finite_number(nested_value(data, *keys))
 
 
-def check_snapshot(name, timestamp, limit_hours):
+def first_metric(data, paths):
+    for path in paths:
+        value = metric_value(data, *path)
 
-    age = hours_old(timestamp)
+        if value is not None:
+            return value
 
-    if age is None:
-        status = "TIMESTAMP_UNKNOWN"
+    return None
 
-    elif age > limit_hours:
-        status = "STALE"
 
-    else:
-        status = "FRESH"
+def metric_timestamp(data, *paths):
+    for path in paths:
+        value = nested_value(data, *path)
+
+        if isinstance(value, dict):
+            for key in (
+                "source_updated_at",
+                "observed_at",
+                "as_of",
+                "asof",
+                "timestamp",
+                "updated_at",
+            ):
+                if value.get(key):
+                    return value[key]
+
+    return None
+
+
+def valid_range(value, low, high):
+    return value is not None and low <= value <= high
+
+
+# ============================================================
+# SNAPSHOT VALIDATION
+# ============================================================
+
+def check_snapshot(data, max_age_hours):
+    if not data:
+        return {
+            "status": "MISSING",
+            "age_hours": None,
+            "reason": "Input file missing or invalid.",
+        }
+
+    timestamp = data.get("generated_at") or data.get("fetched_at")
+
+    quality = timestamp_quality(timestamp, max_age_hours)
+
+    if quality["status"] != "FRESH":
+        return {
+            **quality,
+            "reason": "Snapshot timestamp is missing, invalid, future-dated or stale.",
+        }
 
     return {
-        "name": name,
-        "timestamp": timestamp,
-        "age_hours": round(age, 2) if age is not None else None,
-        "max_age_hours": limit_hours,
-        "status": status
+        **quality,
+        "reason": "Snapshot is fresh.",
     }
 
 
-# =========================================================
-# INPUT LOADING
-# =========================================================
+# ============================================================
+# TECHNICAL DATA EXTRACTION
+# ============================================================
 
-def load_inputs():
+def get_asset_technical(market, symbol):
+    technical = market.get("technical")
 
-    macro, macro_error = read_json(MACRO_FILE)
-    market, market_error = read_json(MARKET_FILE)
+    if not isinstance(technical, dict):
+        technical = {}
 
-    errors = []
-
-    if macro_error:
-        errors.append(
-            "macro_data.json: " + macro_error
-        )
-
-    if market_error:
-        errors.append(
-            "market_data.json: " + market_error
-        )
-
-    return macro, market, errors
-
-
-# =========================================================
-# MACRO ANALYSIS
-# =========================================================
-
-def analyze_macro(macro):
-
-    metrics = macro.get("metrics", {})
-    summary = macro.get("summary", {})
-    overall = macro.get("overall_macro_decision", {})
-
-    if not isinstance(metrics, dict):
-        metrics = {}
-
-    if not isinstance(summary, dict):
-        summary = {}
-
-    if not isinstance(overall, dict):
-        overall = {}
-
-    overall_data = overall.get("DATA", {})
-
-    if not isinstance(overall_data, dict):
-        overall_data = {}
-
-    decision = str(
-        overall.get("DECISION", "UNKNOWN")
-    ).upper()
-
-    risk_score = finite_number(
-        overall_data.get("risk_score")
-    )
-
-    support_score = finite_number(
-        overall_data.get("support_score")
-    )
-
-    inflation = macro.get("inflation", {})
-
-    if not isinstance(inflation, dict):
-        inflation = {}
-
-    cpi_yoy = finite_number(
-        (inflation.get("cpi") or {}).get("yoy_percent")
-    )
-
-    core_pce_yoy = finite_number(
-        (inflation.get("core_pce") or {}).get("yoy_percent")
-    )
-
-    vix = metric_value(metrics, "vix")
-
-    sp_change = finite_number(
-        (metrics.get("sp500") or {}).get("change_percent")
-    )
-
-    nasdaq_change = finite_number(
-        (metrics.get("nasdaq") or {}).get("change_percent")
-    )
-
-    yield_10y_change = finite_number(
-        (metrics.get("yield_10y") or {}).get("change")
-    )
-
-    liquidity = macro.get("liquidity", {})
-
-    liquidity_trend = (
-        liquidity.get("trend")
-        if isinstance(liquidity, dict)
-        else None
-    )
-
-    flags = []
-
-    if decision == "REDUCE RISK":
-        flags.append(
-            "Macro engine-এর সামগ্রিক সিদ্ধান্ত REDUCE RISK।"
-        )
-
-    if cpi_yoy is not None and cpi_yoy >= 3.5:
-        flags.append(
-            "CPI YoY উচ্চ; inflation pressure রয়েছে।"
-        )
-
-    if core_pce_yoy is not None and core_pce_yoy >= 3.0:
-        flags.append(
-            "Core PCE YoY 3% বা তার বেশি।"
-        )
-
-    if vix is not None and vix >= 20:
-        flags.append(
-            "VIX 20-এর ওপরে; equity volatility elevated।"
-        )
-
-    if (
-        sp_change is not None
-        and nasdaq_change is not None
-        and sp_change <= -1.5
-        and nasdaq_change <= -1.5
-    ):
-        flags.append(
-            "S&P 500 ও Nasdaq উভয়ই সর্বশেষ session-এ "
-            "1.5% বা বেশি কমেছে।"
-        )
-
-    if (
-        yield_10y_change is not None
-        and yield_10y_change >= 0.05
-    ):
-        flags.append(
-            "10Y Treasury yield-এর দৈনিক বৃদ্ধি "
-            "0.05 percentage point বা বেশি।"
-        )
-
-    if liquidity_trend == "CONTRACTING":
-        flags.append(
-            "US Net Liquidity proxy-এর trend CONTRACTING।"
-        )
-
-    return {
-
-        "decision": decision,
-
-        "risk_score": risk_score,
-
-        "support_score": support_score,
-
-        "data_quality": summary.get(
-            "data_quality", "UNKNOWN"
-        ),
-
-        "critical_series_available": summary.get(
-            "critical_series_available"
-        ),
-
-        "critical_series_count": summary.get(
-            "critical_series_count"
-        ),
-
-        "critical_missing": summary.get(
-            "critical_missing", []
-        ),
-
-        "key_metrics": {
-
-            "cpi_yoy_percent": cpi_yoy,
-
-            "core_pce_yoy_percent": core_pce_yoy,
-
-            "vix": vix,
-
-            "sp500_daily_change_percent": sp_change,
-
-            "nasdaq_daily_change_percent": nasdaq_change,
-
-            "yield_10y_daily_change_pp": yield_10y_change,
-
-            "net_liquidity_trend": liquidity_trend
-        },
-
-        "risk_flags": flags
-    }
-
-
-# =========================================================
-# BTC / ETH TECHNICAL ANALYSIS
-# =========================================================
-
-def analyze_asset(market, symbol):
-
-    technical = market.get("technical", {})
-
-    asset = technical.get(symbol, {})
+    asset = technical.get(symbol)
 
     if not isinstance(asset, dict):
         asset = {}
 
-    indicators = asset.get("indicators", {})
-
-    if not isinstance(indicators, dict):
-        indicators = {}
-
-    price = nested_value(
-        asset, "price_usdt"
-    )
-
-    ma20 = nested_value(
-        indicators, "ma20"
-    )
-
-    ma50 = nested_value(
-        indicators, "ma50"
-    )
-
-    ma200 = nested_value(
-        indicators, "ma200"
-    )
-
-    rsi = nested_value(
-        indicators, "rsi14"
-    )
-
-    macd = nested_value(
-        indicators, "macd"
-    )
-
-    macd_signal = nested_value(
-        indicators, "macd_signal"
-    )
-
-    adx = nested_value(
-        indicators, "adx14"
-    )
-
-    volume_ratio = nested_value(
-        indicators, "volume_ratio_20d"
-    )
-
-    support = nested_value(
-        indicators, "support_20d"
-    )
-
-    resistance = nested_value(
-        indicators, "resistance_20d"
-    )
-
-    lower_band = nested_value(
-        indicators, "bollinger_lower"
-    )
-
-    last_candle = asset.get(
-        "last_closed_candle_at"
-    )
-
-    available = all(
-        value is not None
-        for value in (
-            price,
-            ma20,
-            ma50,
-            ma200,
-            rsi
+    # Alternative structure support
+    if not asset:
+        alternate = market.get(
+            symbol.lower() + "_technical"
         )
+
+        if isinstance(alternate, dict):
+            asset = alternate
+
+    return asset
+
+
+def analyze_asset(market, symbol):
+    asset = get_asset_technical(market, symbol)
+
+    price = first_metric(asset, [
+        ("price",),
+        ("current_price",),
+        ("close",),
+    ])
+
+    ma20 = first_metric(asset, [
+        ("sma20",),
+        ("ma20",),
+        ("SMA20",),
+    ])
+
+    ma50 = first_metric(asset, [
+        ("sma50",),
+        ("ma50",),
+        ("SMA50",),
+    ])
+
+    ma200 = first_metric(asset, [
+        ("sma200",),
+        ("ma200",),
+        ("SMA200",),
+    ])
+
+    rsi = first_metric(asset, [
+        ("rsi14",),
+        ("rsi",),
+        ("RSI14",),
+    ])
+
+    macd = first_metric(asset, [
+        ("macd",),
+        ("MACD",),
+    ])
+
+    macd_signal = first_metric(asset, [
+        ("macd_signal",),
+        ("signal",),
+        ("MACD_signal",),
+    ])
+
+    adx = first_metric(asset, [
+        ("adx14",),
+        ("adx",),
+    ])
+
+    volume_ratio = first_metric(asset, [
+        ("volume_ratio",),
+        ("volume_sma20_ratio",),
+    ])
+
+    support = first_metric(asset, [
+        ("support_20d",),
+        ("support",),
+    ])
+
+    resistance = first_metric(asset, [
+        ("resistance_20d",),
+        ("resistance",),
+    ])
+
+    bollinger_lower = first_metric(asset, [
+        ("bollinger_lower",),
+        ("bb_lower",),
+    ])
+
+    # Individual technical observation timestamp
+    observed_at = (
+        asset.get("source_updated_at")
+        or asset.get("observed_at")
+        or asset.get("as_of")
+        or market.get("generated_at")
     )
 
-    if not available:
+    technical_age = timestamp_quality(
+        observed_at,
+        TECHNICAL_MAX_AGE_HOURS,
+    )
 
-        trend = "INSUFFICIENT_DATA"
-
-    elif price < ma20 and ma20 < ma50 and ma50 < ma200:
-
-        trend = "STRONG_BEARISH"
-
-    elif price < ma20 and ma20 < ma50:
-
-        trend = "BEARISH"
-
-    elif (
-        price > ma20
-        and ma20 > ma50
-        and ma50 > ma200
-    ):
-
-        trend = "BULLISH"
-
-    elif price > ma20 and price > ma50:
-
-        trend = "RECOVERY_ATTEMPT"
-
-    else:
-
-        trend = "MIXED"
-
-    signals = []
-
-    if available:
-
-        if price < ma20:
-            signals.append(
-                "দাম MA20-এর নিচে।"
-            )
-
-        if ma20 < ma50:
-            signals.append(
-                "MA20 < MA50; short/mid-term trend দুর্বল।"
-            )
-
-        if ma50 < ma200:
-            signals.append(
-                "MA50 < MA200; দীর্ঘমেয়াদি trend bearish।"
-            )
-
-        if rsi < 30:
-            signals.append(
-                "RSI 30-এর নিচে; oversold, "
-                "কিন্তু reversal নিশ্চিত নয়।"
-            )
-
-        elif rsi >= 70:
-            signals.append(
-                "RSI 70 বা বেশি; overbought সতর্কতা।"
-            )
-
-        if (
-            macd is not None
-            and macd_signal is not None
-            and macd < macd_signal
-        ):
-            signals.append(
-                "MACD signal line-এর নিচে।"
-            )
-
-        if (
-            support is not None
-            and price < support
-        ):
-            signals.append(
-                "দাম 20D support-এর নিচে; support breakdown।"
-            )
-
-        if (
-            volume_ratio is not None
-            and volume_ratio >= 1.2
-        ):
-            signals.append(
-                "শেষ দিনের volume 20D average-এর তুলনায় বেশি।"
-            )
-
-    return {
-
-        "symbol": symbol,
-
-        "price_usdt": price,
-
-        "ma20": ma20,
-
-        "ma50": ma50,
-
-        "ma200": ma200,
-
-        "rsi14": rsi,
-
-        "macd": macd,
-
-        "macd_signal": macd_signal,
-
-        "adx14": adx,
-
-        "volume_ratio_20d": volume_ratio,
-
-        "support_20d": support,
-
-        "resistance_20d": resistance,
-
-        "bollinger_lower": lower_band,
-
-        "last_closed_candle_at": last_candle,
-
-        "candle_count": asset.get("candle_count"),
-
-        "trend": trend,
-
-        "signals": signals,
-
-        "data_complete": available
+    checks = {
+        "price": price is not None and price > 0,
+        "ma20": ma20 is not None and ma20 > 0,
+        "ma50": ma50 is not None and ma50 > 0,
+        "ma200": ma200 is not None and ma200 > 0,
+        "rsi": valid_range(rsi, 0, 100),
     }
 
+    required_complete = all(checks.values())
 
-# =========================================================
-# DATA QUALITY AND SOURCE CONSISTENCY
-# =========================================================
+    if not required_complete:
+        quality = "INCOMPLETE"
+    elif technical_age["status"] != "FRESH":
+        quality = "STALE"
+    else:
+        quality = "FRESH"
 
-def detect_data_issues(macro, market):
+    trend = "UNKNOWN"
 
-    issues = []
+    if required_complete and quality == "FRESH":
+        if price > ma20 > ma50 > ma200:
+            trend = "STRONG_BULLISH"
 
-    major_assets = market.get("major_assets", {})
+        elif price > ma50 and ma20 > ma50:
+            trend = "BULLISH"
 
-    bitcoin = major_assets.get("bitcoin", {})
+        elif price < ma20 < ma50 < ma200:
+            trend = "STRONG_BEARISH"
 
-    cg_btc = nested_value(
-        bitcoin, "price_usd"
-    )
+        elif price < ma50 and ma20 < ma50:
+            trend = "BEARISH"
 
-    technical = market.get("technical", {})
-
-    btc_asset = technical.get("BTC", {})
-
-    bn_btc = nested_value(
-        btc_asset, "price_usdt"
-    )
-
-    if (
-        cg_btc is not None
-        and bn_btc is not None
-        and cg_btc > 0
-    ):
-
-        difference = (
-            abs(bn_btc - cg_btc) / cg_btc
-        ) * 100.0
-
-        if difference >= 1.0:
-
-            issues.append(
-                "BTC price source discrepancy: "
-                "CoinGecko snapshot ও Binance technical price-এর "
-                "পার্থক্য "
-                + str(round(difference, 2))
-                + "%। ভিন্ন source/timestamp হওয়ায় "
-                "কোনো একটি value auto-correct করা হয়নি।"
-            )
-
-    metrics = macro.get("metrics", {})
-
-    rrp_metric = metric_value(
-        metrics, "reverse_repo"
-    )
-
-    liquidity = macro.get("liquidity", {})
-
-    components = liquidity.get(
-        "components", {}
-    ) if isinstance(liquidity, dict) else {}
-
-    rrp_component = finite_number(
-        components.get("reverse_repo")
-    )
-
-    if (
-        rrp_metric is not None
-        and rrp_component is not None
-        and abs(rrp_metric - rrp_component) > 0.001
-    ):
-
-        issues.append(
-            "Net Liquidity RRP mismatch: "
-            "metrics.reverse_repo="
-            + str(rrp_metric)
-            + "B, liquidity.components.reverse_repo="
-            + str(rrp_component)
-            + "B। Liquidity formula-এর aligned component "
-            "আলাদা করে দেখানো হয়েছে।"
-        )
-
-    summary = macro.get("summary", {})
-
-    if (
-        summary.get("data_quality")
-        == "GOOD_WITH_OPTIONAL_GAPS"
-    ):
-
-        issues.append(
-            "Macro data quality GOOD_WITH_OPTIONAL_GAPS; "
-            "optional Gold data unavailable।"
-        )
-
-    if market.get("update_mode") != "realtime":
-
-        issues.append(
-            "Market data scheduled snapshot; realtime feed নয়।"
-        )
-
-    return issues
-
-
-# =========================================================
-# FINAL DECISION ENGINE
-# =========================================================
-
-def build_decision(
-    macro_result,
-    btc,
-    market_quality,
-    macro_quality,
-    market
-):
-
-    fear_greed = market.get(
-        "fear_greed", {}
-    )
-
-    fg_value = nested_value(
-        {"fg": fear_greed},
-        "fg"
-    )
-
-    fg_class = (
-        fear_greed.get("classification")
-        if isinstance(fear_greed, dict)
-        else None
-    )
-
-    global_market = market.get(
-        "global_market", {}
-    )
-
-    btc_dom = nested_value(
-        global_market,
-        "btc_dominance_pct"
-    )
-
-    market_cap = nested_value(
-        global_market,
-        "total_market_cap_usd"
-    )
-
-    volume_24h = nested_value(
-        global_market,
-        "total_volume_24h_usd"
-    )
-
-    reasons = []
-    actions = []
-    risks = []
-
-    data_blocked = (
-
-        market_quality.get("status") != "FRESH"
-
-        or macro_quality.get("status") != "FRESH"
-
-        or not btc.get("data_complete")
-
-        or btc.get("trend") == "INSUFFICIENT_DATA"
-    )
-
-    bearish_btc = btc.get(
-        "trend"
-    ) in (
-        "BEARISH",
-        "STRONG_BEARISH"
-    )
-
-    bullish_btc = (
-        btc.get("trend") == "BULLISH"
-    )
-
-    macro_reduce = (
-        macro_result.get("decision")
-        == "REDUCE RISK"
-    )
-
-    support = btc.get("support_20d")
-
-    price = btc.get("price_usdt")
+        else:
+            trend = "NEUTRAL"
 
     support_broken = (
         price is not None
         and support is not None
+        and support > 0
         and price < support
+        and quality == "FRESH"
     )
 
-    # DATA GATE
+    # A support comparison alone is NOT enough to issue SELL.
+    # The support value must be based on previous closed candles.
+    # This engine therefore treats it only as a warning.
 
-    if data_blocked:
+    return {
+        "symbol": symbol,
+        "quality": quality,
+        "technical_age": technical_age,
+        "trend": trend,
+        "price": price,
+        "ma20": ma20,
+        "ma50": ma50,
+        "ma200": ma200,
+        "rsi14": rsi,
+        "macd": macd,
+        "macd_signal": macd_signal,
+        "adx14": adx,
+        "volume_ratio": volume_ratio,
+        "support": support,
+        "resistance": resistance,
+        "bollinger_lower": bollinger_lower,
+        "support_warning": support_broken,
+        "checks": checks,
+    }
 
-        decision = "WAIT"
 
-        reasons.append(
-            "প্রয়োজনীয় ডেটা stale, timestamp অজানা, "
-            "অথবা BTC technical data অসম্পূর্ণ।"
-        )
+# ============================================================
+# MACRO ANALYSIS
+# ============================================================
 
-        actions.append(
-            "নতুন BUY/DCA স্থগিত রাখুন; "
-            "নতুন নির্ভরযোগ্য snapshot সংগ্রহ করুন।"
-        )
+def get_macro_metric(macro, *names):
+    metrics = macro.get("metrics")
 
-    # STRONG COMBINED BEARISH CONDITION
+    if not isinstance(metrics, dict):
+        return None
 
-    elif (
-        support_broken
-        and bearish_btc
-        and macro_reduce
+    for name in names:
+        item = metrics.get(name)
+
+        value = finite_number(item)
+
+        if value is not None:
+            return value
+
+    return None
+
+
+def analyze_macro(macro):
+    decision = macro.get("overall_macro_decision")
+
+    if not isinstance(decision, dict):
+        decision = {}
+
+    decision_label = str(
+        decision.get("decision", "UNKNOWN")
+    ).upper()
+
+    risk_level = str(
+        decision.get("risk_level", "UNKNOWN")
+    ).upper()
+
+    vix = get_macro_metric(
+        macro,
+        "VIX",
+        "vix",
+    )
+
+    yield_10y = get_macro_metric(
+        macro,
+        "DGS10",
+        "10Y",
+        "US10Y",
+    )
+
+    broad_usd = get_macro_metric(
+        macro,
+        "DTWEXBGS",
+        "broad_usd",
+        "usd_broad",
+    )
+
+    fed_funds = get_macro_metric(
+        macro,
+        "FEDFUNDS",
+        "fed_funds",
+    )
+
+    critical_checks = {
+        "vix": valid_range(vix, 0, 150),
+        "10y_yield": valid_range(yield_10y, -1, 20),
+        "broad_usd": broad_usd is not None and broad_usd > 0,
+    }
+
+    available_count = sum(
+        1 for value in critical_checks.values() if value
+    )
+
+    if available_count == 3:
+        quality = "GOOD"
+    elif available_count >= 1:
+        quality = "PARTIAL"
+    else:
+        quality = "POOR"
+
+    risk_score = 0
+    risk_flags = []
+
+    if vix is not None:
+        if vix >= 30:
+            risk_score += 2
+            risk_flags.append("VIX very high")
+        elif vix >= 25:
+            risk_score += 1
+            risk_flags.append("VIX elevated")
+
+    if yield_10y is not None and yield_10y >= 5:
+        risk_score += 1
+        risk_flags.append("US 10Y yield elevated")
+
+    if decision_label in (
+        "REDUCE RISK",
+        "REDUCE_RISK",
+        "HIGH RISK",
+        "HIGH_RISK",
     ):
+        risk_score = max(risk_score, 2)
+        risk_flags.append("Macro engine recommends reducing risk")
 
-        decision = "SELL"
+    if risk_level in ("HIGH", "VERY_HIGH", "CRITICAL"):
+        risk_score = max(risk_score, 2)
+        risk_flags.append("Macro risk level is elevated")
+
+    if quality == "POOR":
+        risk_flags.append("Insufficient macro data")
+
+    if decision_label not in (
+        "RISK ON",
+        "RISK_ON",
+        "HOLD",
+        "REDUCE RISK",
+        "REDUCE_RISK",
+        "WAIT",
+        "UNKNOWN",
+        "NEUTRAL",
+    ):
+        risk_flags.append("Unrecognized macro decision")
+
+    return {
+        "quality": quality,
+        "decision": decision_label,
+        "risk_level": risk_level,
+        "risk_score": risk_score,
+        "risk_flags": risk_flags,
+        "vix": vix,
+        "yield_10y": yield_10y,
+        "broad_usd": broad_usd,
+        "fed_funds": fed_funds,
+        "critical_checks": critical_checks,
+    }
+
+
+# ============================================================
+# DATA QUALITY
+# ============================================================
+
+def detect_data_issues(
+    market,
+    macro,
+    market_quality,
+    macro_quality,
+    btc,
+    eth,
+):
+    issues = []
+
+    if market_quality["status"] != "FRESH":
+        issues.append(
+            "Market snapshot is missing, invalid or stale."
+        )
+
+    if macro_quality["status"] != "FRESH":
+        issues.append(
+            "Macro snapshot is missing, invalid or stale."
+        )
+
+    if btc["quality"] != "FRESH":
+        issues.append(
+            "BTC technical data is incomplete or stale."
+        )
+
+    if eth["quality"] != "FRESH":
+        issues.append(
+            "ETH technical data is incomplete or stale."
+        )
+
+    update_mode = market.get("update_mode")
+
+    if update_mode != "realtime":
+        issues.append(
+            "Market data is a scheduled snapshot, not guaranteed realtime."
+        )
+
+    if macro.get("limitations"):
+        if isinstance(macro["limitations"], list):
+            issues.extend(
+                str(item) for item in macro["limitations"]
+                if item
+            )
+
+    return list(dict.fromkeys(issues))
+
+
+# ============================================================
+# DECISION ENGINE
+# ============================================================
+
+def build_decision(
+    market,
+    macro,
+    market_quality,
+    macro_quality,
+    btc,
+    eth,
+    macro_analysis,
+):
+    issues = detect_data_issues(
+        market,
+        macro,
+        market_quality,
+        macro_quality,
+        btc,
+        eth,
+    )
+
+    # Critical data gate
+    data_ready = (
+        market_quality["status"] == "FRESH"
+        and macro_quality["status"] == "FRESH"
+        and btc["quality"] == "FRESH"
+    )
+
+    reasons = []
+    actions = []
+    risk_items = []
+
+    if not data_ready:
+        final_decision = "WAIT"
 
         reasons.append(
-            "BTC bearish structure, 20D support breakdown "
-            "এবং Macro REDUCE RISK একসঙ্গে রয়েছে।"
+            "Critical market, macro or BTC technical data is not verified."
         )
 
         actions.append(
-            "ঝুঁকিপূর্ণ Altcoin exposure কমান। "
-            "Macro signal একা সব asset sell করার নির্দেশ নয়।"
+            "নতুন Spot position নেওয়া থেকে বিরত থাকুন; আগে data quality ঠিক করুন।"
         )
 
-    # BEARISH BTC + BEARISH MACRO
-
-    elif bearish_btc and macro_reduce:
-
-        decision = "REDUCE RISK"
-
-        reasons.append(
-            "Macro REDUCE RISK এবং BTC daily trend bearish।"
-        )
-
-        actions.append(
-            "নতুন Altcoin BUY/DCA বন্ধ রাখুন। "
-            "দুর্বল ও অতিরিক্ত ওজনের holdings পর্যালোচনা করুন।"
-        )
-
-    # BEARISH BTC
-
-    elif bearish_btc:
-
-        decision = "WAIT"
-
-        reasons.append(
-            "BTC daily trend bearish; oversold RSI একা buy signal নয়।"
-        )
-
-        actions.append(
-            "নতুন BUY/DCA এড়িয়ে চলুন। "
-            "Daily trend recovery নিশ্চিত না হওয়া পর্যন্ত অপেক্ষা করুন।"
-        )
-
-    # MACRO RISK
-
-    elif macro_reduce:
-
-        decision = "REDUCE RISK"
-
-        reasons.append(
-            "Macro risk elevated; BTC technical trend "
-            "একা Macro risk বাতিল করছে না।"
-        )
-
-        actions.append(
-            "নতুন Altcoin exposure সীমিত রাখুন; "
-            "cash reserve বজায় রাখুন।"
-        )
-
-    # BULLISH MARKET
-
-    elif bullish_btc:
-
-        decision = "HOLD"
-
-        reasons.append(
-            "BTC daily trend bullish এবং Macro engine "
-            "REDUCE RISK signal দিচ্ছে না।"
-        )
-
-        actions.append(
-            "বর্তমান spot holdings HOLD করুন। "
-            "নতুন BUY-এর আগে coin-level valuation "
-            "ও fundamentals যাচাই করুন।"
+        risk_items.append(
+            "Incomplete or stale data can produce misleading signals."
         )
 
     else:
+        btc_trend = btc["trend"]
+        eth_trend = eth["trend"]
 
-        decision = "WAIT"
+        macro_score = macro_analysis["risk_score"]
+        macro_label = macro_analysis["decision"]
 
-        reasons.append(
-            "Macro ও BTC trend থেকে একমুখী শক্তিশালী "
-            "সিদ্ধান্ত পাওয়া যায়নি।"
+        # Strong risk conditions
+        strong_macro_risk = (
+            macro_score >= 3
+            or macro_label in (
+                "REDUCE RISK",
+                "REDUCE_RISK",
+            )
         )
 
-        actions.append(
-            "নতুন BUY/DCA করার আগে trend confirmation অপেক্ষা করুন।"
+        btc_bearish = btc_trend in (
+            "BEARISH",
+            "STRONG_BEARISH",
         )
 
-    # ADDITIONAL RISK WARNINGS
-
-    if fg_value is not None and fg_value <= 20:
-
-        reasons.append(
-            "Fear & Greed Extreme Fear; "
-            "এটি একা market bottom signal নয়।"
+        btc_bullish = btc_trend in (
+            "BULLISH",
+            "STRONG_BULLISH",
         )
 
-    if (
-        btc.get("rsi14") is not None
-        and btc["rsi14"] < 30
-    ):
-
-        risks.append(
-            "BTC RSI oversold; আরও পতন বা consolidation সম্ভব। "
-            "Oversold মানেই reversal নয়।"
+        eth_bearish = eth_trend in (
+            "BEARISH",
+            "STRONG_BEARISH",
         )
 
-    if (
-        btc.get("ma20") is not None
-        and btc.get("ma50") is not None
-        and btc["ma20"] < btc["ma50"]
-    ):
+        if strong_macro_risk and btc_bearish:
+            final_decision = "REDUCE RISK"
 
-        risks.append(
-            "BTC MA20 < MA50; short/mid-term trend দুর্বল।"
-        )
+            reasons.append(
+                "BTC bearish structure and elevated macro risk are aligned."
+            )
 
-    if (
-        btc.get("ma50") is not None
-        and btc.get("ma200") is not None
-        and btc["ma50"] < btc["ma200"]
-    ):
+            actions.append(
+                "নতুন Altcoin exposure বাড়াবেন না। দুর্বল ও অতিরিক্ত ঝুঁকিপূর্ণ position পর্যালোচনা করুন।"
+            )
 
-        risks.append(
-            "BTC MA50 < MA200; দীর্ঘমেয়াদি bearish structure।"
-        )
+            risk_items.append(
+                "Broad-market downside risk is elevated."
+            )
 
-    if macro_reduce:
+        elif btc_bearish:
+            final_decision = "WAIT"
 
-        risks.append(
-            "Macro risk elevated; এটি coin-specific "
-            "fundamental sell analysis নয়।"
-        )
+            reasons.append(
+                "BTC technical structure is bearish."
+            )
 
-    if fg_value is None:
+            actions.append(
+                "নতুন Spot BUY/DCA আপাতত বন্ধ রাখুন; বাজারের trend উন্নতির অপেক্ষা করুন।"
+            )
 
-        risks.append(
-            "Fear & Greed value unavailable; "
-            "sentiment confirmation নেই।"
-        )
+        elif strong_macro_risk:
+            final_decision = "REDUCE RISK"
+
+            reasons.append(
+                "Macro risk is elevated even though BTC is not confirmed bearish."
+            )
+
+            actions.append(
+                "নতুন exposure বাড়াবেন না; portfolio concentration ও position risk পর্যালোচনা করুন।"
+            )
+
+        elif btc_bullish and not eth_bearish:
+            final_decision = "HOLD"
+
+            reasons.append(
+                "BTC trend is bullish and macro risk is not elevated."
+            )
+
+            actions.append(
+                "বিদ্যমান Spot position ধরে রাখুন; নতুন BUY সিদ্ধান্তের আগে coin-specific fundamentals ও valuation যাচাই করুন।"
+            )
+
+        else:
+            final_decision = "WAIT"
+
+            reasons.append(
+                "Market signals are mixed or lack sufficient confirmation."
+            )
+
+            actions.append(
+                "নতুন Spot position নেওয়ার আগে BTC ও ETH trend confirmation অপেক্ষা করুন।"
+            )
+
+        if btc["support_warning"]:
+            risk_items.append(
+                "BTC price is below the supplied support reference; verify the support calculation and closed-candle confirmation."
+            )
+
+        if btc["rsi14"] is not None and btc["rsi14"] >= 70:
+            risk_items.append(
+                "BTC RSI is overbought; avoid chasing extended price moves."
+            )
+
+        if eth["rsi14"] is not None and eth["rsi14"] >= 70:
+            risk_items.append(
+                "ETH RSI is overbought."
+            )
+
+        if eth["quality"] != "FRESH":
+            risk_items.append(
+                "ETH technical data is not fully verified; ETH confirmation is limited."
+            )
+
+        if macro_analysis["quality"] != "GOOD":
+            risk_items.append(
+                "Macro metrics are incomplete."
+            )
 
     return {
-
-        "decision": decision,
-
-        "confidence_label": "RULE_BASED_NOT_PROBABILITY",
-
+        "decision": final_decision,
+        "market_status": final_decision,
         "reasons": reasons,
-
         "actions": actions,
-
-        "risk": risks,
-
-        "market_context": {
-
-            "fear_greed_value": fg_value,
-
-            "fear_greed_classification": fg_class,
-
-            "btc_dominance_percent": btc_dom,
-
-            "total_market_cap_usd": market_cap,
-
-            "total_volume_24h_usd": volume_24h
-        },
-
-        "important_note": (
-            "এটি সামগ্রিক market-regime guidance; "
-            "ব্যক্তিগত portfolio holdings-এর "
-            "coin-by-coin SELL signal নয়।"
-        )
+        "risk": risk_items,
+        "data_ready": data_ready,
+        "decision_scope": "BROAD_CRYPTO_MARKET_SPOT",
+        "not_coin_specific": True,
     }
 
 
-# =========================================================
-# MAIN ENGINE
-# =========================================================
+# ============================================================
+# MAIN
+# ============================================================
 
 def main():
+    generated_at = utc_now().isoformat()
 
-    macro, market, errors = load_inputs()
+    market = read_json(MARKET_FILE)
+    macro = read_json(MACRO_FILE)
 
-    if errors:
-
-        output = {
-
-            "schema_version": 1,
-
-            "engine": "Crypto Final Decision Engine",
-
-            "engine_version": VERSION,
-
-            "generated_at": iso_now(),
-
-            "status": "ERROR",
-
-            "decision": "WAIT",
-
-            "errors": errors,
-
-            "message": (
-                "Input data পাওয়া যায়নি বা JSON invalid; "
-                "কোনো market decision তৈরি করা হয়নি।"
-            )
-        }
-
-        DATA_DIR.mkdir(
-            parents=True,
-            exist_ok=True
-        )
-
-        OUTPUT_FILE.write_text(
-            json.dumps(
-                output,
-                ensure_ascii=False,
-                indent=2
-            ),
-            encoding="utf-8"
-        )
-
-        print(
-            json.dumps(
-                output,
-                ensure_ascii=False,
-                indent=2
-            )
-        )
-
-        return 1
-
-    macro_time = macro.get(
-        "fetched_at"
-    )
-
-    market_time = market.get(
-        "generated_at"
+    market_quality = check_snapshot(
+        market,
+        MARKET_MAX_AGE_HOURS,
     )
 
     macro_quality = check_snapshot(
-        "macro_data",
-        macro_time,
-        MACRO_MAX_AGE_HOURS
+        macro,
+        MACRO_MAX_AGE_HOURS,
     )
 
-    market_quality = check_snapshot(
-        "market_data",
-        market_time,
-        MARKET_MAX_AGE_HOURS
-    )
+    btc = analyze_asset(market, "BTC")
+    eth = analyze_asset(market, "ETH")
 
-    btc = analyze_asset(
+    macro_analysis = analyze_macro(macro)
+
+    final_decision = build_decision(
         market,
-        "BTC"
-    )
-
-    eth = analyze_asset(
-        market,
-        "ETH"
-    )
-
-    technical_quality = check_snapshot(
-        "BTC last closed daily candle",
-        btc.get("last_closed_candle_at"),
-        TECHNICAL_MAX_AGE_HOURS
-    )
-
-    eth_technical_quality = check_snapshot(
-        "ETH last closed daily candle",
-        eth.get("last_closed_candle_at"),
-        TECHNICAL_MAX_AGE_HOURS
-    )
-
-    macro_result = analyze_macro(
-        macro
+        macro,
+        market_quality,
+        macro_quality,
+        btc,
+        eth,
+        macro_analysis,
     )
 
     issues = detect_data_issues(
+        market,
         macro,
-        market
-    )
-
-    # A fresh API fetch does not guarantee fresh candles.
-
-    if technical_quality["status"] != "FRESH":
-
-        market_quality = dict(
-            market_quality
-        )
-
-        market_quality["status"] = (
-            "STALE_TECHNICAL_CANDLES"
-        )
-
-    decision = build_decision(
-        macro_result,
-        btc,
         market_quality,
         macro_quality,
-        market
+        btc,
+        eth,
     )
 
-    overall_status = "OK"
-
-    if (
-        macro_quality["status"] != "FRESH"
-        or market_quality["status"] != "FRESH"
-        or not btc.get("data_complete")
-    ):
-
-        overall_status = "DATA_WARNING"
-
-    output = {
-
-        "schema_version": 1,
-
-        "engine": "Crypto Final Decision Engine",
-
-        "engine_version": VERSION,
-
-        "generated_at": iso_now(),
-
-        "status": overall_status,
-
-        "data_quality": {
-
-            "macro": macro_quality,
-
-            "market": market_quality,
-
-            "btc_technical": technical_quality,
-
-            "eth_technical": eth_technical_quality,
-
-            "issues": issues
-        },
-
-        "macro_analysis": macro_result,
-
-        "crypto_market": {
-
-            "global_market_cap_usd": nested_value(
-                market.get("global_market", {}),
-                "total_market_cap_usd"
-            ),
-
-            "global_volume_24h_usd": nested_value(
-                market.get("global_market", {}),
-                "total_volume_24h_usd"
-            ),
-
-            "btc_dominance_percent": nested_value(
-                market.get("global_market", {}),
-                "btc_dominance_pct"
-            ),
-
-            "fear_greed": market.get(
-                "fear_greed", {}
-            ),
-
-            "btc": btc,
-
-            "eth": eth
-        },
-
-        "final_decision": decision,
-
-        "limitations": [
-
-            "Rule-based engine; calibrated probability নয়।",
-
-            "Macro decision একা crypto SELL signal নয়।",
-
-            "BTC/ETH technical data 1D closed candles; "
-            "intraday reversal ধরার জন্য নয়।",
-
-            "ETF flows, crypto on-chain, whale flows, "
-            "liquidation data ও derivatives positioning "
-            "এখনো integrate করা হয়নি।",
-
-            "Coin-specific tokenomics, unlocks, fundamentals "
-            "ও portfolio weight এই engine-এ নেই।",
-
-            "CoinGecko ও Binance price আলাদা source/time; "
-            "source mismatch report করা হয়, auto-correct নয়।",
-
-            "FRED macro observations প্রকাশে বিলম্বিত হতে পারে।"
-        ]
-    }
-
-    DATA_DIR.mkdir(
-        parents=True,
-        exist_ok=True
-    )
-
-    temp_file = OUTPUT_FILE.with_suffix(
-        ".json.tmp"
-    )
-
-    temp_file.write_text(
-        json.dumps(
-            output,
-            ensure_ascii=False,
-            indent=2,
-            allow_nan=False
-        ),
-        encoding="utf-8"
-    )
-
-    temp_file.replace(
-        OUTPUT_FILE
-    )
-
-    print(
-        "Crypto Final Decision Engine v"
-        + VERSION
-    )
-
-    print(
-        "Status: "
-        + overall_status
-    )
-
-    print(
-        "Decision: "
-        + str(decision.get("decision"))
-    )
-
-    print(
-        "BTC trend: "
-        + str(btc.get("trend"))
-    )
-
-    print(
-        "Macro decision: "
-        + str(macro_result.get("decision"))
-    )
-
-    print(
-        "Macro data: "
-        + str(macro_quality.get("status"))
-    )
-
-    print(
-        "Market data: "
-        + str(market_quality.get("status"))
-    )
-
-    print(
-        "Output: data/decision_data.json"
-    )
-
-    if issues:
-
-        print(
-            "Data issues: "
-            + str(len(issues))
+    if macro_analysis["quality"] != "GOOD":
+        issues.append(
+            "Macro critical metric coverage is incomplete."
         )
 
-        for issue in issues:
-            print("- " + issue)
+    data_quality_status = (
+        "GOOD"
+        if final_decision["data_ready"]
+        and macro_analysis["quality"] == "GOOD"
+        else "PARTIAL"
+    )
 
-    return 0
+    output = {
+        "engine": "CRYPTO FINAL DECISION ENGINE",
+        "version": VERSION,
+        "generated_at": generated_at,
+
+        "data_quality": {
+            "status": data_quality_status,
+            "market_snapshot": market_quality,
+            "macro_snapshot": macro_quality,
+            "btc_technical": btc["quality"],
+            "eth_technical": eth["quality"],
+            "issues": list(dict.fromkeys(issues)),
+        },
+
+        "macro_analysis": macro_analysis,
+
+        "crypto_market": {
+            "global_market": market.get("global", {}),
+            "fear_greed": market.get("fear_greed", {}),
+            "btc": btc,
+            "eth": eth,
+        },
+
+        "final_decision": final_decision,
+
+        "limitations": [
+            "This engine evaluates broad crypto-market Spot risk, not individual coin fundamentals.",
+            "Scheduled snapshots are not guaranteed realtime.",
+            "Macro data may be delayed by official publication schedules.",
+            "A support warning alone is not a confirmed breakdown.",
+            "RSI overbought alone is not a SELL signal.",
+            "This engine does not provide personalized portfolio allocation.",
+            "No futures or margin trading signals are generated.",
+        ],
+    }
+
+    atomic_write_json(OUTPUT_FILE, output)
+
+    print("=" * 60)
+    print("CRYPTO FINAL DECISION ENGINE")
+    print("Version:", VERSION)
+    print("Decision:", final_decision["decision"])
+    print("Data Quality:", data_quality_status)
+    print("BTC Trend:", btc["trend"])
+    print("ETH Trend:", eth["trend"])
+    print("Macro Risk Score:", macro_analysis["risk_score"])
+    print("Output:", OUTPUT_FILE)
+    print("=" * 60)
 
 
 if __name__ == "__main__":
-
-    sys.exit(main())
+    main()
