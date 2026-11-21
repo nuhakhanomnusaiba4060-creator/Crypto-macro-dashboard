@@ -1,107 +1,265 @@
 {
-  "schema_version": 2,
+  "schema_version": 3,
   "engine": "Crypto Market Zone Engine",
-  "engine_version": "2.0.0",
-  "generated_at": "2026-11-21T21:46:13.740599+00:00",
-  "data_quality": "POOR",
-  "current_zone": "তথ্য অপর্যাপ্ত",
-  "zone_code": "INSUFFICIENT_DATA",
-  "market_position": "তথ্য নেই",
-  "confidence": 0,
-  "confidence_note": "এটি calibrated probability নয়; ডেটার coverage ও supporting evidence-এর score।",
-  "next_zone": "নির্দিষ্ট ভবিষ্যৎ Zone অনুমান করা হচ্ছে না। বর্তমান trend confirmation প্রয়োজন।",
+  "engine_version": "3.0.0",
+  "generated_at": "2026-11-21T21:51:25.606288+00:00",
+  "data_quality": "PARTIAL",
+  "current_zone": "বিয়ারিশ পুনরুদ্ধার ঝুঁকি",
+  "zone_code": "BEARISH_RECOVERY_RISK",
+  "market_position": "পরিবর্তনশীল পর্যায়",
+  "confidence": 65,
+  "confidence_note": "এটি লাভের সম্ভাবনা বা calibrated probability নয়। এটি পাওয়া তথ্য ও supporting evidence-এর coverage score।",
+  "next_zone": "ভবিষ্যৎ Market Zone নিশ্চিতভাবে অনুমান করা হচ্ছে না। পরবর্তী trend confirmation প্রয়োজন।",
   "spot_action": "অপেক্ষা করুন",
   "spot_action_code": "WAIT",
   "risk_level": "উচ্চ",
   "risk_code": "HIGH",
-  "reason": "প্রয়োজনীয় BTC data অনুপস্থিত, stale অথবা invalid।",
-  "action_instruction": "নতুন Spot position নেবেন না। প্রথমে data quality এবং BTC technical data ঠিক করুন।",
-  "btc_trend": "UNKNOWN",
-  "btc_trend_bn": "তথ্য নেই",
+  "reason": "Macro Engine-এর সিদ্ধান্ত: WAIT — INSUFFICIENT DATA। তাই নতুন BUY/DCA অনুমোদিত নয়।",
+  "action_instruction": "নতুন Spot BUY/DCA করবেন না। Macro Engine-এর প্রয়োজনীয় তথ্য সম্পূর্ণ ও যাচাই হওয়া পর্যন্ত অপেক্ষা করুন।",
+  "btc_trend": "BEARISH",
+  "btc_trend_bn": "বিয়ারিশ",
   "macro_risk": {
-    "score": 1,
-    "level": "MODERATE",
+    "score": 2,
+    "level": "HIGH",
     "reasons": [
-      "VIX elevated; বাজারে সতর্কতা প্রয়োজন।"
+      "VIX ২৫ বা তার বেশি। বাজারে সতর্কতা প্রয়োজন।",
+      "Broad USD সূচকের তথ্য পাওয়া গেছে। শুধু বর্তমান মান দিয়ে ডলারের শক্তি বাড়ছে না কমছে তা নিশ্চিত করা যায় না।",
+      "যুক্তরাষ্ট্রের ১০ বছর মেয়াদি বন্ডের সুদ ৫%-এর সমান বা বেশি।"
     ],
-    "missing": [
-      "Broad USD",
-      "US 10Y yield"
-    ]
+    "missing": []
   },
-  "macro_decision": "UNKNOWN",
+  "macro_decision": "WAIT — INSUFFICIENT DATA",
+  "macro_data_quality": "GOOD_WITH_OPTIONAL_GAPS",
   "final_engine_decision": "WAIT",
   "btc_technical": {
-    "price": null,
+    "price": 58951.51,
     "ma20": 71103.515,
     "ma50": 77717.71659999999,
     "ma200": 72589.18524999998,
     "rsi14": 17.352953009243876,
     "macd": -4800.5169055278675,
     "macd_signal": -3700.802078331073,
-    "volume_ratio": null,
+    "volume_ratio": 1.9360137865525127,
     "support_20d": 61428.26,
     "resistance_20d": 81196.01
   },
   "fear_greed": 12.0,
-  "btc_dominance": null,
+  "btc_dominance": 57.97117128431154,
   "advanced_context": {
-    "mvrv_ratio": 1.104933597125702,
-    "breadth_ratio": null,
-    "advancing": null,
-    "declining": null
+    "mvrv_ratio": null,
+    "breadth_ratio": 1.468,
+    "advancing": 295.0,
+    "declining": 201.0
   },
-  "bullish_score": 0,
-  "bearish_score": 0,
+  "bullish_score": 2,
+  "bearish_score": 6,
   "reasons": [
-    "Market Zone নির্ধারণের জন্য প্রয়োজনীয় BTC data যাচাই হয়নি।"
+    "BTC-এর বর্তমান মূল্য MA200-এর নিচে।",
+    "MA20, MA50-এর নিচে রয়েছে।",
+    "MA50, MA200-এর উপরে; দীর্ঘমেয়াদি প্রবণতা ইতিবাচক।",
+    "BTC মূল্য MA20-এর নিচে।",
+    "RSI ৪০ বা কম; বাজারের গতি দুর্বল।",
+    "RSI ৩০-এর নিচে। বাজার অতিরিক্ত বিক্রিত অবস্থায় থাকতে পারে; তবে শুধু RSI দিয়ে BUY বা DCA করা যাবে না।",
+    "MACD, Signal Line-এর নিচে রয়েছে।",
+    "BTC-এর লেনদেনের পরিমাণ স্বাভাবিক গড়ের চেয়ে বেশি।",
+    "Fear & Greed সূচকে চরম ভয় রয়েছে। এটি একা BUY সংকেত নয়।"
   ],
   "missing_data": [
-    "BTC Technical: price পাওয়া যায়নি।"
+    "Advanced mvrv: তথ্য পাওয়া যায়নি অথবা যাচাই করা যায়নি।",
+    "সতর্কতা: Macro Engine-এর সিদ্ধান্ত নতুন BUY/DCA অনুমোদন করছে না।",
+    "সতর্কতা: Final Decision Engine-এর সিদ্ধান্ত নতুন BUY/DCA সীমিত করছে।"
   ],
   "data_errors": [],
   "verified_inputs": {
     "market": {
       "status": "FRESH",
-      "age_hours": 0.0,
-      "timestamp": "2026-11-21T21:46:03Z",
+      "age_hours": 0.01,
+      "timestamp": "2026-11-21T21:50:43Z",
       "reason": null
     },
     "macro": {
       "status": "FRESH",
-      "age_hours": 1.1,
-      "timestamp": "2026-11-21T20:40:26Z",
+      "age_hours": 0.0,
+      "timestamp": "2026-11-21T21:51:25Z",
       "reason": null
     },
     "advanced": {
       "status": "FRESH",
-      "age_hours": 0.0,
-      "timestamp": "2026-11-21T21:46:04Z",
+      "age_hours": 0.01,
+      "timestamp": "2026-11-21T21:50:45Z",
       "reason": null
     },
     "decision": {
       "status": "FRESH",
       "age_hours": 0.0,
-      "timestamp": "2026-11-21T21:46:13.691741+00:00",
+      "timestamp": "2026-11-21T21:51:25.561853+00:00",
       "reason": null
     },
     "btc_technical": {
-      "valid": false,
-      "missing": [
-        "price"
-      ],
-      "invalid": []
+      "valid": true,
+      "missing": [],
+      "invalid": [],
+      "stale": [],
+      "metrics": {
+        "price": {
+          "valid": true,
+          "status": "FRESH",
+          "timestamp": "2026-11-20T23:59:59Z",
+          "age_hours": 21.86,
+          "reason": null
+        },
+        "ma20": {
+          "valid": true,
+          "status": "FRESH",
+          "timestamp": "2026-11-20T23:59:59Z",
+          "age_hours": 21.86,
+          "reason": null
+        },
+        "ma50": {
+          "valid": true,
+          "status": "FRESH",
+          "timestamp": "2026-11-20T23:59:59Z",
+          "age_hours": 21.86,
+          "reason": null
+        },
+        "ma200": {
+          "valid": true,
+          "status": "FRESH",
+          "timestamp": "2026-11-20T23:59:59Z",
+          "age_hours": 21.86,
+          "reason": null
+        },
+        "rsi14": {
+          "valid": true,
+          "status": "FRESH",
+          "timestamp": "2026-11-20T23:59:59Z",
+          "age_hours": 21.86,
+          "reason": null
+        },
+        "macd": {
+          "valid": true,
+          "status": "FRESH",
+          "timestamp": "2026-11-20T23:59:59Z",
+          "age_hours": 21.86,
+          "reason": null
+        },
+        "macd_signal": {
+          "valid": true,
+          "status": "FRESH",
+          "timestamp": "2026-11-20T23:59:59Z",
+          "age_hours": 21.86,
+          "reason": null
+        },
+        "volume_ratio": {
+          "valid": true,
+          "status": "FRESH",
+          "timestamp": "2026-11-20T23:59:59Z",
+          "age_hours": 21.86,
+          "reason": null
+        },
+        "support_20d": {
+          "valid": true,
+          "status": "FRESH",
+          "timestamp": "2026-11-20T23:59:59Z",
+          "age_hours": 21.86,
+          "reason": null
+        },
+        "resistance_20d": {
+          "valid": true,
+          "status": "FRESH",
+          "timestamp": "2026-11-20T23:59:59Z",
+          "age_hours": 21.86,
+          "reason": null
+        }
+      }
+    },
+    "fear_greed": {
+      "valid": true,
+      "status": "FRESH",
+      "timestamp": "2026-11-21T00:00:00Z",
+      "age_hours": 21.86,
+      "reason": null
+    },
+    "btc_dominance": {
+      "valid": true,
+      "status": "FRESH",
+      "timestamp": "2026-11-21T21:43:02Z",
+      "age_hours": 0.14,
+      "reason": null
+    },
+    "macro_metrics": {
+      "vix": {
+        "valid": true,
+        "status": "FRESH",
+        "timestamp": "2026-11-21T21:50:58Z",
+        "age_hours": 0.01,
+        "reason": null
+      },
+      "usd_broad": {
+        "valid": true,
+        "status": "FRESH",
+        "timestamp": "2026-11-21T21:50:58Z",
+        "age_hours": 0.01,
+        "reason": null
+      },
+      "yield_10y": {
+        "valid": true,
+        "status": "FRESH",
+        "timestamp": "2026-11-21T21:50:59Z",
+        "age_hours": 0.01,
+        "reason": null
+      }
+    },
+    "advanced_metrics": {
+      "mvrv": {
+        "valid": false,
+        "status": "STALE",
+        "timestamp": "2026-11-20T00:00:00.000000000Z",
+        "age_hours": 45.86,
+        "reason": "Metric 45.9 ঘণ্টা পুরোনো।"
+      },
+      "breadth_ratio": {
+        "valid": true,
+        "status": "FRESH",
+        "timestamp": "2026-11-21T21:50:45Z",
+        "age_hours": 0.01,
+        "reason": null
+      },
+      "advancing": {
+        "valid": true,
+        "status": "FRESH",
+        "timestamp": "2026-11-21T21:50:45Z",
+        "age_hours": 0.01,
+        "reason": null
+      },
+      "declining": {
+        "valid": true,
+        "status": "FRESH",
+        "timestamp": "2026-11-21T21:50:45Z",
+        "age_hours": 0.01,
+        "reason": null
+      }
+    },
+    "policy_checks": {
+      "market_quality_ok": true,
+      "macro_quality_ok": true,
+      "advanced_quality_ok": false,
+      "decision_quality_ok": true,
+      "macro_decision_restrictive": true,
+      "final_decision_restrictive": true
     }
   },
   "limitations": [
-    "Market Zone পুরো crypto market-এর broad regime; coin-specific BUY/SELL signal নয়।",
-    "Market data scheduled snapshot; guaranteed realtime নয়।",
-    "Macro data FRED release schedule অনুযায়ী delayed হতে পারে।",
-    "DTWEXBGS হলো broad trade-weighted USD proxy; ICE DXY নয়।",
-    "MVRV Ratio এবং MVRV Z-Score এক জিনিস নয়।",
-    "Fear & Greed একা BUY/SELL signal নয়।",
-    "Confidence score calibrated probability নয়।",
-    "এই Engine কোনো coin-এর valuation বা tokenomics যাচাই করে না।",
-    "CAUTIOUS_DCA মানে স্বয়ংক্রিয় BUY অনুমোদন নয়; coin-level fundamentals, valuation, liquidity এবং unlock যাচাই জরুরি।"
+    "এই রিপোর্ট পুরো Crypto Market-এর সামগ্রিক অবস্থা বোঝায়; কোনো নির্দিষ্ট কয়েনের BUY/SELL সংকেত নয়।",
+    "Dashboard নির্দিষ্ট সময় পরপর Snapshot তৈরি করে; প্রতি Refresh-এ Provider-এর নতুন তথ্য পাওয়া নিশ্চিত নয়।",
+    "Macro-এর FRED তথ্য প্রকাশের সময়সূচি অনুযায়ী বিলম্বিত হতে পারে।",
+    "DTWEXBGS হলো Broad Trade-Weighted USD সূচক; এটি ICE DXY নয়।",
+    "MVRV Ratio এবং MVRV Z-Score আলাদা সূচক।",
+    "Fear & Greed একা BUY/SELL সিদ্ধান্ত নির্ধারণ করে না।",
+    "Confidence হলো তথ্যের Coverage Score; লাভের সম্ভাবনা নয়।",
+    "এই Engine কোনো কয়েনের Fundamentals, Valuation, FDV, Token Unlock বা Tokenomics যাচাই করে না।",
+    "Market Zone-এ DCA-সংক্রান্ত ইতিবাচক অবস্থা দেখা গেলেও এটি স্বয়ংক্রিয় BUY অনুমোদন নয়।",
+    "Spot Market Breadth শুধু উপলব্ধ Binance Spot Trading Pair-এর তথ্যের ওপর নির্ভরশীল।",
+    "কোনো প্রয়োজনীয় তথ্য অনুপস্থিত, পুরোনো অথবা invalid হলে নিরাপদ সিদ্ধান্ত হিসেবে WAIT ব্যবহার করা হয়।"
   ]
 }
