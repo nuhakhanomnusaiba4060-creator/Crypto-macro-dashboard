@@ -1,676 +1,429 @@
 
-/* =========================================================
-   ADVANCED CRYPTO INTELLIGENCE DASHBOARD
-   Bangla UI | Spot Portfolio | Market Radar
-   ========================================================= */
+/* =====================================================
+   CRYPTO MACRO DASHBOARD — ADVANCED MODULE
+   বাংলা UI | Verified JSON Data | Spot Investor
+   ===================================================== */
 
 (() => {
   "use strict";
 
-  if (document.getElementById("advancedCryptoDashboard")) {
-    return;
-  }
+  if (document.getElementById("advancedCryptoDashboard")) return;
+
+  const DATA_URL = "./data/advanced_data.json";
 
   const style = document.createElement("style");
-
   style.textContent = `
     #advancedCryptoDashboard {
-      margin-top: 30px;
-      color: #e8eef7;
+      margin-top:28px;
+      color:#e8f0fa;
+      font-family:Arial,"Noto Sans Bengali",sans-serif;
     }
-
     #advancedCryptoDashboard .adv-title {
-      margin: 25px 0 13px;
-      padding-left: 11px;
-      border-left: 3px solid #f4c65e;
-      font-size: 17px;
-      font-weight: 800;
+      font-size:17px;font-weight:bold;
+      margin:25px 0 12px;
+      border-left:3px solid #3988ff;
+      padding-left:10px;
     }
-
     #advancedCryptoDashboard .adv-grid {
-      display: grid;
-      grid-template-columns: repeat(
-        auto-fit,
-        minmax(190px, 1fr)
-      );
-      gap: 12px;
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(210px,1fr));
+      gap:10px;
     }
-
     #advancedCryptoDashboard .adv-card {
-      background: #101927;
-      border: 1px solid #233248;
-      border-radius: 11px;
-      padding: 15px;
-      min-width: 0;
+      background:#101e30;border:1px solid #263951;
+      border-radius:10px;padding:13px;min-width:0;
     }
-
-    #advancedCryptoDashboard .adv-label {
-      color: #8d9bb0;
-      font-size: 12px;
-      margin-bottom: 10px;
+    #advancedCryptoDashboard .adv-name {
+      color:#91a4bb;font-size:12px;margin-bottom:8px;
     }
-
     #advancedCryptoDashboard .adv-value {
-      font-size: 19px;
-      font-weight: 800;
-      overflow-wrap: anywhere;
+      font-size:19px;font-weight:bold;overflow-wrap:anywhere;
     }
-
-    #advancedCryptoDashboard .adv-note {
-      color: #8d9bb0;
-      font-size: 11px;
-      line-height: 1.6;
-      margin-top: 8px;
+    #advancedCryptoDashboard .adv-detail {
+      font-size:11px;color:#bdcada;line-height:1.7;margin-top:9px;
     }
-
+    #advancedCryptoDashboard .adv-detail b {color:#e8f0fa}
+    #advancedCryptoDashboard .good {color:#16c784}
+    #advancedCryptoDashboard .bad {color:#ea3943}
+    #advancedCryptoDashboard .warn {color:#f0b90b}
     #advancedCryptoDashboard .adv-table-wrap {
-      overflow-x: auto;
-      background: #101927;
-      border: 1px solid #233248;
-      border-radius: 10px;
+      overflow-x:auto;background:#101e30;
+      border:1px solid #263951;border-radius:10px;
     }
-
     #advancedCryptoDashboard table {
-      width: 100%;
-      min-width: 510px;
-      border-collapse: collapse;
-      font-size: 12px;
+      width:100%;min-width:520px;border-collapse:collapse;font-size:12px;
     }
-
     #advancedCryptoDashboard th,
     #advancedCryptoDashboard td {
-      padding: 10px;
-      border-bottom: 1px solid #233248;
-      text-align: left;
+      padding:9px;text-align:left;border-bottom:1px solid #263951;
     }
-
-    #advancedCryptoDashboard th {
-      color: #8d9bb0;
-    }
-
+    #advancedCryptoDashboard th {color:#91a4bb}
     #advancedCryptoDashboard .adv-form {
-      display: grid;
-      grid-template-columns: repeat(
-        auto-fit,
-        minmax(130px, 1fr)
-      );
-      gap: 9px;
+      display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));
+      gap:9px;margin-top:12px;
     }
-
     #advancedCryptoDashboard input {
-      width: 100%;
-      padding: 10px;
-      background: #080d16;
-      border: 1px solid #34445b;
-      border-radius: 7px;
-      color: #e8eef7;
+      width:100%;padding:10px;background:#07111f;
+      border:1px solid #34445b;border-radius:7px;color:white;
+      box-sizing:border-box;
     }
-
     #advancedCryptoDashboard button {
-      margin-top: 10px;
-      padding: 10px 14px;
-      background: #263b55;
-      color: white;
-      border: 1px solid #415875;
-      border-radius: 7px;
-      cursor: pointer;
+      margin-top:10px;padding:10px 14px;background:#3988ff;
+      border:0;border-radius:7px;color:white;font-weight:bold;
     }
-
-    #advancedCryptoDashboard .adv-pill {
-      display: inline-block;
-      padding: 4px 7px;
-      background: #1b2c43;
-      border-radius: 5px;
-      color: #f4c65e;
-      font-size: 10px;
+    #advancedCryptoDashboard .adv-status {
+      display:inline-block;padding:4px 7px;border-radius:5px;
+      background:#1c3049;font-size:10px;margin-top:5px;
     }
   `;
-
   document.head.appendChild(style);
 
   const root = document.createElement("section");
   root.id = "advancedCryptoDashboard";
 
   root.innerHTML = `
-    <div class="adv-title">
-      উন্নত Derivatives ও Institutional Radar
+    <div class="adv-title">১১. অতিরিক্ত On-chain তথ্য</div>
+    <div class="adv-grid" id="advOnchain"></div>
+
+    <div class="adv-title">১২. Bitcoin Halving পর্যবেক্ষণ</div>
+    <div class="adv-grid" id="advHalving"></div>
+
+    <div class="adv-title">১৩. Spot Order Book ও ক্রয়-বিক্রির চাপ</div>
+    <div class="adv-grid" id="advOrderbook"></div>
+
+    <div class="adv-title">১৪. Futures বাজারের ঝুঁকি পর্যবেক্ষণ</div>
+    <div class="adv-detail">
+      এগুলো Cross-exchange Futures তথ্য। Spot কেনাবেচার সংকেত নয়।
     </div>
+    <div class="adv-grid" id="advDerivatives"></div>
 
-    <div class="adv-grid">
-      <div class="adv-card">
-        <div class="adv-label">BTC Funding Rate</div>
-        <div class="adv-value" id="advBtcFunding">লোড হচ্ছে...</div>
-        <div class="adv-note">প্রতি ৮ ঘণ্টার হার</div>
-      </div>
-
-      <div class="adv-card">
-        <div class="adv-label">BTC Open Interest</div>
-        <div class="adv-value" id="advBtcOI">লোড হচ্ছে...</div>
-        <div class="adv-note">কন্ট্রাক্ট সংখ্যা</div>
-      </div>
-
-      <div class="adv-card">
-        <div class="adv-label">BTC Futures Basis</div>
-        <div class="adv-value" id="advBtcBasis">লোড হচ্ছে...</div>
-        <div class="adv-note">Mark Price বনাম Index Price</div>
-      </div>
-
-      <div class="adv-card">
-        <div class="adv-label">ETH Funding Rate</div>
-        <div class="adv-value" id="advEthFunding">লোড হচ্ছে...</div>
-      </div>
-
-      <div class="adv-card">
-        <div class="adv-label">ETH Open Interest</div>
-        <div class="adv-value" id="advEthOI">লোড হচ্ছে...</div>
-      </div>
-
-      <div class="adv-card">
-        <div class="adv-label">ETH Futures Basis</div>
-        <div class="adv-value" id="advEthBasis">লোড হচ্ছে...</div>
-      </div>
-
-      <div class="adv-card">
-        <div class="adv-label">BTC/ETH ETF Flow</div>
-        <div class="adv-value" id="advETF">তথ্য পাওয়া যায়নি</div>
-        <div class="adv-note">যাচাইকৃত ETF ডেটা-সোর্স প্রয়োজন</div>
-      </div>
-
-      <div class="adv-card">
-        <div class="adv-label">Liquidation Heatmap</div>
-        <div class="adv-value" id="advLiquidation">তথ্য পাওয়া যায়নি</div>
-        <div class="adv-note">আলাদা ডেটা-সোর্স প্রয়োজন</div>
-      </div>
-    </div>
-
-    <div class="adv-title">On-chain Intelligence</div>
-
-    <div class="adv-grid">
-      <div class="adv-card">
-        <div class="adv-label">MVRV Z-Score</div>
-        <div class="adv-value" id="advMVRV">তথ্য পাওয়া যায়নি</div>
-        <div class="adv-note">On-chain provider প্রয়োজন</div>
-      </div>
-
-      <div class="adv-card">
-        <div class="adv-label">NUPL</div>
-        <div class="adv-value" id="advNUPL">তথ্য পাওয়া যায়নি</div>
-        <div class="adv-note">On-chain provider প্রয়োজন</div>
-      </div>
-
-      <div class="adv-card">
-        <div class="adv-label">Exchange Netflow</div>
-        <div class="adv-value" id="advExchangeFlow">তথ্য পাওয়া যায়নি</div>
-      </div>
-
-      <div class="adv-card">
-        <div class="adv-label">Whale Activity</div>
-        <div class="adv-value" id="advWhales">তথ্য পাওয়া যায়নি</div>
-      </div>
-    </div>
-
-    <div class="adv-title">Market Breadth ও Volume Radar</div>
-
-    <div class="adv-grid">
-      <div class="adv-card">
-        <div class="adv-label">বৃদ্ধি পাওয়া Pair</div>
-        <div class="adv-value" id="advAdvancing">--</div>
-      </div>
-
-      <div class="adv-card">
-        <div class="adv-label">পতন হওয়া Pair</div>
-        <div class="adv-value" id="advDeclining">--</div>
-      </div>
-
-      <div class="adv-card">
-        <div class="adv-label">Advance / Decline Ratio</div>
-        <div class="adv-value" id="advRatio">--</div>
-      </div>
-
-      <div class="adv-card">
-        <div class="adv-label">Volume Leaders</div>
-        <div class="adv-value" id="advVolumeCount">--</div>
-        <div class="adv-note">গত ২৪ ঘণ্টার ভলিউম</div>
-      </div>
-    </div>
-
-    <div class="adv-table-wrap" style="margin-top:12px">
-      <table>
-        <thead>
-          <tr>
-            <th>Pair</th>
-            <th>২৪ ঘণ্টার Volume (USDT)</th>
-            <th>পরিবর্তন</th>
-            <th>লেনদেন</th>
-          </tr>
-        </thead>
-        <tbody id="advVolumeRows">
-          <tr><td colspan="4">ডেটার জন্য অপেক্ষা...</td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <div class="adv-title">Spot Portfolio Assistant</div>
-
+    <div class="adv-title">১৫. ব্যক্তিগত Spot Portfolio হিসাব</div>
     <div class="adv-card">
-      <div class="adv-note">
-        শুধু Spot holdings লিখুন। হিসাব এই ব্রাউজারেই হবে।
-        কোনো Wallet Password বা API Key লাগবে না।
+      <div class="adv-detail">
+        আপনার Coin, পরিমাণ, গড় ক্রয়মূল্য ও বর্তমান মূল্য লিখুন।
+        হিসাব শুধু এই ব্রাউজারে হবে। কোনো API Key বা Wallet Password লাগবে না।
       </div>
-
-      <div class="adv-form" style="margin-top:12px">
+      <div class="adv-form">
         <input id="advCoin" placeholder="Coin (যেমন BTC)">
-        <input id="advQuantity" type="number" min="0" step="any"
-          placeholder="পরিমাণ">
-        <input id="advAverage" type="number" min="0" step="any"
-          placeholder="গড় ক্রয়মূল্য (USD)">
-        <input id="advCurrent" type="number" min="0" step="any"
-          placeholder="বর্তমান মূল্য (USD)">
+        <input id="advQty" type="number" min="0" step="any" placeholder="পরিমাণ">
+        <input id="advAvg" type="number" min="0" step="any" placeholder="গড় ক্রয়মূল্য USD">
+        <input id="advPrice" type="number" min="0" step="any" placeholder="বর্তমান মূল্য USD">
       </div>
-
-      <button id="advCalculate">লাভ/ক্ষতি হিসাব করুন</button>
-
-      <div id="advPortfolioResult"
-        class="adv-note" aria-live="polite"></div>
+      <button id="advCalculate" type="button">লাভ / ক্ষতি হিসাব করুন</button>
+      <div id="advPortfolioResult" class="adv-detail" aria-live="polite"></div>
     </div>
 
-    <div class="adv-title">Market Signal Table</div>
-
-    <div class="adv-table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>সংকেত</th>
-            <th>বর্তমান অবস্থা</th>
-            <th>ব্যাখ্যা</th>
-            <th>নীতি</th>
-          </tr>
-        </thead>
-        <tbody id="advSignalRows">
-          <tr><td colspan="4">ডেটার জন্য অপেক্ষা...</td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <div class="adv-note">
-      এই টেবিল বাজারের তথ্য দেখায়; এটি স্বয়ংক্রিয় BUY/SELL অর্ডার নয়।
-    </div>
-
-    <div class="adv-note" id="advUpdated"></div>
+    <div class="adv-detail" id="advUpdated"></div>
   `;
 
   const main = document.querySelector("main");
-
-  if (main) {
-    main.appendChild(root);
-  } else {
-    document.body.appendChild(root);
-  }
+  (main || document.body).appendChild(root);
 
   const $ = id => document.getElementById(id);
+  const missing = "তথ্য পাওয়া যায়নি";
 
-  const unavailable = "তথ্য পাওয়া যায়নি";
-
-  function set(id, value) {
-    const element = $(id);
-    if (element) element.textContent = value;
+  function valid(v) {
+    return v !== null && v !== undefined && v !== "" &&
+      Number.isFinite(Number(v));
   }
 
-  function number(value, digits = 2) {
-    if (
-      value === null ||
-      value === undefined ||
-      !Number.isFinite(Number(value))
-    ) {
-      return unavailable;
-    }
-
-    return Number(value).toLocaleString("en-US", {
+  function n(v, digits = 2) {
+    if (!valid(v)) return missing;
+    return Number(v).toLocaleString("en-US", {
       maximumFractionDigits: digits
     });
   }
 
-  function showMetric(item, suffix = "") {
-    if (!item || item.status !== "OK") {
-      return unavailable;
-    }
-
-    return number(item.value, 6) + suffix;
+  function compactUSD(v) {
+    if (!valid(v)) return missing;
+    const x = Number(v);
+    const a = Math.abs(x);
+    if (a >= 1e12) return "$" + n(x / 1e12, 2) + " ট্রিলিয়ন";
+    if (a >= 1e9) return "$" + n(x / 1e9, 2) + " বিলিয়ন";
+    if (a >= 1e6) return "$" + n(x / 1e6, 2) + " মিলিয়ন";
+    return "$" + n(x, 2);
   }
 
-  function safeText(value) {
-    return String(value ?? "").replace(
-      /[&<>"']/g,
-      char => ({
-        "&": "&amp;",
-        "<": "&lt;",
-        ">": "&gt;",
-        '"': "&quot;",
-        "'": "&#39;"
-      })[char]
+  function itemValue(obj) {
+    if (!obj || obj.status !== "OK" || !valid(obj.value)) return null;
+    return Number(obj.value);
+  }
+
+  function card(container, title, value, details, tone = "") {
+    const el = $(container);
+    if (!el) return;
+
+    const box = document.createElement("div");
+    box.className = "adv-card";
+
+    const name = document.createElement("div");
+    name.className = "adv-name";
+    name.textContent = title;
+
+    const val = document.createElement("div");
+    val.className = "adv-value " + tone;
+    val.textContent = value;
+
+    const detail = document.createElement("div");
+    detail.className = "adv-detail";
+    detail.textContent = details;
+
+    box.append(name, val, detail);
+    el.appendChild(box);
+  }
+
+  function explainRatio(v) {
+    if (v === null) return "যাচাইকৃত মান পাওয়া যায়নি।";
+    if (v < 1) return "MVRV ১-এর নিচে: বাজারমূল্য Realized Value-এর নিচে। ঐতিহাসিকভাবে কম মূল্যায়নের অঞ্চল হতে পারে, তবে Bottom নিশ্চিত নয়।";
+    if (v < 2) return "MVRV ১–২: বাজারমূল্য Realized Value-এর ওপরে। একে একা অতিরিক্ত মূল্যায়ন বলা যায় না।";
+    return "MVRV ২ বা বেশি: বাজারমূল্য Realized Value-এর তুলনায় বেশি। অন্যান্য সূচকের সঙ্গে মূল্যায়ন করুন।";
+  }
+
+  function addOnchain(data) {
+    const on = data.on_chain || {};
+
+    const mvrv = itemValue(on.mvrv_ratio);
+    card(
+      "advOnchain",
+      "Bitcoin MVRV Ratio",
+      n(mvrv, 3),
+      "এটি Market Value বনাম Realized Value-এর অনুপাত। " +
+      explainRatio(mvrv),
+      mvrv !== null && mvrv < 1 ? "good" : "warn"
     );
-  }
 
-  function addSignal(name, current, explanation, status) {
-    return `
-      <tr>
-        <td>${safeText(name)}</td>
-        <td>${safeText(current)}</td>
-        <td>${safeText(explanation)}</td>
-        <td><span class="adv-pill">${safeText(status)}</span></td>
-      </tr>
-    `;
-  }
+    const hash = itemValue(on.hashrate);
+    card(
+      "advOnchain",
+      "Bitcoin Network Hashrate",
+      hash === null ? missing : n(hash / 1e18, 2) + " EH/s",
+      "মাইনিং নেটওয়ার্কের মোট গণনাশক্তি। দীর্ঘমেয়াদে নেটওয়ার্ক নিরাপত্তা ও অংশগ্রহণ বোঝাতে সহায়ক।",
+      "good"
+    );
 
-  async function loadAdvancedData() {
-    try {
-      const response = await fetch(
-        "data/advanced_data.json?t=" + Date.now(),
-        { cache: "no-store" }
-      );
+    const difficulty = itemValue(on.mining_difficulty);
+    card(
+      "advOnchain",
+      "Mining Difficulty",
+      difficulty === null ? missing : n(difficulty / 1e12, 2) + " ট্রিলিয়ন",
+      "নতুন Bitcoin ব্লক তৈরি করতে কতটা গণনাগত কঠিনতা রয়েছে তা বোঝায়। এটি সরাসরি BUY/SELL সংকেত নয়।"
+    );
 
-      if (!response.ok) {
-        throw new Error("HTTP " + response.status);
+    const unavailableFields = [
+      ["NUPL", on.nupl],
+      ["Exchange Netflow", on.exchange_netflow],
+      ["Whale Activity", on.whale_activity],
+      ["MVRV Z-Score", on.mvrv_z_score]
+    ];
+
+    unavailableFields.forEach(([name, obj]) => {
+      if (itemValue(obj) !== null) {
+        card(
+          "advOnchain",
+          name,
+          n(itemValue(obj), 3),
+          "উৎসের যাচাইকৃত মান পাওয়া গেছে। ব্যাখ্যার জন্য আলাদা ঐতিহাসিক সীমা ও trend প্রয়োজন।"
+        );
       }
-
-      const data = await response.json();
-
-      const btc = data.derivatives?.BTCUSDT || {};
-      const eth = data.derivatives?.ETHUSDT || {};
-
-      set(
-        "advBtcFunding",
-        showMetric(btc.last_funding_rate, "%")
-      );
-
-      set(
-        "advBtcOI",
-        showMetric(btc.open_interest_contracts)
-      );
-
-      set(
-        "advBtcBasis",
-        showMetric(btc.basis_percent, "%")
-      );
-
-      set(
-        "advEthFunding",
-        showMetric(eth.last_funding_rate, "%")
-      );
-
-      set(
-        "advEthOI",
-        showMetric(eth.open_interest_contracts)
-      );
-
-      set(
-        "advEthBasis",
-        showMetric(eth.basis_percent, "%")
-      );
-
-      set("advETF", showMetric(data.etf_flows));
-
-      set(
-        "advLiquidation",
-        showMetric(data.liquidation_heatmap)
-      );
-
-      set(
-        "advMVRV",
-        showMetric(data.on_chain?.mvrv_z_score)
-      );
-
-      set(
-        "advNUPL",
-        showMetric(data.on_chain?.nupl)
-      );
-
-      set(
-        "advExchangeFlow",
-        showMetric(data.on_chain?.exchange_netflow)
-      );
-
-      set(
-        "advWhales",
-        showMetric(data.on_chain?.whale_activity)
-      );
-
-      const breadth =
-        data.spot_market_activity?.breadth || {};
-
-      set(
-        "advAdvancing",
-        number(breadth.advancing_pairs, 0)
-      );
-
-      set(
-        "advDeclining",
-        number(breadth.declining_pairs, 0)
-      );
-
-      set(
-        "advRatio",
-        number(breadth.advance_decline_ratio, 3)
-      );
-
-      const leaders =
-        data.spot_market_activity?.volume_leaders_24h || [];
-
-      set(
-        "advVolumeCount",
-        leaders.length
-          ? leaders.length + "টি Pair"
-          : unavailable
-      );
-
-      const volumeRows = $("advVolumeRows");
-
-      if (volumeRows) {
-        volumeRows.innerHTML = leaders.length
-          ? leaders.map(item => `
-              <tr>
-                <td>${safeText(item.symbol)}</td>
-                <td>${number(item.quote_volume_24h, 0)}</td>
-                <td>${number(item.change_24h_pct, 2)}%</td>
-                <td>${number(item.trades, 0)}</td>
-              </tr>
-            `).join("")
-          : `<tr><td colspan="4">${unavailable}</td></tr>`;
-      }
-
-      await loadSignalTable(data);
-
-      set(
-        "advUpdated",
-        "সর্বশেষ Advanced ডেটা: " +
-        (data.generated_at || unavailable)
-      );
-
-    } catch (error) {
-      const ids = [
-        "advBtcFunding",
-        "advBtcOI",
-        "advBtcBasis",
-        "advEthFunding",
-        "advEthOI",
-        "advEthBasis",
-        "advETF",
-        "advLiquidation",
-        "advMVRV",
-        "advNUPL",
-        "advExchangeFlow",
-        "advWhales",
-        "advAdvancing",
-        "advDeclining",
-        "advRatio",
-        "advVolumeCount"
-      ];
-
-      ids.forEach(id => set(id, unavailable));
-
-      set(
-        "advUpdated",
-        "Advanced ডেটা লোড হয়নি: " + error.message
-      );
-    }
+    });
   }
 
-  async function loadSignalTable(data) {
-    const rows = [];
+  function addHalving(data) {
+    const h = data.halving || {};
 
-    let decision = null;
-
-    try {
-      const response = await fetch(
-        "data/decision_data.json?t=" + Date.now(),
-        { cache: "no-store" }
-      );
-
-      if (response.ok) {
-        decision = await response.json();
-      }
-    } catch (_) {
-      decision = null;
-    }
-
-    const btc = decision?.crypto_market?.btc || {};
-    const eth = decision?.crypto_market?.eth || {};
-
-    const btcTrend = btc.trend || unavailable;
-    const ethTrend = eth.trend || unavailable;
-
-    rows.push(
-      addSignal(
-        "BTC দৈনিক প্রবণতা",
-        btcTrend,
-        "বিদ্যমান Decision Engine-এর বিশ্লেষণ",
-        btcTrend === "BULLISH"
-          ? "BULLISH"
-          : btcTrend === "BEARISH"
-            ? "BEARISH"
-            : "UNKNOWN"
-      )
-    );
-
-    rows.push(
-      addSignal(
-        "ETH দৈনিক প্রবণতা",
-        ethTrend,
-        "বিদ্যমান Decision Engine-এর বিশ্লেষণ",
-        ethTrend === "BULLISH"
-          ? "BULLISH"
-          : ethTrend === "BEARISH"
-            ? "BEARISH"
-            : "UNKNOWN"
-      )
-    );
-
-    const funding =
-      data.derivatives?.BTCUSDT?.last_funding_rate;
-
-    const fundingValue =
-      funding?.status === "OK"
-        ? Number(funding.value)
-        : null;
-
-    let fundingStatus = "UNKNOWN";
-
-    if (fundingValue !== null) {
-      if (fundingValue > 0.05) {
-        fundingStatus = "HIGH POSITIVE";
-      } else if (fundingValue < -0.03) {
-        fundingStatus = "NEGATIVE";
-      } else {
-        fundingStatus = "NORMAL";
-      }
-    }
-
-    rows.push(
-      addSignal(
-        "BTC Funding",
-        showMetric(funding, "%"),
-        "Positive funding-এ Long পক্ষ funding দেয়; একা এটি reversal signal নয়।",
-        fundingStatus
-      )
-    );
-
-    rows.push(
-      addSignal(
-        "BTC Open Interest",
-        showMetric(
-          data.derivatives?.BTCUSDT?.open_interest_contracts
-        ),
-        "একটি snapshot; সময়ভিত্তিক পরিবর্তন ছাড়া দিক নিশ্চিত নয়।",
-        "CONTEXT ONLY"
-      )
-    );
-
-    const breadth =
-      data.spot_market_activity?.breadth || {};
-
-    rows.push(
-      addSignal(
-        "Spot Market Breadth",
-        number(breadth.advancing_pairs, 0) +
-          " বৃদ্ধি / " +
-          number(breadth.declining_pairs, 0) +
-          " পতন",
-        "Binance Spot USDT Pair-এর ২৪ ঘণ্টার পরিবর্তন।",
-        "CONTEXT ONLY"
-      )
-    );
-
-    const table = $("advSignalRows");
-
-    if (table) {
-      table.innerHTML = rows.join("");
-    }
-  }
-
-  $("advCalculate").addEventListener("click", () => {
-    const coin = $("advCoin").value.trim().toUpperCase();
-    const quantity = Number($("advQuantity").value);
-    const average = Number($("advAverage").value);
-    const current = Number($("advCurrent").value);
-
-    const output = $("advPortfolioResult");
-
-    if (
-      !coin ||
-      !Number.isFinite(quantity) ||
-      quantity <= 0 ||
-      !Number.isFinite(average) ||
-      average <= 0 ||
-      !Number.isFinite(current) ||
-      current <= 0
-    ) {
-      output.textContent =
-        "Coin, পরিমাণ, গড় ক্রয়মূল্য ও বর্তমান মূল্য সঠিকভাবে দিন।";
+    if (h.status !== "OK") {
+      card("advHalving", "Bitcoin Halving", missing,
+        "যাচাইকৃত Halving তথ্য পাওয়া যায়নি।");
       return;
     }
 
-    const investment = quantity * average;
-    const value = quantity * current;
-    const pnl = value - investment;
-    const percentage = (pnl / investment) * 100;
+    card("advHalving", "বর্তমান Block Height",
+      n(h.current_block_height, 0),
+      "Mempool.space তথ্য");
 
-    output.textContent =
-      coin +
-      " | বিনিয়োগ: $" + number(investment) +
-      " | বর্তমান মূল্য: $" + number(value) +
-      " | লাভ/ক্ষতি: " +
-      (pnl >= 0 ? "+" : "-") +
-      "$" + number(Math.abs(pnl)) +
-      " (" +
-      (percentage >= 0 ? "+" : "") +
-      number(percentage) +
-      "%)";
-  });
+    card("advHalving", "পরবর্তী Halving Block",
+      n(h.next_halving_block, 0),
+      "Halving নির্ধারিত হয় Block Height অনুযায়ী।");
 
-  loadAdvancedData();
+    card("advHalving", "বাকি Block",
+      n(h.blocks_remaining, 0),
+      "পরবর্তী Halving পর্যন্ত আনুমানিক অবশিষ্ট Block।");
 
-  // প্রতি ৫ মিনিটে নতুন JSON পরীক্ষা করবে।
-  // মূল Engine প্রতি ঘণ্টায় ডেটা আপডেট করে।
-  setInterval(loadAdvancedData, 5 * 60 * 1000);
+    card("advHalving", "আনুমানিক সময়",
+      valid(h.estimated_days_remaining)
+        ? n(h.estimated_days_remaining, 0) + " দিন"
+        : missing,
+      "Block উৎপাদনের গতি অনুযায়ী সময় পরিবর্তিত হতে পারে।",
+      "warn"
+    );
+  }
 
+  function addOrderbook(data) {
+    const book = data.spot_order_book || {};
+    const taker = data.spot_taker_activity || {};
+
+    ["BTCUSDT", "ETHUSDT"].forEach(symbol => {
+      const label = symbol === "BTCUSDT" ? "Bitcoin" : "Ethereum";
+      const b = book[symbol] || {};
+      const t = taker[symbol] || {};
+
+      const imbalance = itemValue(b.imbalance_percent);
+      card(
+        "advOrderbook",
+        label + " Spot Order Book Imbalance",
+        imbalance === null ? missing : n(imbalance, 2) + "%",
+        "অর্ডার বুকের Bid ও Ask-এর ভারসাম্য। এটি snapshot; বড় অর্ডার দ্রুত সরিয়ে নেওয়া হতে পারে।",
+        imbalance !== null && imbalance > 0 ? "good" : "warn"
+      );
+
+      const bid = itemValue(b.bid_value_usdt);
+      card(
+        "advOrderbook",
+        label + " Bid Liquidity",
+        compactUSD(bid),
+        "দেখানো Order Book-এ ক্রয় অর্ডারের আনুমানিক মূল্য।"
+      );
+
+      const ask = itemValue(b.ask_value_usdt);
+      card(
+        "advOrderbook",
+        label + " Ask Liquidity",
+        compactUSD(ask),
+        "দেখানো Order Book-এ বিক্রয় অর্ডারের আনুমানিক মূল্য।"
+      );
+
+      const ratio = itemValue(t.taker_buy_sell_ratio);
+      card(
+        "advOrderbook",
+        label + " ১৫ মিনিটের Taker Buy/Sell",
+        ratio === null ? missing : n(ratio, 3),
+        ratio === null
+          ? "যাচাইকৃত তথ্য পাওয়া যায়নি।"
+          : ratio > 1
+            ? "এই ক্যান্ডেলে Taker Buy Volume বেশি। এটি স্বল্পমেয়াদি ক্রয়চাপের ইঙ্গিত; একা Trend Reversal নিশ্চিত করে না।"
+            : "এই ক্যান্ডেলে Taker Sell Volume বেশি। স্বল্পমেয়াদি বিক্রির চাপ রয়েছে।",
+        ratio !== null && ratio > 1 ? "good" : "warn"
+      );
+    });
+  }
+
+  function addDerivatives(data) {
+    const all = data.derivatives || {};
+
+    ["BTCUSDT", "ETHUSDT"].forEach(symbol => {
+      const label = symbol === "BTCUSDT" ? "Bitcoin" : "Ethereum";
+      const d = all[symbol] || {};
+
+      const oi = itemValue(d.open_interest_usd);
+      card(
+        "advDerivatives",
+        label + " Futures Open Interest",
+        compactUSD(oi),
+        "Cross-exchange Futures-এর মোট Open Interest। এটি Spot Holdings নয়।"
+      );
+
+      const funding = itemValue(d.last_funding_rate);
+      card(
+        "advDerivatives",
+        label + " সর্বশেষ Funding Rate",
+        funding === null ? missing : n(funding * 100, 5) + "%",
+        "প্রতি ৮ ঘণ্টার হার। এটি Futures বাজারের অবস্থান বোঝায়, Spot কেনার সংকেত নয়।"
+      );
+
+      const longShort = itemValue(d.global_long_short_ratio);
+      card(
+        "advDerivatives",
+        label + " Futures Long/Short Ratio",
+        n(longShort, 3),
+        longShort === null
+          ? "যাচাইকৃত তথ্য পাওয়া যায়নি।"
+          : "১-এর বেশি হলে Long অ্যাকাউন্ট তুলনামূলক বেশি; অতিরিক্ত একদিকে অবস্থান থাকলে squeeze risk তৈরি হতে পারে।"
+      );
+
+      const longPct = itemValue(d.global_long_percent);
+      card(
+        "advDerivatives",
+        label + " Futures Long Account",
+        longPct === null ? missing : n(longPct, 2) + "%",
+        "Cross-exchange account distribution; Spot buyer percentage নয়।"
+      );
+
+      const consistency = d.funding_apr_consistency;
+      if (consistency && consistency !== "MATCH") {
+        card(
+          "advDerivatives",
+          label + " Funding Data Quality",
+          "অমিল পাওয়া গেছে",
+          "Provider APR ও গণনা করা APR-এর মধ্যে অমিল আছে। Funding APR দিয়ে সিদ্ধান্ত নেবেন না।",
+          "warn"
+        );
+      }
+    });
+  }
+
+  function setupPortfolio() {
+    $("advCalculate").addEventListener("click", () => {
+      const coin = $("advCoin").value.trim().toUpperCase();
+      const qty = Number($("advQty").value);
+      const avg = Number($("advAvg").value);
+      const price = Number($("advPrice").value);
+      const out = $("advPortfolioResult");
+
+      if (!coin || !Number.isFinite(qty) || !Number.isFinite(avg) ||
+          !Number.isFinite(price) || qty <= 0 || avg <= 0 || price < 0) {
+        out.textContent = "সঠিক Coin, পরিমাণ, গড় ক্রয়মূল্য ও বর্তমান মূল্য লিখুন।";
+        return;
+      }
+
+      const invested = qty * avg;
+      const current = qty * price;
+      const pnl = current - invested;
+      const pct = (pnl / invested) * 100;
+
+      out.textContent =
+        coin + " | বিনিয়োগ: $" + n(invested, 2) +
+        " | বর্তমান মূল্য: $" + n(current, 2) +
+        " | লাভ/ক্ষতি: $" + n(pnl, 2) +
+        " (" + n(pct, 2) + "%)";
+      out.className = "adv-detail " + (pnl >= 0 ? "good" : "bad");
+    });
+  }
+
+  async function load() {
+    try {
+      const response = await fetch(DATA_URL + "?v=" + Date.now(), {
+        cache: "no-store"
+      });
+
+      if (!response.ok) throw new Error("HTTP " + response.status);
+
+      const data = await response.json();
+
+      $("advOnchain").innerHTML = "";
+      $("advHalving").innerHTML = "";
+      $("advOrderbook").innerHTML = "";
+      $("advDerivatives").innerHTML = "";
+
+      addOnchain(data);
+      addHalving(data);
+      addOrderbook(data);
+      addDerivatives(data);
+
+      $("advUpdated").textContent =
+        "Advanced Data তৈরি: " +
+        (data.generated_at || missing) +
+        " | Source: " +
+        (Array.isArray(data.data_sources)
+          ? data.data_sources.join(", ")
+          : missing);
+
+    } catch (error) {
+      $("advUpdated").textContent =
+        "Advanced Data লোড হয়নি: " + error.message;
+    }
+  }
+
+  setupPortfolio();
+  load();
+  setInterval(load, 300000);
 })();
