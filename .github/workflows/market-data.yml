@@ -3,7 +3,7 @@ name: Crypto Market Data Update
 
 on:
   schedule:
-    - cron: "17 * * * *"
+    - cron: "*/5 * * * *"
   workflow_dispatch:
 
 permissions:
@@ -29,19 +29,27 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Run market data engine
+      - name: Update public crypto market data
         run: python data_engine.py
 
-      - name: Run macro economy engine
-        run: python macro_engine.py
-
-      - name: Run decision engine
-        run: python decision_engine.py
-
-      - name: Run advanced intelligence engine
+      - name: Update advanced Spot and on-chain data
         run: python advanced_engine.py
 
-      - name: Run market zone analysis engine
+      - name: Update macro data every 6 hours
+        shell: bash
+        run: |
+          HOUR="$(date -u +%H)"
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] || [ "$((10#$HOUR % 6))" -eq 0 ]; then
+            echo "Refreshing FRED macro data."
+            python macro_engine.py
+          else
+            echo "Keeping the last verified macro snapshot."
+          fi
+
+      - name: Recalculate final decision
+        run: python decision_engine.py
+
+      - name: Recalculate market phase and zone
         run: python market_zone_engine.py
 
       - name: Validate all JSON files
@@ -66,6 +74,6 @@ jobs:
           if git diff --cached --quiet; then
             echo "No data changes to commit."
           else
-            git commit -m "Update crypto macro and market zone data"
+            git commit -m "Refresh crypto spot and macro dashboard data"
             git push
           fi
