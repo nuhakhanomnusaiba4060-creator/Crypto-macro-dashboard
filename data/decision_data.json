@@ -2,19 +2,19 @@
   "schema_version": 1,
   "engine": "Crypto Final Decision Engine",
   "engine_version": "1.0.0",
-  "generated_at": "2026-11-21T09:38:22Z",
+  "generated_at": "2026-11-21T09:38:55Z",
   "status": "OK",
   "data_quality": {
     "macro": {
       "name": "macro_data",
-      "timestamp": "2026-11-21T09:38:22Z",
+      "timestamp": "2026-11-21T09:38:55Z",
       "age_hours": 0.0,
       "max_age_hours": 72,
       "status": "FRESH"
     },
     "market": {
       "name": "market_data",
-      "timestamp": "2026-11-21T09:37:47Z",
+      "timestamp": "2026-11-21T09:38:32Z",
       "age_hours": 0.01,
       "max_age_hours": 36,
       "status": "FRESH"
@@ -22,19 +22,19 @@
     "btc_technical": {
       "name": "BTC last closed daily candle",
       "timestamp": "2026-11-20T23:59:59Z",
-      "age_hours": 9.64,
+      "age_hours": 9.65,
       "max_age_hours": 60,
       "status": "FRESH"
     },
     "eth_technical": {
       "name": "ETH last closed daily candle",
       "timestamp": "2026-11-20T23:59:59Z",
-      "age_hours": 9.64,
+      "age_hours": 9.65,
       "max_age_hours": 60,
       "status": "FRESH"
     },
     "issues": [
-      "BTC price source discrepancy: CoinGecko snapshot ও Binance technical price-এর পার্থক্য 1.83%। ভিন্ন source/timestamp হওয়ায় কোনো একটি value auto-correct করা হয়নি।",
+      "BTC price source discrepancy: CoinGecko snapshot ও Binance technical price-এর পার্থক্য 1.85%। ভিন্ন source/timestamp হওয়ায় কোনো একটি value auto-correct করা হয়নি।",
       "Net Liquidity RRP mismatch: metrics.reverse_repo=0.401B, liquidity.components.reverse_repo=0.331B। Liquidity formula-এর aligned component আলাদা করে দেখানো হয়েছে।",
       "Macro data quality GOOD_WITH_OPTIONAL_GAPS; optional Gold data unavailable।",
       "Market data scheduled snapshot; realtime feed নয়।"
@@ -76,7 +76,7 @@
       "unit": "/100",
       "source": "Alternative.me Fear & Greed API",
       "source_updated_at": "2026-11-21T00:00:00Z",
-      "fetched_at": "2026-11-21T09:37:47Z",
+      "fetched_at": "2026-11-21T09:38:32Z",
       "status": "OK",
       "error": null
     },
