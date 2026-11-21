@@ -2,19 +2,19 @@
   "schema_version": 1,
   "engine": "Crypto Final Decision Engine",
   "engine_version": "1.0.0",
-  "generated_at": "2026-11-21T11:19:05Z",
+  "generated_at": "2026-11-21T11:59:29Z",
   "status": "OK",
   "data_quality": {
     "macro": {
       "name": "macro_data",
       "timestamp": "2026-11-21T09:38:55Z",
-      "age_hours": 1.67,
+      "age_hours": 2.34,
       "max_age_hours": 72,
       "status": "FRESH"
     },
     "market": {
       "name": "market_data",
-      "timestamp": "2026-11-21T11:18:49Z",
+      "timestamp": "2026-11-21T11:59:14Z",
       "age_hours": 0.0,
       "max_age_hours": 36,
       "status": "FRESH"
@@ -22,19 +22,19 @@
     "btc_technical": {
       "name": "BTC last closed daily candle",
       "timestamp": "2026-11-20T23:59:59Z",
-      "age_hours": 11.32,
+      "age_hours": 11.99,
       "max_age_hours": 60,
       "status": "FRESH"
     },
     "eth_technical": {
       "name": "ETH last closed daily candle",
       "timestamp": "2026-11-20T23:59:59Z",
-      "age_hours": 11.32,
+      "age_hours": 11.99,
       "max_age_hours": 60,
       "status": "FRESH"
     },
     "issues": [
-      "BTC price source discrepancy: CoinGecko snapshot ও Binance technical price-এর পার্থক্য 1.99%। ভিন্ন source/timestamp হওয়ায় কোনো একটি value auto-correct করা হয়নি।",
+      "BTC price source discrepancy: CoinGecko snapshot ও Binance technical price-এর পার্থক্য 1.43%। ভিন্ন source/timestamp হওয়ায় কোনো একটি value auto-correct করা হয়নি।",
       "Net Liquidity RRP mismatch: metrics.reverse_repo=0.401B, liquidity.components.reverse_repo=0.331B। Liquidity formula-এর aligned component আলাদা করে দেখানো হয়েছে।",
       "Macro data quality GOOD_WITH_OPTIONAL_GAPS; optional Gold data unavailable।",
       "Market data scheduled snapshot; realtime feed নয়।"
@@ -67,16 +67,16 @@
     ]
   },
   "crypto_market": {
-    "global_market_cap_usd": 2025386642444.4475,
-    "global_volume_24h_usd": 146878650473.15402,
-    "btc_dominance_percent": 57.48005803643122,
+    "global_market_cap_usd": 2029023063728.5505,
+    "global_volume_24h_usd": 148347383355.987,
+    "btc_dominance_percent": 57.4565814640459,
     "fear_greed": {
       "value": 12.0,
       "classification": "Extreme Fear",
       "unit": "/100",
       "source": "Alternative.me Fear & Greed API",
       "source_updated_at": "2026-11-21T00:00:00Z",
-      "fetched_at": "2026-11-21T11:18:50Z",
+      "fetched_at": "2026-11-21T11:59:14Z",
       "status": "OK",
       "error": null
     },
@@ -151,9 +151,9 @@
     "market_context": {
       "fear_greed_value": 12.0,
       "fear_greed_classification": "Extreme Fear",
-      "btc_dominance_percent": 57.48005803643122,
-      "total_market_cap_usd": 2025386642444.4475,
-      "total_volume_24h_usd": 146878650473.15402
+      "btc_dominance_percent": 57.4565814640459,
+      "total_market_cap_usd": 2029023063728.5505,
+      "total_volume_24h_usd": 148347383355.987
     },
     "important_note": "এটি সামগ্রিক market-regime guidance; ব্যক্তিগত portfolio holdings-এর coin-by-coin SELL signal নয়।"
   },
