@@ -1,49 +1,101 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "engine": "Crypto Market Zone Engine",
-  "engine_version": "1.1.0",
-  "generated_at": "2026-11-21T19:56:12Z",
-  "status": "OK",
-  "market_zone": {
-    "current_zone": "Bear Market Zone",
-    "zone_code": "BEAR_MARKET",
-    "confidence": 60,
-    "confidence_label": "LOW",
-    "market_position": "MID",
-    "spot_action": "WAIT",
-    "risk_level": "HIGH",
-    "next_zone": "Capitulation / Accumulation Zone",
-    "reason": [
-      "দাম MA20 ও MA50-এর নিচে এবং short-term trend bearish; পূর্ণ death-cross structure এখনো নেই।"
+  "engine_version": "2.0.0",
+  "generated_at": "2026-11-21T20:08:37.970247+00:00",
+  "data_quality": {
+    "status": "POOR",
+    "core_ready": false,
+    "issues": [
+      "BTC technical data অসম্পূর্ণ"
     ],
-    "missing_data": [],
-    "verified_inputs": {
-      "btc_price": 58951.51,
-      "ma20": 71103.515,
-      "ma50": 77717.71659999999,
-      "ma200": 72589.18524999998,
-      "rsi14": 17.352953009243876,
-      "macd": -4800.5169055278675,
-      "macd_signal": -3700.802078331073,
-      "fear_greed": 12.0,
-      "btc_dominance": 57.9667167407755,
-      "vix": 28.44,
-      "usd_broad_index": 122.6503,
-      "us_10y_yield": 5.04,
-      "mvrv_ratio": 1.104933597125702,
-      "market_breadth_ratio": 3.048,
-      "volume_ratio_20d": 1.9360137865525127,
-      "support_20d": 61428.26,
-      "resistance_20d": 81196.01
+    "snapshots": {
+      "market": {
+        "status": "FRESH",
+        "age_hours": 0.01,
+        "timestamp": "2026-11-21T20:08:06Z"
+      },
+      "macro": {
+        "status": "FRESH",
+        "age_hours": 0.0,
+        "timestamp": "2026-11-21T20:08:37Z"
+      },
+      "advanced": {
+        "status": "FRESH",
+        "age_hours": 0.01,
+        "timestamp": "2026-11-21T20:08:08Z"
+      },
+      "decision": {
+        "status": "FRESH",
+        "age_hours": 0.0,
+        "timestamp": "2026-11-21T20:08:37.937077+00:00"
+      }
+    }
+  },
+  "current_zone": "INSUFFICIENT_DATA",
+  "zone_code": "INSUFFICIENT_DATA",
+  "confidence": "VERY_LOW",
+  "confidence_score": 0,
+  "market_position": "UNKNOWN",
+  "spot_action": "WAIT",
+  "risk_level": "MEDIUM",
+  "next_zone": "পরবর্তী পরিবর্তন নির্ধারণের জন্য নতুন BTC technical ও Macro confirmation প্রয়োজন",
+  "reason": "Market বা Macro snapshot stale/invalid অথবা BTC technical data অসম্পূর্ণ। নতুন নির্ভরযোগ্য ডেটা না পাওয়া পর্যন্ত Market Zone নির্ধারণ করা হচ্ছে না।",
+  "missing_data": [
+    "BTC technical data অসম্পূর্ণ"
+  ],
+  "verified_inputs": {
+    "btc": {
+      "price": null,
+      "ma20": null,
+      "ma50": null,
+      "ma200": null,
+      "rsi": null,
+      "macd": null,
+      "macd_signal": null,
+      "volume_ratio": null,
+      "support": null,
+      "resistance": null,
+      "trend": "UNKNOWN",
+      "technical_quality": "INCOMPLETE",
+      "support_broken_warning": false
     },
-    "macro_risk_score": 3,
-    "data_limitations": [
-      "BTC weekly trend আলাদা timeframe data দিয়ে এখনো যাচাই করা হয়নি।",
-      "USD Broad Index হলো DXY নয়।",
-      "MVRV Ratio পাওয়া গেছে; এটি MVRV Z-Score নয়।",
-      "ETF flow, SOPR, Exchange Netflow ও whale data অনুপলব্ধ থাকলে সেগুলো score-এ ব্যবহার করা হয় না।",
-      "পরবর্তী Zone conditional outlook; নিশ্চিত ভবিষ্যদ্বাণী নয়।"
-    ],
-    "method": "Conservative multi-factor rule engine"
-  }
+    "sentiment": {
+      "fear_greed": 12.0,
+      "btc_dominance": null
+    },
+    "macro": {
+      "vix": 28.44,
+      "usd_broad": null,
+      "yield_10y": 5.04,
+      "decision": "UNKNOWN",
+      "risk_points": 2,
+      "risk_level": "MEDIUM",
+      "warnings": [
+        "VIX উচ্চ ঝুঁকি নির্দেশ করছে",
+        "US 10Y Yield উচ্চ পর্যায়ে"
+      ]
+    },
+    "spot_breadth": {
+      "advancing": null,
+      "declining": null,
+      "ratio": null,
+      "coverage_percent": null
+    },
+    "final_decision_engine": {
+      "decision": "WAIT",
+      "snapshot_status": "FRESH"
+    }
+  },
+  "limitations": [
+    "Market Zone পুরো Crypto Market-এর regime analysis; কোনো নির্দিষ্ট coin-এর BUY/SELL recommendation নয়।",
+    "Dashboard scheduled snapshot ব্যবহার করে; এটি exchange-এর real-time tick feed নয়।",
+    "Confidence score heuristic; এটি statistical probability নয়।",
+    "BTC support-এর নিচে price থাকা একা confirmed breakdown নয়; closed-candle confirmation প্রয়োজন।",
+    "Accumulation zone মানেই market bottom নিশ্চিত নয়।",
+    "Distribution risk মানেই automatic SELL নয়।",
+    "Broad USD metric থাকলে সেটি DTWEXBGS proxy হতে পারে; এটি ICE DXY নয়।",
+    "Weekly trend confirmation এই engine-এ নেই।",
+    "Spot breadth-এর coverage অসম্পূর্ণ হলে সেটিকে পুরো বাজারের নিশ্চিত প্রতিনিধিত্ব হিসেবে ধরা যাবে না।"
+  ]
 }

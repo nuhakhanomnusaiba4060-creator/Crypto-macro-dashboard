@@ -1,8 +1,8 @@
 {
   "schema_version": 2,
   "engine": "Crypto Macro Engine",
-  "engine_version": "1.2.1",
-  "fetched_at": "2026-11-21T18:25:42Z",
+  "engine_version": "2.0.0",
+  "fetched_at": "2026-11-21T20:08:37Z",
   "source": "Federal Reserve Economic Data (FRED)",
   "source_mode": "FRED CSV export",
   "summary": {
@@ -20,22 +20,6 @@
     "critical_series_available": 18
   },
   "metrics": {
-    "pce": {
-      "key": "pce",
-      "name": "PCE Price Index",
-      "value": 132.257,
-      "unit": "index",
-      "observation_date": "2026-09-01",
-      "previous_value": 131.611,
-      "previous_date": "2026-08-01",
-      "change": 0.646,
-      "change_percent": 0.4908,
-      "source": "FRED_CSV_EXPORT",
-      "fetched_at": "2026-11-21T18:25:25Z",
-      "age_days": 81.77,
-      "status": "OK",
-      "error": null
-    },
     "core_cpi": {
       "key": "core_cpi",
       "name": "Core CPI",
@@ -46,28 +30,15 @@
       "previous_date": "2026-09-01",
       "change": 1.004,
       "change_percent": 0.2963,
+      "change_5d_percent": 0.2963,
+      "change_20d_percent": 0.2963,
+      "change_5d": 1.004,
+      "change_20d": 1.004,
       "source": "FRED_CSV_EXPORT",
-      "fetched_at": "2026-11-21T18:25:25Z",
-      "age_days": 51.77,
+      "fetched_at": "2026-11-21T20:08:19Z",
+      "age_days": 51.84,
       "status": "OK",
       "error": null
-    },
-    "nonfarm_payrolls": {
-      "key": "nonfarm_payrolls",
-      "name": "Total Nonfarm Payrolls",
-      "value": 159293.0,
-      "unit": "thousands",
-      "observation_date": "2026-10-01",
-      "previous_value": 159128.0,
-      "previous_date": "2026-09-01",
-      "change": 165.0,
-      "change_percent": 0.1037,
-      "source": "FRED_CSV_EXPORT",
-      "fetched_at": "2026-11-21T18:25:25Z",
-      "age_days": 51.77,
-      "status": "OK",
-      "error": null,
-      "monthly_change_thousands": 165.0
     },
     "core_pce": {
       "key": "core_pce",
@@ -79,25 +50,33 @@
       "previous_date": "2026-08-01",
       "change": 0.413,
       "change_percent": 0.3165,
+      "change_5d_percent": 0.3165,
+      "change_20d_percent": 0.3165,
+      "change_5d": 0.413,
+      "change_20d": 0.413,
       "source": "FRED_CSV_EXPORT",
-      "fetched_at": "2026-11-21T18:25:25Z",
-      "age_days": 81.77,
+      "fetched_at": "2026-11-21T20:08:19Z",
+      "age_days": 81.84,
       "status": "OK",
       "error": null
     },
-    "unemployment": {
-      "key": "unemployment",
-      "name": "Unemployment Rate",
-      "value": 4.1,
-      "unit": "%",
-      "observation_date": "2026-10-01",
-      "previous_value": 4.2,
-      "previous_date": "2026-09-01",
-      "change": -0.1,
-      "change_percent": -2.381,
+    "pce": {
+      "key": "pce",
+      "name": "PCE Price Index",
+      "value": 132.257,
+      "unit": "index",
+      "observation_date": "2026-09-01",
+      "previous_value": 131.611,
+      "previous_date": "2026-08-01",
+      "change": 0.646,
+      "change_percent": 0.4908,
+      "change_5d_percent": 0.4908,
+      "change_20d_percent": 0.4908,
+      "change_5d": 0.646,
+      "change_20d": 0.646,
       "source": "FRED_CSV_EXPORT",
-      "fetched_at": "2026-11-21T18:25:25Z",
-      "age_days": 51.77,
+      "fetched_at": "2026-11-21T20:08:19Z",
+      "age_days": 81.84,
       "status": "OK",
       "error": null
     },
@@ -111,11 +90,56 @@
       "previous_date": "2026-09-01",
       "change": 1.178,
       "change_percent": 0.3503,
+      "change_5d_percent": 0.3503,
+      "change_20d_percent": 0.3503,
+      "change_5d": 1.178,
+      "change_20d": 1.178,
       "source": "FRED_CSV_EXPORT",
-      "fetched_at": "2026-11-21T18:25:25Z",
-      "age_days": 51.77,
+      "fetched_at": "2026-11-21T20:08:19Z",
+      "age_days": 51.84,
       "status": "OK",
       "error": null
+    },
+    "unemployment": {
+      "key": "unemployment",
+      "name": "Unemployment Rate",
+      "value": 4.1,
+      "unit": "%",
+      "observation_date": "2026-10-01",
+      "previous_value": 4.2,
+      "previous_date": "2026-09-01",
+      "change": -0.1,
+      "change_percent": -2.381,
+      "change_5d_percent": -2.381,
+      "change_20d_percent": -2.381,
+      "change_5d": -0.1,
+      "change_20d": -0.1,
+      "source": "FRED_CSV_EXPORT",
+      "fetched_at": "2026-11-21T20:08:19Z",
+      "age_days": 51.84,
+      "status": "OK",
+      "error": null
+    },
+    "nonfarm_payrolls": {
+      "key": "nonfarm_payrolls",
+      "name": "Total Nonfarm Payrolls",
+      "value": 159293.0,
+      "unit": "thousands",
+      "observation_date": "2026-10-01",
+      "previous_value": 159128.0,
+      "previous_date": "2026-09-01",
+      "change": 165.0,
+      "change_percent": 0.1037,
+      "change_5d_percent": 0.1037,
+      "change_20d_percent": 0.1037,
+      "change_5d": 165.0,
+      "change_20d": 165.0,
+      "source": "FRED_CSV_EXPORT",
+      "fetched_at": "2026-11-21T20:08:19Z",
+      "age_days": 51.84,
+      "status": "OK",
+      "error": null,
+      "monthly_change_thousands": 165.0
     },
     "sp500": {
       "key": "sp500",
@@ -127,9 +151,13 @@
       "previous_date": "2026-11-18",
       "change": -147.8,
       "change_percent": -2.0181,
+      "change_5d_percent": -5.1026,
+      "change_20d_percent": -5.3329,
+      "change_5d": -385.84,
+      "change_20d": -404.24,
       "source": "FRED_CSV_EXPORT",
-      "fetched_at": "2026-11-21T18:25:25Z",
-      "age_days": 2.77,
+      "fetched_at": "2026-11-21T20:08:19Z",
+      "age_days": 2.84,
       "status": "OK",
       "error": null
     },
@@ -143,9 +171,13 @@
       "previous_date": "2026-11-12",
       "change": 0.107,
       "change_percent": 0.0873,
+      "change_5d_percent": 0.6318,
+      "change_20d_percent": 1.0964,
+      "change_5d": 0.77,
+      "change_20d": 1.3301,
       "source": "FRED_CSV_EXPORT",
-      "fetched_at": "2026-11-21T18:25:26Z",
-      "age_days": 8.77,
+      "fetched_at": "2026-11-21T20:08:20Z",
+      "age_days": 8.84,
       "status": "OK",
       "error": null
     },
@@ -159,9 +191,13 @@
       "previous_date": "2026-11-18",
       "change": 3.88,
       "change_percent": 15.798,
+      "change_5d_percent": 47.3575,
+      "change_20d_percent": 46.447,
+      "change_5d": 9.14,
+      "change_20d": 9.02,
       "source": "FRED_CSV_EXPORT",
-      "fetched_at": "2026-11-21T18:25:27Z",
-      "age_days": 2.77,
+      "fetched_at": "2026-11-21T20:08:20Z",
+      "age_days": 2.84,
       "status": "OK",
       "error": null
     },
@@ -175,9 +211,13 @@
       "previous_date": "2026-11-18",
       "change": -0.04,
       "change_percent": -0.8333,
+      "change_5d_percent": -2.459,
+      "change_20d_percent": 4.386,
+      "change_5d": -0.12,
+      "change_20d": 0.2,
       "source": "FRED_CSV_EXPORT",
-      "fetched_at": "2026-11-21T18:25:27Z",
-      "age_days": 2.77,
+      "fetched_at": "2026-11-21T20:08:20Z",
+      "age_days": 2.84,
       "status": "OK",
       "error": null
     },
@@ -191,25 +231,13 @@
       "previous_date": "2026-11-18",
       "change": -0.01,
       "change_percent": -0.1848,
+      "change_5d_percent": -1.2797,
+      "change_20d_percent": 1.6949,
+      "change_5d": -0.07,
+      "change_20d": 0.09,
       "source": "FRED_CSV_EXPORT",
-      "fetched_at": "2026-11-21T18:25:28Z",
-      "age_days": 2.77,
-      "status": "OK",
-      "error": null
-    },
-    "fed_balance_sheet": {
-      "key": "fed_balance_sheet",
-      "name": "Federal Reserve Total Assets",
-      "value": 6741452.0,
-      "unit": "millions USD",
-      "observation_date": "2026-11-18",
-      "previous_value": 6758867.0,
-      "previous_date": "2026-11-11",
-      "change": -17415.0,
-      "change_percent": -0.2577,
-      "source": "FRED_CSV_EXPORT",
-      "fetched_at": "2026-11-21T18:25:28Z",
-      "age_days": 3.77,
+      "fetched_at": "2026-11-21T20:08:20Z",
+      "age_days": 2.84,
       "status": "OK",
       "error": null
     },
@@ -223,9 +251,33 @@
       "previous_date": "2026-11-19",
       "change": 0.01,
       "change_percent": 3.5714,
+      "change_5d_percent": 7.4074,
+      "change_20d_percent": -23.6842,
+      "change_5d": 0.02,
+      "change_20d": -0.09,
       "source": "FRED_CSV_EXPORT",
-      "fetched_at": "2026-11-21T18:25:28Z",
-      "age_days": 1.77,
+      "fetched_at": "2026-11-21T20:08:20Z",
+      "age_days": 1.84,
+      "status": "OK",
+      "error": null
+    },
+    "fed_balance_sheet": {
+      "key": "fed_balance_sheet",
+      "name": "Federal Reserve Total Assets",
+      "value": 6741452.0,
+      "unit": "millions USD",
+      "observation_date": "2026-11-18",
+      "previous_value": 6758867.0,
+      "previous_date": "2026-11-11",
+      "change": -17415.0,
+      "change_percent": -0.2577,
+      "change_5d_percent": -0.2577,
+      "change_20d_percent": -0.062,
+      "change_5d": -17415.0,
+      "change_20d": -4183.0,
+      "source": "FRED_CSV_EXPORT",
+      "fetched_at": "2026-11-21T20:08:24Z",
+      "age_days": 3.84,
       "status": "OK",
       "error": null
     },
@@ -239,9 +291,13 @@
       "previous_date": "2026-08-01",
       "change": 113.0,
       "change_percent": 0.485,
+      "change_5d_percent": 0.485,
+      "change_20d_percent": 0.485,
+      "change_5d": 113.0,
+      "change_20d": 113.0,
       "source": "FRED_CSV_EXPORT",
-      "fetched_at": "2026-11-21T18:25:28Z",
-      "age_days": 81.77,
+      "fetched_at": "2026-11-21T20:08:25Z",
+      "age_days": 81.84,
       "status": "OK",
       "error": null
     },
@@ -255,25 +311,13 @@
       "previous_date": "2026-11-11",
       "change": 2243.0,
       "change_percent": 0.2453,
+      "change_5d_percent": 0.2453,
+      "change_20d_percent": -8.3137,
+      "change_5d": 2243.0,
+      "change_20d": -83114.0,
       "source": "FRED_CSV_EXPORT",
-      "fetched_at": "2026-11-21T18:25:28Z",
-      "age_days": 3.77,
-      "status": "OK",
-      "error": null
-    },
-    "yield_10y": {
-      "key": "yield_10y",
-      "name": "US 10-Year Treasury Yield",
-      "value": 5.04,
-      "unit": "%",
-      "observation_date": "2026-11-19",
-      "previous_value": 5.07,
-      "previous_date": "2026-11-18",
-      "change": -0.03,
-      "change_percent": -0.5917,
-      "source": "FRED_CSV_EXPORT",
-      "fetched_at": "2026-11-21T18:25:28Z",
-      "age_days": 2.77,
+      "fetched_at": "2026-11-21T20:08:25Z",
+      "age_days": 3.84,
       "status": "OK",
       "error": null
     },
@@ -287,25 +331,33 @@
       "previous_date": "2026-11-16",
       "change": 0.29,
       "change_percent": 0.325,
+      "change_5d_percent": -3.0011,
+      "change_20d_percent": -15.7365,
+      "change_5d": -2.77,
+      "change_20d": -16.72,
       "source": "FRED_CSV_EXPORT",
-      "fetched_at": "2026-11-21T18:25:29Z",
-      "age_days": 4.77,
+      "fetched_at": "2026-11-21T20:08:23Z",
+      "age_days": 4.84,
       "status": "OK",
       "error": null
     },
-    "nasdaq": {
-      "key": "nasdaq",
-      "name": "NASDAQ Composite",
-      "value": 23879.2,
-      "unit": "index",
+    "yield_10y": {
+      "key": "yield_10y",
+      "name": "US 10-Year Treasury Yield",
+      "value": 5.04,
+      "unit": "%",
       "observation_date": "2026-11-19",
-      "previous_value": 24429.88,
+      "previous_value": 5.07,
       "previous_date": "2026-11-18",
-      "change": -550.68,
-      "change_percent": -2.2541,
+      "change": -0.03,
+      "change_percent": -0.5917,
+      "change_5d_percent": -2.1359,
+      "change_20d_percent": 2.0243,
+      "change_5d": -0.11,
+      "change_20d": 0.1,
       "source": "FRED_CSV_EXPORT",
-      "fetched_at": "2026-11-21T18:25:29Z",
-      "age_days": 2.77,
+      "fetched_at": "2026-11-21T20:08:20Z",
+      "age_days": 2.84,
       "status": "OK",
       "error": null
     },
@@ -319,9 +371,33 @@
       "previous_date": "2026-11-19",
       "change": -0.004,
       "change_percent": -0.9877,
+      "change_5d_percent": 23.3846,
+      "change_20d_percent": -90.8343,
+      "change_5d": 0.076,
+      "change_20d": -3.974,
       "source": "FRED_CSV_EXPORT",
-      "fetched_at": "2026-11-21T18:25:29Z",
-      "age_days": 1.77,
+      "fetched_at": "2026-11-21T20:08:25Z",
+      "age_days": 1.84,
+      "status": "OK",
+      "error": null
+    },
+    "nasdaq": {
+      "key": "nasdaq",
+      "name": "NASDAQ Composite",
+      "value": 23879.2,
+      "unit": "index",
+      "observation_date": "2026-11-19",
+      "previous_value": 24429.88,
+      "previous_date": "2026-11-18",
+      "change": -550.68,
+      "change_percent": -2.2541,
+      "change_5d_percent": -5.001,
+      "change_20d_percent": -6.1241,
+      "change_5d": -1257.07,
+      "change_20d": -1557.8,
+      "source": "FRED_CSV_EXPORT",
+      "fetched_at": "2026-11-21T20:08:22Z",
+      "age_days": 2.84,
       "status": "OK",
       "error": null
     },
@@ -335,9 +411,13 @@
       "previous_date": "2026-11-12",
       "change": 0.33,
       "change_percent": 0.2068,
+      "change_5d_percent": 1.0744,
+      "change_20d_percent": 1.9507,
+      "change_5d": 1.7,
+      "change_20d": 3.06,
       "source": "FRED_CSV_EXPORT",
-      "fetched_at": "2026-11-21T18:25:29Z",
-      "age_days": 8.77,
+      "fetched_at": "2026-11-21T20:08:25Z",
+      "age_days": 8.84,
       "status": "OK",
       "error": null
     },
@@ -351,9 +431,13 @@
       "previous_date": "2026-11-18",
       "change": 0.0,
       "change_percent": 0.0,
+      "change_5d_percent": 0.0,
+      "change_20d_percent": 0.0,
+      "change_5d": 0.0,
+      "change_20d": 0.0,
       "source": "FRED_CSV_EXPORT",
-      "fetched_at": "2026-11-21T18:25:29Z",
-      "age_days": 2.77,
+      "fetched_at": "2026-11-21T20:08:21Z",
+      "age_days": 2.84,
       "status": "OK",
       "error": null
     },
@@ -367,10 +451,10 @@
       "previous_date": null,
       "change": null,
       "change_percent": null,
-      "source": "FRED GOLDAMGBD228NLBM (disabled)",
-      "fetched_at": "2026-11-21T18:25:29Z",
+      "source": "Unavailable",
+      "fetched_at": "2026-11-21T20:08:27Z",
       "status": "UNAVAILABLE",
-      "error": "FRED endpoint returned HTTP 404. No verified replacement price source is configured."
+      "error": "No verified replacement Gold price source configured."
     }
   },
   "inflation": {
@@ -378,29 +462,37 @@
       "name": "CPI",
       "mom_percent": 0.35,
       "three_month_percent": 1.401,
-      "yoy_percent": 4.081,
-      "status": "OK"
+      "yoy_percent": null,
+      "status": "INSUFFICIENT_HISTORY",
+      "calculation_method": "CALENDAR_MONTH_COMPARISON",
+      "seasonal_adjustment_note": "FRED series CPIAUCSL, CPILFESL, PCEPI and PCEPILFE are seasonally adjusted index series."
     },
     "core_cpi": {
       "name": "Core CPI",
       "mom_percent": 0.296,
       "three_month_percent": 0.924,
-      "yoy_percent": 2.87,
-      "status": "OK"
+      "yoy_percent": null,
+      "status": "INSUFFICIENT_HISTORY",
+      "calculation_method": "CALENDAR_MONTH_COMPARISON",
+      "seasonal_adjustment_note": "FRED series CPIAUCSL, CPILFESL, PCEPI and PCEPILFE are seasonally adjusted index series."
     },
     "pce": {
       "name": "PCE",
       "mom_percent": 0.491,
       "three_month_percent": 0.878,
       "yoy_percent": 3.649,
-      "status": "OK"
+      "status": "OK",
+      "calculation_method": "CALENDAR_MONTH_COMPARISON",
+      "seasonal_adjustment_note": "FRED series CPIAUCSL, CPILFESL, PCEPI and PCEPILFE are seasonally adjusted index series."
     },
     "core_pce": {
       "name": "Core PCE",
       "mom_percent": 0.317,
       "three_month_percent": 0.718,
       "yoy_percent": 3.121,
-      "status": "OK"
+      "status": "OK",
+      "calculation_method": "CALENDAR_MONTH_COMPARISON",
+      "seasonal_adjustment_note": "FRED series CPIAUCSL, CPILFESL, PCEPI and PCEPILFE are seasonally adjusted index series."
     }
   },
   "liquidity": {
@@ -419,11 +511,11 @@
     "change_7d": -19.837,
     "change_30d": -47.557,
     "trend": "CONTRACTING",
-    "observations_available": 7,
-    "alignment_method": "AS_OF_DATE",
-    "lookback_days": 45,
-    "max_tga_age_days": 10,
-    "max_rrp_age_days": 7
+    "observations_available": 9,
+    "alignment_method": "STRICT_AS_OF_DATE",
+    "lookback_days": 60,
+    "max_tga_age_days": 7,
+    "max_rrp_age_days": 3
   },
   "yield_curve": {
     "status": "OK",
@@ -436,26 +528,18 @@
   },
   "reports": {
     "cpi": {
-      "DATA": {
-        "yoy_percent": 4.081,
-        "mom_percent": 0.35,
-        "three_month_percent": 1.401
-      },
-      "ANALYSIS": "CPI YoY উচ্চ এবং MoM-ও শক্তিশালী; inflation pressure বজায় রয়েছে।",
-      "DECISION": "REDUCE RISK",
-      "ACTION": "Inflation pressure বেশি—Fed policy ও Treasury yield এর সঙ্গে মিলিয়ে Crypto risk সতর্কভাবে পরিচালনা করুন।",
-      "RISK": "YoY, MoM ও 3M trend একসঙ্গে দেখতে হবে; একটি metric দিয়ে Fed policy নিশ্চিত করা যায় না।"
+      "DATA": null,
+      "ANALYSIS": "CPI data unavailable or stale.",
+      "DECISION": "WAIT — INSUFFICIENT DATA",
+      "ACTION": "CPI data যাচাই না হওয়া পর্যন্ত সিদ্ধান্ত স্থগিত রাখুন।",
+      "RISK": "অসম্পূর্ণ বা পুরোনো ডেটা থেকে নির্ভরযোগ্য সিদ্ধান্ত নেওয়া যাবে না।"
     },
     "core_cpi": {
-      "DATA": {
-        "yoy_percent": 2.87,
-        "mom_percent": 0.296,
-        "three_month_percent": 0.924
-      },
-      "ANALYSIS": "Core CPI YoY তুলনামূলকভাবে নিয়ন্ত্রিত।",
-      "DECISION": "HOLD / SELECTIVE",
-      "ACTION": "Inflation trend-কে Fed policy, yields ও BTC trend-এর সঙ্গে যাচাই করুন।",
-      "RISK": "YoY, MoM ও 3M trend একসঙ্গে দেখতে হবে; একটি metric দিয়ে Fed policy নিশ্চিত করা যায় না।"
+      "DATA": null,
+      "ANALYSIS": "Core CPI data unavailable or stale.",
+      "DECISION": "WAIT — INSUFFICIENT DATA",
+      "ACTION": "Core CPI data যাচাই না হওয়া পর্যন্ত সিদ্ধান্ত স্থগিত রাখুন।",
+      "RISK": "অসম্পূর্ণ বা পুরোনো ডেটা থেকে নির্ভরযোগ্য সিদ্ধান্ত নেওয়া যাবে না।"
     },
     "pce": {
       "DATA": {
@@ -463,10 +547,10 @@
         "mom_percent": 0.491,
         "three_month_percent": 0.878
       },
-      "ANALYSIS": "PCE YoY উচ্চ এবং MoM-ও শক্তিশালী; inflation pressure বজায় রয়েছে।",
+      "ANALYSIS": "PCE YoY এবং MoM উভয়ই উচ্চ inflation pressure নির্দেশ করছে।",
       "DECISION": "REDUCE RISK",
-      "ACTION": "Inflation pressure বেশি—Fed policy ও Treasury yield এর সঙ্গে মিলিয়ে Crypto risk সতর্কভাবে পরিচালনা করুন।",
-      "RISK": "YoY, MoM ও 3M trend একসঙ্গে দেখতে হবে; একটি metric দিয়ে Fed policy নিশ্চিত করা যায় না।"
+      "ACTION": "Fed policy, Treasury yield ও BTC trend-এর সঙ্গে inflation pressure যাচাই করুন।",
+      "RISK": "একটি inflation reading দিয়ে Fed policy নিশ্চিত করা যায় না।"
     },
     "core_pce": {
       "DATA": {
@@ -474,29 +558,29 @@
         "mom_percent": 0.317,
         "three_month_percent": 0.718
       },
-      "ANALYSIS": "Core PCE YoY উচ্চ এবং MoM-ও শক্তিশালী; inflation pressure বজায় রয়েছে।",
+      "ANALYSIS": "Core PCE YoY এবং MoM উভয়ই উচ্চ inflation pressure নির্দেশ করছে।",
       "DECISION": "REDUCE RISK",
-      "ACTION": "Inflation pressure বেশি—Fed policy ও Treasury yield এর সঙ্গে মিলিয়ে Crypto risk সতর্কভাবে পরিচালনা করুন।",
-      "RISK": "YoY, MoM ও 3M trend একসঙ্গে দেখতে হবে; একটি metric দিয়ে Fed policy নিশ্চিত করা যায় না।"
+      "ACTION": "Fed policy, Treasury yield ও BTC trend-এর সঙ্গে inflation pressure যাচাই করুন।",
+      "RISK": "একটি inflation reading দিয়ে Fed policy নিশ্চিত করা যায় না।"
     },
     "fed_rate": {
       "DATA": {
         "effective_rate_percent": 3.88,
         "observation_date": "2026-11-19"
       },
-      "ANALYSIS": "সর্বশেষ effective Fed funds rate পাওয়া গেছে।",
+      "ANALYSIS": "সর্বশেষ effective Fed Funds Rate পাওয়া গেছে।",
       "DECISION": "HOLD / SELECTIVE",
-      "ACTION": "Fed rate-কে inflation, employment, Treasury yield ও FOMC guidance-এর সঙ্গে বিশ্লেষণ করুন।",
-      "RISK": "Effective rate একা FOMC-এর পরবর্তী সিদ্ধান্ত জানায় না।"
+      "ACTION": "Fed rate-কে inflation, employment ও FOMC guidance-এর সঙ্গে বিশ্লেষণ করুন।",
+      "RISK": "Effective rate একা পরবর্তী FOMC সিদ্ধান্ত জানায় না।"
     },
     "labor_market": {
       "DATA": {
         "unemployment_percent": 4.1,
         "nfp_monthly_change_thousands": 165.0
       },
-      "ANALYSIS": "Labor market তুলনামূলকভাবে স্থিতিশীল।",
+      "ANALYSIS": "Labor market তুলনামূলক স্থিতিশীল।",
       "DECISION": "HOLD / SELECTIVE",
-      "ACTION": "Employment trend ও wage inflation একসঙ্গে পর্যবেক্ষণ করুন।",
+      "ACTION": "Employment ও wage inflation একসঙ্গে পর্যবেক্ষণ করুন।",
       "RISK": "শক্তিশালী employment inflation pressure বজায় রাখতে পারে।"
     },
     "bond_yields": {
@@ -504,12 +588,12 @@
         "2y": 4.76,
         "10y": 5.04,
         "30y": 5.4,
-        "10y_daily_change_pp": -0.03
+        "10y_20d_change_pp": 0.1
       },
-      "ANALYSIS": "10Y yield-এ বড় দৈনিক পরিবর্তন নেই।",
+      "ANALYSIS": "10Y yield-এর 20D পরিবর্তন উল্লেখযোগ্য নয়।",
       "DECISION": "WAIT",
       "ACTION": "Treasury yield trend পর্যবেক্ষণ করুন।",
-      "RISK": "এক দিনের yield change দীর্ঘমেয়াদি trend নিশ্চিত করে না।"
+      "RISK": "একটি yield movement দীর্ঘমেয়াদি trend নিশ্চিত করে না।"
     },
     "yield_curve": {
       "DATA": {
@@ -521,47 +605,47 @@
         "inverted": false,
         "trend": "STABLE"
       },
-      "ANALYSIS": "10Y-2Y spread positive এবং বড় 30D পরিবর্তন নেই।",
+      "ANALYSIS": "10Y-2Y spread positive এবং তুলনামূলক স্থিতিশীল।",
       "DECISION": "HOLD / SELECTIVE",
-      "ACTION": "Yield curve-কে inflation, employment ও long-term yield-এর সঙ্গে পর্যবেক্ষণ করুন।",
-      "RISK": "Yield curve inversion recession-এর ঝুঁকি নির্দেশ করতে পারে, কিন্তু recession নিশ্চিত করে না।"
+      "ACTION": "Inflation, employment ও long-term yield-এর সঙ্গে পর্যবেক্ষণ করুন।",
+      "RISK": "Yield curve inversion recession নিশ্চিত করে না।"
     },
     "usd_index": {
       "DATA": {
-        "daily_change_percent": 0.0873
+        "change_20d_percent": 1.0964
       },
-      "ANALYSIS": "Broad USD index-এ বড় দৈনিক পরিবর্তন নেই।",
-      "DECISION": "WAIT",
-      "ACTION": "USD trend পর্যবেক্ষণ করুন।",
-      "RISK": "এটি ICE DXY নয়; broad trade-weighted USD index।"
+      "ANALYSIS": "Broad USD Index-এর 20D trend শক্তিশালী হয়েছে।",
+      "DECISION": "REDUCE RISK",
+      "ACTION": "Dollar strength-এর সঙ্গে Crypto risk exposure সতর্কভাবে পরিচালনা করুন।",
+      "RISK": "এটি ICE DXY নয়; trade-weighted USD proxy।"
     },
     "vix": {
       "DATA": {
         "value": 28.44
       },
-      "ANALYSIS": "VIX উচ্চ range-এ রয়েছে।",
+      "ANALYSIS": "VIX elevated risk range-এ রয়েছে।",
       "DECISION": "WAIT",
-      "ACTION": "নতুন BUY-তে সতর্ক থাকুন এবং BTC volatility পর্যবেক্ষণ করুন।",
+      "ACTION": "BTC volatility ও equity trend পর্যবেক্ষণ করুন।",
       "RISK": "VIX একা Crypto market direction নির্ধারণ করে না।"
     },
     "equity_market": {
       "DATA": {
         "sp500": 7175.83,
         "nasdaq": 23879.2,
-        "sp500_daily_change_percent": -2.0181,
-        "nasdaq_daily_change_percent": -2.2541
+        "sp500_20d_change_percent": -5.3329,
+        "nasdaq_20d_change_percent": -6.1241
       },
-      "ANALYSIS": "S&P 500 ও Nasdaq উভয়ই সর্বশেষ session-এ দুর্বল হয়েছে।",
+      "ANALYSIS": "S&P 500 ও Nasdaq উভয়ের 20D trend দুর্বল।",
       "DECISION": "WAIT",
       "ACTION": "Equity weakness-এর সময়ে নতুন ঝুঁকিপূর্ণ BUY সীমিত রাখুন।",
-      "RISK": "একটি session-এর পরিবর্তন দীর্ঘমেয়াদি equity trend নয়।"
+      "RISK": "20D equity trend-ও Crypto market direction নিশ্চিত করে না।"
     },
     "commodities": {
       "DATA": {
         "wti_oil_usd_per_barrel": 89.53,
         "gold_usd_per_oz": null,
         "gold_status": "UNAVAILABLE",
-        "gold_note": "FRED endpoint returned HTTP 404. No verified replacement price source is configured."
+        "gold_note": "No verified replacement Gold price source configured."
       },
       "ANALYSIS": "WTI oil data পাওয়া গেছে; Gold source unavailable.",
       "DECISION": "HOLD / SELECTIVE",
@@ -580,11 +664,11 @@
     },
     "liquidity": {
       "DATA": {
-        "current_billions_usd": 5824.508,
-        "change_7d_billions_usd": -19.837,
-        "change_30d_billions_usd": -47.557,
-        "trend": "CONTRACTING",
+        "status": "OK",
+        "unit": "billions USD",
+        "formula": "WALCL - TGA - RRP",
         "observation_date": "2026-11-18",
+        "current": 5824.508,
         "components": {
           "fed_assets": 6741.452,
           "treasury_general_account": 916.613,
@@ -592,44 +676,53 @@
           "tga_observation_date": "2026-11-18",
           "reverse_repo_observation_date": "2026-11-18"
         },
-        "formula": "WALCL - TGA - RRP",
-        "alignment_method": "AS_OF_DATE",
-        "observations_available": 7
+        "change_7d": -19.837,
+        "change_30d": -47.557,
+        "trend": "CONTRACTING",
+        "observations_available": 9,
+        "alignment_method": "STRICT_AS_OF_DATE",
+        "lookback_days": 60,
+        "max_tga_age_days": 7,
+        "max_rrp_age_days": 3
       },
-      "ANALYSIS": "US Net Liquidity-এর 30D পরিবর্তন উল্লেখযোগ্য expansion বা contraction threshold অতিক্রম করেনি।",
+      "ANALYSIS": "US Net Liquidity-তে বড় 30D expansion বা contraction নেই।",
       "DECISION": "WAIT",
-      "ACTION": "Net Liquidity trend পর্যবেক্ষণ করুন; শুধু এই metric-এর ভিত্তিতে নতুন risk exposure বাড়াবেন না।",
-      "RISK": "ছোট পরিবর্তনেও বাজারে প্রভাব থাকতে পারে; তবে বর্তমান threshold অনুযায়ী শক্তিশালী signal নেই।"
+      "ACTION": "পরবর্তী liquidity observation পর্যবেক্ষণ করুন।",
+      "RISK": "এই proxy একা Crypto market direction নির্ধারণ করে না।"
     }
   },
   "overall_macro_decision": {
     "DATA": {
-      "risk_score": 3,
-      "support_score": 1,
-      "risk_flags": [
-        "Broad inflation pressure: CPI and Core PCE elevated",
-        "VIX >= 25: elevated volatility",
-        "S&P 500 and Nasdaq both down >= 1.5%"
+      "required_metrics": [
+        "usd_broad_index",
+        "vix",
+        "yield_10y",
+        "cpi",
+        "core_pce",
+        "unemployment",
+        "sp500",
+        "nasdaq"
       ],
-      "supportive_flags": [
-        "Labor market comparatively stable"
+      "missing_metrics": [
+        "cpi_inflation_history"
       ],
-      "unavailable_calculations": [],
-      "risk_categories": 8,
+      "risk_flags": [],
+      "supportive_flags": [],
+      "risk_score": null,
+      "support_score": null,
       "model_type": "RULE_BASED_MULTI_FACTOR",
       "calibrated_probability": null
     },
-    "ANALYSIS": "একাধিক স্বাধীন Macro risk category একই সময়ে চাপ তৈরি করছে।",
-    "DECISION": "REDUCE RISK",
-    "ACTION": "Macro risk elevated—ঝুঁকিপূর্ণ Altcoin exposure কম রাখুন এবং নতুন BUY সীমিত করুন।",
-    "RISK": "BTC trend, ETF flows, crypto liquidity ও on-chain data ছাড়া এটি চূড়ান্ত Crypto Sell signal নয়।"
+    "ANALYSIS": "Core Macro calculation incomplete বা stale.",
+    "DECISION": "WAIT — INSUFFICIENT DATA",
+    "ACTION": "Core Macro data সম্পূর্ণ না হওয়া পর্যন্ত Risk-On/Risk-Off সিদ্ধান্ত স্থগিত রাখুন।",
+    "RISK": "অসম্পূর্ণ data থেকে ভুল market assessment হতে পারে।"
   },
   "limitations": [
     "DTWEXBGS is a broad trade-weighted USD proxy, not ICE DXY.",
     "FRED observations are released with delays.",
     "Freshness limits are series-specific.",
-    "Gold is unavailable because the previous FRED endpoint returned HTTP 404.",
-    "No unverified Gold replacement is used.",
+    "Gold is unavailable because no verified replacement source is configured.",
     "US Net Liquidity is a proxy calculated as WALCL - TGA - RRP.",
     "Net Liquidity is not a complete Global Liquidity Composite.",
     "Economic calendar forecast/actual/surprise is not integrated.",

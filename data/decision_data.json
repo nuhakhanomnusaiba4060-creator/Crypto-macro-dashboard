@@ -1,171 +1,154 @@
 {
-  "schema_version": 1,
-  "engine": "Crypto Final Decision Engine",
-  "engine_version": "1.0.0",
-  "generated_at": "2026-11-21T19:56:12Z",
-  "status": "OK",
+  "engine": "CRYPTO FINAL DECISION ENGINE",
+  "version": "2.0.0",
+  "generated_at": "2026-11-21T20:08:37.937077+00:00",
   "data_quality": {
-    "macro": {
-      "name": "macro_data",
-      "timestamp": "2026-11-21T18:25:42Z",
-      "age_hours": 1.51,
-      "max_age_hours": 72,
-      "status": "FRESH"
+    "status": "PARTIAL",
+    "market_snapshot": {
+      "status": "FRESH",
+      "age_hours": 0.01,
+      "reason": "Snapshot is fresh."
     },
-    "market": {
-      "name": "market_data",
-      "timestamp": "2026-11-21T19:56:01Z",
+    "macro_snapshot": {
+      "status": "FRESH",
       "age_hours": 0.0,
-      "max_age_hours": 36,
-      "status": "FRESH"
+      "reason": "Snapshot is fresh."
     },
-    "btc_technical": {
-      "name": "BTC last closed daily candle",
-      "timestamp": "2026-11-20T23:59:59Z",
-      "age_hours": 19.94,
-      "max_age_hours": 60,
-      "status": "FRESH"
-    },
-    "eth_technical": {
-      "name": "ETH last closed daily candle",
-      "timestamp": "2026-11-20T23:59:59Z",
-      "age_hours": 19.94,
-      "max_age_hours": 60,
-      "status": "FRESH"
-    },
+    "btc_technical": "INCOMPLETE",
+    "eth_technical": "INCOMPLETE",
     "issues": [
-      "BTC price source discrepancy: CoinGecko snapshot ও Binance technical price-এর পার্থক্য 2.19%। ভিন্ন source/timestamp হওয়ায় কোনো একটি value auto-correct করা হয়নি।",
-      "Net Liquidity RRP mismatch: metrics.reverse_repo=0.401B, liquidity.components.reverse_repo=0.331B। Liquidity formula-এর aligned component আলাদা করে দেখানো হয়েছে।",
-      "Macro data quality GOOD_WITH_OPTIONAL_GAPS; optional Gold data unavailable।",
-      "Market data scheduled snapshot; realtime feed নয়।"
+      "BTC technical data is incomplete or stale.",
+      "ETH technical data is incomplete or stale.",
+      "Market data is a scheduled snapshot, not guaranteed realtime.",
+      "DTWEXBGS is a broad trade-weighted USD proxy, not ICE DXY.",
+      "FRED observations are released with delays.",
+      "Freshness limits are series-specific.",
+      "Gold is unavailable because no verified replacement source is configured.",
+      "US Net Liquidity is a proxy calculated as WALCL - TGA - RRP.",
+      "Net Liquidity is not a complete Global Liquidity Composite.",
+      "Economic calendar forecast/actual/surprise is not integrated.",
+      "BOJ policy and Japanese government bond yield curves are not integrated.",
+      "JPY carry-trade risk model is not integrated.",
+      "Crypto ETF flows are not integrated.",
+      "BTC market structure and technical confirmation are not integrated.",
+      "Crypto-specific on-chain data are not integrated.",
+      "Rule-based Macro Risk Score is not a calibrated probability.",
+      "Macro decision is not a standalone crypto trading signal.",
+      "Macro critical metric coverage is incomplete."
     ]
   },
   "macro_analysis": {
-    "decision": "REDUCE RISK",
-    "risk_score": 3.0,
-    "support_score": 1.0,
-    "data_quality": "GOOD_WITH_OPTIONAL_GAPS",
-    "critical_series_available": 18,
-    "critical_series_count": 18,
-    "critical_missing": [],
-    "key_metrics": {
-      "cpi_yoy_percent": 4.081,
-      "core_pce_yoy_percent": 3.121,
-      "vix": 28.44,
-      "sp500_daily_change_percent": -2.0181,
-      "nasdaq_daily_change_percent": -2.2541,
-      "yield_10y_daily_change_pp": -0.03,
-      "net_liquidity_trend": "CONTRACTING"
-    },
+    "quality": "PARTIAL",
+    "decision": "UNKNOWN",
+    "risk_level": "UNKNOWN",
+    "risk_score": 1,
     "risk_flags": [
-      "Macro engine-এর সামগ্রিক সিদ্ধান্ত REDUCE RISK।",
-      "CPI YoY উচ্চ; inflation pressure রয়েছে।",
-      "Core PCE YoY 3% বা তার বেশি।",
-      "VIX 20-এর ওপরে; equity volatility elevated।",
-      "S&P 500 ও Nasdaq উভয়ই সর্বশেষ session-এ 1.5% বা বেশি কমেছে।",
-      "US Net Liquidity proxy-এর trend CONTRACTING।"
-    ]
+      "VIX elevated"
+    ],
+    "vix": 28.44,
+    "yield_10y": null,
+    "broad_usd": null,
+    "fed_funds": null,
+    "critical_checks": {
+      "vix": true,
+      "10y_yield": false,
+      "broad_usd": false
+    }
   },
   "crypto_market": {
-    "global_market_cap_usd": 2088719525813.203,
-    "global_volume_24h_usd": 123367404747.01482,
-    "btc_dominance_percent": 57.9667167407755,
+    "global_market": {},
     "fear_greed": {
       "value": 12.0,
       "classification": "Extreme Fear",
       "unit": "/100",
       "source": "Alternative.me Fear & Greed API",
       "source_updated_at": "2026-11-21T00:00:00Z",
-      "fetched_at": "2026-11-21T19:56:01Z",
+      "fetched_at": "2026-11-21T20:08:07Z",
       "status": "OK",
       "error": null
     },
     "btc": {
       "symbol": "BTC",
-      "price_usdt": 58951.51,
-      "ma20": 71103.515,
-      "ma50": 77717.71659999999,
-      "ma200": 72589.18524999998,
-      "rsi14": 17.352953009243876,
-      "macd": -4800.5169055278675,
-      "macd_signal": -3700.802078331073,
-      "adx14": 44.27721782281161,
-      "volume_ratio_20d": 1.9360137865525127,
-      "support_20d": 61428.26,
-      "resistance_20d": 81196.01,
-      "bollinger_lower": 58508.48123896466,
-      "last_closed_candle_at": "2026-11-20T23:59:59Z",
-      "candle_count": 249,
-      "trend": "BEARISH",
-      "signals": [
-        "দাম MA20-এর নিচে।",
-        "MA20 < MA50; short/mid-term trend দুর্বল।",
-        "RSI 30-এর নিচে; oversold, কিন্তু reversal নিশ্চিত নয়।",
-        "MACD signal line-এর নিচে।",
-        "দাম 20D support-এর নিচে; support breakdown।",
-        "শেষ দিনের volume 20D average-এর তুলনায় বেশি।"
-      ],
-      "data_complete": true
+      "quality": "INCOMPLETE",
+      "technical_age": {
+        "status": "FRESH",
+        "age_hours": 0.01
+      },
+      "trend": "UNKNOWN",
+      "price": null,
+      "ma20": null,
+      "ma50": null,
+      "ma200": null,
+      "rsi14": null,
+      "macd": null,
+      "macd_signal": null,
+      "adx14": null,
+      "volume_ratio": null,
+      "support": null,
+      "resistance": null,
+      "bollinger_lower": null,
+      "support_warning": false,
+      "checks": {
+        "price": false,
+        "ma20": false,
+        "ma50": false,
+        "ma200": false,
+        "rsi": false
+      }
     },
     "eth": {
       "symbol": "ETH",
-      "price_usdt": 1623.09,
-      "ma20": 2033.7244999999998,
-      "ma50": 2287.512200000001,
-      "ma200": 2130.4131500000003,
-      "rsi14": 19.246242959260357,
-      "macd": -169.42349714189731,
-      "macd_signal": -139.46273825262426,
-      "adx14": 41.84494891941189,
-      "volume_ratio_20d": 2.237459303578145,
-      "support_20d": 1711.08,
-      "resistance_20d": 2450.0,
-      "bollinger_lower": 1590.10802801209,
-      "last_closed_candle_at": "2026-11-20T23:59:59Z",
-      "candle_count": 249,
-      "trend": "BEARISH",
-      "signals": [
-        "দাম MA20-এর নিচে।",
-        "MA20 < MA50; short/mid-term trend দুর্বল।",
-        "RSI 30-এর নিচে; oversold, কিন্তু reversal নিশ্চিত নয়।",
-        "MACD signal line-এর নিচে।",
-        "দাম 20D support-এর নিচে; support breakdown।",
-        "শেষ দিনের volume 20D average-এর তুলনায় বেশি।"
-      ],
-      "data_complete": true
+      "quality": "INCOMPLETE",
+      "technical_age": {
+        "status": "FRESH",
+        "age_hours": 0.01
+      },
+      "trend": "UNKNOWN",
+      "price": null,
+      "ma20": null,
+      "ma50": null,
+      "ma200": null,
+      "rsi14": null,
+      "macd": null,
+      "macd_signal": null,
+      "adx14": null,
+      "volume_ratio": null,
+      "support": null,
+      "resistance": null,
+      "bollinger_lower": null,
+      "support_warning": false,
+      "checks": {
+        "price": false,
+        "ma20": false,
+        "ma50": false,
+        "ma200": false,
+        "rsi": false
+      }
     }
   },
   "final_decision": {
-    "decision": "SELL",
-    "confidence_label": "RULE_BASED_NOT_PROBABILITY",
+    "decision": "WAIT",
+    "market_status": "WAIT",
     "reasons": [
-      "BTC bearish structure, 20D support breakdown এবং Macro REDUCE RISK একসঙ্গে রয়েছে।",
-      "Fear & Greed Extreme Fear; এটি একা market bottom signal নয়।"
+      "Critical market, macro or BTC technical data is not verified."
     ],
     "actions": [
-      "ঝুঁকিপূর্ণ Altcoin exposure কমান। Macro signal একা সব asset sell করার নির্দেশ নয়।"
+      "নতুন Spot position নেওয়া থেকে বিরত থাকুন; আগে data quality ঠিক করুন।"
     ],
     "risk": [
-      "BTC RSI oversold; আরও পতন বা consolidation সম্ভব। Oversold মানেই reversal নয়।",
-      "BTC MA20 < MA50; short/mid-term trend দুর্বল।",
-      "Macro risk elevated; এটি coin-specific fundamental sell analysis নয়।"
+      "Incomplete or stale data can produce misleading signals."
     ],
-    "market_context": {
-      "fear_greed_value": 12.0,
-      "fear_greed_classification": "Extreme Fear",
-      "btc_dominance_percent": 57.9667167407755,
-      "total_market_cap_usd": 2088719525813.203,
-      "total_volume_24h_usd": 123367404747.01482
-    },
-    "important_note": "এটি সামগ্রিক market-regime guidance; ব্যক্তিগত portfolio holdings-এর coin-by-coin SELL signal নয়।"
+    "data_ready": false,
+    "decision_scope": "BROAD_CRYPTO_MARKET_SPOT",
+    "not_coin_specific": true
   },
   "limitations": [
-    "Rule-based engine; calibrated probability নয়।",
-    "Macro decision একা crypto SELL signal নয়।",
-    "BTC/ETH technical data 1D closed candles; intraday reversal ধরার জন্য নয়।",
-    "ETF flows, crypto on-chain, whale flows, liquidation data ও derivatives positioning এখনো integrate করা হয়নি।",
-    "Coin-specific tokenomics, unlocks, fundamentals ও portfolio weight এই engine-এ নেই।",
-    "CoinGecko ও Binance price আলাদা source/time; source mismatch report করা হয়, auto-correct নয়।",
-    "FRED macro observations প্রকাশে বিলম্বিত হতে পারে।"
+    "This engine evaluates broad crypto-market Spot risk, not individual coin fundamentals.",
+    "Scheduled snapshots are not guaranteed realtime.",
+    "Macro data may be delayed by official publication schedules.",
+    "A support warning alone is not a confirmed breakdown.",
+    "RSI overbought alone is not a SELL signal.",
+    "This engine does not provide personalized portfolio allocation.",
+    "No futures or margin trading signals are generated."
   ]
 }
