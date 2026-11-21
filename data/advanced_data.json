@@ -2,7 +2,7 @@
   "schema_version": 2,
   "engine": "Free Advanced Crypto Intelligence",
   "engine_version": "2.5.0",
-  "generated_at": "2026-11-21T04:07:26Z",
+  "generated_at": "2026-11-21T05:10:37Z",
   "data_policy": "Free public APIs only. Unavailable data remains null. No synthetic values. Futures data is sentiment context only.",
   "data_sources": [
     "Binance Spot Public API",
@@ -14,7 +14,7 @@
     "value": null,
     "status": "UNAVAILABLE",
     "reason": "ETF flow integration not configured",
-    "fetched_at": "2026-11-21T04:07:26Z"
+    "fetched_at": "2026-11-21T05:10:37Z"
   },
   "on_chain": {
     "mvrv_ratio": {
@@ -22,7 +22,7 @@
       "unit": "ratio",
       "status": "OK",
       "source": "Coin Metrics Community API",
-      "fetched_at": "2026-11-21T04:07:18Z",
+      "fetched_at": "2026-11-21T05:10:31Z",
       "observed_at": "2026-11-20T00:00:00.000000000Z",
       "observation_date": "2026-11-20T00:00:00.000000000Z"
     },
@@ -30,69 +30,69 @@
       "value": null,
       "status": "UNAVAILABLE",
       "reason": "CapMVRVCur is MVRV Ratio, not MVRV Z-Score",
-      "fetched_at": "2026-11-21T04:07:18Z"
+      "fetched_at": "2026-11-21T05:10:31Z"
     },
     "sth_sopr": {
       "value": null,
       "status": "UNAVAILABLE",
       "reason": "No verified free STH SOPR source configured",
-      "fetched_at": "2026-11-21T04:07:26Z"
+      "fetched_at": "2026-11-21T05:10:37Z"
     },
     "nupl": {
       "value": null,
       "status": "UNAVAILABLE",
       "reason": "No verified free NUPL source configured",
-      "fetched_at": "2026-11-21T04:07:26Z"
+      "fetched_at": "2026-11-21T05:10:37Z"
     },
     "exchange_netflow": {
       "value": null,
       "status": "UNAVAILABLE",
       "reason": "No verified free exchange flow source configured",
-      "fetched_at": "2026-11-21T04:07:26Z"
+      "fetched_at": "2026-11-21T05:10:37Z"
     },
     "stablecoin_supply": {
       "value": null,
       "status": "UNAVAILABLE",
       "reason": "No verified free stablecoin supply source configured",
-      "fetched_at": "2026-11-21T04:07:26Z"
+      "fetched_at": "2026-11-21T05:10:37Z"
     },
     "whale_activity": {
       "value": null,
       "status": "UNAVAILABLE",
       "reason": "Entity-labelled whale data unavailable",
-      "fetched_at": "2026-11-21T04:07:26Z"
+      "fetched_at": "2026-11-21T05:10:37Z"
     },
     "hashrate": {
-      "value": 1.059912350467496e+21,
+      "value": 1.062172822016827e+21,
       "unit": "H/s",
       "status": "OK",
       "source": "Mempool.space",
-      "fetched_at": "2026-11-21T04:07:18Z"
+      "fetched_at": "2026-11-21T05:10:30Z"
     },
     "mining_difficulty": {
       "value": 134823837323272.7,
       "unit": "difficulty",
       "status": "OK",
       "source": "Mempool.space",
-      "fetched_at": "2026-11-21T04:07:18Z"
+      "fetched_at": "2026-11-21T05:10:30Z"
     },
     "estimated_hashrate": {
       "value": null,
       "status": "UNAVAILABLE",
       "reason": "Valid numeric data unavailable",
-      "fetched_at": "2026-11-21T04:07:18Z"
+      "fetched_at": "2026-11-21T05:10:30Z"
     }
   },
   "halving": {
-    "current_block_height": 976838,
+    "current_block_height": 976849,
     "next_halving_block": 1050000,
-    "blocks_remaining": 73162,
-    "estimated_days_remaining": 508.07,
+    "blocks_remaining": 73151,
+    "estimated_days_remaining": 507.99,
     "estimated_years_remaining": 1.39,
     "status": "OK",
     "source": "Mempool.space",
     "note": "আনুমানিক সময়; প্রকৃত Halving নির্ধারিত হবে Block Height অনুযায়ী।",
-    "fetched_at": "2026-11-21T04:07:18Z"
+    "fetched_at": "2026-11-21T05:10:30Z"
   },
   "spot_market_activity": {
     "status": "OK",
@@ -100,94 +100,94 @@
       {
         "symbol": "BTCUSDT",
         "base_asset": "BTC",
-        "quote_volume_24h": 2659084583.5399265,
-        "change_24h_pct": -9.903,
-        "trades": 5874849
+        "quote_volume_24h": 2876513763.348616,
+        "change_24h_pct": -8.506,
+        "trades": 6198344
       },
       {
         "symbol": "ETHUSDT",
         "base_asset": "ETH",
-        "quote_volume_24h": 1198845318.723292,
-        "change_24h_pct": -10.658,
-        "trades": 4685722
+        "quote_volume_24h": 1250179234.014725,
+        "change_24h_pct": -9.308,
+        "trades": 4953672
       },
       {
         "symbol": "ZECUSDT",
         "base_asset": "ZEC",
-        "quote_volume_24h": 312381646.76757,
-        "change_24h_pct": -19.227,
-        "trades": 1407333
+        "quote_volume_24h": 323161630.31016,
+        "change_24h_pct": -17.113,
+        "trades": 1449929
       },
       {
         "symbol": "SOLUSDT",
         "base_asset": "SOL",
-        "quote_volume_24h": 294416688.57525,
-        "change_24h_pct": -9.843,
-        "trades": 1113720
+        "quote_volume_24h": 312393247.43233,
+        "change_24h_pct": -8.388,
+        "trades": 1179540
       },
       {
         "symbol": "XRPUSDT",
         "base_asset": "XRP",
-        "quote_volume_24h": 168903711.6872,
-        "change_24h_pct": -9.102,
-        "trades": 621528
+        "quote_volume_24h": 178054663.79733,
+        "change_24h_pct": -9.033,
+        "trades": 655693
       },
       {
         "symbol": "BNBUSDT",
         "base_asset": "BNB",
-        "quote_volume_24h": 150319353.18891,
-        "change_24h_pct": -10.33,
-        "trades": 1018104
+        "quote_volume_24h": 157348602.07648,
+        "change_24h_pct": -9.387,
+        "trades": 1085592
       },
       {
         "symbol": "NEARUSDT",
         "base_asset": "NEAR",
-        "quote_volume_24h": 117471355.853,
-        "change_24h_pct": -13.171,
-        "trades": 393411
+        "quote_volume_24h": 128764334.9119,
+        "change_24h_pct": -14.2,
+        "trades": 427825
       },
       {
         "symbol": "HYPEUSDT",
         "base_asset": "HYPE",
-        "quote_volume_24h": 64178093.56972,
-        "change_24h_pct": -13.82,
-        "trades": 275279
-      },
-      {
-        "symbol": "XAUTUSDT",
-        "base_asset": "XAUT",
-        "quote_volume_24h": 54995209.217653,
-        "change_24h_pct": -0.99,
-        "trades": 125580
+        "quote_volume_24h": 74014320.85263,
+        "change_24h_pct": -12.67,
+        "trades": 322532
       },
       {
         "symbol": "DOGEUSDT",
         "base_asset": "DOGE",
-        "quote_volume_24h": 54042189.86538,
-        "change_24h_pct": -10.306,
-        "trades": 545175
+        "quote_volume_24h": 57625605.52765,
+        "change_24h_pct": -8.904,
+        "trades": 584639
       },
       {
         "symbol": "UUSDT",
         "base_asset": "U",
-        "quote_volume_24h": 51978588.918,
-        "change_24h_pct": 0.03,
-        "trades": 52153
+        "quote_volume_24h": 53349550.9828,
+        "change_24h_pct": 0.01,
+        "trades": 55962
+      },
+      {
+        "symbol": "XAUTUSDT",
+        "base_asset": "XAUT",
+        "quote_volume_24h": 51989166.572889,
+        "change_24h_pct": -0.364,
+        "trades": 126118
       },
       {
         "symbol": "PEPEUSDT",
         "base_asset": "PEPE",
-        "quote_volume_24h": 41107512.25409122,
-        "change_24h_pct": -9.524,
-        "trades": 107333
+        "quote_volume_24h": 43179342.17317065,
+        "change_24h_pct": -9.551,
+        "trades": 112068
       }
     ],
     "breadth": {
-      "advancing_pairs": 23,
+      "advancing_pairs": 25,
       "declining_pairs": 485,
-      "unchanged_pairs": 3,
+      "unchanged_pairs": 1,
       "measured_pairs": 511,
-      "advance_decline_ratio": 0.047,
+      "advance_decline_ratio": 0.052,
       "excluded_stablecoin_pairs": 10,
       "excluded_tokenized_equity_pairs": 3,
       "excluded_leveraged_token_pairs": 2,
@@ -195,7 +195,7 @@
       "classification": "Trading Binance Spot USDT pairs only; stablecoins, known tokenized equity/ETF assets, leveraged tokens, and symbols without exchange metadata excluded.",
       "status": "OK",
       "source": "Binance Spot 24h ticker + exchangeInfo",
-      "fetched_at": "2026-11-21T04:07:22Z"
+      "fetched_at": "2026-11-21T05:10:33Z"
     },
     "note": "২৪ ঘণ্টার Crypto Spot Market Breadth; stablecoin, tokenized equity/ETF এবং leveraged token বাদ।"
   },
@@ -203,111 +203,111 @@
     "BTCUSDT": {
       "symbol": "BTCUSDT",
       "imbalance_percent": {
-        "value": 45.67793845162825,
+        "value": -46.22845268037903,
         "unit": "%",
         "status": "OK",
         "source": "Binance Spot Order Book",
-        "fetched_at": "2026-11-21T04:07:15Z"
+        "fetched_at": "2026-11-21T05:10:28Z"
       },
       "bid_value_usdt": {
-        "value": 1828355.1167551994,
+        "value": 705871.9671331003,
         "unit": "USDT",
         "status": "OK",
         "source": "Binance Spot Order Book",
-        "fetched_at": "2026-11-21T04:07:15Z"
+        "fetched_at": "2026-11-21T05:10:28Z"
       },
       "ask_value_usdt": {
-        "value": 681778.0388732997,
+        "value": 1919575.8851942997,
         "unit": "USDT",
         "status": "OK",
         "source": "Binance Spot Order Book",
-        "fetched_at": "2026-11-21T04:07:15Z"
+        "fetched_at": "2026-11-21T05:10:28Z"
       },
-      "last_update_id": 103337374900
+      "last_update_id": 103344637054
     },
     "ETHUSDT": {
       "symbol": "ETHUSDT",
       "imbalance_percent": {
-        "value": 37.94515045199679,
+        "value": 6.539668190437717,
         "unit": "%",
         "status": "OK",
         "source": "Binance Spot Order Book",
-        "fetched_at": "2026-11-21T04:07:16Z"
+        "fetched_at": "2026-11-21T05:10:29Z"
       },
       "bid_value_usdt": {
-        "value": 1895310.7418499996,
+        "value": 1569701.9136070008,
         "unit": "USDT",
         "status": "OK",
         "source": "Binance Spot Order Book",
-        "fetched_at": "2026-11-21T04:07:16Z"
+        "fetched_at": "2026-11-21T05:10:29Z"
       },
       "ask_value_usdt": {
-        "value": 852608.6096309999,
+        "value": 1376997.5463560005,
         "unit": "USDT",
         "status": "OK",
         "source": "Binance Spot Order Book",
-        "fetched_at": "2026-11-21T04:07:16Z"
+        "fetched_at": "2026-11-21T05:10:29Z"
       },
-      "last_update_id": 83738685548
+      "last_update_id": 83745414998
     }
   },
   "spot_taker_activity": {
     "BTCUSDT": {
       "symbol": "BTCUSDT",
       "interval": "15m",
-      "candle_close_time": 1795233599999,
+      "candle_close_time": 1795237199999,
       "taker_buy_sell_ratio": {
-        "value": 0.9654301503063406,
+        "value": 1.3732008196920569,
         "unit": "ratio",
         "status": "OK",
         "source": "Binance Spot 15m Kline",
-        "fetched_at": "2026-11-21T04:07:16Z",
-        "observed_at": 1795233599999
+        "fetched_at": "2026-11-21T05:10:29Z",
+        "observed_at": 1795237199999
       },
       "taker_buy_quote_volume": {
-        "value": 38148551.7773344,
+        "value": 33134957.6856673,
         "unit": "USDT",
         "status": "OK",
         "source": "Binance Spot 15m Kline",
-        "fetched_at": "2026-11-21T04:07:16Z",
-        "observed_at": 1795233599999
+        "fetched_at": "2026-11-21T05:10:29Z",
+        "observed_at": 1795237199999
       },
       "taker_sell_quote_volume": {
-        "value": 39514564.32682311,
+        "value": 24129724.662630104,
         "unit": "USDT",
         "status": "OK",
         "source": "Binance Spot 15m Kline",
-        "fetched_at": "2026-11-21T04:07:16Z",
-        "observed_at": 1795233599999
+        "fetched_at": "2026-11-21T05:10:29Z",
+        "observed_at": 1795237199999
       }
     },
     "ETHUSDT": {
       "symbol": "ETHUSDT",
       "interval": "15m",
-      "candle_close_time": 1795233599999,
+      "candle_close_time": 1795237199999,
       "taker_buy_sell_ratio": {
-        "value": 0.6501556750557944,
+        "value": 1.1686079806670837,
         "unit": "ratio",
         "status": "OK",
         "source": "Binance Spot 15m Kline",
-        "fetched_at": "2026-11-21T04:07:17Z",
-        "observed_at": 1795233599999
+        "fetched_at": "2026-11-21T05:10:30Z",
+        "observed_at": 1795237199999
       },
       "taker_buy_quote_volume": {
-        "value": 7754849.572702,
+        "value": 7233623.298136,
         "unit": "USDT",
         "status": "OK",
         "source": "Binance Spot 15m Kline",
-        "fetched_at": "2026-11-21T04:07:17Z",
-        "observed_at": 1795233599999
+        "fetched_at": "2026-11-21T05:10:30Z",
+        "observed_at": 1795237199999
       },
       "taker_sell_quote_volume": {
-        "value": 11927681.123504,
+        "value": 6189948.569414001,
         "unit": "USDT",
         "status": "OK",
         "source": "Binance Spot 15m Kline",
-        "fetched_at": "2026-11-21T04:07:17Z",
-        "observed_at": 1795233599999
+        "fetched_at": "2026-11-21T05:10:30Z",
+        "observed_at": 1795237199999
       }
     }
   },
@@ -317,436 +317,436 @@
       "provider": "CoinBoss",
       "data_type": "Cross-exchange Futures sentiment only; not Spot market data",
       "open_interest_usd": {
-        "value": 33801777581.22,
+        "value": 33630520055.26,
         "unit": "USD",
         "status": "OK",
         "source": "CoinBoss Cross-exchange Open Interest",
-        "fetched_at": "2026-11-21T04:07:23Z",
-        "observed_at": "2026-11-21T04:06:54Z"
+        "fetched_at": "2026-11-21T05:10:34Z",
+        "observed_at": "2026-11-21T05:10:05Z"
       },
       "open_interest_change_24h_pct": {
         "value": null,
         "status": "UNAVAILABLE",
         "reason": "Valid numeric data unavailable",
-        "fetched_at": "2026-11-21T04:07:23Z"
+        "fetched_at": "2026-11-21T05:10:34Z"
       },
       "open_interest_instrument_count": {
         "value": 26.0,
         "unit": "instruments",
         "status": "OK",
         "source": "CoinBoss",
-        "fetched_at": "2026-11-21T04:07:23Z"
+        "fetched_at": "2026-11-21T05:10:34Z"
       },
       "open_interest_exchange_count": {
         "value": 22.0,
         "unit": "exchanges",
         "status": "OK",
         "source": "CoinBoss",
-        "fetched_at": "2026-11-21T04:07:23Z"
+        "fetched_at": "2026-11-21T05:10:34Z"
       },
       "last_funding_rate": {
-        "value": -2.814266287481684e-05,
+        "value": -1.9175021418031094e-05,
         "unit": "fraction per 8h",
         "status": "OK",
         "source": "CoinBoss Cross-exchange Funding",
-        "fetched_at": "2026-11-21T04:07:24Z"
+        "fetched_at": "2026-11-21T05:10:35Z"
       },
       "funding_avg_8h": {
-        "value": 2.9741304347826094e-05,
+        "value": 5.946869565217391e-05,
         "unit": "fraction per 8h",
         "status": "OK",
         "source": "CoinBoss Cross-exchange Funding",
-        "fetched_at": "2026-11-21T04:07:24Z"
+        "fetched_at": "2026-11-21T05:10:35Z"
       },
       "funding_apr_pct": {
-        "value": 3.256672826086958,
+        "value": 6.511822173913043,
         "unit": "% per year",
         "status": "OK",
         "source": "Calculated from CoinBoss average 8h funding",
-        "fetched_at": "2026-11-21T04:07:24Z"
+        "fetched_at": "2026-11-21T05:10:35Z"
       },
       "funding_provider_apr_pct": {
-        "value": -3.0816,
+        "value": -2.0997,
         "unit": "% per year",
         "status": "OK",
         "source": "CoinBoss provider-reported APR",
-        "fetched_at": "2026-11-21T04:07:24Z"
+        "fetched_at": "2026-11-21T05:10:35Z"
       },
       "funding_apr_consistency": "MISMATCH",
       "funding_apr_difference_percentage_points": {
-        "value": 6.338272826086958,
+        "value": 8.611522173913043,
         "unit": "percentage points",
         "status": "OK",
         "source": "Comparison of calculated and provider APR",
-        "fetched_at": "2026-11-21T04:07:24Z"
+        "fetched_at": "2026-11-21T05:10:35Z"
       },
       "funding_exchange_count": {
         "value": 23.0,
         "unit": "exchanges",
         "status": "OK",
         "source": "CoinBoss",
-        "fetched_at": "2026-11-21T04:07:24Z"
+        "fetched_at": "2026-11-21T05:10:35Z"
       },
       "global_long_short_ratio": {
-        "value": 2.8023,
+        "value": 2.6928,
         "unit": "long/short ratio",
         "status": "OK",
         "source": "CoinBoss Cross-exchange Account",
-        "fetched_at": "2026-11-21T04:07:24Z",
-        "observed_at": "2026-11-21T04:06:40Z"
+        "fetched_at": "2026-11-21T05:10:35Z",
+        "observed_at": "2026-11-21T05:09:56Z"
       },
       "global_long_percent": {
-        "value": 73.7,
+        "value": 72.92,
         "unit": "%",
         "status": "OK",
         "source": "CoinBoss Cross-exchange Account",
-        "fetched_at": "2026-11-21T04:07:24Z",
-        "observed_at": "2026-11-21T04:06:40Z"
+        "fetched_at": "2026-11-21T05:10:35Z",
+        "observed_at": "2026-11-21T05:09:56Z"
       },
       "global_short_percent": {
-        "value": 26.3,
+        "value": 27.08,
         "unit": "%",
         "status": "OK",
         "source": "CoinBoss Cross-exchange Account",
-        "fetched_at": "2026-11-21T04:07:24Z",
-        "observed_at": "2026-11-21T04:06:40Z"
+        "fetched_at": "2026-11-21T05:10:35Z",
+        "observed_at": "2026-11-21T05:09:56Z"
       },
       "top_account_long_short_ratio": {
-        "value": 2.0349,
+        "value": 2.2295,
         "unit": "long/short ratio",
         "status": "OK",
         "source": "CoinBoss Cross-exchange Top Trader Account",
-        "fetched_at": "2026-11-21T04:07:24Z",
-        "observed_at": "2026-11-21T04:06:40Z"
+        "fetched_at": "2026-11-21T05:10:35Z",
+        "observed_at": "2026-11-21T05:09:56Z"
       },
       "top_position_long_short_ratio": {
-        "value": 0.9466,
+        "value": 0.9592,
         "unit": "long/short ratio",
         "status": "OK",
         "source": "CoinBoss Cross-exchange Top Trader Position",
-        "fetched_at": "2026-11-21T04:07:24Z",
-        "observed_at": "2026-11-21T04:06:40Z"
+        "fetched_at": "2026-11-21T05:10:35Z",
+        "observed_at": "2026-11-21T05:09:56Z"
       },
       "position_long_short_ratio": {
-        "value": 0.9466,
+        "value": 0.9592,
         "unit": "long/short ratio",
         "status": "OK",
         "source": "CoinBoss Cross-exchange Top Trader Position",
-        "fetched_at": "2026-11-21T04:07:24Z",
-        "observed_at": "2026-11-21T04:06:40Z"
+        "fetched_at": "2026-11-21T05:10:35Z",
+        "observed_at": "2026-11-21T05:09:56Z"
       },
       "all_position_long_short_ratio": {
-        "value": 1.0101,
+        "value": 0.9984,
         "unit": "long/short ratio",
         "status": "OK",
         "source": "CoinBoss Cross-exchange All Trader Position",
-        "fetched_at": "2026-11-21T04:07:24Z",
-        "observed_at": "2026-11-21T04:06:40Z"
+        "fetched_at": "2026-11-21T05:10:35Z",
+        "observed_at": "2026-11-21T05:09:56Z"
       },
       "taker_long_short_ratio": {
-        "value": 0.9828,
+        "value": 0.8428,
         "unit": "long/short ratio",
         "status": "OK",
         "source": "CoinBoss Cross-exchange Taker Buy/Sell",
-        "fetched_at": "2026-11-21T04:07:24Z",
-        "observed_at": "2026-11-21T04:06:40Z"
+        "fetched_at": "2026-11-21T05:10:35Z",
+        "observed_at": "2026-11-21T05:09:56Z"
       },
       "long_short_detail": {
         "account": {
           "ratio": {
-            "value": 2.8023,
+            "value": 2.6928,
             "unit": "long/short ratio",
             "status": "OK",
             "source": "CoinBoss Cross-exchange Account",
-            "fetched_at": "2026-11-21T04:07:24Z",
-            "observed_at": "2026-11-21T04:06:40Z"
+            "fetched_at": "2026-11-21T05:10:35Z",
+            "observed_at": "2026-11-21T05:09:56Z"
           },
           "long_pct": {
-            "value": 73.7,
+            "value": 72.92,
             "unit": "%",
             "status": "OK",
             "source": "CoinBoss Cross-exchange Account",
-            "fetched_at": "2026-11-21T04:07:24Z",
-            "observed_at": "2026-11-21T04:06:40Z"
+            "fetched_at": "2026-11-21T05:10:35Z",
+            "observed_at": "2026-11-21T05:09:56Z"
           },
           "short_pct": {
-            "value": 26.3,
+            "value": 27.08,
             "unit": "%",
             "status": "OK",
             "source": "CoinBoss Cross-exchange Account",
-            "fetched_at": "2026-11-21T04:07:24Z",
-            "observed_at": "2026-11-21T04:06:40Z"
+            "fetched_at": "2026-11-21T05:10:35Z",
+            "observed_at": "2026-11-21T05:09:56Z"
           },
           "exchange_count": {
             "value": 6.0,
             "unit": "exchanges",
             "status": "OK",
             "source": "CoinBoss Cross-exchange Account",
-            "fetched_at": "2026-11-21T04:07:24Z",
-            "observed_at": "2026-11-21T04:06:40Z"
+            "fetched_at": "2026-11-21T05:10:35Z",
+            "observed_at": "2026-11-21T05:09:56Z"
           },
           "by_exchange": [
             {
               "exchange": "binance",
-              "long_pct": 75.82,
-              "short_pct": 24.18,
-              "ratio": 3.1356,
+              "long_pct": 75.39,
+              "short_pct": 24.61,
+              "ratio": 3.0634,
               "timestamp": null
             },
             {
               "exchange": "bitget",
-              "long_pct": 82.47,
-              "short_pct": 17.53,
-              "ratio": 4.7045,
+              "long_pct": 80.92,
+              "short_pct": 19.08,
+              "ratio": 4.2411,
               "timestamp": null
             },
             {
               "exchange": "bybit",
-              "long_pct": 73.37,
-              "short_pct": 26.63,
-              "ratio": 2.7552,
+              "long_pct": 73.08,
+              "short_pct": 26.92,
+              "ratio": 2.7147,
               "timestamp": null
             },
             {
               "exchange": "gate",
-              "long_pct": 68.04,
-              "short_pct": 31.96,
-              "ratio": 2.129,
+              "long_pct": 66.68,
+              "short_pct": 33.32,
+              "ratio": 2.0008,
               "timestamp": null
             },
             {
               "exchange": "kraken",
-              "long_pct": 68.47,
-              "short_pct": 31.53,
-              "ratio": 2.1716,
+              "long_pct": 67.98,
+              "short_pct": 32.02,
+              "ratio": 2.123,
               "timestamp": null
             },
             {
               "exchange": "okx",
-              "long_pct": 74.03,
-              "short_pct": 25.97,
-              "ratio": 2.85,
+              "long_pct": 73.47,
+              "short_pct": 26.53,
+              "ratio": 2.77,
               "timestamp": null
             }
           ]
         },
         "top_account": {
           "ratio": {
-            "value": 2.0349,
+            "value": 2.2295,
             "unit": "long/short ratio",
             "status": "OK",
             "source": "CoinBoss Cross-exchange Top Trader Account",
-            "fetched_at": "2026-11-21T04:07:24Z",
-            "observed_at": "2026-11-21T04:06:40Z"
+            "fetched_at": "2026-11-21T05:10:35Z",
+            "observed_at": "2026-11-21T05:09:56Z"
           },
           "long_pct": {
-            "value": 67.05,
+            "value": 69.04,
             "unit": "%",
             "status": "OK",
             "source": "CoinBoss Cross-exchange Top Trader Account",
-            "fetched_at": "2026-11-21T04:07:24Z",
-            "observed_at": "2026-11-21T04:06:40Z"
+            "fetched_at": "2026-11-21T05:10:35Z",
+            "observed_at": "2026-11-21T05:09:56Z"
           },
           "short_pct": {
-            "value": 32.95,
+            "value": 30.97,
             "unit": "%",
             "status": "OK",
             "source": "CoinBoss Cross-exchange Top Trader Account",
-            "fetched_at": "2026-11-21T04:07:24Z",
-            "observed_at": "2026-11-21T04:06:40Z"
+            "fetched_at": "2026-11-21T05:10:35Z",
+            "observed_at": "2026-11-21T05:09:56Z"
           },
           "exchange_count": {
             "value": 2.0,
             "unit": "exchanges",
             "status": "OK",
             "source": "CoinBoss Cross-exchange Top Trader Account",
-            "fetched_at": "2026-11-21T04:07:24Z",
-            "observed_at": "2026-11-21T04:06:40Z"
+            "fetched_at": "2026-11-21T05:10:35Z",
+            "observed_at": "2026-11-21T05:09:56Z"
           },
           "by_exchange": [
             {
               "exchange": "binance",
-              "long_pct": 79.2,
-              "short_pct": 20.8,
-              "ratio": 3.8077,
+              "long_pct": 78.07,
+              "short_pct": 21.93,
+              "ratio": 3.56,
               "timestamp": null
             },
             {
               "exchange": "htx",
-              "long_pct": 54.9,
-              "short_pct": 45.1,
-              "ratio": 1.2174,
+              "long_pct": 60.0,
+              "short_pct": 40.0,
+              "ratio": 1.5,
               "timestamp": null
             }
           ]
         },
         "top_position": {
           "ratio": {
-            "value": 0.9466,
+            "value": 0.9592,
             "unit": "long/short ratio",
             "status": "OK",
             "source": "CoinBoss Cross-exchange Top Trader Position",
-            "fetched_at": "2026-11-21T04:07:24Z",
-            "observed_at": "2026-11-21T04:06:40Z"
+            "fetched_at": "2026-11-21T05:10:35Z",
+            "observed_at": "2026-11-21T05:09:56Z"
           },
           "long_pct": {
-            "value": 48.63,
+            "value": 48.96,
             "unit": "%",
             "status": "OK",
             "source": "CoinBoss Cross-exchange Top Trader Position",
-            "fetched_at": "2026-11-21T04:07:24Z",
-            "observed_at": "2026-11-21T04:06:40Z"
+            "fetched_at": "2026-11-21T05:10:35Z",
+            "observed_at": "2026-11-21T05:09:56Z"
           },
           "short_pct": {
-            "value": 51.37,
+            "value": 51.04,
             "unit": "%",
             "status": "OK",
             "source": "CoinBoss Cross-exchange Top Trader Position",
-            "fetched_at": "2026-11-21T04:07:24Z",
-            "observed_at": "2026-11-21T04:06:40Z"
+            "fetched_at": "2026-11-21T05:10:35Z",
+            "observed_at": "2026-11-21T05:09:56Z"
           },
           "exchange_count": {
             "value": 4.0,
             "unit": "exchanges",
             "status": "OK",
             "source": "CoinBoss Cross-exchange Top Trader Position",
-            "fetched_at": "2026-11-21T04:07:24Z",
-            "observed_at": "2026-11-21T04:06:40Z"
+            "fetched_at": "2026-11-21T05:10:35Z",
+            "observed_at": "2026-11-21T05:09:56Z"
           },
           "by_exchange": [
             {
               "exchange": "binance",
-              "long_pct": 63.31,
-              "short_pct": 36.69,
-              "ratio": 1.7255,
+              "long_pct": 62.6,
+              "short_pct": 37.4,
+              "ratio": 1.6738,
               "timestamp": null
             },
             {
               "exchange": "gate",
-              "long_pct": 42.17,
-              "short_pct": 57.83,
-              "ratio": 0.7292,
+              "long_pct": 43.49,
+              "short_pct": 56.51,
+              "ratio": 0.7695,
               "timestamp": null
             },
             {
               "exchange": "htx",
-              "long_pct": 41.9,
-              "short_pct": 58.1,
-              "ratio": 0.7212,
+              "long_pct": 42.4,
+              "short_pct": 57.6,
+              "ratio": 0.7361,
               "timestamp": null
             },
             {
               "exchange": "okx",
-              "long_pct": 47.13,
-              "short_pct": 52.87,
-              "ratio": 0.8914,
+              "long_pct": 47.35,
+              "short_pct": 52.65,
+              "ratio": 0.8995,
               "timestamp": null
             }
           ]
         },
         "all_position": {
           "ratio": {
-            "value": 1.0101,
+            "value": 0.9984,
             "unit": "long/short ratio",
             "status": "OK",
             "source": "CoinBoss Cross-exchange All Trader Position",
-            "fetched_at": "2026-11-21T04:07:24Z",
-            "observed_at": "2026-11-21T04:06:40Z"
+            "fetched_at": "2026-11-21T05:10:35Z",
+            "observed_at": "2026-11-21T05:09:56Z"
           },
           "long_pct": {
-            "value": 50.25,
+            "value": 49.96,
             "unit": "%",
             "status": "OK",
             "source": "CoinBoss Cross-exchange All Trader Position",
-            "fetched_at": "2026-11-21T04:07:24Z",
-            "observed_at": "2026-11-21T04:06:40Z"
+            "fetched_at": "2026-11-21T05:10:35Z",
+            "observed_at": "2026-11-21T05:09:56Z"
           },
           "short_pct": {
-            "value": 49.75,
+            "value": 50.04,
             "unit": "%",
             "status": "OK",
             "source": "CoinBoss Cross-exchange All Trader Position",
-            "fetched_at": "2026-11-21T04:07:24Z",
-            "observed_at": "2026-11-21T04:06:40Z"
+            "fetched_at": "2026-11-21T05:10:35Z",
+            "observed_at": "2026-11-21T05:09:56Z"
           },
           "exchange_count": {
             "value": 1.0,
             "unit": "exchanges",
             "status": "OK",
             "source": "CoinBoss Cross-exchange All Trader Position",
-            "fetched_at": "2026-11-21T04:07:24Z",
-            "observed_at": "2026-11-21T04:06:40Z"
+            "fetched_at": "2026-11-21T05:10:35Z",
+            "observed_at": "2026-11-21T05:09:56Z"
           },
           "by_exchange": [
             {
               "exchange": "bitget",
-              "long_pct": 50.25,
-              "short_pct": 49.75,
-              "ratio": 1.0101,
+              "long_pct": 49.96,
+              "short_pct": 50.04,
+              "ratio": 0.9984,
               "timestamp": null
             }
           ]
         },
         "taker": {
           "ratio": {
-            "value": 0.9828,
+            "value": 0.8428,
             "unit": "long/short ratio",
             "status": "OK",
             "source": "CoinBoss Cross-exchange Taker Buy/Sell",
-            "fetched_at": "2026-11-21T04:07:24Z",
-            "observed_at": "2026-11-21T04:06:40Z"
+            "fetched_at": "2026-11-21T05:10:35Z",
+            "observed_at": "2026-11-21T05:09:56Z"
           },
           "long_pct": {
-            "value": 49.57,
+            "value": 45.74,
             "unit": "%",
             "status": "OK",
             "source": "CoinBoss Cross-exchange Taker Buy/Sell",
-            "fetched_at": "2026-11-21T04:07:24Z",
-            "observed_at": "2026-11-21T04:06:40Z"
+            "fetched_at": "2026-11-21T05:10:35Z",
+            "observed_at": "2026-11-21T05:09:56Z"
           },
           "short_pct": {
-            "value": 50.43,
+            "value": 54.27,
             "unit": "%",
             "status": "OK",
             "source": "CoinBoss Cross-exchange Taker Buy/Sell",
-            "fetched_at": "2026-11-21T04:07:24Z",
-            "observed_at": "2026-11-21T04:06:40Z"
+            "fetched_at": "2026-11-21T05:10:35Z",
+            "observed_at": "2026-11-21T05:09:56Z"
           },
           "exchange_count": {
             "value": 4.0,
             "unit": "exchanges",
             "status": "OK",
             "source": "CoinBoss Cross-exchange Taker Buy/Sell",
-            "fetched_at": "2026-11-21T04:07:24Z",
-            "observed_at": "2026-11-21T04:06:40Z"
+            "fetched_at": "2026-11-21T05:10:35Z",
+            "observed_at": "2026-11-21T05:09:56Z"
           },
           "by_exchange": [
             {
               "exchange": "binance",
-              "long_pct": 48.37,
-              "short_pct": 51.63,
-              "ratio": 0.937,
+              "long_pct": 50.38,
+              "short_pct": 49.62,
+              "ratio": 1.0155,
               "timestamp": null
             },
             {
               "exchange": "bitget",
-              "long_pct": 39.75,
-              "short_pct": 60.25,
-              "ratio": 0.6598,
+              "long_pct": 45.72,
+              "short_pct": 54.28,
+              "ratio": 0.8424,
               "timestamp": null
             },
             {
               "exchange": "gate",
-              "long_pct": 61.79,
-              "short_pct": 38.21,
-              "ratio": 1.6172,
+              "long_pct": 43.88,
+              "short_pct": 56.12,
+              "ratio": 0.782,
               "timestamp": null
             },
             {
               "exchange": "okx",
-              "long_pct": 48.36,
-              "short_pct": 51.64,
-              "ratio": 0.9364,
+              "long_pct": 42.96,
+              "short_pct": 57.04,
+              "ratio": 0.7532,
               "timestamp": null
             }
           ]
@@ -768,19 +768,19 @@
         "value": null,
         "status": "UNAVAILABLE",
         "reason": "Not included in selected CoinBoss aggregate endpoint",
-        "fetched_at": "2026-11-21T04:07:24Z"
+        "fetched_at": "2026-11-21T05:10:35Z"
       },
       "index_price": {
         "value": null,
         "status": "UNAVAILABLE",
         "reason": "Not included in selected CoinBoss aggregate endpoint",
-        "fetched_at": "2026-11-21T04:07:24Z"
+        "fetched_at": "2026-11-21T05:10:35Z"
       },
       "liquidation_clusters": {
         "value": null,
         "status": "UNAVAILABLE",
         "reason": "Verified liquidation heatmap integration not configured",
-        "fetched_at": "2026-11-21T04:07:24Z"
+        "fetched_at": "2026-11-21T05:10:35Z"
       },
       "coverage": {
         "open_interest": {
@@ -815,280 +815,280 @@
               "exchange": "binance",
               "symbol": "BTCUSD_PERP",
               "oi_usd": 1112041600,
-              "age_s": 138833,
+              "age_s": 142627,
               "reason": "older_than_usable_window"
             },
             {
               "exchange": "okx",
               "symbol": "BTC-USD-SWAP",
               "oi_usd": 710064010,
-              "age_s": 138833,
+              "age_s": 142627,
               "reason": "older_than_usable_window"
             },
             {
               "exchange": "bybit",
               "symbol": "BTCUSD",
               "oi_usd": 595522882,
-              "age_s": 138833,
+              "age_s": 142627,
               "reason": "older_than_usable_window"
             },
             {
               "exchange": "deribit",
               "symbol": "BTC-25DEC26",
               "oi_usd": 301445400,
-              "age_s": 138833,
+              "age_s": 142627,
               "reason": "older_than_usable_window"
             },
             {
               "exchange": "mexc",
               "symbol": "BTC_USD",
               "oi_usd": 204988800,
-              "age_s": 138833,
+              "age_s": 142627,
               "reason": "older_than_usable_window"
             },
             {
               "exchange": "mexc",
               "symbol": "BTC_USDC",
               "oi_usd": 145284813.98,
-              "age_s": 138833,
+              "age_s": 142627,
               "reason": "older_than_usable_window"
             },
             {
               "exchange": "okx",
               "symbol": "BTC-USD_UM_XPERP-310404",
               "oi_usd": 136745781.14,
-              "age_s": 138833,
+              "age_s": 142627,
               "reason": "older_than_usable_window"
             },
             {
               "exchange": "deribit",
               "symbol": "BTC-26MAR27",
               "oi_usd": 114435650,
-              "age_s": 138833,
+              "age_s": 142627,
               "reason": "older_than_usable_window"
             },
             {
               "exchange": "bybit",
               "symbol": "BTC-PERP",
               "oi_usd": 103954158.72,
-              "age_s": 138833,
+              "age_s": 142627,
               "reason": "older_than_usable_window"
             },
             {
               "exchange": "bitget",
               "symbol": "BTC-PERP",
               "oi_usd": 88999747.33,
-              "age_s": 138833,
+              "age_s": 142627,
               "reason": "older_than_usable_window"
             },
             {
               "exchange": "kucoin",
               "symbol": "BTCUSD",
               "oi_usd": 82812893,
-              "age_s": 138833,
+              "age_s": 142627,
               "reason": "older_than_usable_window"
             },
             {
               "exchange": "deribit",
               "symbol": "BTC-27NOV26",
               "oi_usd": 74733220,
-              "age_s": 138833,
+              "age_s": 142627,
               "reason": "older_than_usable_window"
             },
             {
               "exchange": "deribit",
               "symbol": "BTC-25JUN27",
               "oi_usd": 71855110,
-              "age_s": 138833,
+              "age_s": 142627,
               "reason": "older_than_usable_window"
             },
             {
               "exchange": "binance",
               "symbol": "BTCUSD_261225",
               "oi_usd": 58083200,
-              "age_s": 138833,
+              "age_s": 142627,
               "reason": "older_than_usable_window"
             },
             {
               "exchange": "okx",
               "symbol": "BTC-USD-261225",
               "oi_usd": 47641740,
-              "age_s": 138833,
+              "age_s": 142627,
               "reason": "older_than_usable_window"
             },
             {
               "exchange": "deribit",
               "symbol": "BTC-20NOV26",
               "oi_usd": 35633790,
-              "age_s": 138833,
+              "age_s": 142627,
               "reason": "older_than_usable_window"
             },
             {
               "exchange": "binance",
               "symbol": "BTCUSD_270326",
               "oi_usd": 30276900,
-              "age_s": 138952,
+              "age_s": 142746,
               "reason": "older_than_usable_window"
             },
             {
               "exchange": "kucoin",
               "symbol": "BTCUSDC",
               "oi_usd": 24906881.92,
-              "age_s": 138833,
+              "age_s": 142627,
               "reason": "older_than_usable_window"
             },
             {
               "exchange": "okx",
               "symbol": "BTC-USD-270326",
               "oi_usd": 23187020,
-              "age_s": 138833,
+              "age_s": 142627,
               "reason": "older_than_usable_window"
             },
             {
               "exchange": "deribit",
               "symbol": "BTC-13NOV26",
               "oi_usd": 20515580,
-              "age_s": 676674,
+              "age_s": 680468,
               "reason": "older_than_usable_window"
             },
             {
               "exchange": "mexc",
               "symbol": "BTC_USD1",
               "oi_usd": 18577311,
-              "age_s": 138833,
+              "age_s": 142627,
               "reason": "older_than_usable_window"
             },
             {
               "exchange": "htx",
               "symbol": "BTC-USD",
               "oi_usd": 17809200,
-              "age_s": 138833,
+              "age_s": 142627,
               "reason": "older_than_usable_window"
             },
             {
               "exchange": "deribit",
               "symbol": "BTC-24SEP27",
               "oi_usd": 17314340,
-              "age_s": 138833,
+              "age_s": 142627,
               "reason": "older_than_usable_window"
             },
             {
               "exchange": "gate",
               "symbol": "BTC_USD",
               "oi_usd": 16291402,
-              "age_s": 138833,
+              "age_s": 142627,
               "reason": "older_than_usable_window"
             },
             {
               "exchange": "okx",
               "symbol": "BTC-USD-261127",
               "oi_usd": 16265950,
-              "age_s": 138833,
+              "age_s": 142627,
               "reason": "older_than_usable_window"
             },
             {
               "exchange": "binance",
               "symbol": "BTC-USD1",
               "oi_usd": 14454076.11,
-              "age_s": 138833,
+              "age_s": 142627,
               "reason": "older_than_usable_window"
             },
             {
               "exchange": "bybit",
               "symbol": "BTCUSDT-25DEC26",
               "oi_usd": 11144789.03,
-              "age_s": 138833,
+              "age_s": 142627,
               "reason": "older_than_usable_window"
             },
             {
               "exchange": "bybit",
               "symbol": "BTCUSDT-27NOV26",
               "oi_usd": 10250202.75,
-              "age_s": 138833,
+              "age_s": 142627,
               "reason": "older_than_usable_window"
             },
             {
               "exchange": "deribit",
               "symbol": "BTC-29JAN27",
               "oi_usd": 10211270,
-              "age_s": 138833,
+              "age_s": 142627,
               "reason": "older_than_usable_window"
             },
             {
               "exchange": "bybit",
               "symbol": "BTCUSDT-20NOV26",
               "oi_usd": 9948803.16,
-              "age_s": 138833,
+              "age_s": 142627,
               "reason": "older_than_usable_window"
             },
             {
               "exchange": "okx",
               "symbol": "BTC-USD-270625",
               "oi_usd": 9467340,
-              "age_s": 138833,
+              "age_s": 142627,
               "reason": "older_than_usable_window"
             },
             {
               "exchange": "bybit",
               "symbol": "BTCUSDT-13NOV26",
               "oi_usd": 9311831.19,
-              "age_s": 676674,
+              "age_s": 680468,
               "reason": "older_than_usable_window"
             },
             {
               "exchange": "bybit",
               "symbol": "BTCUSDT-26MAR27",
               "oi_usd": 8589504.99,
-              "age_s": 138833,
+              "age_s": 142627,
               "reason": "older_than_usable_window"
             },
             {
               "exchange": "bybit",
               "symbol": "BTCUSD-Z26",
               "oi_usd": 7772948,
-              "age_s": 138833,
+              "age_s": 142627,
               "reason": "older_than_usable_window"
             },
             {
               "exchange": "deribit",
               "symbol": "BTC-4DEC26",
               "oi_usd": 7465480,
-              "age_s": 138833,
+              "age_s": 142627,
               "reason": "older_than_usable_window"
             },
             {
               "exchange": "bybit",
               "symbol": "BTCUSDT-25JUN27",
               "oi_usd": 5843265.6,
-              "age_s": 138833,
+              "age_s": 142627,
               "reason": "older_than_usable_window"
             },
             {
               "exchange": "binance",
               "symbol": "BTC-U",
               "oi_usd": 5623774.45,
-              "age_s": 138833,
+              "age_s": 142627,
               "reason": "older_than_usable_window"
             },
             {
               "exchange": "bybit",
               "symbol": "BTCUSDT-24SEP27",
               "oi_usd": 5256704.94,
-              "age_s": 138833,
+              "age_s": 142627,
               "reason": "older_than_usable_window"
             },
             {
               "exchange": "okx",
               "symbol": "BTC-USD-270924",
               "oi_usd": 5086080,
-              "age_s": 138833,
+              "age_s": 142627,
               "reason": "older_than_usable_window"
             },
             {
               "exchange": "bybit",
               "symbol": "BTCUSD-H27",
               "oi_usd": 3896790,
-              "age_s": 138833,
+              "age_s": 142627,
               "reason": "older_than_usable_window"
             }
           ],
@@ -1128,9 +1128,9 @@
         "long_short": null
       },
       "asof": {
-        "open_interest": "2026-11-21T04:06:54Z",
-        "funding": "2026-11-21T04:07:11Z",
-        "long_short": "2026-11-21T04:06:40Z"
+        "open_interest": "2026-11-21T05:10:05Z",
+        "funding": "2026-11-21T05:10:35Z",
+        "long_short": "2026-11-21T05:09:56Z"
       },
       "provider_note": "CoinBoss aggregates data from multiple derivatives venues. Long/short measures are kept separate. Futures metrics are context only, not Spot signals."
     },
@@ -1139,436 +1139,436 @@
       "provider": "CoinBoss",
       "data_type": "Cross-exchange Futures sentiment only; not Spot market data",
       "open_interest_usd": {
-        "value": 18791271065.62,
+        "value": 18827502341.64,
         "unit": "USD",
         "status": "OK",
         "source": "CoinBoss Cross-exchange Open Interest",
-        "fetched_at": "2026-11-21T04:07:25Z",
-        "observed_at": "2026-11-21T04:07:05Z"
+        "fetched_at": "2026-11-21T05:10:36Z",
+        "observed_at": "2026-11-21T05:10:05Z"
       },
       "open_interest_change_24h_pct": {
         "value": null,
         "status": "UNAVAILABLE",
         "reason": "Valid numeric data unavailable",
-        "fetched_at": "2026-11-21T04:07:25Z"
+        "fetched_at": "2026-11-21T05:10:36Z"
       },
       "open_interest_instrument_count": {
         "value": 26.0,
         "unit": "instruments",
         "status": "OK",
         "source": "CoinBoss",
-        "fetched_at": "2026-11-21T04:07:25Z"
+        "fetched_at": "2026-11-21T05:10:36Z"
       },
       "open_interest_exchange_count": {
         "value": 22.0,
         "unit": "exchanges",
         "status": "OK",
         "source": "CoinBoss",
-        "fetched_at": "2026-11-21T04:07:25Z"
+        "fetched_at": "2026-11-21T05:10:36Z"
       },
       "last_funding_rate": {
-        "value": -0.00017561541877379202,
+        "value": -0.00014781157827652042,
         "unit": "fraction per 8h",
         "status": "OK",
         "source": "CoinBoss Cross-exchange Funding",
-        "fetched_at": "2026-11-21T04:07:26Z"
+        "fetched_at": "2026-11-21T05:10:36Z"
       },
       "funding_avg_8h": {
-        "value": -0.00012672260869565216,
+        "value": -9.376695652173914e-05,
         "unit": "fraction per 8h",
         "status": "OK",
         "source": "CoinBoss Cross-exchange Funding",
-        "fetched_at": "2026-11-21T04:07:26Z"
+        "fetched_at": "2026-11-21T05:10:36Z"
       },
       "funding_apr_pct": {
-        "value": -13.876125652173913,
+        "value": -10.267481739130435,
         "unit": "% per year",
         "status": "OK",
         "source": "Calculated from CoinBoss average 8h funding",
-        "fetched_at": "2026-11-21T04:07:26Z"
+        "fetched_at": "2026-11-21T05:10:36Z"
       },
       "funding_provider_apr_pct": {
-        "value": -19.2299,
+        "value": -16.1854,
         "unit": "% per year",
         "status": "OK",
         "source": "CoinBoss provider-reported APR",
-        "fetched_at": "2026-11-21T04:07:26Z"
+        "fetched_at": "2026-11-21T05:10:36Z"
       },
       "funding_apr_consistency": "MISMATCH",
       "funding_apr_difference_percentage_points": {
-        "value": 5.3537743478260875,
+        "value": 5.917918260869566,
         "unit": "percentage points",
         "status": "OK",
         "source": "Comparison of calculated and provider APR",
-        "fetched_at": "2026-11-21T04:07:26Z"
+        "fetched_at": "2026-11-21T05:10:36Z"
       },
       "funding_exchange_count": {
         "value": 23.0,
         "unit": "exchanges",
         "status": "OK",
         "source": "CoinBoss",
-        "fetched_at": "2026-11-21T04:07:26Z"
+        "fetched_at": "2026-11-21T05:10:36Z"
       },
       "global_long_short_ratio": {
-        "value": 2.9793,
+        "value": 2.8885,
         "unit": "long/short ratio",
         "status": "OK",
         "source": "CoinBoss Cross-exchange Account",
-        "fetched_at": "2026-11-21T04:07:26Z",
-        "observed_at": "2026-11-21T04:07:26Z"
+        "fetched_at": "2026-11-21T05:10:37Z",
+        "observed_at": "2026-11-21T05:10:37Z"
       },
       "global_long_percent": {
-        "value": 74.87,
+        "value": 74.28,
         "unit": "%",
         "status": "OK",
         "source": "CoinBoss Cross-exchange Account",
-        "fetched_at": "2026-11-21T04:07:26Z",
-        "observed_at": "2026-11-21T04:07:26Z"
+        "fetched_at": "2026-11-21T05:10:37Z",
+        "observed_at": "2026-11-21T05:10:37Z"
       },
       "global_short_percent": {
-        "value": 25.13,
+        "value": 25.72,
         "unit": "%",
         "status": "OK",
         "source": "CoinBoss Cross-exchange Account",
-        "fetched_at": "2026-11-21T04:07:26Z",
-        "observed_at": "2026-11-21T04:07:26Z"
+        "fetched_at": "2026-11-21T05:10:37Z",
+        "observed_at": "2026-11-21T05:10:37Z"
       },
       "top_account_long_short_ratio": {
-        "value": 2.3944,
+        "value": 2.1878,
         "unit": "long/short ratio",
         "status": "OK",
         "source": "CoinBoss Cross-exchange Top Trader Account",
-        "fetched_at": "2026-11-21T04:07:26Z",
-        "observed_at": "2026-11-21T04:07:26Z"
+        "fetched_at": "2026-11-21T05:10:37Z",
+        "observed_at": "2026-11-21T05:10:37Z"
       },
       "top_position_long_short_ratio": {
-        "value": 0.8646,
+        "value": 0.876,
         "unit": "long/short ratio",
         "status": "OK",
         "source": "CoinBoss Cross-exchange Top Trader Position",
-        "fetched_at": "2026-11-21T04:07:26Z",
-        "observed_at": "2026-11-21T04:07:26Z"
+        "fetched_at": "2026-11-21T05:10:37Z",
+        "observed_at": "2026-11-21T05:10:37Z"
       },
       "position_long_short_ratio": {
-        "value": 0.8646,
+        "value": 0.876,
         "unit": "long/short ratio",
         "status": "OK",
         "source": "CoinBoss Cross-exchange Top Trader Position",
-        "fetched_at": "2026-11-21T04:07:26Z",
-        "observed_at": "2026-11-21T04:07:26Z"
+        "fetched_at": "2026-11-21T05:10:37Z",
+        "observed_at": "2026-11-21T05:10:37Z"
       },
       "all_position_long_short_ratio": {
-        "value": 1.0855,
+        "value": 1.0803,
         "unit": "long/short ratio",
         "status": "OK",
         "source": "CoinBoss Cross-exchange All Trader Position",
-        "fetched_at": "2026-11-21T04:07:26Z",
-        "observed_at": "2026-11-21T04:07:26Z"
+        "fetched_at": "2026-11-21T05:10:37Z",
+        "observed_at": "2026-11-21T05:10:37Z"
       },
       "taker_long_short_ratio": {
-        "value": 0.9276,
+        "value": 0.7597,
         "unit": "long/short ratio",
         "status": "OK",
         "source": "CoinBoss Cross-exchange Taker Buy/Sell",
-        "fetched_at": "2026-11-21T04:07:26Z",
-        "observed_at": "2026-11-21T04:07:26Z"
+        "fetched_at": "2026-11-21T05:10:37Z",
+        "observed_at": "2026-11-21T05:10:37Z"
       },
       "long_short_detail": {
         "account": {
           "ratio": {
-            "value": 2.9793,
+            "value": 2.8885,
             "unit": "long/short ratio",
             "status": "OK",
             "source": "CoinBoss Cross-exchange Account",
-            "fetched_at": "2026-11-21T04:07:26Z",
-            "observed_at": "2026-11-21T04:07:26Z"
+            "fetched_at": "2026-11-21T05:10:37Z",
+            "observed_at": "2026-11-21T05:10:37Z"
           },
           "long_pct": {
-            "value": 74.87,
+            "value": 74.28,
             "unit": "%",
             "status": "OK",
             "source": "CoinBoss Cross-exchange Account",
-            "fetched_at": "2026-11-21T04:07:26Z",
-            "observed_at": "2026-11-21T04:07:26Z"
+            "fetched_at": "2026-11-21T05:10:37Z",
+            "observed_at": "2026-11-21T05:10:37Z"
           },
           "short_pct": {
-            "value": 25.13,
+            "value": 25.72,
             "unit": "%",
             "status": "OK",
             "source": "CoinBoss Cross-exchange Account",
-            "fetched_at": "2026-11-21T04:07:26Z",
-            "observed_at": "2026-11-21T04:07:26Z"
+            "fetched_at": "2026-11-21T05:10:37Z",
+            "observed_at": "2026-11-21T05:10:37Z"
           },
           "exchange_count": {
             "value": 6.0,
             "unit": "exchanges",
             "status": "OK",
             "source": "CoinBoss Cross-exchange Account",
-            "fetched_at": "2026-11-21T04:07:26Z",
-            "observed_at": "2026-11-21T04:07:26Z"
+            "fetched_at": "2026-11-21T05:10:37Z",
+            "observed_at": "2026-11-21T05:10:37Z"
           },
           "by_exchange": [
             {
               "exchange": "binance",
-              "long_pct": 72.25,
-              "short_pct": 27.75,
-              "ratio": 2.6036,
+              "long_pct": 71.23,
+              "short_pct": 28.77,
+              "ratio": 2.4758,
               "timestamp": null
             },
             {
               "exchange": "bitget",
-              "long_pct": 84.91,
-              "short_pct": 15.09,
-              "ratio": 5.6269,
+              "long_pct": 84.29,
+              "short_pct": 15.71,
+              "ratio": 5.3654,
               "timestamp": null
             },
             {
               "exchange": "bybit",
-              "long_pct": 77.4,
-              "short_pct": 22.6,
-              "ratio": 3.4248,
+              "long_pct": 77.37,
+              "short_pct": 22.63,
+              "ratio": 3.4189,
               "timestamp": null
             },
             {
               "exchange": "gate",
-              "long_pct": 68.92,
-              "short_pct": 31.08,
-              "ratio": 2.2176,
+              "long_pct": 67.98,
+              "short_pct": 32.02,
+              "ratio": 2.1229,
               "timestamp": null
             },
             {
               "exchange": "kraken",
-              "long_pct": 68.68,
-              "short_pct": 31.32,
-              "ratio": 2.1928,
+              "long_pct": 68.09,
+              "short_pct": 31.91,
+              "ratio": 2.1338,
               "timestamp": null
             },
             {
               "exchange": "okx",
-              "long_pct": 77.06,
-              "short_pct": 22.94,
-              "ratio": 3.36,
+              "long_pct": 76.74,
+              "short_pct": 23.26,
+              "ratio": 3.3,
               "timestamp": null
             }
           ]
         },
         "top_account": {
           "ratio": {
-            "value": 2.3944,
+            "value": 2.1878,
             "unit": "long/short ratio",
             "status": "OK",
             "source": "CoinBoss Cross-exchange Top Trader Account",
-            "fetched_at": "2026-11-21T04:07:26Z",
-            "observed_at": "2026-11-21T04:07:26Z"
+            "fetched_at": "2026-11-21T05:10:37Z",
+            "observed_at": "2026-11-21T05:10:37Z"
           },
           "long_pct": {
-            "value": 70.54,
+            "value": 68.63,
             "unit": "%",
             "status": "OK",
             "source": "CoinBoss Cross-exchange Top Trader Account",
-            "fetched_at": "2026-11-21T04:07:26Z",
-            "observed_at": "2026-11-21T04:07:26Z"
+            "fetched_at": "2026-11-21T05:10:37Z",
+            "observed_at": "2026-11-21T05:10:37Z"
           },
           "short_pct": {
-            "value": 29.46,
+            "value": 31.37,
             "unit": "%",
             "status": "OK",
             "source": "CoinBoss Cross-exchange Top Trader Account",
-            "fetched_at": "2026-11-21T04:07:26Z",
-            "observed_at": "2026-11-21T04:07:26Z"
+            "fetched_at": "2026-11-21T05:10:37Z",
+            "observed_at": "2026-11-21T05:10:37Z"
           },
           "exchange_count": {
             "value": 2.0,
             "unit": "exchanges",
             "status": "OK",
             "source": "CoinBoss Cross-exchange Top Trader Account",
-            "fetched_at": "2026-11-21T04:07:26Z",
-            "observed_at": "2026-11-21T04:07:26Z"
+            "fetched_at": "2026-11-21T05:10:37Z",
+            "observed_at": "2026-11-21T05:10:37Z"
           },
           "by_exchange": [
             {
               "exchange": "binance",
-              "long_pct": 82.38,
-              "short_pct": 17.62,
-              "ratio": 4.6754,
+              "long_pct": 80.74,
+              "short_pct": 19.26,
+              "ratio": 4.1921,
               "timestamp": null
             },
             {
               "exchange": "htx",
-              "long_pct": 58.7,
-              "short_pct": 41.3,
-              "ratio": 1.4211,
+              "long_pct": 56.52,
+              "short_pct": 43.48,
+              "ratio": 1.3,
               "timestamp": null
             }
           ]
         },
         "top_position": {
           "ratio": {
-            "value": 0.8646,
+            "value": 0.876,
             "unit": "long/short ratio",
             "status": "OK",
             "source": "CoinBoss Cross-exchange Top Trader Position",
-            "fetched_at": "2026-11-21T04:07:26Z",
-            "observed_at": "2026-11-21T04:07:26Z"
+            "fetched_at": "2026-11-21T05:10:37Z",
+            "observed_at": "2026-11-21T05:10:37Z"
           },
           "long_pct": {
-            "value": 46.37,
+            "value": 46.7,
             "unit": "%",
             "status": "OK",
             "source": "CoinBoss Cross-exchange Top Trader Position",
-            "fetched_at": "2026-11-21T04:07:26Z",
-            "observed_at": "2026-11-21T04:07:26Z"
+            "fetched_at": "2026-11-21T05:10:37Z",
+            "observed_at": "2026-11-21T05:10:37Z"
           },
           "short_pct": {
-            "value": 53.63,
+            "value": 53.31,
             "unit": "%",
             "status": "OK",
             "source": "CoinBoss Cross-exchange Top Trader Position",
-            "fetched_at": "2026-11-21T04:07:26Z",
-            "observed_at": "2026-11-21T04:07:26Z"
+            "fetched_at": "2026-11-21T05:10:37Z",
+            "observed_at": "2026-11-21T05:10:37Z"
           },
           "exchange_count": {
             "value": 4.0,
             "unit": "exchanges",
             "status": "OK",
             "source": "CoinBoss Cross-exchange Top Trader Position",
-            "fetched_at": "2026-11-21T04:07:26Z",
-            "observed_at": "2026-11-21T04:07:26Z"
+            "fetched_at": "2026-11-21T05:10:37Z",
+            "observed_at": "2026-11-21T05:10:37Z"
           },
           "by_exchange": [
             {
               "exchange": "binance",
-              "long_pct": 62.19,
-              "short_pct": 37.81,
-              "ratio": 1.6448,
+              "long_pct": 62.75,
+              "short_pct": 37.25,
+              "ratio": 1.6846,
               "timestamp": null
             },
             {
               "exchange": "gate",
-              "long_pct": 36.89,
-              "short_pct": 63.11,
-              "ratio": 0.5846,
+              "long_pct": 38.14,
+              "short_pct": 61.86,
+              "ratio": 0.6166,
               "timestamp": null
             },
             {
               "exchange": "htx",
-              "long_pct": 40.4,
-              "short_pct": 59.6,
-              "ratio": 0.6779,
+              "long_pct": 39.6,
+              "short_pct": 60.4,
+              "ratio": 0.6556,
               "timestamp": null
             },
             {
               "exchange": "okx",
-              "long_pct": 46.0,
-              "short_pct": 54.0,
-              "ratio": 0.852,
+              "long_pct": 46.29,
+              "short_pct": 53.71,
+              "ratio": 0.8619,
               "timestamp": null
             }
           ]
         },
         "all_position": {
           "ratio": {
-            "value": 1.0855,
+            "value": 1.0803,
             "unit": "long/short ratio",
             "status": "OK",
             "source": "CoinBoss Cross-exchange All Trader Position",
-            "fetched_at": "2026-11-21T04:07:26Z",
-            "observed_at": "2026-11-21T04:07:26Z"
+            "fetched_at": "2026-11-21T05:10:37Z",
+            "observed_at": "2026-11-21T05:10:37Z"
           },
           "long_pct": {
-            "value": 52.05,
+            "value": 51.93,
             "unit": "%",
             "status": "OK",
             "source": "CoinBoss Cross-exchange All Trader Position",
-            "fetched_at": "2026-11-21T04:07:26Z",
-            "observed_at": "2026-11-21T04:07:26Z"
+            "fetched_at": "2026-11-21T05:10:37Z",
+            "observed_at": "2026-11-21T05:10:37Z"
           },
           "short_pct": {
-            "value": 47.95,
+            "value": 48.07,
             "unit": "%",
             "status": "OK",
             "source": "CoinBoss Cross-exchange All Trader Position",
-            "fetched_at": "2026-11-21T04:07:26Z",
-            "observed_at": "2026-11-21T04:07:26Z"
+            "fetched_at": "2026-11-21T05:10:37Z",
+            "observed_at": "2026-11-21T05:10:37Z"
           },
           "exchange_count": {
             "value": 1.0,
             "unit": "exchanges",
             "status": "OK",
             "source": "CoinBoss Cross-exchange All Trader Position",
-            "fetched_at": "2026-11-21T04:07:26Z",
-            "observed_at": "2026-11-21T04:07:26Z"
+            "fetched_at": "2026-11-21T05:10:37Z",
+            "observed_at": "2026-11-21T05:10:37Z"
           },
           "by_exchange": [
             {
               "exchange": "bitget",
-              "long_pct": 52.05,
-              "short_pct": 47.95,
-              "ratio": 1.0855,
+              "long_pct": 51.93,
+              "short_pct": 48.07,
+              "ratio": 1.0803,
               "timestamp": null
             }
           ]
         },
         "taker": {
           "ratio": {
-            "value": 0.9276,
+            "value": 0.7597,
             "unit": "long/short ratio",
             "status": "OK",
             "source": "CoinBoss Cross-exchange Taker Buy/Sell",
-            "fetched_at": "2026-11-21T04:07:26Z",
-            "observed_at": "2026-11-21T04:07:26Z"
+            "fetched_at": "2026-11-21T05:10:37Z",
+            "observed_at": "2026-11-21T05:10:37Z"
           },
           "long_pct": {
-            "value": 48.12,
+            "value": 43.17,
             "unit": "%",
             "status": "OK",
             "source": "CoinBoss Cross-exchange Taker Buy/Sell",
-            "fetched_at": "2026-11-21T04:07:26Z",
-            "observed_at": "2026-11-21T04:07:26Z"
+            "fetched_at": "2026-11-21T05:10:37Z",
+            "observed_at": "2026-11-21T05:10:37Z"
           },
           "short_pct": {
-            "value": 51.88,
+            "value": 56.83,
             "unit": "%",
             "status": "OK",
             "source": "CoinBoss Cross-exchange Taker Buy/Sell",
-            "fetched_at": "2026-11-21T04:07:26Z",
-            "observed_at": "2026-11-21T04:07:26Z"
+            "fetched_at": "2026-11-21T05:10:37Z",
+            "observed_at": "2026-11-21T05:10:37Z"
           },
           "exchange_count": {
             "value": 4.0,
             "unit": "exchanges",
             "status": "OK",
             "source": "CoinBoss Cross-exchange Taker Buy/Sell",
-            "fetched_at": "2026-11-21T04:07:26Z",
-            "observed_at": "2026-11-21T04:07:26Z"
+            "fetched_at": "2026-11-21T05:10:37Z",
+            "observed_at": "2026-11-21T05:10:37Z"
           },
           "by_exchange": [
             {
               "exchange": "binance",
-              "long_pct": 49.62,
-              "short_pct": 50.38,
-              "ratio": 0.9851,
+              "long_pct": 52.02,
+              "short_pct": 47.98,
+              "ratio": 1.0844,
               "timestamp": null
             },
             {
               "exchange": "bitget",
-              "long_pct": 38.73,
-              "short_pct": 61.27,
-              "ratio": 0.6321,
+              "long_pct": 19.82,
+              "short_pct": 80.18,
+              "ratio": 0.2471,
               "timestamp": null
             },
             {
               "exchange": "gate",
-              "long_pct": 53.26,
-              "short_pct": 46.74,
-              "ratio": 1.1396,
+              "long_pct": 54.01,
+              "short_pct": 45.99,
+              "ratio": 1.1746,
               "timestamp": null
             },
             {
               "exchange": "okx",
-              "long_pct": 50.88,
-              "short_pct": 49.12,
-              "ratio": 1.0357,
+              "long_pct": 46.84,
+              "short_pct": 53.16,
+              "ratio": 0.8811,
               "timestamp": null
             }
           ]
@@ -1590,19 +1590,19 @@
         "value": null,
         "status": "UNAVAILABLE",
         "reason": "Not included in selected CoinBoss aggregate endpoint",
-        "fetched_at": "2026-11-21T04:07:26Z"
+        "fetched_at": "2026-11-21T05:10:37Z"
       },
       "index_price": {
         "value": null,
         "status": "UNAVAILABLE",
         "reason": "Not included in selected CoinBoss aggregate endpoint",
-        "fetched_at": "2026-11-21T04:07:26Z"
+        "fetched_at": "2026-11-21T05:10:37Z"
       },
       "liquidation_clusters": {
         "value": null,
         "status": "UNAVAILABLE",
         "reason": "Verified liquidation heatmap integration not configured",
-        "fetched_at": "2026-11-21T04:07:26Z"
+        "fetched_at": "2026-11-21T05:10:37Z"
       },
       "coverage": {
         "open_interest": {
@@ -1623,8 +1623,8 @@
             "aster",
             "bitfinex",
             "lighter",
-            "kraken",
             "htx",
+            "kraken",
             "edgex",
             "dydx",
             "backpack",
@@ -1637,280 +1637,280 @@
               "exchange": "binance",
               "symbol": "ETHUSD_PERP",
               "oi_usd": 302180180,
-              "age_s": 138847,
+              "age_s": 142628,
               "reason": "older_than_usable_window"
             },
             {
               "exchange": "okx",
               "symbol": "ETH-USD-SWAP",
               "oi_usd": 198288970,
-              "age_s": 138847,
+              "age_s": 142628,
               "reason": "older_than_usable_window"
             },
             {
               "exchange": "mexc",
               "symbol": "ETH_USD",
               "oi_usd": 140553760,
-              "age_s": 138847,
+              "age_s": 142628,
               "reason": "older_than_usable_window"
             },
             {
               "exchange": "bybit",
               "symbol": "ETHUSD",
               "oi_usd": 116231034,
-              "age_s": 138847,
+              "age_s": 142628,
               "reason": "older_than_usable_window"
             },
             {
               "exchange": "deribit",
               "symbol": "ETH-25DEC26",
               "oi_usd": 73738350,
-              "age_s": 138847,
+              "age_s": 142628,
               "reason": "older_than_usable_window"
             },
             {
               "exchange": "mexc",
               "symbol": "ETH_USDC",
               "oi_usd": 61788408.56,
-              "age_s": 138847,
+              "age_s": 142628,
               "reason": "older_than_usable_window"
             },
             {
               "exchange": "bitget",
               "symbol": "ETH-PERP",
               "oi_usd": 54504995.18,
-              "age_s": 138847,
+              "age_s": 142628,
               "reason": "older_than_usable_window"
             },
             {
               "exchange": "okx",
               "symbol": "ETH-USD_UM_XPERP-310404",
               "oi_usd": 38727121.56,
-              "age_s": 138847,
+              "age_s": 142628,
               "reason": "older_than_usable_window"
             },
             {
               "exchange": "okx",
               "symbol": "ETH-USD-261225",
               "oi_usd": 33050360,
-              "age_s": 138847,
+              "age_s": 142628,
               "reason": "older_than_usable_window"
             },
             {
               "exchange": "deribit",
               "symbol": "ETH-26MAR27",
               "oi_usd": 30143085,
-              "age_s": 138847,
+              "age_s": 142628,
               "reason": "older_than_usable_window"
             },
             {
               "exchange": "deribit",
               "symbol": "ETH-27NOV26",
               "oi_usd": 27286575,
-              "age_s": 138847,
+              "age_s": 142628,
               "reason": "older_than_usable_window"
             },
             {
               "exchange": "bybit",
               "symbol": "ETH-PERP",
               "oi_usd": 26655059.14,
-              "age_s": 138847,
+              "age_s": 142628,
               "reason": "older_than_usable_window"
             },
             {
               "exchange": "kucoin",
               "symbol": "ETHUSD",
               "oi_usd": 19728164,
-              "age_s": 138847,
+              "age_s": 142628,
               "reason": "older_than_usable_window"
             },
             {
               "exchange": "deribit",
               "symbol": "ETH-29JAN27",
               "oi_usd": 17508684,
-              "age_s": 138847,
+              "age_s": 142628,
               "reason": "older_than_usable_window"
             },
             {
               "exchange": "deribit",
               "symbol": "ETH-25JUN27",
               "oi_usd": 17438978,
-              "age_s": 138847,
+              "age_s": 142628,
               "reason": "older_than_usable_window"
             },
             {
               "exchange": "binance",
               "symbol": "ETHUSD_261225",
               "oi_usd": 17294450,
-              "age_s": 138847,
+              "age_s": 142628,
               "reason": "older_than_usable_window"
             },
             {
               "exchange": "okx",
               "symbol": "ETH-USD-270326",
               "oi_usd": 15100510,
-              "age_s": 138847,
+              "age_s": 142628,
               "reason": "older_than_usable_window"
             },
             {
               "exchange": "deribit",
               "symbol": "ETH-24SEP27",
               "oi_usd": 13402619,
-              "age_s": 138847,
+              "age_s": 142628,
               "reason": "older_than_usable_window"
             },
             {
               "exchange": "mexc",
               "symbol": "ETH_USD1",
               "oi_usd": 12867741.06,
-              "age_s": 138847,
+              "age_s": 142628,
               "reason": "older_than_usable_window"
             },
             {
               "exchange": "bybit",
               "symbol": "ETHUSDT-25DEC26",
               "oi_usd": 9310323.7,
-              "age_s": 138847,
+              "age_s": 142628,
               "reason": "older_than_usable_window"
             },
             {
               "exchange": "binance",
               "symbol": "ETHUSD_270326",
               "oi_usd": 8492830,
-              "age_s": 139207,
+              "age_s": 142988,
               "reason": "older_than_usable_window"
             },
             {
               "exchange": "bybit",
               "symbol": "ETHUSDT-26MAR27",
               "oi_usd": 8185112.04,
-              "age_s": 138847,
+              "age_s": 142628,
               "reason": "older_than_usable_window"
             },
             {
               "exchange": "okx",
               "symbol": "ETH-USD-261127",
               "oi_usd": 8161820,
-              "age_s": 138847,
+              "age_s": 142628,
               "reason": "older_than_usable_window"
             },
             {
               "exchange": "binance",
               "symbol": "ETH-USD1",
               "oi_usd": 7773280.4,
-              "age_s": 138847,
+              "age_s": 142628,
               "reason": "older_than_usable_window"
             },
             {
               "exchange": "deribit",
               "symbol": "ETH-20NOV26",
               "oi_usd": 7539911,
-              "age_s": 138847,
+              "age_s": 142628,
               "reason": "older_than_usable_window"
             },
             {
               "exchange": "binance",
               "symbol": "ETH-U",
               "oi_usd": 7535461.65,
-              "age_s": 138847,
+              "age_s": 142628,
               "reason": "older_than_usable_window"
             },
             {
               "exchange": "bybit",
               "symbol": "ETHUSDT-13NOV26",
               "oi_usd": 7332586.21,
-              "age_s": 676688,
+              "age_s": 680469,
               "reason": "older_than_usable_window"
             },
             {
               "exchange": "deribit",
               "symbol": "ETH-13NOV26",
               "oi_usd": 7328376,
-              "age_s": 676688,
+              "age_s": 680469,
               "reason": "older_than_usable_window"
             },
             {
               "exchange": "bybit",
               "symbol": "ETHUSDT-27NOV26",
               "oi_usd": 6882172.91,
-              "age_s": 138847,
+              "age_s": 142628,
               "reason": "older_than_usable_window"
             },
             {
               "exchange": "bybit",
               "symbol": "ETHUSD-Z26",
               "oi_usd": 5218270,
-              "age_s": 138847,
+              "age_s": 142628,
               "reason": "older_than_usable_window"
             },
             {
               "exchange": "okx",
               "symbol": "ETH-USD-270625",
               "oi_usd": 4376020,
-              "age_s": 138847,
+              "age_s": 142628,
               "reason": "older_than_usable_window"
             },
             {
               "exchange": "kucoin",
               "symbol": "ETHUSDC",
               "oi_usd": 4097348.35,
-              "age_s": 138847,
+              "age_s": 142628,
               "reason": "older_than_usable_window"
             },
             {
               "exchange": "htx",
               "symbol": "ETH-USD",
               "oi_usd": 3915220,
-              "age_s": 138847,
+              "age_s": 142628,
               "reason": "older_than_usable_window"
             },
             {
               "exchange": "bybit",
               "symbol": "ETHUSDT-25JUN27",
               "oi_usd": 3579441.78,
-              "age_s": 138847,
+              "age_s": 142628,
               "reason": "older_than_usable_window"
             },
             {
               "exchange": "bybit",
               "symbol": "ETHUSDT-24SEP27",
               "oi_usd": 3436491,
-              "age_s": 138847,
+              "age_s": 142628,
               "reason": "older_than_usable_window"
             },
             {
               "exchange": "okx",
               "symbol": "ETH-USD-270924",
               "oi_usd": 3188950,
-              "age_s": 138847,
+              "age_s": 142628,
               "reason": "older_than_usable_window"
             },
             {
               "exchange": "bybit",
               "symbol": "ETHUSD-H27",
               "oi_usd": 2940822,
-              "age_s": 138847,
+              "age_s": 142628,
               "reason": "older_than_usable_window"
             },
             {
               "exchange": "bybit",
               "symbol": "ETHUSDT-29JAN27",
               "oi_usd": 2691493.74,
-              "age_s": 138847,
+              "age_s": 142628,
               "reason": "older_than_usable_window"
             },
             {
               "exchange": "bybit",
               "symbol": "ETHUSDT-20NOV26",
               "oi_usd": 2065461.08,
-              "age_s": 138847,
+              "age_s": 142628,
               "reason": "older_than_usable_window"
             },
             {
               "exchange": "deribit",
               "symbol": "ETH-17NOV26",
               "oi_usd": 1582039,
-              "age_s": 331087,
+              "age_s": 334868,
               "reason": "older_than_usable_window"
             }
           ],
@@ -1950,9 +1950,9 @@
         "long_short": null
       },
       "asof": {
-        "open_interest": "2026-11-21T04:07:05Z",
-        "funding": "2026-11-21T04:07:26Z",
-        "long_short": "2026-11-21T04:07:26Z"
+        "open_interest": "2026-11-21T05:10:05Z",
+        "funding": "2026-11-21T05:10:36Z",
+        "long_short": "2026-11-21T05:10:37Z"
       },
       "provider_note": "CoinBoss aggregates data from multiple derivatives venues. Long/short measures are kept separate. Futures metrics are context only, not Spot signals."
     }
@@ -1961,7 +1961,7 @@
     "value": null,
     "status": "UNAVAILABLE",
     "reason": "Verified liquidation heatmap integration not configured",
-    "fetched_at": "2026-11-21T04:07:26Z"
+    "fetched_at": "2026-11-21T05:10:37Z"
   },
   "portfolio": {
     "status": "LOCAL_ONLY",
