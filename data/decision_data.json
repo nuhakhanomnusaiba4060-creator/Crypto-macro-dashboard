@@ -1,25 +1,23 @@
 {
   "engine": "CRYPTO FINAL DECISION ENGINE",
-  "version": "2.0.0",
-  "generated_at": "2026-11-21T20:29:17.834123+00:00",
+  "version": "2.1.0",
+  "generated_at": "2026-11-21T20:40:27.043748+00:00",
   "data_quality": {
-    "status": "PARTIAL",
+    "status": "GOOD",
     "market_snapshot": {
       "status": "FRESH",
       "age_hours": 0.01,
-      "reason": "Snapshot is fresh."
+      "timestamp": "2026-11-21T20:39:43Z"
     },
     "macro_snapshot": {
       "status": "FRESH",
-      "age_hours": 0.34,
-      "reason": "Snapshot is fresh."
+      "age_hours": 0.0,
+      "timestamp": "2026-11-21T20:40:26Z"
     },
-    "btc_technical": "INCOMPLETE",
-    "eth_technical": "INCOMPLETE",
+    "btc_technical": "FRESH",
+    "eth_technical": "FRESH",
     "issues": [
-      "BTC technical data is incomplete or stale.",
-      "ETH technical data is incomplete or stale.",
-      "Market data is a scheduled snapshot, not guaranteed realtime.",
+      "বাজারের ডেটা নির্দিষ্ট বিরতিতে নেওয়া Snapshot; এটি Tick-by-tick Live নয়।",
       "DTWEXBGS is a broad trade-weighted USD proxy, not ICE DXY.",
       "FRED observations are released with delays.",
       "Freshness limits are series-specific.",
@@ -33,122 +31,156 @@
       "BTC market structure and technical confirmation are not integrated.",
       "Crypto-specific on-chain data are not integrated.",
       "Rule-based Macro Risk Score is not a calibrated probability.",
-      "Macro decision is not a standalone crypto trading signal.",
-      "Macro critical metric coverage is incomplete."
+      "Macro decision is not a standalone crypto trading signal."
     ]
   },
   "macro_analysis": {
-    "quality": "PARTIAL",
+    "quality": "GOOD",
     "decision": "UNKNOWN",
     "risk_level": "UNKNOWN",
-    "risk_score": 1,
+    "risk_score": 2,
     "risk_flags": [
-      "VIX elevated"
+      "VIX উচ্চ",
+      "যুক্তরাষ্ট্রের ১০ বছর মেয়াদি বন্ডের Yield বেশি"
     ],
     "vix": 28.44,
-    "yield_10y": null,
-    "broad_usd": null,
-    "fed_funds": null,
+    "yield_10y": 5.04,
+    "broad_usd": 122.6503,
     "critical_checks": {
       "vix": true,
-      "10y_yield": false,
-      "broad_usd": false
+      "10y": true,
+      "broad_usd": true
     }
   },
   "crypto_market": {
-    "global_market": {},
+    "global_market": {
+      "total_market_cap_usd": {
+        "value": 2089605573359.1323,
+        "unit": "USD",
+        "source": "CoinGecko API",
+        "source_updated_at": "2026-11-21T20:32:52Z",
+        "fetched_at": "2026-11-21T20:39:43Z",
+        "status": "OK",
+        "error": null
+      },
+      "total_volume_24h_usd": {
+        "value": 121125189717.65704,
+        "unit": "USD",
+        "source": "CoinGecko API",
+        "source_updated_at": "2026-11-21T20:32:52Z",
+        "fetched_at": "2026-11-21T20:39:43Z",
+        "status": "OK",
+        "error": null
+      },
+      "btc_dominance_pct": {
+        "value": 57.9865603427981,
+        "unit": "%",
+        "source": "CoinGecko API",
+        "source_updated_at": "2026-11-21T20:32:52Z",
+        "fetched_at": "2026-11-21T20:39:43Z",
+        "status": "OK",
+        "error": null
+      },
+      "eth_dominance_pct": {
+        "value": 9.831891771680795,
+        "unit": "%",
+        "source": "CoinGecko API",
+        "source_updated_at": "2026-11-21T20:32:52Z",
+        "fetched_at": "2026-11-21T20:39:43Z",
+        "status": "OK",
+        "error": null
+      },
+      "active_cryptocurrencies": {
+        "value": 21338.0,
+        "unit": "count",
+        "source": "CoinGecko API",
+        "source_updated_at": "2026-11-21T20:32:52Z",
+        "fetched_at": "2026-11-21T20:39:43Z",
+        "status": "OK",
+        "error": null
+      },
+      "markets_count": {
+        "value": 1529.0,
+        "unit": "count",
+        "source": "CoinGecko API",
+        "source_updated_at": "2026-11-21T20:32:52Z",
+        "fetched_at": "2026-11-21T20:39:43Z",
+        "status": "OK",
+        "error": null
+      }
+    },
     "fear_greed": {
       "value": 12.0,
       "classification": "Extreme Fear",
       "unit": "/100",
       "source": "Alternative.me Fear & Greed API",
       "source_updated_at": "2026-11-21T00:00:00Z",
-      "fetched_at": "2026-11-21T20:28:42Z",
+      "fetched_at": "2026-11-21T20:39:43Z",
       "status": "OK",
       "error": null
     },
     "btc": {
       "symbol": "BTC",
-      "quality": "INCOMPLETE",
-      "technical_age": {
-        "status": "FRESH",
-        "age_hours": 0.01
-      },
-      "trend": "UNKNOWN",
-      "price": null,
-      "ma20": null,
-      "ma50": null,
-      "ma200": null,
-      "rsi14": null,
-      "macd": null,
-      "macd_signal": null,
-      "adx14": null,
-      "volume_ratio": null,
-      "support": null,
-      "resistance": null,
-      "bollinger_lower": null,
-      "support_warning": false,
-      "checks": {
-        "price": false,
-        "ma20": false,
-        "ma50": false,
-        "ma200": false,
-        "rsi": false
-      }
+      "quality": "FRESH",
+      "trend": "BEARISH",
+      "price": 58951.51,
+      "ma20": 71103.515,
+      "ma50": 77717.71659999999,
+      "ma200": 72589.18524999998,
+      "rsi": 17.352953009243876,
+      "macd": -4800.5169055278675,
+      "macd_signal": -3700.802078331073,
+      "adx": 44.27721782281161,
+      "volume_ratio": 1.9360137865525127,
+      "support": 61428.26,
+      "resistance": 81196.01,
+      "bollinger_lower": 58508.48123896466,
+      "missing": [],
+      "last_closed_candle_at": "2026-11-20T23:59:59Z",
+      "support_warning": true
     },
     "eth": {
       "symbol": "ETH",
-      "quality": "INCOMPLETE",
-      "technical_age": {
-        "status": "FRESH",
-        "age_hours": 0.01
-      },
-      "trend": "UNKNOWN",
-      "price": null,
-      "ma20": null,
-      "ma50": null,
-      "ma200": null,
-      "rsi14": null,
-      "macd": null,
-      "macd_signal": null,
-      "adx14": null,
-      "volume_ratio": null,
-      "support": null,
-      "resistance": null,
-      "bollinger_lower": null,
-      "support_warning": false,
-      "checks": {
-        "price": false,
-        "ma20": false,
-        "ma50": false,
-        "ma200": false,
-        "rsi": false
-      }
+      "quality": "FRESH",
+      "trend": "BEARISH",
+      "price": 1623.09,
+      "ma20": 2033.7244999999998,
+      "ma50": 2287.512200000001,
+      "ma200": 2130.4131500000003,
+      "rsi": 19.246242959260357,
+      "macd": -169.42349714189731,
+      "macd_signal": -139.46273825262426,
+      "adx": 41.84494891941189,
+      "volume_ratio": 2.237459303578145,
+      "support": 1711.08,
+      "resistance": 2450.0,
+      "bollinger_lower": 1590.10802801209,
+      "missing": [],
+      "last_closed_candle_at": "2026-11-20T23:59:59Z",
+      "support_warning": true
     }
   },
   "final_decision": {
     "decision": "WAIT",
     "market_status": "WAIT",
     "reasons": [
-      "Critical market, macro or BTC technical data is not verified."
+      "BTC-এর Daily Trend Bearish।"
     ],
     "actions": [
-      "নতুন Spot position নেওয়া থেকে বিরত থাকুন; আগে data quality ঠিক করুন।"
+      "নতুন Spot BUY/DCA বন্ধ রাখুন; Trend উন্নতির নিশ্চিত সংকেতের অপেক্ষা করুন।"
     ],
     "risk": [
-      "Incomplete or stale data can produce misleading signals."
+      "BTC মূল্য Support reference-এর নিচে; Daily Candle Close দিয়ে ভাঙন নিশ্চিত করতে হবে।"
     ],
-    "data_ready": false,
+    "data_ready": true,
     "decision_scope": "BROAD_CRYPTO_MARKET_SPOT",
     "not_coin_specific": true
   },
   "limitations": [
-    "This engine evaluates broad crypto-market Spot risk, not individual coin fundamentals.",
-    "Scheduled snapshots are not guaranteed realtime.",
-    "Macro data may be delayed by official publication schedules.",
-    "A support warning alone is not a confirmed breakdown.",
-    "RSI overbought alone is not a SELL signal.",
-    "This engine does not provide personalized portfolio allocation.",
-    "No futures or margin trading signals are generated."
+    "এটি সামগ্রিক Crypto Spot Market ঝুঁকি বিশ্লেষণ; নির্দিষ্ট Coin-এর BUY/SELL নির্দেশ নয়।",
+    "Scheduled Snapshot সম্পূর্ণ Real-time নয়।",
+    "FRED Macro তথ্য প্রকাশে বিলম্ব হয়।",
+    "শুধু RSI বা Support warning দিয়ে SELL সিদ্ধান্ত দেওয়া হয় না।",
+    "Futures/Margin সংকেত তৈরি করা হয় না।"
   ]
 }
