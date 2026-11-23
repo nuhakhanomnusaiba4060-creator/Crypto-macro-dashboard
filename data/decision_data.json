@@ -1,23 +1,24 @@
 {
   "engine": "CRYPTO FINAL DECISION ENGINE",
   "version": "2.1.0",
-  "generated_at": "2026-11-22T23:26:58.551118+00:00",
+  "generated_at": "2026-11-23T00:07:24.068379+00:00",
   "data_quality": {
-    "status": "GOOD",
+    "status": "PARTIAL",
     "market_snapshot": {
       "status": "FRESH",
-      "age_hours": 0.0,
-      "timestamp": "2026-11-22T23:26:45Z"
+      "age_hours": 0.02,
+      "timestamp": "2026-11-23T00:06:26Z"
     },
     "macro_snapshot": {
       "status": "FRESH",
-      "age_hours": 4.99,
-      "timestamp": "2026-11-22T18:27:32Z"
+      "age_hours": 0.0,
+      "timestamp": "2026-11-23T00:07:23Z"
     },
     "btc_technical": "FRESH",
     "eth_technical": "FRESH",
     "issues": [
       "বাজারের ডেটা নির্দিষ্ট বিরতিতে নেওয়া Snapshot; এটি Tick-by-tick Live নয়।",
+      "VIX, 10Y Yield ও Broad USD-এর সব গুরুত্বপূর্ণ মান যাচাই হয়নি।",
       "DTWEXBGS is a broad trade-weighted USD proxy, not ICE DXY.",
       "FRED observations are released with delays.",
       "Freshness limits are series-specific.",
@@ -35,7 +36,7 @@
     ]
   },
   "macro_analysis": {
-    "quality": "GOOD",
+    "quality": "PARTIAL",
     "decision": "UNKNOWN",
     "risk_level": "UNKNOWN",
     "risk_score": 2,
@@ -45,48 +46,48 @@
     ],
     "vix": 28.44,
     "yield_10y": 5.04,
-    "broad_usd": 122.6503,
+    "broad_usd": null,
     "critical_checks": {
       "vix": true,
       "10y": true,
-      "broad_usd": true
+      "broad_usd": false
     }
   },
   "crypto_market": {
     "global_market": {
       "total_market_cap_usd": {
-        "value": 2080578389768.145,
+        "value": 2088141985351.571,
         "unit": "USD",
         "source": "CoinGecko API",
-        "source_updated_at": "2026-11-22T23:16:48Z",
-        "fetched_at": "2026-11-22T23:26:45Z",
+        "source_updated_at": "2026-11-22T23:56:53Z",
+        "fetched_at": "2026-11-23T00:06:26Z",
         "status": "OK",
         "error": null
       },
       "total_volume_24h_usd": {
-        "value": 56211290425.35336,
+        "value": 56732033992.851006,
         "unit": "USD",
         "source": "CoinGecko API",
-        "source_updated_at": "2026-11-22T23:16:48Z",
-        "fetched_at": "2026-11-22T23:26:45Z",
+        "source_updated_at": "2026-11-22T23:56:53Z",
+        "fetched_at": "2026-11-23T00:06:26Z",
         "status": "OK",
         "error": null
       },
       "btc_dominance_pct": {
-        "value": 58.826981699264294,
+        "value": 58.89785993578973,
         "unit": "%",
         "source": "CoinGecko API",
-        "source_updated_at": "2026-11-22T23:16:48Z",
-        "fetched_at": "2026-11-22T23:26:45Z",
+        "source_updated_at": "2026-11-22T23:56:53Z",
+        "fetched_at": "2026-11-23T00:06:26Z",
         "status": "OK",
         "error": null
       },
       "eth_dominance_pct": {
-        "value": 10.077481026549767,
+        "value": 10.066438801915204,
         "unit": "%",
         "source": "CoinGecko API",
-        "source_updated_at": "2026-11-22T23:16:48Z",
-        "fetched_at": "2026-11-22T23:26:45Z",
+        "source_updated_at": "2026-11-22T23:56:53Z",
+        "fetched_at": "2026-11-23T00:06:26Z",
         "status": "OK",
         "error": null
       },
@@ -94,8 +95,8 @@
         "value": 21317.0,
         "unit": "count",
         "source": "CoinGecko API",
-        "source_updated_at": "2026-11-22T23:16:48Z",
-        "fetched_at": "2026-11-22T23:26:45Z",
+        "source_updated_at": "2026-11-22T23:56:53Z",
+        "fetched_at": "2026-11-23T00:06:26Z",
         "status": "OK",
         "error": null
       },
@@ -103,8 +104,8 @@
         "value": 1529.0,
         "unit": "count",
         "source": "CoinGecko API",
-        "source_updated_at": "2026-11-22T23:16:48Z",
-        "fetched_at": "2026-11-22T23:26:45Z",
+        "source_updated_at": "2026-11-22T23:56:53Z",
+        "fetched_at": "2026-11-23T00:06:26Z",
         "status": "OK",
         "error": null
       }
@@ -114,8 +115,8 @@
       "classification": "Extreme Fear",
       "unit": "/100",
       "source": "Alternative.me Fear & Greed API",
-      "source_updated_at": "2026-11-22T00:00:00Z",
-      "fetched_at": "2026-11-22T23:26:46Z",
+      "source_updated_at": "2026-11-23T00:00:00Z",
+      "fetched_at": "2026-11-23T00:06:26Z",
       "status": "OK",
       "error": null
     },
@@ -123,40 +124,40 @@
       "symbol": "BTC",
       "quality": "FRESH",
       "trend": "BEARISH",
-      "price": 60215.77,
-      "ma20": 70196.6035,
-      "ma50": 77231.67179999998,
-      "ma200": 72485.73649999998,
-      "rsi": 22.502325577247944,
-      "macd": -4933.324292599333,
-      "macd_signal": -3947.3065114747155,
-      "adx": 46.92878026130353,
-      "volume_ratio": 2.2280807094653046,
-      "support": 57778.35,
+      "price": 61271.08,
+      "ma20": 69419.3575,
+      "ma50": 76762.02219999999,
+      "ma200": 72384.85684999998,
+      "rsi": 26.612653744595548,
+      "macd": -4896.971168375916,
+      "macd_signal": -4137.23943146533,
+      "adx": 48.93321510291896,
+      "volume_ratio": 0.908366407119314,
+      "support": 55130.0,
       "resistance": 81196.01,
-      "bollinger_lower": 57214.32275830245,
+      "bollinger_lower": 56255.28214989831,
       "missing": [],
-      "last_closed_candle_at": "2026-11-21T23:59:59Z",
+      "last_closed_candle_at": "2026-11-22T23:59:59Z",
       "support_warning": false
     },
     "eth": {
       "symbol": "ETH",
       "quality": "FRESH",
       "trend": "BEARISH",
-      "price": 1685.63,
-      "ma20": 2004.2404999999999,
-      "ma50": 2267.853000000001,
-      "ma200": 2127.0374500000007,
-      "rsi": 25.92102501851859,
-      "macd": -171.7028912332437,
-      "macd_signal": -145.91076841420437,
-      "adx": 43.948126219095904,
-      "volume_ratio": 1.9117883194742904,
-      "support": 1581.47,
+      "price": 1724.33,
+      "ma20": 1977.7925,
+      "ma50": 2248.5950000000007,
+      "ma200": 2123.9049000000005,
+      "rsi": 29.788439803189178,
+      "macd": -168.44483357863464,
+      "macd_signal": -150.41758090942633,
+      "adx": 45.60641332305622,
+      "volume_ratio": 0.7239309255087446,
+      "support": 1538.0,
       "resistance": 2450.0,
-      "bollinger_lower": 1550.5009330466648,
+      "bollinger_lower": 1523.5387661518346,
       "missing": [],
-      "last_closed_candle_at": "2026-11-21T23:59:59Z",
+      "last_closed_candle_at": "2026-11-22T23:59:59Z",
       "support_warning": false
     }
   },
@@ -164,13 +165,15 @@
     "decision": "WAIT",
     "market_status": "WAIT",
     "reasons": [
-      "BTC-এর Daily Trend Bearish।"
+      "প্রয়োজনীয় বাজার, Macro অথবা BTC Technical Data সম্পূর্ণভাবে যাচাই হয়নি।"
     ],
     "actions": [
-      "নতুন Spot BUY/DCA বন্ধ রাখুন; Trend উন্নতির নিশ্চিত সংকেতের অপেক্ষা করুন।"
+      "নতুন Spot BUY/DCA করবেন না। ডেটা ঠিক ও হালনাগাদ না হওয়া পর্যন্ত অপেক্ষা করুন।"
     ],
-    "risk": [],
-    "data_ready": true,
+    "risk": [
+      "অসম্পূর্ণ বা পুরোনো ডেটা ভুল সিদ্ধান্ত তৈরি করতে পারে।"
+    ],
+    "data_ready": false,
     "decision_scope": "BROAD_CRYPTO_MARKET_SPOT",
     "not_coin_specific": true
   },
