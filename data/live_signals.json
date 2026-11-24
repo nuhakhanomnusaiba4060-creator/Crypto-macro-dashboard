@@ -1,18 +1,18 @@
 {
   "schema_version": 1,
   "engine": "Crypto Dada Style Live Signals Engine",
-  "engine_version": "1.2.0",
+  "engine_version": "1.3.0",
   "symbol": "BTCUSDT",
   "market": "Binance Spot",
-  "fetched_at": "2026-11-24T16:30:56+00:00",
+  "fetched_at": "2026-11-24T16:59:59+00:00",
   "price_structure": {
     "price": {
-      "value": 59532.01,
+      "value": 59417.65,
       "unit": "USDT",
       "status": "OK",
       "source": "Binance Spot BTCUSDT Ticker",
-      "source_updated_at": "2026-11-24T16:30:57+00:00",
-      "fetched_at": "2026-11-24T16:30:57+00:00"
+      "source_updated_at": "2026-11-24T17:00:01+00:00",
+      "fetched_at": "2026-11-24T17:00:01+00:00"
     },
     "support": {
       "value": 58951.51,
@@ -20,7 +20,7 @@
       "status": "OK",
       "source": "Binance Spot Daily Candles",
       "source_updated_at": "2026-11-23T23:59:59+00:00",
-      "fetched_at": "2026-11-24T16:30:57+00:00"
+      "fetched_at": "2026-11-24T17:00:01+00:00"
     },
     "resistance": {
       "value": 80504.01,
@@ -28,7 +28,7 @@
       "status": "OK",
       "source": "Binance Spot Daily Candles",
       "source_updated_at": "2026-11-23T23:59:59+00:00",
-      "fetched_at": "2026-11-24T16:30:57+00:00"
+      "fetched_at": "2026-11-24T17:00:01+00:00"
     },
     "ma20": {
       "value": 68610.211,
@@ -36,7 +36,7 @@
       "status": "OK",
       "source": "Binance Spot Daily Candles",
       "source_updated_at": "2026-11-23T23:59:59+00:00",
-      "fetched_at": "2026-11-24T16:30:57+00:00"
+      "fetched_at": "2026-11-24T17:00:01+00:00"
     },
     "ma50": {
       "value": 76256.84079999998,
@@ -44,7 +44,7 @@
       "status": "OK",
       "source": "Binance Spot Daily Candles",
       "source_updated_at": "2026-11-23T23:59:59+00:00",
-      "fetched_at": "2026-11-24T16:30:57+00:00"
+      "fetched_at": "2026-11-24T17:00:01+00:00"
     },
     "ma200": {
       "value": 72291.18149999999,
@@ -52,7 +52,7 @@
       "status": "OK",
       "source": "Binance Spot Daily Candles",
       "source_updated_at": "2026-11-23T23:59:59+00:00",
-      "fetched_at": "2026-11-24T16:30:57+00:00"
+      "fetched_at": "2026-11-24T17:00:01+00:00"
     },
     "rsi14": {
       "value": 17.526216326037954,
@@ -60,7 +60,7 @@
       "status": "OK",
       "source": "Binance Spot Daily Candles",
       "source_updated_at": "2026-11-23T23:59:59+00:00",
-      "fetched_at": "2026-11-24T16:30:57+00:00"
+      "fetched_at": "2026-11-24T17:00:01+00:00"
     },
     "candle_updated_at": "2026-11-23T23:59:59+00:00",
     "status": "OK"
@@ -69,64 +69,67 @@
     "value": null,
     "unit": "",
     "status": "UNAVAILABLE",
-    "source": "CoinGlass Bitcoin ETF Flow",
+    "source": "CoinBoss Bitcoin ETF Flow",
     "source_updated_at": null,
-    "fetched_at": "2026-11-24T16:30:57+00:00",
-    "error": "COINGLASS_API_KEY GitHub Secret is missing"
+    "fetched_at": "2026-11-24T17:00:02+00:00",
+    "error": "HTTP Error 404: Not Found"
   },
   "funding_rate": {
     "value": null,
     "unit": "",
     "status": "UNAVAILABLE",
-    "source": "CoinGlass Funding Rate",
+    "source": "CoinBoss Funding Rate",
     "source_updated_at": null,
-    "fetched_at": "2026-11-24T16:30:56+00:00"
+    "fetched_at": "2026-11-24T16:59:59+00:00",
+    "error": "HTTP Error 404: Not Found"
   },
   "open_interest": {
     "value": null,
     "unit": "",
     "status": "UNAVAILABLE",
-    "source": "CoinGlass Open Interest",
+    "source": "CoinBoss Open Interest",
     "source_updated_at": null,
-    "fetched_at": "2026-11-24T16:30:56+00:00"
+    "fetched_at": "2026-11-24T16:59:59+00:00",
+    "error": "HTTP Error 404: Not Found"
   },
   "futures_premium": {
     "value": null,
     "unit": "",
     "status": "UNAVAILABLE",
-    "source": "CoinGlass Futures Premium",
+    "source": "CoinBoss Futures Basis",
     "source_updated_at": null,
-    "fetched_at": "2026-11-24T16:30:56+00:00"
+    "fetched_at": "2026-11-24T16:59:59+00:00",
+    "error": "HTTP Error 404: Not Found"
   },
   "on_chain": {
     "mvrv_z_score": {
-      "value": null,
+      "value": 0.177104,
       "unit": "",
-      "status": "UNAVAILABLE",
-      "source": "Glassnode MVRV Z-Score",
-      "source_updated_at": null,
-      "fetched_at": "2026-11-24T16:30:57+00:00",
-      "error": "GLASSNODE_API_KEY GitHub Secret is missing"
+      "status": "OK",
+      "source": "Explore21 MVRV Z-Score",
+      "source_updated_at": "2026-11-20",
+      "fetched_at": "2026-11-24T17:00:02+00:00",
+      "update_frequency": "Daily",
+      "attribution": "Explore21 Charts, CC BY 4.0"
     },
     "nupl": {
       "value": null,
       "unit": "",
       "status": "UNAVAILABLE",
-      "source": "Glassnode NUPL",
+      "source": "Explore21 NUPL",
       "source_updated_at": null,
-      "fetched_at": "2026-11-24T16:30:57+00:00",
-      "error": "GLASSNODE_API_KEY GitHub Secret is missing"
+      "fetched_at": "2026-11-24T17:00:05+00:00",
+      "error": "NUPL metric is not listed in the free provider catalog"
     }
   },
   "retail_mania": {
     "value": 11.0,
     "unit": "index / 100",
     "status": "PROXY_ONLY",
-    "classification": "Extreme Fear",
     "source": "Alternative.me Fear & Greed Index",
     "source_updated_at": "2026-11-24T00:00:00+00:00",
-    "fetched_at": "2026-11-24T16:30:58+00:00",
-    "update_frequency": "Daily",
-    "note": "Sentiment proxy only. This is not direct retail trading activity or verified retail buying/selling data."
+    "fetched_at": "2026-11-24T17:00:05+00:00",
+    "classification": "Extreme Fear",
+    "note": "Sentiment proxy only. Not direct retail trading activity."
   }
 }
