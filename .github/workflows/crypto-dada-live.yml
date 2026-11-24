@@ -17,8 +17,11 @@ concurrency:
 jobs:
   update-live-signals:
     runs-on: ubuntu-latest
+    timeout-minutes: 8
 
-    timeout-minutes: 5
+    env:
+      COINGLASS_API_KEY: ${{ secrets.COINGLASS_API_KEY }}
+      GLASSNODE_API_KEY: ${{ secrets.GLASSNODE_API_KEY }}
 
     steps:
       - name: Checkout Repository
@@ -32,16 +35,16 @@ jobs:
       - name: Run Live Signals Engine
         run: python live_signals_engine.py
 
-      - name: Check Generated Data
+      - name: Validate Generated JSON
         run: |
           if [ ! -f data/live_signals.json ]; then
-            echo "ERROR: data/live_signals.json was not generated."
+            echo "ERROR: JSON file was not generated."
             exit 1
           fi
 
           python -m json.tool data/live_signals.json > /dev/null
 
-          echo "Live signals JSON validation successful."
+          echo "JSON validation successful."
 
       - name: Commit Updated Live Data
         run: |
