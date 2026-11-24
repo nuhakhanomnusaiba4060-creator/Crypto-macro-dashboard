@@ -10,20 +10,20 @@
 :root {
   --bg:#050807;
   --panel:#0b1210;
-  --panel2:#0e1814;
-  --border:#183629;
+  --panel2:#101b15;
+  --border:#1b3829;
   --green:#00e58a;
   --green2:#00a968;
-  --red:#ff4d61;
+  --red:#ff5265;
   --yellow:#ffc857;
+  --blue:#5bb8ff;
   --text:#e5f3eb;
   --muted:#82978b;
-  --blue:#5bb8ff;
 }
 
-* {
-  box-sizing:border-box;
-}
+* {box-sizing:border-box}
+
+html {scroll-behavior:smooth}
 
 body {
   margin:0;
@@ -42,7 +42,7 @@ body {
 }
 
 .sidebar {
-  width:235px;
+  width:230px;
   background:#070d0a;
   border-right:1px solid var(--border);
   padding:22px 15px;
@@ -97,7 +97,7 @@ body {
   border-radius:8px;
   color:var(--muted);
   font-size:11px;
-  line-height:1.7;
+  line-height:1.8;
 }
 
 .main {
@@ -151,8 +151,9 @@ button {
   font-weight:700;
 }
 
-button:hover {
-  background:#12432b;
+button:disabled {
+  opacity:.5;
+  cursor:wait;
 }
 
 .panel {
@@ -161,7 +162,6 @@ button:hover {
   border-radius:10px;
   padding:19px;
   margin-bottom:20px;
-  box-shadow:0 0 20px rgba(0,0,0,.2);
 }
 
 .panel-heading {
@@ -207,7 +207,7 @@ button:hover {
 .etf-status p {
   font-size:12px;
   color:var(--muted);
-  line-height:1.7;
+  line-height:1.8;
   margin-bottom:0;
 }
 
@@ -270,17 +270,9 @@ button:hover {
   background:var(--green2);
 }
 
-.signal-card.warning::before {
-  background:var(--yellow);
-}
-
-.signal-card.danger::before {
-  background:var(--red);
-}
-
-.signal-card.unavailable::before {
-  background:#66736b;
-}
+.signal-card.warning::before {background:var(--yellow)}
+.signal-card.danger::before {background:var(--red)}
+.signal-card.unavailable::before {background:#66736b}
 
 .card-top {
   display:flex;
@@ -335,9 +327,7 @@ button:hover {
   overflow-wrap:anywhere;
 }
 
-.metric-main.neutral {
-  color:var(--yellow);
-}
+.metric-main.neutral {color:var(--yellow)}
 
 .metric-main.missing {
   color:#9aa79f;
@@ -347,6 +337,7 @@ button:hover {
 .metric-unit {
   color:var(--muted);
   font-size:11px;
+  line-height:1.6;
 }
 
 .details {
@@ -387,13 +378,21 @@ button:hover {
   margin-top:9px;
   color:var(--green);
   font-size:12px;
-  line-height:1.7;
+  line-height:1.8;
 }
 
 .source {
   color:#71877a;
   font-size:10px;
   margin-top:12px;
+  line-height:1.8;
+  overflow-wrap:anywhere;
+}
+
+.api-error {
+  color:var(--red);
+  margin-top:8px;
+  font-size:11px;
   line-height:1.7;
   overflow-wrap:anywhere;
 }
@@ -407,7 +406,7 @@ button:hover {
   border-radius:8px;
   margin-bottom:18px;
   font-size:12px;
-  line-height:1.7;
+  line-height:1.8;
 }
 
 .footer {
@@ -419,19 +418,12 @@ button:hover {
 }
 
 @media(max-width:850px) {
-  .sidebar {
-    width:190px;
-  }
-
-  .main {
-    padding:18px;
-  }
+  .sidebar {width:190px}
+  .main {padding:18px}
 }
 
 @media(max-width:650px) {
-  .app {
-    display:block;
-  }
+  .app {display:block}
 
   .sidebar {
     width:100%;
@@ -445,10 +437,7 @@ button:hover {
     margin-bottom:12px;
   }
 
-  .side-title,
-  .sidebar-note {
-    display:none;
-  }
+  .side-title,.sidebar-note {display:none}
 
   .nav-list {
     display:flex;
@@ -463,26 +452,15 @@ button:hover {
     font-size:11px;
   }
 
-  .main {
-    padding:14px;
-  }
+  .main {padding:14px}
+  .page-title {font-size:19px}
 
-  .page-title {
-    font-size:19px;
-  }
-
-  .signal-grid,
-  .etf-layout {
+  .signal-grid,.etf-layout {
     grid-template-columns:1fr;
   }
 
-  .panel {
-    padding:14px;
-  }
-
-  .metric-main {
-    font-size:23px;
-  }
+  .panel {padding:14px}
+  .metric-main {font-size:23px}
 }
 </style>
 </head>
@@ -525,7 +503,7 @@ button:hover {
 
   <div class="top-actions">
     <span class="live-indicator" id="connection">● DATA CHECKING</span>
-    <button onclick="loadDashboard()">↻ Refresh</button>
+    <button id="refreshButton" onclick="loadDashboard()">↻ Refresh</button>
   </div>
 </header>
 
@@ -542,13 +520,13 @@ button:hover {
       <div class="label">CURRENT ETF CONDITION</div>
       <strong id="etfStatus">UNAVAILABLE</strong>
       <p id="etfExplanation">
-        ETF Flow provider এখনো সংযুক্ত নয়। তাই Accumulation বা Distribution নিশ্চিত করা যাচ্ছে না।
+        ETF Flow Provider সংযুক্ত নয়। Accumulation বা Distribution নিশ্চিত করা যাচ্ছে না।
       </p>
     </div>
 
     <div class="etf-placeholder" id="etfChart">
       ETF FLOW DATA পাওয়া যায়নি।<br>
-      Provider যুক্ত হলে এখানে প্রকৃত তথ্য দেখানো হবে।
+      Provider যুক্ত হলে প্রকৃত তথ্য দেখানো হবে।
     </div>
   </div>
 </section>
@@ -559,11 +537,9 @@ button:hover {
 </div>
 
 <div class="signal-grid" id="signalGrid">
-
   <article class="signal-card unavailable">
-    <div class="card-title">লোড হচ্ছে...</div>
+    <div class="card-title">ডেটা লোড হচ্ছে...</div>
   </article>
-
 </div>
 
 <section class="panel" id="data-info">
@@ -579,13 +555,13 @@ button:hover {
     </div>
 
     <div class="detail">
-      <span>Last Data Fetch</span>
-      <strong id="lastFetch">N/A</strong>
+      <span>Engine Version</span>
+      <strong id="engineVersion">N/A</strong>
     </div>
 
     <div class="detail">
-      <span>Next Refresh</span>
-      <strong>৫ মিনিট পর</strong>
+      <span>Last Data Fetch</span>
+      <strong id="lastFetch">N/A</strong>
     </div>
 
     <div class="detail">
@@ -595,7 +571,7 @@ button:hover {
   </div>
 
   <div class="explanation">
-    গুরুত্বপূর্ণ: Binance Futures-এর Funding Rate, Open Interest ও Futures Premium কেবল বাজারের অতিরিক্ত পরিস্থিতি বোঝার জন্য। এগুলো একা Spot BUY বা SELL সিদ্ধান্ত দেয় না।
+    গুরুত্বপূর্ণ: Funding Rate, Open Interest ও Futures Premium Futures Market-এর তথ্য। এগুলো একা Spot BUY বা SELL সিদ্ধান্ত দেয় না।
     ETF, MVRV ও NUPL-এর তথ্য না থাকলে Dashboard অনুমান করে কোনো সংখ্যা দেখাবে না।
   </div>
 </section>
@@ -615,109 +591,104 @@ button:hover {
 const DATA_URL = "./data/live_signals.json";
 
 const STATUS_TEXT = {
-  OK: "তথ্য পাওয়া গেছে",
-  PARTIAL: "আংশিক তথ্য",
-  PROXY_ONLY: "Proxy তথ্য",
-  UNAVAILABLE: "তথ্য পাওয়া যায়নি",
-  ERROR: "তথ্য সংগ্রহে সমস্যা"
+  OK:"তথ্য পাওয়া গেছে",
+  PARTIAL:"আংশিক তথ্য",
+  PROXY_ONLY:"Proxy তথ্য",
+  UNAVAILABLE:"তথ্য পাওয়া যায়নি",
+  ERROR:"তথ্য সংগ্রহে সমস্যা"
 };
 
-function get(obj, path) {
-  return path.split(".").reduce((value, key) => {
+function get(obj,path) {
+  return path.split(".").reduce((value,key) => {
     return value && value[key] !== undefined ? value[key] : null;
-  }, obj);
+  },obj);
 }
 
-function first(obj, paths) {
-  for (const path of paths) {
-    const value = get(obj, path);
-    if (value !== null && value !== undefined) return value;
+function first(obj,paths) {
+  for(const path of paths) {
+    const value = get(obj,path);
+    if(value !== null && value !== undefined) return value;
   }
   return null;
 }
 
-function metricValue(obj, paths) {
-  const value = first(obj, paths);
+function metricValue(obj,paths) {
+  const value = first(obj,paths);
 
-  if (value && typeof value === "object") {
-    return first(value, ["value", "current", "price"]);
+  if(value && typeof value === "object") {
+    return first(value,["value","current","price"]);
   }
 
   return value;
 }
 
-function metricObject(obj, paths) {
-  for (const path of paths) {
-    const value = get(obj, path);
-    if (value && typeof value === "object") return value;
+function metricObject(obj,paths) {
+  for(const path of paths) {
+    const value = get(obj,path);
+    if(value && typeof value === "object") return value;
   }
   return {};
 }
 
-function number(value, digits=2) {
-  if (value === null || value === undefined || value === "") {
-    return "N/A";
-  }
+function meta(metric,container) {
+  metric = metric || {};
+  container = container || {};
+
+  return {
+    source:metric.source || container.source || "N/A",
+    sourceUpdated:metric.source_updated_at || container.source_updated_at || null,
+    fetched:metric.fetched_at || container.fetched_at || null,
+    error:metric.error || container.error || null
+  };
+}
+
+function number(value,digits=2) {
+  if(value === null || value === undefined || value === "") return "N/A";
 
   const n = Number(value);
+  if(!Number.isFinite(n)) return "N/A";
 
-  if (!Number.isFinite(n)) return "N/A";
-
-  return n.toLocaleString("en-US", {
+  return n.toLocaleString("en-US",{
     maximumFractionDigits:digits
   });
 }
 
 function money(value) {
-  if (value === null || value === undefined || value === "") {
-    return "N/A";
-  }
+  if(value === null || value === undefined || value === "") return "N/A";
 
   const n = Number(value);
+  if(!Number.isFinite(n)) return "N/A";
 
-  if (!Number.isFinite(n)) return "N/A";
-
-  return "$" + n.toLocaleString("en-US", {
+  return "$" + n.toLocaleString("en-US",{
     maximumFractionDigits:2
   });
 }
 
 function timestamp(value) {
-  if (!value) return "N/A";
+  if(!value) return "N/A";
 
   let date;
 
-  if (typeof value === "number") {
-    date = new Date(value < 1000000000000 ? value * 1000 : value);
+  if(typeof value === "number") {
+    date = new Date(value < 1000000000000 ? value*1000 : value);
   } else {
     date = new Date(value);
   }
 
-  if (Number.isNaN(date.getTime())) return String(value);
+  if(Number.isNaN(date.getTime())) return String(value);
 
-  return date.toLocaleString("en-GB", {
+  return date.toLocaleString("en-GB",{
     day:"2-digit",
     month:"short",
     year:"numeric",
     hour:"2-digit",
     minute:"2-digit",
     timeZone:"Asia/Dhaka"
-  }) + " (BDT)";
-}
-
-function statusClass(status) {
-  if (status === "OK") return "";
-  if (status === "PARTIAL" || status === "PROXY_ONLY") return "warning";
-  if (status === "ERROR") return "danger";
-  return "unavailable";
-}
-
-function statusLabel(status) {
-  return STATUS_TEXT[status] || "অজানা অবস্থা";
+  }) + " BDT";
 }
 
 function safeText(value) {
-  return String(value ?? "N/A").replace(/[&<>"']/g, char => ({
+  return String(value ?? "N/A").replace(/[&<>"']/g,char => ({
     "&":"&amp;",
     "<":"&lt;",
     ">":"&gt;",
@@ -726,10 +697,23 @@ function safeText(value) {
   })[char]);
 }
 
+function statusClass(status) {
+  if(status === "OK") return "";
+  if(status === "PARTIAL" || status === "PROXY_ONLY") return "warning";
+  if(status === "ERROR") return "danger";
+  return "unavailable";
+}
+
+function statusLabel(status) {
+  return STATUS_TEXT[status] || "অজানা অবস্থা";
+}
+
 function makeCard(config) {
   const status = config.status || "UNAVAILABLE";
   const cls = statusClass(status);
-  const unavailable = status === "UNAVAILABLE" || status === "ERROR";
+
+  const unavailable =
+    status === "UNAVAILABLE" || status === "ERROR";
 
   const mainValue = unavailable
     ? "তথ্য পাওয়া যায়নি"
@@ -745,6 +729,10 @@ function makeCard(config) {
       <strong>${safeText(item.value)}</strong>
     </div>
   `).join("");
+
+  const errorHTML = config.error
+    ? `<div class="api-error">API Error: ${safeText(config.error)}</div>`
+    : "";
 
   return `
     <article class="signal-card ${cls}">
@@ -770,163 +758,167 @@ function makeCard(config) {
       </div>
 
       <div class="source">
-        Source: ${safeText(config.source || "N/A")}<br>
+        Source: ${safeText(config.source)}<br>
         Source Updated: ${safeText(timestamp(config.sourceUpdated))}<br>
         Data Fetched: ${safeText(timestamp(config.fetched))}
       </div>
+
+      ${errorHTML}
     </article>
   `;
 }
 
 function buildSignals(data) {
-  const p = metricObject(data, ["price_structure"]);
-  const funding = metricObject(data, ["funding_rate"]);
-  const oi = metricObject(data, ["open_interest"]);
-  const premium = metricObject(data, ["futures_premium"]);
-  const etf = metricObject(data, ["etf_flows"]);
-  const onchain = metricObject(data, ["on_chain", "onchain"]);
-  const mvrv = metricObject(onchain, ["mvrv_z_score"]);
-  const nupl = metricObject(onchain, ["nupl"]);
-  const retail = metricObject(data, ["retail_mania"]);
+  const p = metricObject(data,["price_structure"]);
+  const funding = metricObject(data,["funding_rate"]);
+  const oi = metricObject(data,["open_interest"]);
+  const premium = metricObject(data,["futures_premium"]);
+  const etf = metricObject(data,["etf_flows"]);
+  const onchain = metricObject(data,["on_chain"]);
+  const mvrv = metricObject(onchain,["mvrv_z_score"]);
+  const nupl = metricObject(onchain,["nupl"]);
+  const retail = metricObject(data,["retail_mania"]);
 
-  const price = metricValue(p, ["price", "close", "last_closed_price"]);
-  const support = metricValue(p, ["support"]);
-  const resistance = metricValue(p, ["resistance"]);
-  const ma20 = metricValue(p, ["ma20", "ma_20"]);
-  const ma50 = metricValue(p, ["ma50", "ma_50"]);
-  const ma200 = metricValue(p, ["ma200", "ma_200"]);
-  const rsi = metricValue(p, ["rsi", "rsi14", "rsi_14"]);
+  const priceMetric = metricObject(p,["price"]);
+  const supportMetric = metricObject(p,["support"]);
+  const resistanceMetric = metricObject(p,["resistance"]);
+  const ma20Metric = metricObject(p,["ma20"]);
+  const ma50Metric = metricObject(p,["ma50"]);
+  const ma200Metric = metricObject(p,["ma200"]);
+  const rsiMetric = metricObject(p,["rsi14"]);
+
+  const price = metricValue(p,["price"]);
+  const support = metricValue(p,["support"]);
+  const resistance = metricValue(p,["resistance"]);
+  const ma20 = metricValue(p,["ma20"]);
+  const ma50 = metricValue(p,["ma50"]);
+  const ma200 = metricValue(p,["ma200"]);
+  const rsi = metricValue(p,["rsi14"]);
+
+  const priceMeta = meta(priceMetric,p);
+  const fundingMeta = meta(funding);
+  const oiMeta = meta(oi);
+  const premiumMeta = meta(premium);
+  const etfMeta = meta(etf);
+  const mvrvMeta = meta(mvrv);
+  const nuplMeta = meta(nupl);
+  const retailMeta = meta(retail);
 
   const signals = [
     {
       number:"SIGNAL 01",
-      title:"PRICE STRUCTURE",
+      title:"BTC PRICE STRUCTURE",
       value:money(price),
-      unit:"শেষ বন্ধ দৈনিক Candle-এর মূল্য; Real-time Price নয়",
-      status:p.status || (price !== null ? "PARTIAL" : "UNAVAILABLE"),
+      unit:"Binance Spot Ticker Price (USDT)",
+      status:priceMetric.status || p.status || "UNAVAILABLE",
       details:[
         {label:"Support",value:money(support)},
         {label:"Resistance",value:money(resistance)},
         {label:"MA20 / MA50",value:number(ma20)+" / "+number(ma50)},
-        {label:"MA200 / RSI",value:number(ma200)+" / "+number(rsi)}
+        {label:"MA200 / RSI14",value:number(ma200)+" / "+number(rsi)}
       ],
-      explanation:"BTC-এর শেষ বন্ধ দৈনিক Candle, Moving Average, Support ও Resistance দিয়ে বাজারের কাঠামো বোঝা হয়।",
-      action:"MA20, MA50 ও MA200-এর অবস্থান এবং গুরুত্বপূর্ণ Support পর্যবেক্ষণ করুন। শুধু একটি সূচক দেখে সিদ্ধান্ত নেবেন না।",
-      source:p.source,
-      sourceUpdated:p.source_updated_at,
-      fetched:p.fetched_at
+      explanation:"BTC-এর বর্তমান Spot Ticker Price এবং Daily Candle-ভিত্তিক Moving Average, Support ও Resistance দিয়ে বাজারের কাঠামো বোঝা হয়।",
+      action:"MA20, MA50 ও MA200-এর অবস্থান এবং গুরুত্বপূর্ণ Support পর্যবেক্ষণ করুন। শুধু RSI দেখে BUY করবেন না।",
+      ...priceMeta,
+      error:priceMeta.error
     },
     {
       number:"SIGNAL 02",
       title:"ETF FLOWS",
-      value:metricValue(etf,["value","net_flow","flow"]),
+      value:metricValue(etf,["value"]),
       unit:etf.unit || "ETF Net Flow",
       status:etf.status || "UNAVAILABLE",
       details:[
-        {label:"Flow",value:etf.value !== undefined ? String(etf.value) : "N/A"},
+        {label:"Flow",value:etf.value === null ? "N/A" : String(etf.value)},
         {label:"Classification",value:first(etf,["classification","signal"]) || "N/A"}
       ],
       explanation:"ETF-এ প্রকৃত অর্থের প্রবাহ Institutional Demand বা Distribution বুঝতে সাহায্য করে।",
-      action:"বিশ্বস্ত ETF Flow provider-এর তথ্য ছাড়া Accumulation বা Distribution ধরে নেবেন না।",
-      source:etf.source,
-      sourceUpdated:etf.source_updated_at,
-      fetched:etf.fetched_at
+      action:"যাচাইকৃত ETF Flow Data ছাড়া Accumulation বা Distribution ধরে নেবেন না।",
+      ...etfMeta
     },
     {
       number:"SIGNAL 03",
       title:"FUNDING RATE",
-      value:metricValue(funding,["value","funding_rate"]),
+      value:metricValue(funding,["value"]),
       unit:funding.unit || "Funding Rate",
       status:funding.status || "UNAVAILABLE",
       details:[
-        {label:"Current Rate",value:number(metricValue(funding,["value","funding_rate"]),6)},
+        {label:"Current Rate",value:number(funding.value,6)},
         {label:"Market Context",value:"Futures Only"}
       ],
       explanation:"Funding Rate Futures Market-এ Long ও Short Position-এর ভারসাম্য সম্পর্কে ধারণা দেয়।",
       action:"অস্বাভাবিক Funding Rate-কে অতিরিক্ত জল্পনার সতর্কতা হিসেবে দেখুন। এটি একা Spot Sell Signal নয়।",
-      source:funding.source,
-      sourceUpdated:funding.source_updated_at,
-      fetched:funding.fetched_at
+      ...fundingMeta
     },
     {
       number:"SIGNAL 04",
       title:"OPEN INTEREST",
-      value:number(metricValue(oi,["value","open_interest","openInterest"]),4),
+      value:number(oi.value,4),
       unit:oi.unit || "BTC (USD নয়)",
       status:oi.status || "UNAVAILABLE",
       details:[
-        {label:"Open Interest",value:number(metricValue(oi,["value","open_interest","openInterest"]),4)},
+        {label:"Open Interest",value:number(oi.value,4)},
         {label:"Unit",value:oi.unit || "BTC"}
       ],
-      explanation:"Open Interest Futures Contract-এর মোট খোলা অবস্থান বোঝায়। এটি BTC পরিমাণ; USD Value নয়।",
+      explanation:"Open Interest Futures Contract-এর মোট খোলা অবস্থান বোঝায়। আপনার Engine-এর এই Data BTC পরিমাণে হওয়ার কথা, USD নয়।",
       action:"দাম ও Open Interest একসঙ্গে পর্যবেক্ষণ করুন। শুধু OI বাড়লেই BUY করবেন না।",
-      source:oi.source,
-      sourceUpdated:oi.source_updated_at,
-      fetched:oi.fetched_at
+      ...oiMeta
     },
     {
       number:"SIGNAL 05",
       title:"FUTURES PREMIUM",
-      value:number(metricValue(premium,["value","premium","premium_percent"]),5),
+      value:number(premium.value,5),
       unit:premium.unit || "Futures Premium",
       status:premium.status || "UNAVAILABLE",
       details:[
-        {label:"Premium",value:number(metricValue(premium,["value","premium","premium_percent"]),5)},
+        {label:"Premium",value:number(premium.value,5)},
         {label:"Market",value:"Futures vs Index"}
       ],
       explanation:"Mark Price ও Index Price-এর পার্থক্য Futures Premium বোঝাতে ব্যবহার করা হয়।",
       action:"Premium অস্বাভাবিক হলে বাজারের জল্পনা ও ঝুঁকি পর্যবেক্ষণ করুন। এটি একা Spot সিদ্ধান্ত নয়।",
-      source:premium.source,
-      sourceUpdated:premium.source_updated_at,
-      fetched:premium.fetched_at
+      ...premiumMeta
     },
     {
       number:"SIGNAL 06",
       title:"MVRV Z-SCORE",
-      value:metricValue(mvrv,["value","z_score"]),
+      value:metricValue(mvrv,["value"]),
       unit:mvrv.unit || "On-chain Valuation",
       status:mvrv.status || "UNAVAILABLE",
       details:[
-        {label:"Z-Score",value:number(metricValue(mvrv,["value","z_score"]),3)},
+        {label:"Z-Score",value:number(mvrv.value,3)},
         {label:"Provider",value:mvrv.source || "Not Connected"}
       ],
       explanation:"MVRV Z-Score বাজারমূল্য ও Realized Value তুলনা করে দীর্ঘমেয়াদি Valuation বুঝতে সাহায্য করে।",
-      action:"On-chain Provider-এর যাচাইকৃত তথ্য না আসা পর্যন্ত এই সূচক দিয়ে সিদ্ধান্ত নেবেন না।",
-      source:mvrv.source,
-      sourceUpdated:mvrv.source_updated_at,
-      fetched:mvrv.fetched_at
+      action:"যাচাইকৃত On-chain Data না আসা পর্যন্ত এই সূচক দিয়ে সিদ্ধান্ত নেবেন না।",
+      ...mvrvMeta
     },
     {
       number:"SIGNAL 07",
       title:"NUPL",
-      value:metricValue(nupl,["value","nupl"]),
+      value:metricValue(nupl,["value"]),
       unit:nupl.unit || "Net Unrealized Profit/Loss",
       status:nupl.status || "UNAVAILABLE",
       details:[
-        {label:"NUPL",value:number(metricValue(nupl,["value","nupl"]),4)},
+        {label:"NUPL",value:number(nupl.value,4)},
         {label:"Provider",value:nupl.source || "Not Connected"}
       ],
       explanation:"NUPL বিনিয়োগকারীদের সামগ্রিক Unrealized Profit ও Loss-এর অবস্থা বুঝতে সাহায্য করে।",
       action:"সঠিক On-chain Data ছাড়া বাজারের অতিরিক্ত লোভ বা আতঙ্কের সিদ্ধান্ত নেবেন না।",
-      source:nupl.source,
-      sourceUpdated:nupl.source_updated_at,
-      fetched:nupl.fetched_at
+      ...nuplMeta
     },
     {
       number:"SIGNAL 08",
       title:"RETAIL MANIA / SENTIMENT PROXY",
-      value:metricValue(retail,["value","fear_greed_index","index"]),
-      unit:"Fear & Greed Index Proxy; সরাসরি Retail Activity নয়",
+      value:metricValue(retail,["value"]),
+      unit:retail.unit || "Fear & Greed Index Proxy",
       status:retail.status || "UNAVAILABLE",
       details:[
-        {label:"Sentiment",value:first(retail,["classification","label","sentiment"]) || "N/A"},
-        {label:"Index",value:number(metricValue(retail,["value","fear_greed_index","index"]),0)}
+        {label:"Sentiment",value:retail.classification || "N/A"},
+        {label:"Index",value:number(retail.value,0)+" / 100"}
       ],
       explanation:"এটি Fear & Greed Index-ভিত্তিক বাজার Sentiment Proxy। সরাসরি Retail Buying বা Selling মাপে না।",
       action:"Sentiment অতিরিক্ত উত্তপ্ত হলেও BTC Trend, Volume ও Support যাচাই করুন।",
-      source:retail.source,
-      sourceUpdated:retail.source_updated_at,
-      fetched:retail.fetched_at
+      ...retailMeta
     }
   ];
 
@@ -944,21 +936,21 @@ function updateETF(etf) {
     (status === "OK" || status === "PARTIAL") &&
     classification !== null;
 
-  if (usable) {
+  if(usable) {
     document.getElementById("etfStatus").textContent =
-      safeText(classification);
+      classification;
 
     document.getElementById("etfExplanation").textContent =
-      "ETF provider-এর তথ্য পাওয়া গেছে। তবে প্রবাহের সময়সীমা ও মান যাচাই করুন।";
+      "ETF Provider-এর তথ্য পাওয়া গেছে। প্রবাহের সময়সীমা ও মান যাচাই করুন।";
 
     document.getElementById("etfChart").textContent =
-      "ETF Flow Chart-এর জন্য প্রকৃত historical flow data প্রয়োজন।";
+      "ETF Flow Chart-এর জন্য প্রকৃত Historical Flow Data প্রয়োজন।";
   } else {
     document.getElementById("etfStatus").textContent =
       "UNAVAILABLE";
 
     document.getElementById("etfExplanation").textContent =
-      "ETF Flow provider এখনো সংযুক্ত নয়। তাই Accumulation বা Distribution নিশ্চিত করা যাচ্ছে না।";
+      "ETF Flow Provider সংযুক্ত নয়। Accumulation বা Distribution নিশ্চিত করা যাচ্ছে না।";
 
     document.getElementById("etfChart").innerHTML =
       "ETF FLOW DATA পাওয়া যায়নি।<br>Provider যুক্ত হলে প্রকৃত তথ্য দেখানো হবে।";
@@ -968,9 +960,11 @@ function updateETF(etf) {
 async function loadDashboard() {
   const connection = document.getElementById("connection");
   const errorPanel = document.getElementById("errorPanel");
+  const refreshButton = document.getElementById("refreshButton");
 
   connection.textContent = "● DATA CHECKING";
   connection.style.color = "var(--yellow)";
+  refreshButton.disabled = true;
   errorPanel.style.display = "none";
 
   try {
@@ -979,13 +973,13 @@ async function loadDashboard() {
       {cache:"no-store"}
     );
 
-    if (!response.ok) {
+    if(!response.ok) {
       throw new Error("JSON file পাওয়া যায়নি। HTTP " + response.status);
     }
 
     const data = await response.json();
 
-    if (!data || typeof data !== "object") {
+    if(!data || typeof data !== "object") {
       throw new Error("JSON Data সঠিক নয়।");
     }
 
@@ -997,10 +991,13 @@ async function loadDashboard() {
     document.getElementById("systemConnection").textContent =
       "Connected";
 
-    document.getElementById("lastFetch").textContent =
-      timestamp(data.fetched_at || data.updated_at || data.generated_at);
+    document.getElementById("engineVersion").textContent =
+      data.engine_version || "N/A";
 
-  } catch (error) {
+    document.getElementById("lastFetch").textContent =
+      timestamp(data.fetched_at);
+
+  } catch(error) {
     connection.textContent = "● DATA ERROR";
     connection.style.color = "var(--red)";
 
@@ -1010,13 +1007,15 @@ async function loadDashboard() {
     errorPanel.style.display = "block";
     errorPanel.textContent =
       "ডেটা লোড করা যায়নি: " + error.message +
-      "। data/live_signals.json ফাইল তৈরি হয়েছে কি না এবং GitHub Pages চালু আছে কি না যাচাই করুন।";
+      "। data/live_signals.json ফাইল এবং GitHub Pages প্রকাশনা যাচাই করুন।";
+  } finally {
+    refreshButton.disabled = false;
   }
 }
 
 loadDashboard();
 
-setInterval(loadDashboard, 5 * 60 * 1000);
+setInterval(loadDashboard,5*60*1000);
 </script>
 </body>
 </html>
