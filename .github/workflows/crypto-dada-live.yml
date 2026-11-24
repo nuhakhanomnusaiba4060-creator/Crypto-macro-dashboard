@@ -1,0 +1,58 @@
+
+name: Crypto Dada Live Signals
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"
+
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: crypto-dada-live-signals
+  cancel-in-progress: false
+
+jobs:
+  update-live-signals:
+    runs-on: ubuntu-latest
+
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Run Live Signals Engine
+        run: python live_signals_engine.py
+
+      - name: Check Generated Data
+        run: |
+          if [ ! -f data/live_signals.json ]; then
+            echo "ERROR: data/live_signals.json was not generated."
+            exit 1
+          fi
+
+          python -m json.tool data/live_signals.json > /dev/null
+
+          echo "Live signals JSON validation successful."
+
+      - name: Commit Updated Live Data
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add data/live_signals.json
+
+          if git diff --cached --quiet; then
+            echo "No data changes to commit."
+          else
+            git commit -m "Update Crypto Dada live signals"
+            git push
+          fi
