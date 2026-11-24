@@ -2,80 +2,82 @@
 #!/usr/bin/env python3
 """
 Crypto Dada Style Live Signals Engine
-Version: 1.2.0
+Version: 1.3.0
 
-Providers:
-- Binance Spot: BTC price and daily candles
-- CoinGlass API V4: ETF flows and futures market data
-- Glassnode API: MVRV Z-Score and NUPL
-- Alternative.me: Fear & Greed sentiment proxy
+FREE PROVIDERS:
+1. Binance Spot
+2. CoinBoss Public API
+3. Explore21 Public On-chain API
+4. Alternative.me Fear & Greed
+
+No paid API keys required.
 
 Output:
 data/live_signals.json
-
-API keys must be stored in GitHub Actions Secrets:
-COINGLASS_API_KEY
-GLASSNODE_API_KEY
 """
 
 import json
 import math
-import os
 import time
-import urllib.error
-import urllib.parse
 import urllib.request
+import urllib.parse
 
 from datetime import datetime, timezone
 from pathlib import Path
 
 
-VERSION = "1.2.0"
+VERSION = "1.3.0"
+
 OUTPUT_FILE = Path("data/live_signals.json")
 
-SPOT_BASE = "https://api.binance.com"
-SPOT_BACKUP = "https://data-api.binance.vision"
+BINANCE_URLS = [
+    "https://api.binance.com",
+    "https://data-api.binance.vision"
+]
 
-COINGLASS_BASE = "https://open-api-v4.coinglass.com"
-GLASSNODE_BASE = "https://api.glassnode.com"
+COINBOSS = "https://www.coinboss.com/api"
 
-REQUEST_TIMEOUT = 20
+EXPLORE21 = "https://data.explore21.com/v1"
 
-
-# ---------------------------------------------------------
-# COMMON HELPERS
-# ---------------------------------------------------------
-
-def utc_now():
-    return datetime.now(timezone.utc).isoformat(timespec="seconds")
+TIMEOUT = 20
 
 
-def timestamp_from_ms(value):
+# --------------------------------------------------
+# COMMON FUNCTIONS
+# --------------------------------------------------
+
+def now():
+    return datetime.now(timezone.utc).isoformat(
+        timespec="seconds"
+    )
+
+
+def timestamp_ms(value):
     try:
         return datetime.fromtimestamp(
             float(value) / 1000,
             timezone.utc
         ).isoformat(timespec="seconds")
-    except (TypeError, ValueError, OverflowError):
+    except Exception:
         return None
 
 
-def timestamp_from_seconds(value):
+def timestamp_seconds(value):
     try:
         return datetime.fromtimestamp(
             float(value),
             timezone.utc
         ).isoformat(timespec="seconds")
-    except (TypeError, ValueError, OverflowError):
+    except Exception:
         return None
 
 
-def safe_float(value):
+def number(value):
     try:
-        number = float(value)
+        result = float(value)
 
-        if math.isfinite(number):
-            return number
+        if math.isfinite(result):
+            return result
 
     except (TypeError, ValueError, OverflowError):
         pass
@@ -83,31 +85,26 @@ def safe_float(value):
     return None
 
 
-def http_get(url, headers=None):
-    request_headers = {
-        "User-Agent": "CryptoDada-LiveSignals/1.2.0",
-        "Accept": "application/json"
-    }
-
-    if headers:
-        request_headers.update(headers)
-
+def request_json(url):
     request = urllib.request.Request(
         url,
-        headers=request_headers
+        headers={
+            "User-Agent": "CryptoDadaDashboard/1.3.0",
+            "Accept": "application/json"
+        }
     )
 
     with urllib.request.urlopen(
         request,
-        timeout=REQUEST_TIMEOUT
+        timeout=TIMEOUT
     ) as response:
 
-        raw = response.read().decode("utf-8")
+        return json.loads(
+            response.read().decode("utf-8")
+        )
 
-        return json.loads(raw)
 
-
-def build_url(base, path, params=None):
+def make_url(base, path, params=None):
     url = base.rstrip("/") + "/" + path.lstrip("/")
 
     if params:
@@ -116,95 +113,155 @@ def build_url(base, path, params=None):
     return url
 
 
-def get_json(base, path, params=None, headers=None):
-    return http_get(
-        build_url(base, path, params),
-        headers=headers
-    )
-
-
-def unavailable(source="Not connected", error=None):
-    result = {
-        "value": None,
-        "unit": "",
-        "status": "UNAVAILABLE",
+def metric(
+    value,
+    unit,
+    source,
+    updated=None,
+    status="OK"
+):
+    return {
+        "value": value,
+        "unit": unit,
+        "status": status if value is not None else "UNAVAILABLE",
         "source": source,
-        "source_updated_at": None,
-        "fetched_at": utc_now()
+        "source_updated_at": updated,
+        "fetched_at": now()
     }
 
+
+def unavailable(source, error=None):
+    result = metric(
+        None,
+        "",
+        source,
+        None,
+        "UNAVAILABLE"
+    )
+
     if error:
-        result["error"] = str(error)[:350]
+        result["error"] = str(error)[:300]
 
     return result
 
 
-def make_metric(
-    value,
-    unit="",
-    source="",
-    source_updated_at=None,
-    status="OK"
-):
-    if value is None:
-        return unavailable(source or "Unknown source")
+def extract_number(data, keys):
+    """Find a numeric field in nested API data."""
 
-    return {
-        "value": value,
-        "unit": unit,
-        "status": status,
-        "source": source,
-        "source_updated_at": source_updated_at,
-        "fetched_at": utc_now()
-    }
+    if isinstance(data, dict):
+
+        for key in keys:
+            if key in data:
+                value = number(data[key])
+
+                if value is not None:
+                    return value
+
+        for value in data.values():
+            result = extract_number(value, keys)
+
+            if result is not None:
+                return result
+
+    elif isinstance(data, list):
+
+        for item in data:
+            result = extract_number(item, keys)
+
+            if result is not None:
+                return result
+
+    return None
 
 
-def safe_build(function, source_name):
+def extract_timestamp(data):
+    """Find the latest available source timestamp."""
+
+    if isinstance(data, dict):
+
+        for key in (
+            "asof",
+            "timestamp",
+            "time",
+            "ts",
+            "updated_at",
+            "updatedAt",
+            "date"
+        ):
+
+            value = data.get(key)
+
+            if value is None:
+                continue
+
+            if isinstance(value, (int, float)):
+                if value > 100000000000:
+                    return timestamp_ms(value)
+
+                if value > 1000000000:
+                    return timestamp_seconds(value)
+
+            if isinstance(value, str):
+                if len(value) >= 10:
+                    return value
+
+        for value in data.values():
+            result = extract_timestamp(value)
+
+            if result:
+                return result
+
+    elif isinstance(data, list):
+
+        for item in reversed(data):
+            result = extract_timestamp(item)
+
+            if result:
+                return result
+
+    return None
+
+
+def run_safely(function, source):
     try:
         return function()
 
     except Exception as exc:
-        print(source_name, "ERROR:", str(exc)[:250])
+        print(source, "ERROR:", str(exc)[:200])
 
-        return unavailable(
-            source=source_name,
-            error=exc
-        )
+        return unavailable(source, exc)
 
 
-# ---------------------------------------------------------
+# --------------------------------------------------
 # BINANCE SPOT
-# ---------------------------------------------------------
+# --------------------------------------------------
 
-def get_spot_json(path, params=None):
+def binance_get(path, params=None):
     errors = []
 
-    for base in (SPOT_BASE, SPOT_BACKUP):
+    for base in BINANCE_URLS:
 
         try:
-            return get_json(
-                base,
-                path,
-                params
+            return request_json(
+                make_url(base, path, params)
             )
 
         except Exception as exc:
             errors.append(str(exc))
 
     raise RuntimeError(
-        "Binance Spot API unavailable: " +
-        " | ".join(errors)
+        "Binance API failed: " + " | ".join(errors)
     )
 
 
-def calculate_sma(values, period):
+def sma(values, period):
     if len(values) < period:
         return None
 
     return sum(values[-period:]) / period
 
 
-def calculate_rsi(values, period=14):
+def rsi(values, period=14):
     if len(values) < period + 1:
         return None
 
@@ -216,36 +273,32 @@ def calculate_rsi(values, period=14):
         )
     ]
 
-    gains = [max(change, 0) for change in changes]
-    losses = [abs(min(change, 0)) for change in changes]
+    gains = [max(x, 0) for x in changes]
+    losses = [abs(min(x, 0)) for x in changes]
 
-    average_gain = sum(gains) / period
-    average_loss = sum(losses) / period
+    avg_gain = sum(gains) / period
+    avg_loss = sum(losses) / period
 
-    if average_loss == 0:
-        return 100.0 if average_gain > 0 else 50.0
+    if avg_loss == 0:
+        return 100.0 if avg_gain > 0 else 50.0
 
-    rs = average_gain / average_loss
+    rs = avg_gain / avg_loss
 
     return 100 - (100 / (1 + rs))
 
 
-def fetch_btc_price():
-    data = get_spot_json(
+def build_price_structure():
+    ticker = binance_get(
         "/api/v3/ticker/price",
         {"symbol": "BTCUSDT"}
     )
 
-    price = safe_float(data.get("price"))
+    price = number(ticker.get("price"))
 
     if price is None:
-        raise RuntimeError("Invalid BTC Spot price")
+        raise RuntimeError("BTC price unavailable")
 
-    return price
-
-
-def fetch_btc_daily_candles():
-    data = get_spot_json(
+    candles = binance_get(
         "/api/v3/klines",
         {
             "symbol": "BTCUSDT",
@@ -254,116 +307,92 @@ def fetch_btc_daily_candles():
         }
     )
 
-    if not isinstance(data, list):
-        raise RuntimeError("Invalid Binance candle response")
-
-    now_ms = int(time.time() * 1000)
+    current_ms = int(time.time() * 1000)
 
     closed = [
-        candle for candle in data
-        if len(candle) > 6
-        and int(candle[6]) < now_ms
+        candle for candle in candles
+        if int(candle[6]) < current_ms
     ]
 
-    if len(closed) < 200:
-        raise RuntimeError(
-            "Not enough closed daily candles for MA200"
-        )
+    closes = [
+        number(candle[4])
+        for candle in closed
+    ]
 
-    closes = []
-
-    for candle in closed:
-        value = safe_float(candle[4])
-
-        if value is not None:
-            closes.append(value)
+    closes = [
+        value for value in closes
+        if value is not None
+    ]
 
     if len(closes) < 200:
-        raise RuntimeError("Invalid daily close values")
+        raise RuntimeError("MA200 data unavailable")
 
-    candle_updated = timestamp_from_ms(closed[-1][6])
+    updated = timestamp_ms(closed[-1][6])
 
-    return closes, candle_updated
-
-
-def build_price_structure():
-    current_price = fetch_btc_price()
-
-    closes, candle_updated = fetch_btc_daily_candles()
-
-    ma20 = calculate_sma(closes, 20)
-    ma50 = calculate_sma(closes, 50)
-    ma200 = calculate_sma(closes, 200)
-    rsi14 = calculate_rsi(closes, 14)
-
-    # Previous 20 completed daily candles.
-    previous_candles = closes[-21:-1]
-
-    support = min(previous_candles)
-    resistance = max(previous_candles)
+    previous = closes[-21:-1]
 
     return {
-        "price": make_metric(
-            current_price,
+        "price": metric(
+            price,
             "USDT",
             "Binance Spot BTCUSDT Ticker",
-            utc_now()
+            now()
         ),
 
-        "support": make_metric(
-            support,
+        "support": metric(
+            min(previous),
             "USDT",
             "Binance Spot Daily Candles",
-            candle_updated
+            updated
         ),
 
-        "resistance": make_metric(
-            resistance,
+        "resistance": metric(
+            max(previous),
             "USDT",
             "Binance Spot Daily Candles",
-            candle_updated
+            updated
         ),
 
-        "ma20": make_metric(
-            ma20,
+        "ma20": metric(
+            sma(closes, 20),
             "USDT",
             "Binance Spot Daily Candles",
-            candle_updated
+            updated
         ),
 
-        "ma50": make_metric(
-            ma50,
+        "ma50": metric(
+            sma(closes, 50),
             "USDT",
             "Binance Spot Daily Candles",
-            candle_updated
+            updated
         ),
 
-        "ma200": make_metric(
-            ma200,
+        "ma200": metric(
+            sma(closes, 200),
             "USDT",
             "Binance Spot Daily Candles",
-            candle_updated
+            updated
         ),
 
-        "rsi14": make_metric(
-            rsi14,
+        "rsi14": metric(
+            rsi(closes, 14),
             "RSI",
             "Binance Spot Daily Candles",
-            candle_updated
+            updated
         ),
 
-        "candle_updated_at": candle_updated,
+        "candle_updated_at": updated,
         "status": "OK"
     }
 
 
-def build_price_safely():
+def safe_price_structure():
     try:
         return build_price_structure()
 
     except Exception as exc:
         return {
-            "price": unavailable("Binance Spot API", exc),
+            "price": unavailable("Binance Spot", exc),
             "support": unavailable("Binance Daily Candles", exc),
             "resistance": unavailable("Binance Daily Candles", exc),
             "ma20": unavailable("Binance Daily Candles", exc),
@@ -372,411 +401,401 @@ def build_price_safely():
             "rsi14": unavailable("Binance Daily Candles", exc),
             "candle_updated_at": None,
             "status": "UNAVAILABLE",
-            "error": str(exc)[:350]
+            "error": str(exc)[:300]
         }
 
 
-# ---------------------------------------------------------
-# COINGLASS API V4
-# ---------------------------------------------------------
+# --------------------------------------------------
+# COINBOSS FREE API
+# --------------------------------------------------
 
-def coinglass_get(path, params=None):
-    api_key = os.getenv("COINGLASS_API_KEY", "").strip()
+def coinboss(path, params=None):
+    data = request_json(
+        make_url(COINBOSS, path, params)
+    )
 
-    if not api_key:
+    if isinstance(data, dict):
+
+        if data.get("success") is False:
+            raise RuntimeError(
+                data.get("error", "CoinBoss request failed")
+            )
+
+        if data.get("ok") is False:
+            raise RuntimeError(
+                data.get("error", "CoinBoss request failed")
+            )
+
+    return data
+
+
+def coinboss_value(path, keys, unit, label, params=None):
+    data = coinboss(path, params)
+
+    value = extract_number(data, keys)
+
+    if value is None:
         raise RuntimeError(
-            "COINGLASS_API_KEY GitHub Secret is missing"
+            "Required numeric field not found in response"
         )
 
-    response = get_json(
-        COINGLASS_BASE,
-        path,
-        params,
-        headers={
-            "CG-API-KEY": api_key
+    updated = extract_timestamp(data)
+
+    result = metric(
+        value,
+        unit,
+        "CoinBoss " + label,
+        updated
+    )
+
+    result["provider_response_received_at"] = now()
+
+    return result
+
+
+# --------------------------------------------------
+# ETF FLOWS
+# --------------------------------------------------
+
+def build_etf():
+    data = coinboss(
+        "/api/etf/flows",
+        {
+            "asset": "BTC",
+            "days": 7
         }
     )
 
-    if not isinstance(response, dict):
-        raise RuntimeError("Invalid CoinGlass response")
+    rows = data
 
-    if str(response.get("code")) != "0":
-        raise RuntimeError(
-            "CoinGlass API error: " +
-            str(response.get("msg", response.get("code")))
+    if isinstance(data, dict):
+        rows = data.get(
+            "data",
+            data.get("rows", data.get("flows", data))
         )
 
-    return response.get("data")
+    if isinstance(rows, dict):
+        rows = rows.get("data", rows.get("rows", []))
 
+    if not isinstance(rows, list) or not rows:
+        raise RuntimeError("ETF flow history unavailable")
 
-def build_etf_flows():
-    data = coinglass_get(
-        "/api/etf/bitcoin/flow-history"
+    latest = rows[-1]
+
+    value = extract_number(
+        latest,
+        [
+            "flow",
+            "net_flow",
+            "netFlow",
+            "flow_usd",
+            "total_flow",
+            "net_flow_usd",
+            "flow_m"
+        ]
     )
 
-    if not isinstance(data, list) or not data:
-        raise RuntimeError("Bitcoin ETF flow data unavailable")
+    if value is None:
+        raise RuntimeError("ETF flow value missing")
 
-    # Latest available daily record.
-    latest = data[-1]
+    updated = extract_timestamp(latest)
 
-    flow = safe_float(latest.get("flow_usd"))
-
-    if flow is None:
-        raise RuntimeError("Latest ETF net flow is missing")
-
-    timestamp = timestamp_from_ms(
-        latest.get("timestamp")
-    )
-
-    if not timestamp:
-        raise RuntimeError("ETF source timestamp is missing")
-
-    age_seconds = (
-        datetime.now(timezone.utc)
-        - datetime.fromisoformat(timestamp)
-    ).total_seconds()
-
-    status = "OK"
-
-    if age_seconds > 72 * 60 * 60:
-        status = "STALE"
-
-    result = make_metric(
-        flow,
+    result = metric(
+        value,
         "USD",
-        "CoinGlass Bitcoin Spot ETF Flow",
-        timestamp,
-        status
+        "CoinBoss Bitcoin Spot ETF Flow",
+        updated
     )
 
     result["classification"] = (
-        "Net Inflow" if flow > 0
-        else "Net Outflow" if flow < 0
+        "Net Inflow" if value > 0
+        else "Net Outflow" if value < 0
         else "Neutral"
     )
 
-    result["record_date"] = timestamp[:10]
     result["update_frequency"] = "Daily"
     result["note"] = (
-        "Positive value means net inflow; "
-        "negative value means net outflow."
-    )
-
-    result["data_age_hours"] = round(
-        max(age_seconds, 0) / 3600,
-        2
+        "Positive means net inflow; "
+        "negative means net outflow."
     )
 
     return result
 
 
-def fetch_coinglass_btc_pairs():
-    data = coinglass_get(
-        "/api/futures/pairs-markets",
-        {"symbol": "BTC"}
-    )
+# --------------------------------------------------
+# FUNDING RATE
+# --------------------------------------------------
 
-    if not isinstance(data, list) or not data:
-        raise RuntimeError("CoinGlass BTC Futures market data unavailable")
-
-    return data
-
-
-def find_binance_btcusdt(pairs):
-    for item in pairs:
-
-        exchange = str(
-            item.get("exchange_name", "")
-        ).lower()
-
-        instrument = str(
-            item.get("instrument_id", "")
-        ).upper()
-
-        if exchange == "binance" and instrument == "BTCUSDT":
-            return item
-
-    raise RuntimeError(
-        "CoinGlass did not return Binance BTCUSDT Futures pair"
+def build_funding():
+    return coinboss_value(
+        "/api/sd/funding",
+        [
+            "weighted_rate",
+            "funding_rate",
+            "funding",
+            "rate",
+            "current_rate"
+        ],
+        "%",
+        "BTC Aggregated Funding Rate",
+        {"coin": "BTC"}
     )
 
 
-def build_futures_market():
-    pairs = fetch_coinglass_btc_pairs()
+# --------------------------------------------------
+# OPEN INTEREST
+# --------------------------------------------------
 
-    item = find_binance_btcusdt(pairs)
-
-    funding = safe_float(item.get("funding_rate"))
-    oi_btc = safe_float(item.get("open_interest_quantity"))
-    oi_usd = safe_float(item.get("open_interest_usd"))
-
-    current_price = safe_float(item.get("current_price"))
-    index_price = safe_float(item.get("index_price"))
-
-    fetched = utc_now()
-
-    if funding is None:
-        funding_metric = unavailable(
-            "CoinGlass Binance Futures Funding Rate",
-            "Funding rate field is missing"
-        )
-    else:
-        funding_metric = make_metric(
-            funding,
-            "%",
-            "CoinGlass Binance BTCUSDT Futures",
-            fetched
-        )
-
-    if oi_btc is None:
-        oi_metric = unavailable(
-            "CoinGlass Binance Futures Open Interest",
-            "Open interest quantity is missing"
-        )
-    else:
-        oi_metric = make_metric(
-            oi_btc,
-            "BTC",
-            "CoinGlass Binance BTCUSDT Futures",
-            fetched
-        )
-
-        if oi_usd is not None:
-            oi_metric["value_usd"] = oi_usd
-            oi_metric["value_usd_unit"] = "USD"
-
-    if (
-        current_price is None
-        or index_price is None
-        or index_price == 0
-    ):
-        premium_metric = unavailable(
-            "CoinGlass Binance Futures Premium",
-            "Current price or index price is missing"
-        )
-    else:
-        premium = (
-            (current_price - index_price)
-            / index_price
-        ) * 100
-
-        premium_metric = make_metric(
-            premium,
-            "%",
-            "CoinGlass Binance Futures Current Price vs Index Price",
-            fetched
-        )
-
-        premium_metric["current_price"] = current_price
-        premium_metric["index_price"] = index_price
-
-    return {
-        "funding_rate": funding_metric,
-        "open_interest": oi_metric,
-        "futures_premium": premium_metric
-    }
-
-
-# ---------------------------------------------------------
-# GLASSNODE ON-CHAIN API
-# ---------------------------------------------------------
-
-def glassnode_get(path):
-    api_key = os.getenv("GLASSNODE_API_KEY", "").strip()
-
-    if not api_key:
-        raise RuntimeError(
-            "GLASSNODE_API_KEY GitHub Secret is missing"
-        )
-
-    params = {
-        "a": "BTC",
-        "i": "24h",
-        "f": "json",
-        "api_key": api_key
-    }
-
-    data = get_json(
-        GLASSNODE_BASE,
-        path,
-        params
+def build_open_interest():
+    return coinboss_value(
+        "/api/sd/oi",
+        [
+            "total_usd_single_adjusted",
+            "total_usd",
+            "open_interest_usd",
+            "oi_usd",
+            "openInterestUsd"
+        ],
+        "USD",
+        "BTC Aggregated Open Interest",
+        {"coin": "BTC"}
     )
 
-    if not isinstance(data, list) or not data:
-        raise RuntimeError(
-            "Glassnode returned no metric data"
-        )
 
-    valid = []
+# --------------------------------------------------
+# FUTURES PREMIUM / BASIS
+# --------------------------------------------------
 
-    for item in data:
-        if not isinstance(item, dict):
-            continue
+def build_futures_premium():
+    data = coinboss(
+        "/api/sd/basis",
+        {"coin": "BTC"}
+    )
 
-        value = safe_float(item.get("v"))
-        timestamp = safe_float(item.get("t"))
+    value = extract_number(
+        data,
+        [
+            "oi_weighted",
+            "weighted_basis",
+            "median",
+            "perp_spot_basis",
+            "basis_pct",
+            "premium"
+        ]
+    )
 
-        if value is not None and timestamp is not None:
-            valid.append((timestamp, value))
+    if value is None:
+        raise RuntimeError("Futures premium/basis unavailable")
 
-    if not valid:
-        raise RuntimeError(
-            "Glassnode metric has no valid values"
-        )
+    # Preserve the provider's published value.
+    # Do not multiply/divide unless its schema confirms the unit.
+    updated = extract_timestamp(data)
 
-    valid.sort(key=lambda row: row[0])
-
-    return valid[-1]
-
-
-def build_glassnode_metric(
-    path,
-    metric_name,
-    unit=""
-):
-    timestamp, value = glassnode_get(path)
-
-    source_time = timestamp_from_seconds(timestamp)
-
-    if not source_time:
-        raise RuntimeError(
-            metric_name + " source timestamp is invalid"
-        )
-
-    age_seconds = (
-        datetime.now(timezone.utc)
-        - datetime.fromisoformat(source_time)
-    ).total_seconds()
-
-    status = "OK"
-
-    # Daily on-chain data older than 72h is not presented as fresh.
-    if age_seconds > 72 * 60 * 60:
-        status = "STALE"
-
-    result = make_metric(
+    result = metric(
         value,
-        unit,
-        "Glassnode BTC " + metric_name,
-        source_time,
-        status
+        "%",
+        "CoinBoss BTC Futures Basis",
+        updated
+    )
+
+    result["note"] = (
+        "Provider-reported basis/premium. "
+        "Check provider methodology and unit."
+    )
+
+    return result
+
+
+# --------------------------------------------------
+# EXPLORE21 ON-CHAIN API
+# --------------------------------------------------
+
+def explore_get(path):
+    return request_json(
+        EXPLORE21.rstrip("/") + "/" + path.lstrip("/")
+    )
+
+
+def explore_metric(metric_id, value_keys, label):
+    data = explore_get(
+        "/metrics/" + metric_id + "/latest"
+    )
+
+    rows = data.get("data", [])
+
+    if isinstance(rows, dict):
+        rows = [rows]
+
+    if not rows:
+        raise RuntimeError(label + " data unavailable")
+
+    latest = rows[-1]
+
+    value = extract_number(
+        latest,
+        value_keys
+    )
+
+    if value is None:
+        raise RuntimeError(label + " value missing")
+
+    source_date = latest.get("date")
+
+    result = metric(
+        value,
+        "",
+        "Explore21 " + label,
+        source_date
     )
 
     result["update_frequency"] = "Daily"
-
-    result["data_age_hours"] = round(
-        max(age_seconds, 0) / 3600,
-        2
+    result["attribution"] = (
+        "Explore21 Charts, CC BY 4.0"
     )
 
     return result
 
 
 def build_mvrv():
-    return build_glassnode_metric(
-        "/v1/metrics/market/mvrv_z_score",
+    return explore_metric(
+        "bitcoin-mvrv-z-score",
+        ["mvrv_z_score"],
         "MVRV Z-Score"
     )
 
 
+def find_nupl_metric():
+    """
+    Discover NUPL metric ID from the public metric catalog.
+    Do not assume a guessed metric ID exists.
+    """
+
+    catalog = explore_get("/metrics")
+
+    entries = catalog.get(
+        "metrics",
+        catalog.get("data", [])
+    )
+
+    if isinstance(entries, dict):
+        entries = entries.get("metrics", [])
+
+    if not isinstance(entries, list):
+        raise RuntimeError("Explore21 metric catalog unavailable")
+
+    for item in entries:
+        if not isinstance(item, dict):
+            continue
+
+        text = " ".join(
+            str(item.get(key, ""))
+            for key in ("id", "title", "name", "description")
+        ).lower()
+
+        if "nupl" in text or "net unrealized profit" in text:
+            return item.get("id")
+
+    raise RuntimeError(
+        "NUPL metric is not listed in the free provider catalog"
+    )
+
+
 def build_nupl():
-    return build_glassnode_metric(
-        "/v1/metrics/indicators/net_unrealized_profit_loss",
+    metric_id = find_nupl_metric()
+
+    return explore_metric(
+        metric_id,
+        ["nupl", "net_unrealized_profit_loss"],
         "NUPL"
     )
 
 
-# ---------------------------------------------------------
-# ALTERNATIVE.ME FEAR & GREED
-# ---------------------------------------------------------
+# --------------------------------------------------
+# FEAR & GREED
+# --------------------------------------------------
 
-def build_retail_sentiment():
-    data = http_get(
+def build_sentiment():
+    data = request_json(
         "https://api.alternative.me/fng/?limit=1&format=json"
     )
 
-    entries = data.get("data", [])
+    rows = data.get("data", [])
 
-    if not entries:
-        raise RuntimeError("Fear & Greed data unavailable")
+    if not rows:
+        raise RuntimeError("Fear & Greed unavailable")
 
-    item = entries[0]
+    latest = rows[0]
 
-    value = safe_float(item.get("value"))
+    value = number(latest.get("value"))
 
     if value is None:
         raise RuntimeError("Invalid Fear & Greed value")
 
-    timestamp_value = safe_float(
-        item.get("timestamp")
+    updated = timestamp_seconds(
+        latest.get("timestamp")
     )
 
-    source_time = (
-        timestamp_from_seconds(timestamp_value)
-        if timestamp_value is not None
-        else None
+    result = metric(
+        value,
+        "index / 100",
+        "Alternative.me Fear & Greed Index",
+        updated,
+        "PROXY_ONLY"
     )
 
-    return {
-        "value": value,
-        "unit": "index / 100",
-        "status": "PROXY_ONLY",
-        "classification": item.get(
-            "value_classification",
-            "Unknown"
+    result["classification"] = latest.get(
+        "value_classification",
+        "Unknown"
+    )
+
+    result["note"] = (
+        "Sentiment proxy only. Not direct retail "
+        "trading activity."
+    )
+
+    return result
+
+
+# --------------------------------------------------
+# BUILD FINAL JSON
+# --------------------------------------------------
+
+def build_payload():
+    futures = {
+        "funding_rate": run_safely(
+            build_funding,
+            "CoinBoss Funding Rate"
         ),
-        "source": "Alternative.me Fear & Greed Index",
-        "source_updated_at": source_time,
-        "fetched_at": utc_now(),
-        "update_frequency": "Daily",
-        "note": (
-            "Sentiment proxy only. This is not direct retail "
-            "trading activity or verified retail buying/selling data."
+
+        "open_interest": run_safely(
+            build_open_interest,
+            "CoinBoss Open Interest"
+        ),
+
+        "futures_premium": run_safely(
+            build_futures_premium,
+            "CoinBoss Futures Basis"
         )
     }
 
-
-# ---------------------------------------------------------
-# MAIN PAYLOAD
-# ---------------------------------------------------------
-
-def build_payload():
-    fetched_at = utc_now()
-
-    futures = safe_build(
-        build_futures_market,
-        "CoinGlass Futures Market"
-    )
-
-    if not isinstance(futures, dict) or (
-        "funding_rate" not in futures
-    ):
-        futures = {
-            "funding_rate": unavailable(
-                "CoinGlass Funding Rate"
-            ),
-            "open_interest": unavailable(
-                "CoinGlass Open Interest"
-            ),
-            "futures_premium": unavailable(
-                "CoinGlass Futures Premium"
-            )
-        }
-
-    payload = {
+    return {
         "schema_version": 1,
+
         "engine": "Crypto Dada Style Live Signals Engine",
+
         "engine_version": VERSION,
+
         "symbol": "BTCUSDT",
+
         "market": "Binance Spot",
-        "fetched_at": fetched_at,
 
-        "price_structure": build_price_safely(),
+        "fetched_at": now(),
 
-        "etf_flows": safe_build(
-            build_etf_flows,
-            "CoinGlass Bitcoin ETF Flow"
+        "price_structure": safe_price_structure(),
+
+        "etf_flows": run_safely(
+            build_etf,
+            "CoinBoss Bitcoin ETF Flow"
         ),
 
         "funding_rate": futures["funding_rate"],
@@ -786,41 +805,39 @@ def build_payload():
         "futures_premium": futures["futures_premium"],
 
         "on_chain": {
-            "mvrv_z_score": safe_build(
+            "mvrv_z_score": run_safely(
                 build_mvrv,
-                "Glassnode MVRV Z-Score"
+                "Explore21 MVRV Z-Score"
             ),
 
-            "nupl": safe_build(
+            "nupl": run_safely(
                 build_nupl,
-                "Glassnode NUPL"
+                "Explore21 NUPL"
             )
         },
 
-        "retail_mania": safe_build(
-            build_retail_sentiment,
+        "retail_mania": run_safely(
+            build_sentiment,
             "Alternative.me Fear & Greed"
         )
     }
 
-    return payload
 
+# --------------------------------------------------
+# SAVE
+# --------------------------------------------------
 
-# ---------------------------------------------------------
-# SAVE JSON SAFELY
-# ---------------------------------------------------------
-
-def save_payload(payload):
+def save_json(data):
     OUTPUT_FILE.parent.mkdir(
         parents=True,
         exist_ok=True
     )
 
-    temporary_file = OUTPUT_FILE.with_suffix(".tmp")
+    temp = OUTPUT_FILE.with_suffix(".tmp")
 
-    temporary_file.write_text(
+    temp.write_text(
         json.dumps(
-            payload,
+            data,
             indent=2,
             ensure_ascii=False,
             allow_nan=False
@@ -828,55 +845,53 @@ def save_payload(payload):
         encoding="utf-8"
     )
 
-    temporary_file.replace(OUTPUT_FILE)
+    temp.replace(OUTPUT_FILE)
 
 
-# ---------------------------------------------------------
-# RUN
-# ---------------------------------------------------------
+# --------------------------------------------------
+# MAIN
+# --------------------------------------------------
 
 def main():
-    print("Starting Crypto Dada Style Live Signals Engine...")
+    print("=" * 55)
+    print("CRYPTO DADA LIVE SIGNALS ENGINE")
     print("Version:", VERSION)
+    print("Free Providers - No Paid API Keys")
+    print("=" * 55)
 
-    payload = build_payload()
+    data = build_payload()
 
-    save_payload(payload)
+    save_json(data)
 
-    print("Output saved:", OUTPUT_FILE)
-    print("Fetched at:", payload["fetched_at"])
+    print("\nJSON saved:", OUTPUT_FILE)
+    print("Fetched:", data["fetched_at"])
 
-    sections = [
-        "price_structure",
-        "etf_flows",
-        "funding_rate",
-        "open_interest",
-        "futures_premium",
-        "retail_mania"
+    checks = [
+        ("BTC Price", data["price_structure"]["price"]),
+        ("ETF Flows", data["etf_flows"]),
+        ("Funding Rate", data["funding_rate"]),
+        ("Open Interest", data["open_interest"]),
+        ("Futures Premium", data["futures_premium"]),
+        ("MVRV Z-Score", data["on_chain"]["mvrv_z_score"]),
+        ("NUPL", data["on_chain"]["nupl"]),
+        ("Fear & Greed", data["retail_mania"])
     ]
 
-    for name in sections:
-        item = payload.get(name, {})
+    print("\nDATA STATUS")
 
+    for name, item in checks:
         print(
             name,
             "=>",
-            item.get("status", "UNKNOWN"),
+            item.get("status"),
             "|",
-            item.get("value", "N/A")
+            item.get("value")
         )
 
-    print(
-        "mvrv_z_score =>",
-        payload["on_chain"]["mvrv_z_score"]["status"]
-    )
+        if item.get("error"):
+            print("   ERROR:", item["error"])
 
-    print(
-        "nupl =>",
-        payload["on_chain"]["nupl"]["status"]
-    )
-
-    print("Engine completed.")
+    print("\nEngine completed.")
 
 
 if __name__ == "__main__":
