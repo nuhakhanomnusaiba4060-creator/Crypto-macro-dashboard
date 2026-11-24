@@ -1,922 +1,1396 @@
 
 #!/usr/bin/env python3
-"""
-Crypto Dada Style Live Signals Engine
-Version: 1.3.1
+# -*- coding: utf-8 -*-
 
-FREE PROVIDERS:
+"""
+CRYPTO DADA LIVE SIGNALS ENGINE
+Version: 1.3.2
+
+Free public data providers:
 - Binance Spot
 - CoinBoss Public API
-- Explore21 Public On-chain API
-- Alternative.me Fear & Greed
+- Explore21
+- Alternative.me
 
-No paid API keys required.
+No paid API key required.
 
-Output:
-data/live_signals.json
+Important:
+- Missing data is represented as null, never as fake zero.
+- Source observation time is kept separate from fetch time.
+- Support/resistance use completed daily candle lows/highs.
+- Old observations are marked STALE.
+- One provider failure does not stop the remaining providers.
+- JSON schema_version remains 1 for dashboard compatibility.
 """
 
 import json
 import math
 import time
-import urllib.request
+import urllib.error
 import urllib.parse
+import urllib.request
 
 from datetime import datetime, timezone
 from pathlib import Path
 
 
-VERSION = "1.3.1"
+# ============================================================
+# CONFIGURATION
+# ============================================================
+
+VERSION = "1.3.2"
+SCHEMA_VERSION = 1
+
+SYMBOL = "BTCUSDT"
+BINANCE_BASE = "https://api.binance.com"
+COINBOSS_BASE = "https://www.coinboss.com"
+EXPLORE21_BASE = "https://data.explore21.com"
+ALTERNATIVE_BASE = "https://api.alternative.me"
 
 OUTPUT_FILE = Path("data/live_signals.json")
 
-BINANCE_URLS = [
-    "https://api.binance.com",
-    "https://data-api.binance.vision",
-]
+HTTP_TIMEOUT = 20
+USER_AGENT = "CryptoDadaLiveSignals/1.3.2"
 
-# Correct base URL.
-# Endpoint paths already contain /api/.
-COINBOSS = "https://www.coinboss.com"
+PRICE_CANDLE_LIMIT = 210
+SUPPORT_RESISTANCE_LOOKBACK = 20
 
-EXPLORE21 = "https://data.explore21.com/v1"
-
-TIMEOUT = 20
-
-
-# ==================================================
-# COMMON FUNCTIONS
-# ==================================================
-
-def now():
-    return datetime.now(timezone.utc).isoformat(
-        timespec="seconds"
-    )
+# Data freshness thresholds
+DEFAULT_MAX_AGE_HOURS = 48
+DAILY_MAX_AGE_HOURS = 48
+MVRV_MAX_AGE_HOURS = 48
+FEAR_GREED_MAX_AGE_HOURS = 48
 
 
-def timestamp_ms(value):
+# ============================================================
+# TIME AND BASIC HELPERS
+# ============================================================
+
+def utc_now():
+    return datetime.now(timezone.utc)
+
+
+def iso_now():
+    return utc_now().isoformat(timespec="seconds")
+
+
+def iso_from_ms(value):
     try:
+        number = float(value)
+
+        if not math.isfinite(number) or number <= 0:
+            return None
+
         return datetime.fromtimestamp(
-            float(value) / 1000,
-            timezone.utc
+            number / 1000.0,
+            tz=timezone.utc
         ).isoformat(timespec="seconds")
-    except Exception:
+
+    except (TypeError, ValueError, OverflowError, OSError):
         return None
 
 
-def timestamp_seconds(value):
-    try:
-        return datetime.fromtimestamp(
-            float(value),
-            timezone.utc
-        ).isoformat(timespec="seconds")
-    except Exception:
+def parse_timestamp(value):
+    """
+    Convert supported timestamp formats to aware UTC datetime.
+
+    Supported:
+    - ISO timestamp strings
+    - Unix seconds
+    - Unix milliseconds
+    - YYYY-MM-DD
+    """
+
+    if value is None:
         return None
 
-
-def number(value):
     try:
-        result = float(value)
+        if isinstance(value, (int, float)):
+            number = float(value)
 
-        if math.isfinite(result):
-            return result
+            if not math.isfinite(number) or number <= 0:
+                return None
 
-    except (TypeError, ValueError, OverflowError):
-        pass
+            if number > 100000000000:
+                number /= 1000.0
+
+            return datetime.fromtimestamp(
+                number,
+                tz=timezone.utc
+            )
+
+        if isinstance(value, str):
+            text = value.strip()
+
+            if not text:
+                return None
+
+            if text.isdigit():
+                return parse_timestamp(int(text))
+
+            if len(text) == 10 and text[4] == "-":
+                text += "T00:00:00+00:00"
+
+            if text.endswith("Z"):
+                text = text[:-1] + "+00:00"
+
+            parsed = datetime.fromisoformat(text)
+
+            if parsed.tzinfo is None:
+                parsed = parsed.replace(tzinfo=timezone.utc)
+
+            return parsed.astimezone(timezone.utc)
+
+    except (TypeError, ValueError, OverflowError, OSError):
+        return None
 
     return None
 
 
-def request_json(url):
+def finite_number(value):
+    try:
+        number = float(value)
+
+        if not math.isfinite(number):
+            return None
+
+        return number
+
+    except (TypeError, ValueError, OverflowError):
+        return None
+
+
+def safe_round(value, digits=4):
+    number = finite_number(value)
+
+    if number is None:
+        return None
+
+    return round(number, digits)
+
+
+def age_hours(timestamp):
+    parsed = parse_timestamp(timestamp)
+
+    if parsed is None:
+        return None
+
+    difference = utc_now() - parsed
+    return max(0.0, difference.total_seconds() / 3600.0)
+
+
+def timestamp_from_date_or_value(value):
+    """
+    Extract a real observation timestamp from provider data.
+    Returns None when the provider does not expose one.
+    """
+
+    return parse_timestamp(value).isoformat(timespec="seconds") \
+        if parse_timestamp(value) else None
+
+
+# ============================================================
+# HTTP
+# ============================================================
+
+def http_get_json(url, params=None):
+    if params:
+        query = urllib.parse.urlencode(params)
+        separator = "&" if "?" in url else "?"
+        url = url + separator + query
 
     request = urllib.request.Request(
         url,
         headers={
-            "User-Agent": "CryptoDadaDashboard/1.3.1",
-            "Accept": "application/json",
+            "User-Agent": USER_AGENT,
+            "Accept": "application/json"
         },
+        method="GET"
     )
 
     with urllib.request.urlopen(
         request,
-        timeout=TIMEOUT
+        timeout=HTTP_TIMEOUT
     ) as response:
 
-        return json.loads(
-            response.read().decode("utf-8")
-        )
+        status_code = getattr(response, "status", 200)
 
-
-def make_url(base, path, params=None):
-
-    url = (
-        base.rstrip("/")
-        + "/"
-        + path.lstrip("/")
-    )
-
-    if params:
-        url += "?" + urllib.parse.urlencode(params)
-
-    return url
-
-
-def metric(
-    value,
-    unit,
-    source,
-    updated=None,
-    status="OK"
-):
-
-    return {
-        "value": value,
-        "unit": unit,
-        "status": status if value is not None else "UNAVAILABLE",
-        "source": source,
-        "source_updated_at": updated,
-        "fetched_at": now(),
-    }
-
-
-def unavailable(source, error=None):
-
-    result = metric(
-        None,
-        "",
-        source,
-        None,
-        "UNAVAILABLE",
-    )
-
-    if error:
-        result["error"] = str(error)[:300]
-
-    return result
-
-
-def run_safely(function, source):
-
-    try:
-        return function()
-
-    except Exception as exc:
-
-        print(
-            source,
-            "ERROR:",
-            str(exc)[:200]
-        )
-
-        return unavailable(source, exc)
-
-
-def extract_timestamp(data):
-
-    if isinstance(data, dict):
-
-        for key in (
-            "asof",
-            "timestamp",
-            "time",
-            "ts",
-            "updated_at",
-            "updatedAt",
-            "date",
-        ):
-
-            value = data.get(key)
-
-            if value is None:
-                continue
-
-            if isinstance(value, (int, float)):
-
-                if value > 100000000000:
-                    return timestamp_ms(value)
-
-                if value > 1000000000:
-                    return timestamp_seconds(value)
-
-            if isinstance(value, str) and len(value) >= 10:
-                return value
-
-        for value in data.values():
-
-            result = extract_timestamp(value)
-
-            if result:
-                return result
-
-    elif isinstance(data, list):
-
-        for item in reversed(data):
-
-            result = extract_timestamp(item)
-
-            if result:
-                return result
-
-    return None
-
-
-# ==================================================
-# BINANCE SPOT API
-# ==================================================
-
-def binance_get(path, params=None):
-
-    errors = []
-
-    for base in BINANCE_URLS:
-
-        try:
-            return request_json(
-                make_url(base, path, params)
+        if status_code < 200 or status_code >= 300:
+            raise RuntimeError(
+                f"HTTP request failed: {status_code}"
             )
 
-        except Exception as exc:
-            errors.append(str(exc))
+        raw = response.read().decode("utf-8")
 
-    raise RuntimeError(
-        "Binance API failed: "
-        + " | ".join(errors)
+        return json.loads(raw)
+
+
+# ============================================================
+# METRIC STRUCTURE
+# ============================================================
+
+def make_metric(
+    value=None,
+    unit=None,
+    status="UNAVAILABLE",
+    source=None,
+    source_updated_at=None,
+    note=None,
+    extra=None
+):
+    metric = {
+        "value": finite_number(value),
+        "unit": unit,
+        "status": status,
+        "source": source,
+        "source_updated_at": source_updated_at,
+        "fetched_at": iso_now(),
+        "data_age_hours": None,
+        "note": note
+    }
+
+    age = age_hours(source_updated_at)
+
+    if age is not None:
+        metric["data_age_hours"] = round(age, 2)
+
+    if extra and isinstance(extra, dict):
+        metric.update(extra)
+
+    return metric
+
+
+def unavailable_metric(source, note, unit=None):
+    return make_metric(
+        value=None,
+        unit=unit,
+        status="UNAVAILABLE",
+        source=source,
+        source_updated_at=None,
+        note=note
     )
 
 
-def sma(values, period):
+def apply_freshness(metric, max_age_hours):
+    """
+    Mark an observation STALE when its actual source timestamp
+    is older than the configured limit.
 
+    Missing source timestamp is not treated as fresh.
+    """
+
+    if not isinstance(metric, dict):
+        return metric
+
+    source_time = metric.get("source_updated_at")
+
+    if not source_time:
+        if metric.get("status") not in (
+            "UNAVAILABLE",
+            "ERROR",
+            "PROXY_ONLY"
+        ):
+            metric["status"] = "TIME_UNKNOWN"
+
+            old_note = metric.get("note")
+            timestamp_note = (
+                "Provider did not expose a verified observation "
+                "timestamp. Fetch time is shown separately."
+            )
+
+            metric["note"] = (
+                f"{old_note} {timestamp_note}"
+                if old_note else timestamp_note
+            )
+
+        return metric
+
+    age = age_hours(source_time)
+
+    if age is None:
+        metric["status"] = "TIME_UNKNOWN"
+        metric["data_age_hours"] = None
+        return metric
+
+    metric["data_age_hours"] = round(age, 2)
+
+    if age > max_age_hours:
+        metric["status"] = "STALE"
+
+        old_note = metric.get("note")
+        stale_note = (
+            f"Source observation is {age:.1f} hours old; "
+            f"freshness limit is {max_age_hours} hours."
+        )
+
+        metric["note"] = (
+            f"{old_note} {stale_note}"
+            if old_note else stale_note
+        )
+
+    return metric
+
+
+def run_safely(name, function, *args, **kwargs):
+    """
+    Run one provider independently.
+    A provider error must not stop other metrics.
+    """
+
+    try:
+        result = function(*args, **kwargs)
+
+        if not isinstance(result, dict):
+            raise RuntimeError(
+                "Provider returned an invalid metric structure."
+            )
+
+        return result
+
+    except Exception as exc:
+        message = f"{type(exc).__name__}: {str(exc)}"
+
+        print(f"{name} => ERROR | {message}")
+
+        return make_metric(
+            value=None,
+            unit=None,
+            status="ERROR",
+            source=name,
+            source_updated_at=None,
+            note=message
+        )
+
+
+# ============================================================
+# BINANCE SPOT PRICE
+# ============================================================
+
+def fetch_binance_price():
+    url = f"{BINANCE_BASE}/api/v3/ticker/price"
+
+    data = http_get_json(
+        url,
+        {"symbol": SYMBOL}
+    )
+
+    price = finite_number(data.get("price"))
+
+    if price is None or price <= 0:
+        raise RuntimeError("Invalid Binance spot price.")
+
+    return make_metric(
+        value=price,
+        unit="USDT",
+        status="OK",
+        source="Binance Spot BTCUSDT Ticker",
+        source_updated_at=None,
+        note=(
+            "Live ticker response. Binance ticker price endpoint "
+            "does not provide an observation timestamp; fetch time "
+            "is recorded separately."
+        )
+    )
+
+
+# ============================================================
+# BINANCE DAILY CANDLES
+# ============================================================
+
+def fetch_daily_candles():
+    url = f"{BINANCE_BASE}/api/v3/klines"
+
+    data = http_get_json(
+        url,
+        {
+            "symbol": SYMBOL,
+            "interval": "1d",
+            "limit": PRICE_CANDLE_LIMIT
+        }
+    )
+
+    if not isinstance(data, list) or len(data) < 200:
+        raise RuntimeError(
+            "Insufficient Binance daily candle history."
+        )
+
+    candles = []
+
+    for row in data:
+        if not isinstance(row, list) or len(row) < 7:
+            continue
+
+        try:
+            candle = {
+                "open_time": int(row[0]),
+                "open": finite_number(row[1]),
+                "high": finite_number(row[2]),
+                "low": finite_number(row[3]),
+                "close": finite_number(row[4]),
+                "volume": finite_number(row[5]),
+                "close_time": int(row[6])
+            }
+
+            if (
+                candle["open"] is None
+                or candle["high"] is None
+                or candle["low"] is None
+                or candle["close"] is None
+            ):
+                continue
+
+            candles.append(candle)
+
+        except (TypeError, ValueError, IndexError):
+            continue
+
+    if len(candles) < 200:
+        raise RuntimeError(
+            "Not enough valid daily candles after parsing."
+        )
+
+    # Exclude the current, potentially incomplete daily candle.
+    now_ms = int(time.time() * 1000)
+
+    completed = [
+        candle
+        for candle in candles
+        if candle["close_time"] < now_ms
+    ]
+
+    if len(completed) < 200:
+        raise RuntimeError(
+            "Not enough completed daily candles."
+        )
+
+    return completed
+
+
+def calculate_sma(values, period):
     if len(values) < period:
         return None
 
-    return sum(values[-period:]) / period
+    sample = values[-period:]
+
+    if any(value is None for value in sample):
+        return None
+
+    return sum(sample) / period
 
 
-def rsi(values, period=14):
-
+def calculate_rsi(values, period=14):
     if len(values) < period + 1:
         return None
 
     changes = [
-        values[i] - values[i - 1]
-        for i in range(
-            len(values) - period,
-            len(values)
+        values[index] - values[index - 1]
+        for index in range(len(values) - period, len(values))
+    ]
+
+    gains = [
+        change if change > 0 else 0.0
+        for change in changes
+    ]
+
+    losses = [
+        abs(change) if change < 0 else 0.0
+        for change in changes
+    ]
+
+    average_gain = sum(gains) / period
+    average_loss = sum(losses) / period
+
+    if average_loss == 0:
+        return 100.0 if average_gain > 0 else 50.0
+
+    relative_strength = average_gain / average_loss
+
+    return 100.0 - (
+        100.0 / (1.0 + relative_strength)
+    )
+
+
+def fetch_price_structure():
+    candles = fetch_daily_candles()
+
+    closes = [candle["close"] for candle in candles]
+    latest_candle = candles[-1]
+
+    ma20 = calculate_sma(closes, 20)
+    ma50 = calculate_sma(closes, 50)
+    ma200 = calculate_sma(closes, 200)
+    rsi14 = calculate_rsi(closes, 14)
+
+    # Use the previous 20 completed candles for S/R.
+    # The latest completed candle is excluded from the
+    # support/resistance lookback to avoid using the same
+    # candle as both current reference and historical range.
+    sr_candles = candles[-(SUPPORT_RESISTANCE_LOOKBACK + 1):-1]
+
+    if len(sr_candles) < SUPPORT_RESISTANCE_LOOKBACK:
+        raise RuntimeError(
+            "Insufficient candles for support/resistance."
         )
-    ]
 
-    gains = [max(x, 0) for x in changes]
-    losses = [abs(min(x, 0)) for x in changes]
-
-    avg_gain = sum(gains) / period
-    avg_loss = sum(losses) / period
-
-    if avg_loss == 0:
-
-        if avg_gain > 0:
-            return 100.0
-
-        return 50.0
-
-    rs = avg_gain / avg_loss
-
-    return 100 - (100 / (1 + rs))
-
-
-def build_price_structure():
-
-    ticker = binance_get(
-        "/api/v3/ticker/price",
-        {"symbol": "BTCUSDT"},
+    support = min(
+        candle["low"] for candle in sr_candles
     )
 
-    price = number(ticker.get("price"))
-
-    if price is None:
-        raise RuntimeError("BTC price unavailable")
-
-    candles = binance_get(
-        "/api/v3/klines",
-        {
-            "symbol": "BTCUSDT",
-            "interval": "1d",
-            "limit": 210,
-        },
+    resistance = max(
+        candle["high"] for candle in sr_candles
     )
 
-    current_ms = int(time.time() * 1000)
+    candle_timestamp = iso_from_ms(
+        latest_candle["close_time"]
+    )
 
-    closed = [
-        candle for candle in candles
-        if int(candle[6]) < current_ms
-    ]
-
-    closes = [
-        number(candle[4])
-        for candle in closed
-    ]
-
-    closes = [
-        value for value in closes
-        if value is not None
-    ]
-
-    if len(closes) < 200:
-        raise RuntimeError("MA200 data unavailable")
-
-    updated = timestamp_ms(closed[-1][6])
-
-    previous = closes[-21:-1]
+    price = fetch_binance_price()
 
     return {
+        "price": price,
 
-        "price": metric(
-            price,
-            "USDT",
-            "Binance Spot BTCUSDT Ticker",
-            now(),
+        "support": make_metric(
+            value=support,
+            unit="USDT",
+            status="OK",
+            source="Binance Spot Daily Candles",
+            source_updated_at=candle_timestamp,
+            note=(
+                f"Lowest Low of the previous "
+                f"{SUPPORT_RESISTANCE_LOOKBACK} completed daily candles."
+            ),
+            extra={
+                "lookback": (
+                    f"{SUPPORT_RESISTANCE_LOOKBACK} completed daily candles"
+                ),
+                "method": "lowest low"
+            }
         ),
 
-        "support": metric(
-            min(previous),
-            "USDT",
-            "Binance Spot Daily Candles",
-            updated,
+        "resistance": make_metric(
+            value=resistance,
+            unit="USDT",
+            status="OK",
+            source="Binance Spot Daily Candles",
+            source_updated_at=candle_timestamp,
+            note=(
+                f"Highest High of the previous "
+                f"{SUPPORT_RESISTANCE_LOOKBACK} completed daily candles."
+            ),
+            extra={
+                "lookback": (
+                    f"{SUPPORT_RESISTANCE_LOOKBACK} completed daily candles"
+                ),
+                "method": "highest high"
+            }
         ),
 
-        "resistance": metric(
-            max(previous),
-            "USDT",
-            "Binance Spot Daily Candles",
-            updated,
+        "ma20": make_metric(
+            value=ma20,
+            unit="USDT",
+            status="OK" if ma20 is not None else "UNAVAILABLE",
+            source="Binance Spot Daily Candles",
+            source_updated_at=candle_timestamp,
+            note="20-day simple moving average."
         ),
 
-        "ma20": metric(
-            sma(closes, 20),
-            "USDT",
-            "Binance Spot Daily Candles",
-            updated,
+        "ma50": make_metric(
+            value=ma50,
+            unit="USDT",
+            status="OK" if ma50 is not None else "UNAVAILABLE",
+            source="Binance Spot Daily Candles",
+            source_updated_at=candle_timestamp,
+            note="50-day simple moving average."
         ),
 
-        "ma50": metric(
-            sma(closes, 50),
-            "USDT",
-            "Binance Spot Daily Candles",
-            updated,
+        "ma200": make_metric(
+            value=ma200,
+            unit="USDT",
+            status="OK" if ma200 is not None else "UNAVAILABLE",
+            source="Binance Spot Daily Candles",
+            source_updated_at=candle_timestamp,
+            note="200-day simple moving average."
         ),
 
-        "ma200": metric(
-            sma(closes, 200),
-            "USDT",
-            "Binance Spot Daily Candles",
-            updated,
+        "rsi14": make_metric(
+            value=rsi14,
+            unit="RSI",
+            status="OK" if rsi14 is not None else "UNAVAILABLE",
+            source="Binance Spot Daily Candles",
+            source_updated_at=candle_timestamp,
+            note="14-period RSI calculated from completed daily closes."
         ),
 
-        "rsi14": metric(
-            rsi(closes, 14),
-            "RSI",
-            "Binance Spot Daily Candles",
-            updated,
-        ),
-
-        "candle_updated_at": updated,
-        "status": "OK",
+        "candle_updated_at": candle_timestamp
     }
 
 
-def safe_price_structure():
+# ============================================================
+# COINBOSS ETF FLOWS
+# ============================================================
 
-    try:
-        return build_price_structure()
+def fetch_etf_flows():
+    url = f"{COINBOSS_BASE}/api/etf/flows"
 
-    except Exception as exc:
-
-        return {
-
-            "price": unavailable("Binance Spot", exc),
-
-            "support": unavailable("Binance Daily Candles", exc),
-
-            "resistance": unavailable("Binance Daily Candles", exc),
-
-            "ma20": unavailable("Binance Daily Candles", exc),
-
-            "ma50": unavailable("Binance Daily Candles", exc),
-
-            "ma200": unavailable("Binance Daily Candles", exc),
-
-            "rsi14": unavailable("Binance Daily Candles", exc),
-
-            "candle_updated_at": None,
-
-            "status": "UNAVAILABLE",
-
-            "error": str(exc)[:300],
-        }
-
-
-# ==================================================
-# COINBOSS PUBLIC API
-# ==================================================
-
-def coinboss(path, params=None):
-
-    data = request_json(
-        make_url(
-            COINBOSS,
-            path,
-            params
-        )
-    )
-
-    if not isinstance(data, dict):
-        raise RuntimeError("Invalid CoinBoss response")
-
-    if data.get("success") is False:
-
-        raise RuntimeError(
-            data.get("error", "CoinBoss request failed")
-        )
-
-    if data.get("ok") is False:
-
-        raise RuntimeError(
-            data.get("error", "CoinBoss request failed")
-        )
-
-    return data
-
-
-# ==================================================
-# BITCOIN ETF FLOWS
-# ==================================================
-
-def build_etf():
-
-    data = coinboss(
-        "/api/etf/flows",
+    data = http_get_json(
+        url,
         {
             "asset": "BTC",
-            "days": 30,
-        },
+            "days": 30
+        }
     )
 
-    latest = data.get("latest")
+    latest = data.get("latest") or {}
 
-    if not isinstance(latest, dict):
-        raise RuntimeError("ETF latest data unavailable")
-
-    value = number(latest.get("flow"))
-
-    if value is None:
-        raise RuntimeError("ETF flow value missing")
-
-    updated = latest.get("date")
-
-    result = metric(
-        value,
-        "million USD",
-        "CoinBoss Bitcoin Spot ETF Flow",
-        updated,
+    daily_flow = finite_number(
+        latest.get("flow")
     )
 
-    result["classification"] = (
-        "Net Inflow" if value > 0
-        else "Net Outflow" if value < 0
-        else "Neutral"
-    )
-
-    result["sum_7d"] = number(
+    weekly_flow = finite_number(
         latest.get("sum_7d")
     )
 
-    result["aum"] = number(
+    aum = finite_number(
         latest.get("aum")
     )
 
-    result["update_frequency"] = "Daily"
-
-    result["note"] = (
-        "Daily net ETF flow. Positive means inflow; "
-        "negative means outflow. Unit: million USD."
+    observation_time = (
+        timestamp_from_date_or_value(latest.get("date"))
     )
 
-    result["provider_response_received_at"] = now()
+    if daily_flow is None and weekly_flow is None:
+        raise RuntimeError(
+            "ETF response did not contain a valid daily or 7-day flow."
+        )
 
-    return result
+    if daily_flow is None:
+        daily_status = "UNAVAILABLE"
+        daily_note = "Provider did not return a valid latest daily flow."
+    else:
+        daily_status = "OK"
+        daily_note = (
+            "Latest reported daily net ETF flow. "
+            "A zero value is preserved as a genuine provider value."
+        )
+
+    if weekly_flow is None:
+        weekly_status = "UNAVAILABLE"
+        weekly_note = "Provider did not return a valid 7-day net flow."
+    else:
+        weekly_status = "OK"
+        weekly_note = "Provider-reported cumulative 7-day net ETF flow."
+
+    return {
+        "value": daily_flow,
+        "unit": "million USD",
+        "status": daily_status,
+        "source": "CoinBoss Public ETF API",
+        "source_updated_at": observation_time,
+        "fetched_at": iso_now(),
+        "data_age_hours": age_hours(observation_time),
+        "note": daily_note,
+
+        "daily_net_flow": daily_flow,
+        "daily_unit": "million USD",
+
+        "seven_day_net_flow": weekly_flow,
+        "seven_day_unit": "million USD",
+        "seven_day_status": weekly_status,
+        "seven_day_note": weekly_note,
+
+        # Keep the old field name for compatibility.
+        "sum_7d": weekly_flow,
+
+        "aum": aum,
+        "aum_unit": "million USD",
+
+        "classification": (
+            "Unavailable"
+            if daily_flow is None
+            else (
+                "Positive"
+                if daily_flow > 0
+                else "Negative"
+                if daily_flow < 0
+                else "Neutral"
+            )
+        ),
+
+        "update_frequency": "Daily"
+    }
 
 
-# ==================================================
-# FUNDING RATE
-# ==================================================
+# ============================================================
+# COINBOSS FUNDING RATE
+# ============================================================
 
-def build_funding():
+def fetch_funding_rate():
+    url = f"{COINBOSS_BASE}/api/sd/funding"
 
-    data = coinboss(
-        "/api/sd/funding",
-        {"coin": "BTC"},
+    data = http_get_json(
+        url,
+        {"coin": "BTC"}
     )
 
-    value = number(
+    value = finite_number(
         data.get("oi_weighted_8h")
     )
 
-    aggregation = "OI-weighted 8-hour rate"
-
     if value is None:
-
-        value = number(
+        value = finite_number(
             data.get("avg_8h")
         )
 
-        aggregation = "Average 8-hour rate"
-
     if value is None:
-        raise RuntimeError("Funding rate fields unavailable")
+        raise RuntimeError(
+            "Funding API did not return a valid funding rate."
+        )
 
-    # API value is fraction.
-    # Convert fraction into percentage.
-    value_pct = value * 100
+    # Provider returns a fraction; convert to percentage.
+    percentage = value * 100.0
 
-    updated = timestamp_ms(
+    source_timestamp = timestamp_from_date_or_value(
         data.get("now")
     )
 
-    result = metric(
-        value_pct,
-        "% per 8h",
-        "CoinBoss BTC Aggregated Funding Rate",
-        updated,
+    return make_metric(
+        value=percentage,
+        unit="% per 8h",
+        status="OK",
+        source="CoinBoss Public Funding API",
+        source_updated_at=source_timestamp,
+        note=(
+            "Open-interest-weighted 8-hour funding rate. "
+            "Provider fraction converted to percentage."
+        ),
+        extra={
+            "method": "oi_weighted_8h",
+            "raw_fraction": value
+        }
     )
 
-    result["aggregation"] = aggregation
 
-    result["note"] = (
-        "Positive funding means longs generally pay shorts. "
-        "Negative funding means shorts generally pay longs."
+# ============================================================
+# COINBOSS OPEN INTEREST
+# ============================================================
+
+def fetch_open_interest():
+    url = f"{COINBOSS_BASE}/api/sd/oi"
+
+    data = http_get_json(
+        url,
+        {"coin": "BTC"}
     )
 
-    result["provider_response_received_at"] = now()
-
-    return result
-
-
-# ==================================================
-# OPEN INTEREST
-# ==================================================
-
-def build_open_interest():
-
-    data = coinboss(
-        "/api/sd/oi",
-        {"coin": "BTC"},
-    )
-
-    value = number(
+    value = finite_number(
         data.get("total_usd_single_adjusted")
     )
 
     if value is None:
-
-        value = number(
+        value = finite_number(
             data.get("total_usd")
         )
 
     if value is None:
-        raise RuntimeError("Open Interest value unavailable")
+        raise RuntimeError(
+            "Open interest API did not return a valid USD value."
+        )
 
-    updated = timestamp_ms(
+    source_timestamp = timestamp_from_date_or_value(
         data.get("asof")
     )
 
-    result = metric(
-        value,
-        "USD",
-        "CoinBoss BTC Aggregated Open Interest",
-        updated,
-    )
-
-    result["note"] = (
-        "Aggregated BTC futures open interest in USD. "
-        "Single-side adjusted value preferred when available."
-    )
-
-    result["provider_response_received_at"] = now()
-
-    return result
-
-
-# ==================================================
-# FUTURES PREMIUM / BASIS
-# ==================================================
-
-def build_futures_premium():
-
-    data = coinboss(
-        "/api/sd/basis",
-        {"coin": "BTC"},
-    )
-
-    perp = data.get("perp", {})
-
-    if not isinstance(perp, dict):
-        perp = {}
-
-    aggregate = perp.get("aggregate", {})
-
-    if not isinstance(aggregate, dict):
-        aggregate = {}
-
-    value = number(
-        aggregate.get("oi_weighted_pct")
-    )
-
-    if value is None:
-
-        value = number(
-            aggregate.get("median_pct")
-        )
-
-    if value is None:
-        raise RuntimeError("Futures basis value unavailable")
-
-    updated = (
-        extract_timestamp(data.get("meta", {}))
-        or timestamp_ms(data.get("now"))
-    )
-
-    result = metric(
-        value,
-        "%",
-        "CoinBoss BTC Perpetual Futures Basis",
-        updated,
-    )
-
-    result["note"] = (
-        "Open-interest-weighted perpetual mark/index basis. "
-        "This is futures market context, not a spot trading signal."
-    )
-
-    result["provider_response_received_at"] = now()
-
-    return result
-
-
-# ==================================================
-# EXPLORE21 ON-CHAIN API
-# ==================================================
-
-def explore_get(path):
-
-    return request_json(
-        make_url(
-            EXPLORE21,
-            path
+    return make_metric(
+        value=value,
+        unit="USD",
+        status="OK",
+        source="CoinBoss Public Open Interest API",
+        source_updated_at=source_timestamp,
+        note=(
+            "Total BTC open interest in USD. "
+            "Preferred adjusted value, with total_usd fallback."
         )
     )
 
 
-def build_mvrv():
+# ============================================================
+# COINBOSS FUTURES BASIS / PREMIUM
+# ============================================================
 
-    data = explore_get(
-        "/metrics/bitcoin-mvrv-z-score/latest"
+def fetch_futures_premium():
+    url = f"{COINBOSS_BASE}/api/sd/basis"
+
+    data = http_get_json(
+        url,
+        {"coin": "BTC"}
     )
 
-    rows = data.get("data", [])
+    perp = data.get("perp") or {}
 
-    if isinstance(rows, dict):
-        rows = [rows]
-
-    if not rows:
-        raise RuntimeError("MVRV data unavailable")
-
-    latest = rows[-1]
-
-    value = number(
-        latest.get("mvrv_z_score")
+    value = finite_number(
+        perp.get("oi_weighted_pct")
     )
 
     if value is None:
-        raise RuntimeError("MVRV value missing")
+        value = finite_number(
+            perp.get("median_pct")
+        )
 
-    result = metric(
-        value,
-        "",
-        "Explore21 Bitcoin MVRV Z-Score",
-        latest.get("date"),
+    if value is None:
+        raise RuntimeError(
+            "Basis API did not return a valid perp basis."
+        )
+
+    # Do not use data['now'] as the observation timestamp.
+    # It may only be the response/server time.
+    meta = data.get("meta") or {}
+
+    source_timestamp = None
+
+    for key in (
+        "source_updated_at",
+        "updated_at",
+        "timestamp",
+        "asof",
+        "time"
+    ):
+        candidate = timestamp_from_date_or_value(
+            meta.get(key)
+        )
+
+        if candidate:
+            source_timestamp = candidate
+            break
+
+    note = (
+        "Perpetual futures basis percentage. "
+        "This is not a pure spot premium measurement."
     )
 
-    result["update_frequency"] = "Daily"
+    if source_timestamp is None:
+        note += (
+            " Provider did not expose a verified underlying "
+            "observation timestamp; fetch time is shown separately."
+        )
 
-    result["attribution"] = "Explore21"
-
-    return result
-
-
-def build_nupl():
-
-    return unavailable(
-        "Explore21 NUPL",
-        "NUPL is not currently listed in the verified free Explore21 metric catalog."
+    return make_metric(
+        value=value,
+        unit="%",
+        status="OK" if source_timestamp else "TIME_UNKNOWN",
+        source="CoinBoss Public Futures Basis API",
+        source_updated_at=source_timestamp,
+        note=note,
+        extra={
+            "method": (
+                "oi_weighted_pct"
+                if perp.get("oi_weighted_pct") is not None
+                else "median_pct"
+            )
+        }
     )
 
 
-# ==================================================
-# FEAR & GREED
-# ==================================================
+# ============================================================
+# EXPLORE21 MVRV Z-SCORE
+# ============================================================
 
-def build_sentiment():
-
-    data = request_json(
-        "https://api.alternative.me/fng/?limit=1&format=json"
+def fetch_mvrv_z_score():
+    url = (
+        f"{EXPLORE21_BASE}"
+        "/v1/metrics/bitcoin-mvrv-z-score/latest"
     )
 
-    rows = data.get("data", [])
+    data = http_get_json(url)
+
+    # Support common response layouts without assuming one
+    # undocumented field structure.
+    candidates = []
+
+    if isinstance(data, dict):
+        candidates.append(data)
+
+        for key in ("data", "result", "metric"):
+            nested = data.get(key)
+
+            if isinstance(nested, dict):
+                candidates.append(nested)
+
+            elif isinstance(nested, list) and nested:
+                if isinstance(nested[0], dict):
+                    candidates.append(nested[0])
+
+    value = None
+    source_timestamp = None
+
+    value_keys = (
+        "value",
+        "mvrv_z_score",
+        "mvrv_zscore",
+        "latest"
+    )
+
+    timestamp_keys = (
+        "date",
+        "timestamp",
+        "updated_at",
+        "as_of",
+        "time"
+    )
+
+    for candidate in candidates:
+        if value is None:
+            for key in value_keys:
+                possible = finite_number(candidate.get(key))
+
+                if possible is not None:
+                    value = possible
+                    break
+
+        if source_timestamp is None:
+            for key in timestamp_keys:
+                possible_time = timestamp_from_date_or_value(
+                    candidate.get(key)
+                )
+
+                if possible_time:
+                    source_timestamp = possible_time
+                    break
+
+    if value is None:
+        raise RuntimeError(
+            "Explore21 response did not contain a valid MVRV Z-Score."
+        )
+
+    metric = make_metric(
+        value=value,
+        unit="Z-Score",
+        status="OK",
+        source="Explore21 Bitcoin MVRV Z-Score",
+        source_updated_at=source_timestamp,
+        note=(
+            "On-chain MVRV Z-Score. "
+            "Value is retained when stale, but marked accordingly."
+        )
+    )
+
+    return apply_freshness(
+        metric,
+        MVRV_MAX_AGE_HOURS
+    )
+
+
+# ============================================================
+# NUPL
+# ============================================================
+
+def fetch_nupl():
+    # NUPL is not currently listed in the verified free
+    # Explore21 metric catalog used by this engine.
+    # Do not substitute an unverified provider or fabricate data.
+
+    return unavailable_metric(
+        source="Explore21",
+        note=(
+            "NUPL is not currently listed in the verified "
+            "free Explore21 metric catalog. No unverified "
+            "alternative provider is being used."
+        ),
+        unit="Ratio"
+    )
+
+
+# ============================================================
+# ALTERNATIVE.ME FEAR AND GREED
+# ============================================================
+
+def fetch_fear_greed():
+    url = f"{ALTERNATIVE_BASE}/fng/"
+
+    data = http_get_json(
+        url,
+        {"limit": 1}
+    )
+
+    rows = data.get("data") or []
 
     if not rows:
-        raise RuntimeError("Fear & Greed unavailable")
+        raise RuntimeError(
+            "Fear & Greed API returned no data."
+        )
 
     latest = rows[0]
 
-    value = number(
+    value = finite_number(
         latest.get("value")
     )
 
     if value is None:
-        raise RuntimeError("Invalid Fear & Greed value")
+        raise RuntimeError(
+            "Fear & Greed API returned an invalid value."
+        )
 
-    updated = timestamp_seconds(
+    classification = latest.get(
+        "value_classification"
+    )
+
+    source_timestamp = timestamp_from_date_or_value(
         latest.get("timestamp")
     )
 
-    result = metric(
-        value,
-        "index / 100",
-        "Alternative.me Fear & Greed Index",
-        updated,
-        "PROXY_ONLY",
+    metric = make_metric(
+        value=value,
+        unit="Index (0-100)",
+        status="PROXY_ONLY",
+        source="Alternative.me Fear & Greed Index",
+        source_updated_at=source_timestamp,
+        note=(
+            "Sentiment proxy only. This is not a direct measurement "
+            "of retail trading activity or retail positioning."
+        ),
+        extra={
+            "classification": classification,
+            "proxy_only": True
+        }
     )
 
-    result["classification"] = latest.get(
-        "value_classification",
-        "Unknown",
+    return apply_freshness(
+        metric,
+        FEAR_GREED_MAX_AGE_HOURS
     )
 
-    result["note"] = (
-        "Sentiment proxy only. Not direct retail trading activity."
-    )
 
-    return result
+# ============================================================
+# DATA COLLECTION
+# ============================================================
 
-
-# ==================================================
-# BUILD FINAL JSON
-# ==================================================
-
-def build_payload():
-
-    return {
-
-        "schema_version": 1,
-
-        "engine": "Crypto Dada Style Live Signals Engine",
-
-        "engine_version": VERSION,
-
-        "symbol": "BTCUSDT",
-
-        "market": "Binance Spot",
-
-        "fetched_at": now(),
-
-        "price_structure": safe_price_structure(),
-
-        "etf_flows": run_safely(
-            build_etf,
-            "CoinBoss Bitcoin ETF Flow",
-        ),
-
-        "funding_rate": run_safely(
-            build_funding,
-            "CoinBoss Funding Rate",
-        ),
-
-        "open_interest": run_safely(
-            build_open_interest,
-            "CoinBoss Open Interest",
-        ),
-
-        "futures_premium": run_safely(
-            build_futures_premium,
-            "CoinBoss Futures Basis",
-        ),
-
-        "on_chain": {
-
-            "mvrv_z_score": run_safely(
-                build_mvrv,
-                "Explore21 MVRV Z-Score",
-            ),
-
-            "nupl": build_nupl(),
-        },
-
-        "retail_mania": run_safely(
-            build_sentiment,
-            "Alternative.me Fear & Greed",
-        ),
-    }
-
-
-# ==================================================
-# SAVE JSON SAFELY
-# ==================================================
-
-def save_json(data):
-
-    OUTPUT_FILE.parent.mkdir(
-        parents=True,
-        exist_ok=True,
-    )
-
-    temp = OUTPUT_FILE.with_suffix(".tmp")
-
-    temp.write_text(
-        json.dumps(
-            data,
-            indent=2,
-            ensure_ascii=False,
-            allow_nan=False,
-        ),
-        encoding="utf-8",
-    )
-
-    temp.replace(OUTPUT_FILE)
-
-
-# ==================================================
-# MAIN
-# ==================================================
-
-def main():
-
-    print("=" * 55)
-
+def collect_all_data():
+    print("=" * 60)
     print("CRYPTO DADA LIVE SIGNALS ENGINE")
-
-    print("Version:", VERSION)
-
+    print(f"Version: {VERSION}")
     print("Free Providers - No Paid API Keys")
+    print("=" * 60)
 
-    print("=" * 55)
+    run_started_at = iso_now()
 
-    data = build_payload()
+    print("\nCollecting market data...\n")
 
-    save_json(data)
+    # Price structure is collected independently.
+    try:
+        price_structure = fetch_price_structure()
 
-    print("\nJSON saved:", OUTPUT_FILE)
-
-    print("Fetched:", data["fetched_at"])
-
-    checks = [
-
-        ("BTC Price", data["price_structure"]["price"]),
-
-        ("ETF Flows", data["etf_flows"]),
-
-        ("Funding Rate", data["funding_rate"]),
-
-        ("Open Interest", data["open_interest"]),
-
-        ("Futures Premium", data["futures_premium"]),
-
-        ("MVRV Z-Score", data["on_chain"]["mvrv_z_score"]),
-
-        ("NUPL", data["on_chain"]["nupl"]),
-
-        ("Fear & Greed", data["retail_mania"]),
-    ]
-
-    print("\nDATA STATUS")
-
-    for name, item in checks:
-
+    except Exception as exc:
         print(
-            name,
-            "=>",
-            item.get("status"),
-            "|",
-            item.get("value"),
+            "Price Structure => ERROR | "
+            f"{type(exc).__name__}: {str(exc)}"
         )
 
-        if item.get("error"):
+        price_structure = {
+            "price": make_metric(
+                source="Binance Spot BTCUSDT",
+                status="ERROR",
+                note=str(exc)
+            ),
+            "support": unavailable_metric(
+                "Binance Spot Daily Candles",
+                "Price structure collection failed."
+            ),
+            "resistance": unavailable_metric(
+                "Binance Spot Daily Candles",
+                "Price structure collection failed."
+            ),
+            "ma20": unavailable_metric(
+                "Binance Spot Daily Candles",
+                "Price structure collection failed."
+            ),
+            "ma50": unavailable_metric(
+                "Binance Spot Daily Candles",
+                "Price structure collection failed."
+            ),
+            "ma200": unavailable_metric(
+                "Binance Spot Daily Candles",
+                "Price structure collection failed."
+            ),
+            "rsi14": unavailable_metric(
+                "Binance Spot Daily Candles",
+                "Price structure collection failed."
+            ),
+            "candle_updated_at": None
+        }
 
-            print(
-                "   ERROR:",
-                item["error"],
+    # Independent providers: one failure must not block another.
+    etf_flows = run_safely(
+        "ETF Flows",
+        fetch_etf_flows
+    )
+
+    funding_rate = run_safely(
+        "Funding Rate",
+        fetch_funding_rate
+    )
+
+    open_interest = run_safely(
+        "Open Interest",
+        fetch_open_interest
+    )
+
+    futures_premium = run_safely(
+        "Futures Premium",
+        fetch_futures_premium
+    )
+
+    mvrv_z_score = run_safely(
+        "MVRV Z-Score",
+        fetch_mvrv_z_score
+    )
+
+    nupl = run_safely(
+        "NUPL",
+        fetch_nupl
+    )
+
+    fear_greed = run_safely(
+        "Fear & Greed",
+        fetch_fear_greed
+    )
+
+    # Root fetched_at is set after all provider requests finish.
+    completed_at = iso_now()
+
+    payload = {
+        "schema_version": SCHEMA_VERSION,
+        "engine": "Crypto Dada Style Live Signals Engine",
+        "engine_version": VERSION,
+        "symbol": SYMBOL,
+        "market": "Binance Spot",
+
+        # Keep fetched_at for existing dashboard compatibility.
+        # It now represents the end of the collection run.
+        "fetched_at": completed_at,
+        "run_started_at": run_started_at,
+        "run_completed_at": completed_at,
+
+        "price_structure": price_structure,
+
+        "etf_flows": etf_flows,
+
+        "funding_rate": funding_rate,
+
+        "open_interest": open_interest,
+
+        "futures_premium": futures_premium,
+
+        "on_chain": {
+            "mvrv_z_score": mvrv_z_score,
+            "nupl": nupl
+        },
+
+        "retail_mania": fear_greed
+    }
+
+    return payload
+
+
+# ============================================================
+# JSON VALIDATION AND SAVE
+# ============================================================
+
+def validate_no_non_finite(value, path="root"):
+    if isinstance(value, float):
+        if not math.isfinite(value):
+            raise ValueError(
+                f"Non-finite number found at {path}"
             )
 
-    print("\nEngine completed.")
+    elif isinstance(value, dict):
+        for key, item in value.items():
+            validate_no_non_finite(
+                item,
+                f"{path}.{key}"
+            )
+
+    elif isinstance(value, list):
+        for index, item in enumerate(value):
+            validate_no_non_finite(
+                item,
+                f"{path}[{index}]"
+            )
+
+
+def save_json_atomically(payload):
+    OUTPUT_FILE.parent.mkdir(
+        parents=True,
+        exist_ok=True
+    )
+
+    validate_no_non_finite(payload)
+
+    temporary_file = OUTPUT_FILE.with_suffix(
+        OUTPUT_FILE.suffix + ".tmp"
+    )
+
+    with temporary_file.open(
+        "w",
+        encoding="utf-8"
+    ) as file:
+        json.dump(
+            payload,
+            file,
+            indent=2,
+            ensure_ascii=False,
+            allow_nan=False
+        )
+
+        file.write("\n")
+
+    temporary_file.replace(OUTPUT_FILE)
+
+
+# ============================================================
+# STATUS REPORT
+# ============================================================
+
+def get_metric_value(metric):
+    if not isinstance(metric, dict):
+        return None
+
+    return metric.get("value")
+
+
+def get_metric_status(metric):
+    if not isinstance(metric, dict):
+        return "UNAVAILABLE"
+
+    return metric.get("status", "UNAVAILABLE")
+
+
+def print_status(name, metric):
+    value = get_metric_value(metric)
+    status = get_metric_status(metric)
+
+    print(
+        f"{name} => {status} | {value}"
+    )
+
+    if isinstance(metric, dict):
+        note = metric.get("note")
+
+        if note and status in (
+            "ERROR",
+            "UNAVAILABLE",
+            "STALE",
+            "TIME_UNKNOWN"
+        ):
+            print(f"  NOTE: {note}")
+
+
+def print_report(payload):
+    print("\nDATA STATUS")
+
+    price = payload["price_structure"]
+
+    print_status(
+        "BTC Price",
+        price.get("price")
+    )
+
+    print_status(
+        "BTC Support",
+        price.get("support")
+    )
+
+    print_status(
+        "BTC Resistance",
+        price.get("resistance")
+    )
+
+    print_status(
+        "MA20",
+        price.get("ma20")
+    )
+
+    print_status(
+        "MA50",
+        price.get("ma50")
+    )
+
+    print_status(
+        "MA200",
+        price.get("ma200")
+    )
+
+    print_status(
+        "RSI14",
+        price.get("rsi14")
+    )
+
+    print_status(
+        "ETF Daily Flow",
+        payload.get("etf_flows")
+    )
+
+    etf = payload.get("etf_flows") or {}
+
+    print(
+        "ETF 7-Day Flow => "
+        f"{etf.get('seven_day_status', 'UNAVAILABLE')} | "
+        f"{etf.get('seven_day_net_flow')}"
+    )
+
+    print_status(
+        "Funding Rate",
+        payload.get("funding_rate")
+    )
+
+    print_status(
+        "Open Interest",
+        payload.get("open_interest")
+    )
+
+    print_status(
+        "Futures Premium",
+        payload.get("futures_premium")
+    )
+
+    on_chain = payload.get("on_chain") or {}
+
+    print_status(
+        "MVRV Z-Score",
+        on_chain.get("mvrv_z_score")
+    )
+
+    print_status(
+        "NUPL",
+        on_chain.get("nupl")
+    )
+
+    print_status(
+        "Fear & Greed",
+        payload.get("retail_mania")
+    )
+
+
+# ============================================================
+# MAIN
+# ============================================================
+
+def main():
+    try:
+        payload = collect_all_data()
+
+        save_json_atomically(payload)
+
+        print_report(payload)
+
+        print("\n" + "=" * 60)
+        print(f"Engine Version: {VERSION}")
+        print(f"JSON saved: {OUTPUT_FILE}")
+        print(f"Fetched: {payload.get('fetched_at')}")
+        print("=" * 60)
+
+    except Exception as exc:
+        print("\nFATAL ENGINE ERROR")
+        print(f"{type(exc).__name__}: {str(exc)}")
+        raise
 
 
 if __name__ == "__main__":
