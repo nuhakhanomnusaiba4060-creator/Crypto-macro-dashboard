@@ -1,7 +1,7 @@
 
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""Crypto Spot Final Decision Engine v2.1.0"""
+"""Crypto Spot Final Decision Engine v2.2.0"""
 
 import json
 import math
@@ -17,7 +17,7 @@ MARKET = DATA / "market_data.json"
 MACRO = DATA / "macro_data.json"
 OUT = DATA / "decision_data.json"
 
-VERSION = "2.1.0"
+VERSION = "2.2.0"
 
 MAX_MARKET_H = 36
 MAX_MACRO_H = 72
@@ -148,6 +148,10 @@ def metric_fresh(obj, limit_h):
     return age is not None and age <= limit_h
 
 
+# ============================================================
+# BTC / ETH TECHNICAL ANALYSIS
+# ============================================================
+
 def analyze_asset(market, symbol):
     asset = get(market, "technical", symbol)
 
@@ -257,13 +261,32 @@ def analyze_asset(market, symbol):
     }
 
 
+# ============================================================
+# MACRO ENGINE INTEGRATION
+# ============================================================
+
 def analyze_macro(macro):
+    """
+    Compatible with actual macro_engine.py v2 schema.
+
+    overall_macro_decision.DATA.risk_score
+    overall_macro_decision.DATA.support_score
+    overall_macro_decision.DATA.risk_flags
+    overall_macro_decision.DECISION
+    overall_macro_decision.ANALYSIS
+    overall_macro_decision.ACTION
+    overall_macro_decision.RISK
+
+    FRED metric timestamp: observation_date
+    Macro snapshot timestamp: fetched_at
+    """
+
     metrics = macro.get("metrics")
 
     if not isinstance(metrics, dict):
         metrics = {}
 
-    def mv(*keys):
+    def read_metric(*keys):
         for key in keys:
             item = metrics.get(key)
 
@@ -275,18 +298,31 @@ def analyze_macro(macro):
 
             value = n(item.get("value"))
 
-            if value is not None:
-                return value
+            if value is None:
+                continue
+
+            timestamp = (
+                item.get("observation_date")
+                or item.get("source_updated_at")
+                or item.get("observed_at")
+            )
+
+            age = age_hours(timestamp)
+
+            if age is None or age > MAX_MACRO_H:
+                continue
+
+            return value
 
         return None
 
-    vix = mv("vix", "VIX", "VIXCLS")
+    vix = read_metric("vix", "VIX", "VIXCLS")
 
-    yield_10y = mv(
+    yield_10y = read_metric(
         "yield_10y", "DGS10", "10Y"
     )
 
-    broad_usd = mv(
+    broad_usd = read_metric(
         "usd_broad_index",
         "DTWEXBGS",
         "broad_usd",
@@ -299,7 +335,64 @@ def analyze_macro(macro):
         "broad_usd": broad_usd is not None and broad_usd > 0
     }
 
-    if all(checks.values()):
+    overall = macro.get("overall_macro_decision")
+
+    if not isinstance(overall, dict):
+        overall = {}
+
+    # Actual Macro Engine uses uppercase DATA and DECISION.
+    decision_data = overall.get("DATA")
+
+    if not isinstance(decision_data, dict):
+        decision_data = {}
+
+    raw_decision = (
+        overall.get("DECISION")
+        or overall.get("decision")
+        or overall.get("label")
+        or "UNKNOWN"
+    )
+
+    label = " ".join(
+        str(raw_decision).upper().replace("_", " ").split()
+    )
+
+    raw_risk_score = n(
+        decision_data.get("risk_score")
+    )
+
+    raw_support_score = n(
+        decision_data.get("support_score")
+    )
+
+    risk_flags = decision_data.get("risk_flags")
+
+    if not isinstance(risk_flags, list):
+        risk_flags = []
+
+    supportive_flags = decision_data.get(
+        "supportive_flags"
+    )
+
+    if not isinstance(supportive_flags, list):
+        supportive_flags = []
+
+    missing_calculations = decision_data.get(
+        "unavailable_calculations",
+        decision_data.get("missing_metrics", [])
+    )
+
+    if not isinstance(missing_calculations, list):
+        missing_calculations = []
+
+    insufficient = (
+        "INSUFFICIENT DATA" in label
+        or raw_risk_score is None
+        or bool(missing_calculations)
+        or label == "UNKNOWN"
+    )
+
+    if all(checks.values()) and not insufficient:
         quality = "GOOD"
 
     elif any(checks.values()):
@@ -308,51 +401,61 @@ def analyze_macro(macro):
     else:
         quality = "POOR"
 
-    macro_decision = macro.get("overall_macro_decision")
+    score = (
+        max(0, int(raw_risk_score))
+        if raw_risk_score is not None else 0
+    )
 
-    if not isinstance(macro_decision, dict):
-        macro_decision = {}
+    if quality != "GOOD":
+        risk_level = "UNKNOWN"
 
-    label = str(
-        macro_decision.get("decision")
-        or macro_decision.get("label")
-        or "UNKNOWN"
-    ).upper().replace("_", " ")
+    elif score >= 4:
+        risk_level = "VERY_HIGH"
 
-    risk_level = str(
-        macro_decision.get("risk_level") or "UNKNOWN"
-    ).upper()
+    elif score >= 3:
+        risk_level = "HIGH"
 
-    score = 0
-    flags = []
+    elif score >= 1:
+        risk_level = "MODERATE"
 
-    if vix is not None:
-        if vix >= 30:
-            score += 2
-            flags.append("VIX অত্যন্ত বেশি")
-
-        elif vix >= 25:
-            score += 1
-            flags.append("VIX উচ্চ")
-
-    if yield_10y is not None and yield_10y >= 5:
-        score += 1
-        flags.append("যুক্তরাষ্ট্রের ১০ বছর মেয়াদি বন্ডের Yield বেশি")
-
-    if label == "REDUCE RISK":
-        score = max(score, 2)
-        flags.append("Macro Engine ঝুঁকি কমানোর সংকেত দিয়েছে")
-
-    if risk_level in ("HIGH", "VERY_HIGH", "CRITICAL"):
-        score = max(score, 2)
-        flags.append("Macro ঝুঁকির মাত্রা বেশি")
+    else:
+        risk_level = "LOW"
 
     return {
         "quality": quality,
         "decision": label,
         "risk_level": risk_level,
         "risk_score": score,
-        "risk_flags": flags,
+
+        "support_score": (
+            max(0, int(raw_support_score))
+            if raw_support_score is not None else None
+        ),
+
+        "risk_flags": [
+            str(x) for x in risk_flags
+        ],
+
+        "supportive_flags": [
+            str(x) for x in supportive_flags
+        ],
+
+        "missing_calculations": [
+            str(x) for x in missing_calculations
+        ],
+
+        "analysis": str(
+            overall.get("ANALYSIS") or ""
+        ),
+
+        "action": str(
+            overall.get("ACTION") or ""
+        ),
+
+        "risk_note": str(
+            overall.get("RISK") or ""
+        ),
+
         "vix": vix,
         "yield_10y": yield_10y,
         "broad_usd": broad_usd,
@@ -360,9 +463,19 @@ def analyze_macro(macro):
     }
 
 
+# ============================================================
+# FINAL MARKET DECISION
+# ============================================================
+
 def build(market, macro):
-    market_quality = snapshot(market, MAX_MARKET_H)
-    macro_quality = snapshot(macro, MAX_MACRO_H)
+
+    market_quality = snapshot(
+        market, MAX_MARKET_H
+    )
+
+    macro_quality = snapshot(
+        macro, MAX_MACRO_H
+    )
 
     btc = analyze_asset(market, "BTC")
     eth = analyze_asset(market, "ETH")
@@ -372,10 +485,14 @@ def build(market, macro):
     issues = []
 
     if market_quality["status"] != "FRESH":
-        issues.append("বাজারের Snapshot অনুপস্থিত, ভুল বা পুরোনো।")
+        issues.append(
+            "বাজারের Snapshot অনুপস্থিত, ভুল বা পুরোনো।"
+        )
 
     if macro_quality["status"] != "FRESH":
-        issues.append("Macro Snapshot অনুপস্থিত, ভুল বা পুরোনো।")
+        issues.append(
+            "Macro Snapshot অনুপস্থিত, ভুল বা পুরোনো।"
+        )
 
     if btc["quality"] != "FRESH":
         issues.append(
@@ -397,13 +514,16 @@ def build(market, macro):
 
     if macro_analysis["quality"] != "GOOD":
         issues.append(
-            "VIX, 10Y Yield ও Broad USD-এর সব গুরুত্বপূর্ণ মান যাচাই হয়নি।"
+            "VIX, 10Y Yield, Broad USD অথবা Macro Decision "
+            "সম্পূর্ণভাবে যাচাই হয়নি।"
         )
 
     limitations = macro.get("limitations")
 
     if isinstance(limitations, list):
-        issues.extend(str(x) for x in limitations if x)
+        issues.extend(
+            str(x) for x in limitations if x
+        )
 
     ready = (
         market_quality["status"] == "FRESH"
@@ -417,6 +537,7 @@ def build(market, macro):
     risks = []
 
     if not ready:
+
         decision = "WAIT"
 
         reasons.append(
@@ -433,7 +554,16 @@ def build(market, macro):
             "অসম্পূর্ণ বা পুরোনো ডেটা ভুল সিদ্ধান্ত তৈরি করতে পারে।"
         )
 
+        if macro_analysis["missing_calculations"]:
+            risks.append(
+                "Macro-এর অসম্পূর্ণ হিসাব: "
+                + ", ".join(
+                    macro_analysis["missing_calculations"]
+                )
+            )
+
     else:
+
         btc_bearish = btc["trend"] in (
             "BEARISH", "STRONG_BEARISH"
         )
@@ -444,19 +574,28 @@ def build(market, macro):
 
         eth_bearish = (
             eth["quality"] != "FRESH"
-            or eth["trend"] in ("BEARISH", "STRONG_BEARISH")
+            or eth["trend"] in (
+                "BEARISH", "STRONG_BEARISH"
+            )
         )
 
         macro_risk = (
             macro_analysis["risk_score"] >= 3
-            or macro_analysis["decision"] == "REDUCE RISK"
+            or macro_analysis["decision"].startswith(
+                "REDUCE RISK"
+            )
         )
 
         if btc_bearish and macro_risk:
+
             decision = "REDUCE RISK"
 
             reasons.append(
                 "BTC-এর Daily Trend দুর্বল এবং Macro ঝুঁকি বেশি।"
+            )
+
+            reasons.extend(
+                macro_analysis["risk_flags"]
             )
 
             actions.append(
@@ -470,9 +609,12 @@ def build(market, macro):
             )
 
         elif btc_bearish:
+
             decision = "WAIT"
 
-            reasons.append("BTC-এর Daily Trend Bearish।")
+            reasons.append(
+                "BTC-এর Daily Trend Bearish।"
+            )
 
             actions.append(
                 "নতুন Spot BUY/DCA বন্ধ রাখুন; "
@@ -480,10 +622,15 @@ def build(market, macro):
             )
 
         elif macro_risk:
+
             decision = "REDUCE RISK"
 
             reasons.append(
-                "BTC এখনো Bearish নয়, তবে Macro ঝুঁকি বেশি।"
+                "Macro Engine-এর পূর্ণাঙ্গ Multi-Factor Risk Score উচ্চ।"
+            )
+
+            reasons.extend(
+                macro_analysis["risk_flags"]
             )
 
             actions.append(
@@ -491,7 +638,15 @@ def build(market, macro):
                 "Portfolio concentration ও দুর্বল Coin পর্যালোচনা করুন।"
             )
 
-        elif btc_bullish and not eth_bearish:
+        elif (
+            btc_bullish
+            and not eth_bearish
+            and macro_analysis["decision"] not in (
+                "WAIT",
+                "WAIT INSUFFICIENT DATA"
+            )
+        ):
+
             decision = "HOLD"
 
             reasons.append(
@@ -504,10 +659,11 @@ def build(market, macro):
             )
 
         else:
+
             decision = "WAIT"
 
             reasons.append(
-                "BTC/ETH-এর সংকেত একই দিকে নেই বা Trend নিশ্চিত নয়।"
+                "BTC/ETH-এর সংকেত একই দিকে নেই অথবা Trend নিশ্চিত নয়।"
             )
 
             actions.append(
@@ -525,6 +681,16 @@ def build(market, macro):
                 "ETH Technical Data যাচাই হয়নি; ETH confirmation দুর্বল।"
             )
 
+        risks.extend(
+            macro_analysis["risk_flags"]
+        )
+
+        if macro_analysis["decision"] == "WAIT":
+            risks.append(
+                "Macro Engine-এর সিদ্ধান্ত WAIT; "
+                "Macro confirmation এখনো যথেষ্ট নয়।"
+            )
+
         if btc["support_warning"]:
             risks.append(
                 "BTC মূল্য Support reference-এর নিচে; "
@@ -532,6 +698,7 @@ def build(market, macro):
             )
 
     return {
+
         "engine": "CRYPTO FINAL DECISION ENGINE",
         "version": VERSION,
         "generated_at": now().isoformat(),
@@ -548,19 +715,25 @@ def build(market, macro):
         "macro_analysis": macro_analysis,
 
         "crypto_market": {
-            "global_market": market.get("global_market", {}),
-            "fear_greed": market.get("fear_greed", {}),
+            "global_market": market.get(
+                "global_market", {}
+            ),
+            "fear_greed": market.get(
+                "fear_greed", {}
+            ),
             "btc": btc,
             "eth": eth
         },
 
         "final_decision": {
+
             "decision": decision,
             "market_status": decision,
             "reasons": reasons,
             "actions": actions,
             "risk": risks,
             "data_ready": ready,
+
             "decision_scope": "BROAD_CRYPTO_MARKET_SPOT",
             "not_coin_specific": True
         },
@@ -568,16 +741,31 @@ def build(market, macro):
         "limitations": [
             "এটি সামগ্রিক Crypto Spot Market ঝুঁকি বিশ্লেষণ; "
             "নির্দিষ্ট Coin-এর BUY/SELL নির্দেশ নয়।",
+
             "Scheduled Snapshot সম্পূর্ণ Real-time নয়।",
+
             "FRED Macro তথ্য প্রকাশে বিলম্ব হয়।",
+
             "শুধু RSI বা Support warning দিয়ে SELL সিদ্ধান্ত দেওয়া হয় না।",
-            "Futures/Margin সংকেত তৈরি করা হয় না।"
+
+            "Futures/Margin সংকেত তৈরি করা হয় না।",
+
+            "Macro Risk Score একটি rule-based score; "
+            "এটি calibrated probability নয়।"
         ]
     }
 
 
+# ============================================================
+# ATOMIC JSON WRITER
+# ============================================================
+
 def write(path, data):
-    path.parent.mkdir(parents=True, exist_ok=True)
+
+    path.parent.mkdir(
+        parents=True,
+        exist_ok=True
+    )
 
     fd, tmp = tempfile.mkstemp(
         dir=str(path.parent),
@@ -585,7 +773,13 @@ def write(path, data):
     )
 
     try:
-        with os.fdopen(fd, "w", encoding="utf-8") as f:
+
+        with os.fdopen(
+            fd,
+            "w",
+            encoding="utf-8"
+        ) as f:
+
             json.dump(
                 data,
                 f,
@@ -594,26 +788,72 @@ def write(path, data):
                 allow_nan=False
             )
 
+            f.write("\n")
+
         os.replace(tmp, path)
 
     finally:
+
         if os.path.exists(tmp):
             os.remove(tmp)
 
 
+# ============================================================
+# MAIN
+# ============================================================
+
 def main():
+
     output = build(
         read(MARKET),
         read(MACRO)
     )
 
-    write(OUT, output)
+    write(
+        OUT,
+        output
+    )
+
+    print("=" * 55)
+    print("CRYPTO FINAL DECISION ENGINE")
+    print("Version:", VERSION)
 
     print(
-        "Decision:", output["final_decision"]["decision"],
-        "| Data:", output["data_quality"]["status"],
-        "| BTC:", output["crypto_market"]["btc"]["trend"]
+        "Decision:",
+        output["final_decision"]["decision"]
     )
+
+    print(
+        "Data Quality:",
+        output["data_quality"]["status"]
+    )
+
+    print(
+        "BTC Trend:",
+        output["crypto_market"]["btc"]["trend"]
+    )
+
+    print(
+        "Macro Decision:",
+        output["macro_analysis"]["decision"]
+    )
+
+    print(
+        "Macro Risk Score:",
+        output["macro_analysis"]["risk_score"]
+    )
+
+    print(
+        "Macro Quality:",
+        output["macro_analysis"]["quality"]
+    )
+
+    print(
+        "Output:",
+        OUT
+    )
+
+    print("=" * 55)
 
     return 0
 
