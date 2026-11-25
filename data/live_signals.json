@@ -1,84 +1,88 @@
 {
   "schema_version": 1,
   "engine": "Crypto Dada Style Live Signals Engine",
-  "engine_version": "1.3.2",
+  "engine_version": "1.3.3",
   "symbol": "BTCUSDT",
   "market": "Binance Spot",
-  "fetched_at": "2026-11-25T05:44:30+00:00",
-  "run_started_at": "2026-11-25T05:44:25+00:00",
-  "run_completed_at": "2026-11-25T05:44:30+00:00",
+  "fetched_at": "2026-11-25T06:44:21+00:00",
+  "run_started_at": "2026-11-25T06:44:14+00:00",
+  "run_completed_at": "2026-11-25T06:44:21+00:00",
   "price_structure": {
     "price": {
-      "value": null,
-      "unit": null,
-      "status": "ERROR",
-      "source": "Binance Spot BTCUSDT",
+      "value": 59202.01,
+      "unit": "USDT",
+      "status": "TIME_UNKNOWN",
+      "source": "Binance Spot BTCUSDT Ticker",
       "source_updated_at": null,
-      "fetched_at": "2026-11-25T05:44:26+00:00",
+      "fetched_at": "2026-11-25T06:44:15+00:00",
       "data_age_hours": null,
-      "note": "HTTP Error 451: "
+      "note": "Binance public spot ticker. This endpoint does not provide an observation timestamp. Fetch time is recorded separately."
     },
     "support": {
-      "value": null,
-      "unit": null,
-      "status": "UNAVAILABLE",
+      "value": 55130.0,
+      "unit": "USDT",
+      "status": "OK",
       "source": "Binance Spot Daily Candles",
-      "source_updated_at": null,
-      "fetched_at": "2026-11-25T05:44:26+00:00",
-      "data_age_hours": null,
-      "note": "Price structure collection failed."
+      "source_updated_at": "2026-11-24T23:59:59+00:00",
+      "fetched_at": "2026-11-25T06:44:15+00:00",
+      "data_age_hours": 6.74,
+      "note": "Lowest Low of the previous 20 completed daily candles.",
+      "lookback": "20 completed daily candles",
+      "method": "lowest low"
     },
     "resistance": {
-      "value": null,
-      "unit": null,
-      "status": "UNAVAILABLE",
+      "value": 81196.01,
+      "unit": "USDT",
+      "status": "OK",
       "source": "Binance Spot Daily Candles",
-      "source_updated_at": null,
-      "fetched_at": "2026-11-25T05:44:26+00:00",
-      "data_age_hours": null,
-      "note": "Price structure collection failed."
+      "source_updated_at": "2026-11-24T23:59:59+00:00",
+      "fetched_at": "2026-11-25T06:44:15+00:00",
+      "data_age_hours": 6.74,
+      "note": "Highest High of the previous 20 completed daily candles.",
+      "lookback": "20 completed daily candles",
+      "method": "highest high"
     },
     "ma20": {
-      "value": null,
-      "unit": null,
-      "status": "UNAVAILABLE",
+      "value": 67576.61050000001,
+      "unit": "USDT",
+      "status": "OK",
       "source": "Binance Spot Daily Candles",
-      "source_updated_at": null,
-      "fetched_at": "2026-11-25T05:44:26+00:00",
-      "data_age_hours": null,
-      "note": "Price structure collection failed."
+      "source_updated_at": "2026-11-24T23:59:59+00:00",
+      "fetched_at": "2026-11-25T06:44:15+00:00",
+      "data_age_hours": 6.74,
+      "note": "20-day simple moving average."
     },
     "ma50": {
-      "value": null,
-      "unit": null,
-      "status": "UNAVAILABLE",
+      "value": 75738.14339999999,
+      "unit": "USDT",
+      "status": "OK",
       "source": "Binance Spot Daily Candles",
-      "source_updated_at": null,
-      "fetched_at": "2026-11-25T05:44:26+00:00",
-      "data_age_hours": null,
-      "note": "Price structure collection failed."
+      "source_updated_at": "2026-11-24T23:59:59+00:00",
+      "fetched_at": "2026-11-25T06:44:15+00:00",
+      "data_age_hours": 6.74,
+      "note": "50-day simple moving average."
     },
     "ma200": {
-      "value": null,
-      "unit": null,
-      "status": "UNAVAILABLE",
+      "value": 72189.37564999997,
+      "unit": "USDT",
+      "status": "OK",
       "source": "Binance Spot Daily Candles",
-      "source_updated_at": null,
-      "fetched_at": "2026-11-25T05:44:26+00:00",
-      "data_age_hours": null,
-      "note": "Price structure collection failed."
+      "source_updated_at": "2026-11-24T23:59:59+00:00",
+      "fetched_at": "2026-11-25T06:44:15+00:00",
+      "data_age_hours": 6.74,
+      "note": "200-day simple moving average."
     },
     "rsi14": {
-      "value": null,
-      "unit": null,
-      "status": "UNAVAILABLE",
+      "value": 17.634611070009456,
+      "unit": "RSI",
+      "status": "OK",
       "source": "Binance Spot Daily Candles",
-      "source_updated_at": null,
-      "fetched_at": "2026-11-25T05:44:26+00:00",
-      "data_age_hours": null,
-      "note": "Price structure collection failed."
+      "source_updated_at": "2026-11-24T23:59:59+00:00",
+      "fetched_at": "2026-11-25T06:44:15+00:00",
+      "data_age_hours": 6.74,
+      "note": "14-period RSI calculated from completed daily candle closes."
     },
-    "candle_updated_at": null
+    "candle_updated_at": "2026-11-24T23:59:59+00:00"
   },
   "etf_flows": {
     "value": -231.4,
@@ -86,11 +90,12 @@
     "status": "OK",
     "source": "CoinBoss Public ETF API",
     "source_updated_at": "2026-11-24T00:00:00+00:00",
-    "fetched_at": "2026-11-25T05:44:26+00:00",
-    "data_age_hours": 29.740822743055553,
-    "note": "Latest reported daily net ETF flow. A zero value is preserved as a genuine provider value.",
+    "fetched_at": "2026-11-25T06:44:16+00:00",
+    "data_age_hours": 30.74,
+    "note": "Latest reported daily net ETF flow. Zero is preserved only when the provider actually reports zero.",
     "daily_net_flow": -231.4,
     "daily_unit": "million USD",
+    "daily_status": "OK",
     "seven_day_net_flow": -2591.1,
     "seven_day_unit": "million USD",
     "seven_day_status": "OK",
@@ -102,36 +107,42 @@
     "update_frequency": "Daily"
   },
   "funding_rate": {
-    "value": 0.003488969965374163,
+    "value": 0.005421337028652579,
     "unit": "% per 8h",
-    "status": "OK",
+    "status": "TIME_UNKNOWN",
     "source": "CoinBoss Public Funding API",
-    "source_updated_at": "2026-11-25T05:44:21+00:00",
-    "fetched_at": "2026-11-25T05:44:27+00:00",
-    "data_age_hours": 0.0,
-    "note": "Open-interest-weighted 8-hour funding rate. Provider fraction converted to percentage.",
+    "source_updated_at": null,
+    "fetched_at": "2026-11-25T06:44:16+00:00",
+    "data_age_hours": null,
+    "note": "Open-interest-weighted 8-hour funding rate. Provider fraction converted to percentage. Provider did not expose a verified observation timestamp. Fetch time is recorded separately.",
     "method": "oi_weighted_8h",
-    "raw_fraction": 3.488969965374163e-05
+    "raw_fraction": 5.4213370286525784e-05
   },
   "open_interest": {
-    "value": 30979697281.055,
+    "value": 31072926208.57999,
     "unit": "USD",
     "status": "OK",
     "source": "CoinBoss Public Open Interest API",
-    "source_updated_at": "2026-11-25T05:44:02+00:00",
-    "fetched_at": "2026-11-25T05:44:28+00:00",
-    "data_age_hours": 0.01,
-    "note": "Total BTC open interest in USD. Preferred adjusted value, with total_usd fallback."
+    "source_updated_at": "2026-11-25T06:42:54+00:00",
+    "fetched_at": "2026-11-25T06:44:18+00:00",
+    "data_age_hours": 0.02,
+    "note": "Total BTC open interest in USD. Adjusted single-sided value is preferred.",
+    "method": "total_usd_single_adjusted"
   },
   "futures_premium": {
-    "value": null,
-    "unit": null,
-    "status": "ERROR",
-    "source": "Futures Premium",
-    "source_updated_at": null,
-    "fetched_at": "2026-11-25T05:44:29+00:00",
-    "data_age_hours": null,
-    "note": "RuntimeError: Basis API did not return a valid perp basis."
+    "value": -0.03082,
+    "unit": "%",
+    "status": "OK",
+    "source": "CoinBoss Public Futures Basis API",
+    "source_updated_at": "2026-11-25T06:43:34+00:00",
+    "fetched_at": "2026-11-25T06:44:20+00:00",
+    "data_age_hours": 0.01,
+    "note": "Perpetual futures mark/index basis percentage. This is not a pure spot-versus-perpetual premium.",
+    "method": "perp.aggregate.oi_weighted_pct",
+    "provider_quality": "FRESH",
+    "provider_is_stale": false,
+    "exchange_count": 18,
+    "contract_count": 34
   },
   "on_chain": {
     "mvrv_z_score": {
@@ -140,9 +151,9 @@
       "status": "STALE",
       "source": "Explore21 Bitcoin MVRV Z-Score",
       "source_updated_at": "2026-11-20T00:00:00+00:00",
-      "fetched_at": "2026-11-25T05:44:29+00:00",
-      "data_age_hours": 125.74,
-      "note": "On-chain MVRV Z-Score. Value is retained when stale, but marked accordingly. Source observation is 125.7 hours old; freshness limit is 48 hours."
+      "fetched_at": "2026-11-25T06:44:21+00:00",
+      "data_age_hours": 126.74,
+      "note": "On-chain MVRV Z-Score. Stale values are retained for reference. Source data is 126.7 hours old; freshness limit is 48 hours."
     },
     "nupl": {
       "value": null,
@@ -150,9 +161,9 @@
       "status": "UNAVAILABLE",
       "source": "Explore21",
       "source_updated_at": null,
-      "fetched_at": "2026-11-25T05:44:29+00:00",
+      "fetched_at": "2026-11-25T06:44:21+00:00",
       "data_age_hours": null,
-      "note": "NUPL is not currently listed in the verified free Explore21 metric catalog. No unverified alternative provider is being used."
+      "note": "NUPL is not currently available from the verified free provider used by this engine. No unverified value is substituted."
     }
   },
   "retail_mania": {
@@ -161,9 +172,9 @@
     "status": "PROXY_ONLY",
     "source": "Alternative.me Fear & Greed Index",
     "source_updated_at": "2026-11-25T00:00:00+00:00",
-    "fetched_at": "2026-11-25T05:44:30+00:00",
-    "data_age_hours": 5.74,
-    "note": "Sentiment proxy only. This is not a direct measurement of retail trading activity or retail positioning.",
+    "fetched_at": "2026-11-25T06:44:21+00:00",
+    "data_age_hours": 6.74,
+    "note": "Sentiment proxy only. It does not directly measure retail trading activity or positioning.",
     "classification": "Extreme Fear",
     "proxy_only": true
   }
