@@ -1,9 +1,9 @@
 
-name: Crypto Dada Live Signals
+name: Crypto Dada Advanced Dashboard
 
 on:
   schedule:
-    - cron: "*/5 * * * *"
+    - cron: "*/10 * * * *"
 
   workflow_dispatch:
 
@@ -11,17 +11,16 @@ permissions:
   contents: write
 
 concurrency:
-  group: crypto-dada-live-signals
+  group: crypto-dada-advanced-dashboard
   cancel-in-progress: false
 
 jobs:
-  update-live-signals:
+  build-dashboard-data:
     runs-on: ubuntu-latest
-    timeout-minutes: 8
+    timeout-minutes: 20
 
     env:
-      COINGLASS_API_KEY: ${{ secrets.COINGLASS_API_KEY }}
-      GLASSNODE_API_KEY: ${{ secrets.GLASSNODE_API_KEY }}
+      FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
 
     steps:
       - name: Checkout Repository
@@ -32,30 +31,176 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Run Live Signals Engine
+      - name: Prepare Data Directory
+        run: mkdir -p data
+
+      - name: Run Global Market and BTC ETH Engine
+        run: python data_engine.py
+
+      - name: Run Macro Economy Engine
+        run: python macro_engine.py
+
+      - name: Run Advanced Spot and Derivatives Engine
+        run: python advanced_engine.py
+
+      - name: Run ETF Funding OI Basis and Sentiment Engine
         run: python live_signals_engine.py
 
-      - name: Validate Generated JSON
+      - name: Run Final Spot Decision Engine
+        run: python decision_engine.py
+
+      - name: Run Market Zone and Risk Engine
+        run: python market_zone_engine.py
+
+      - name: Validate All Dashboard JSON Files
         run: |
-          if [ ! -f data/live_signals.json ]; then
-            echo "ERROR: JSON file was not generated."
-            exit 1
-          fi
+          python - <<'PY'
+          import json
+          from datetime import datetime, timezone
+          from pathlib import Path
 
-          python -m json.tool data/live_signals.json > /dev/null
+          required = {
+              "data/market_data.json": [
+                  "global_market",
+                  "major_assets",
+                  "technical",
+                  "fear_greed"
+              ],
+              "data/macro_data.json": [
+                  "metrics",
+                  "reports",
+                  "liquidity",
+                  "yield_curve",
+                  "overall_macro_decision"
+              ],
+              "data/advanced_data.json": [
+                  "spot_order_book",
+                  "spot_taker_activity",
+                  "spot_market_activity",
+                  "derivatives",
+                  "on_chain"
+              ],
+              "data/live_signals.json": [
+                  "price_structure",
+                  "etf_flows",
+                  "funding_rate",
+                  "open_interest",
+                  "futures_premium",
+                  "on_chain",
+                  "retail_mania"
+              ],
+              "data/decision_data.json": [
+                  "data_quality",
+                  "final_decision",
+                  "macro_analysis"
+              ],
+              "data/market_zone_data.json": [
+                  "data_quality",
+                  "current_zone",
+                  "spot_action_code",
+                  "risk_level",
+                  "verified_inputs"
+              ]
+          }
 
-          echo "JSON validation successful."
+          now = datetime.now(timezone.utc)
+          errors = []
 
-      - name: Commit Updated Live Data
+          for filename, keys in required.items():
+              path = Path(filename)
+
+              if not path.is_file():
+                  errors.append(f"{filename}: file missing")
+                  continue
+
+              try:
+                  with path.open(encoding="utf-8") as handle:
+                      payload = json.load(handle)
+              except Exception as exc:
+                  errors.append(
+                      f"{filename}: invalid JSON: {exc}"
+                  )
+                  continue
+
+              if not isinstance(payload, dict):
+                  errors.append(
+                      f"{filename}: root must be an object"
+                  )
+                  continue
+
+              for key in keys:
+                  if key not in payload:
+                      errors.append(
+                          f"{filename}: missing key '{key}'"
+                      )
+
+              timestamp = (
+                  payload.get("generated_at")
+                  or payload.get("fetched_at")
+              )
+
+              if not isinstance(timestamp, str):
+                  errors.append(
+                      f"{filename}: missing timestamp"
+                  )
+                  continue
+
+              try:
+                  parsed = datetime.fromisoformat(
+                      timestamp.replace("Z", "+00:00")
+                  )
+
+                  if parsed.tzinfo is None:
+                      parsed = parsed.replace(
+                          tzinfo=timezone.utc
+                      )
+
+                  age = (
+                      now - parsed.astimezone(timezone.utc)
+                  ).total_seconds() / 60
+
+                  if age < -5:
+                      errors.append(
+                          f"{filename}: future timestamp"
+                      )
+
+                  elif age > 45:
+                      errors.append(
+                          f"{filename}: stale output ({age:.1f} min)"
+                      )
+
+              except Exception:
+                  errors.append(
+                      f"{filename}: invalid timestamp"
+                  )
+
+              print(f"VALID JSON: {filename}")
+
+          if errors:
+              print("\nVALIDATION FAILED:")
+              for error in errors:
+                  print(" -", error)
+              raise SystemExit(1)
+
+          print("\nAll six dashboard JSON files passed validation.")
+          PY
+
+      - name: Commit All Dashboard Data
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          git add data/live_signals.json
+          git add \
+            data/market_data.json \
+            data/macro_data.json \
+            data/advanced_data.json \
+            data/live_signals.json \
+            data/decision_data.json \
+            data/market_zone_data.json
 
           if git diff --cached --quiet; then
-            echo "No data changes to commit."
+            echo "No dashboard data changes."
           else
-            git commit -m "Update Crypto Dada live signals"
+            git commit -m "Update complete Crypto Dada dashboard data"
             git push
           fi
