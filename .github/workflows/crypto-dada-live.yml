@@ -63,7 +63,6 @@ jobs:
           from pathlib import Path
 
           required = {
-          
               "data/market_data.json": [
                   "global_market",
                   "major_assets",
@@ -104,6 +103,15 @@ jobs:
                   "spot_action_code",
                   "risk_level",
                   "verified_inputs"
+              ],
+              "data/cycle_data.json": [
+                  "current_market_cycle",
+                  "bull_run_tracker",
+                  "recession_risk",
+                  "altcoin_season",
+                  "eth_btc_ratio",
+                  "altcoin_market_caps",
+                  "cycle_history"
               ]
           }
 
@@ -186,7 +194,7 @@ jobs:
                   print(" -", error)
               raise SystemExit(1)
 
-          print("\nAll six dashboard JSON files passed validation.")
+          print("\nAll seven dashboard JSON files passed validation.")
           PY
 
       - name: Commit All Dashboard Data
@@ -200,7 +208,8 @@ jobs:
             data/advanced_data.json \
             data/live_signals.json \
             data/decision_data.json \
-            data/market_zone_data.json
+            data/market_zone_data.json \
+            data/cycle_data.json
 
           if git diff --cached --quiet; then
             echo "No dashboard data changes."
