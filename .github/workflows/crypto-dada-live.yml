@@ -52,6 +52,9 @@ jobs:
       - name: Run Market Zone and Risk Engine
         run: python market_zone_engine.py
 
+      - name: Run Market Cycle and Bull Run Tracker
+        run: python cycle_engine.py
+
       - name: Validate All Dashboard JSON Files
         run: |
           python - <<'PY'
@@ -60,6 +63,7 @@ jobs:
           from pathlib import Path
 
           required = {
+          
               "data/market_data.json": [
                   "global_market",
                   "major_assets",
