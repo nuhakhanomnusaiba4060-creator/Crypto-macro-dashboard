@@ -4,1017 +4,696 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Crypto Dada | Live Signals Dashboard</title>
+<meta name="theme-color" content="#050807">
+<title>Crypto Dada | Advanced Market Intelligence</title>
 
 <style>
-:root {
-  --bg:#050807;
-  --panel:#0b1210;
-  --panel2:#101b15;
-  --border:#1b3829;
-  --green:#00e58a;
-  --green2:#00a968;
-  --red:#ff5265;
-  --yellow:#ffc857;
-  --blue:#5bb8ff;
-  --text:#e5f3eb;
-  --muted:#82978b;
+:root{
+ --bg:#050807;--panel:#0b1210;--panel2:#101b15;
+ --border:#1b3829;--green:#00e58a;--green2:#00a968;
+ --red:#ff5265;--yellow:#ffc857;--blue:#5bb8ff;
+ --text:#e5f3eb;--muted:#82978b;
 }
-
-* {box-sizing:border-box}
-
-html {scroll-behavior:smooth}
-
-body {
-  margin:0;
-  background:
-    linear-gradient(rgba(0,229,138,.035) 1px,transparent 1px),
-    linear-gradient(90deg,rgba(0,229,138,.035) 1px,transparent 1px),
-    var(--bg);
-  background-size:30px 30px;
-  color:var(--text);
-  font-family:Arial,"Noto Sans Bengali",sans-serif;
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:18px}
+body{
+ margin:0;color:var(--text);
+ background:
+ linear-gradient(rgba(0,229,138,.025) 1px,transparent 1px),
+ linear-gradient(90deg,rgba(0,229,138,.025) 1px,transparent 1px),
+ var(--bg);
+ background-size:30px 30px;
+ font-family:Arial,"Noto Sans Bengali",sans-serif;
 }
-
-.app {
-  display:flex;
-  min-height:100vh;
+button{font:inherit}
+.app{display:flex;min-height:100vh}
+.sidebar{
+ width:235px;flex-shrink:0;background:#070d0a;
+ border-right:1px solid var(--border);
+ padding:20px 14px;position:sticky;top:0;height:100vh;
+ overflow-y:auto;z-index:20;
 }
-
-.sidebar {
-  width:230px;
-  background:#070d0a;
-  border-right:1px solid var(--border);
-  padding:22px 15px;
-  flex-shrink:0;
+.logo{font-size:21px;font-weight:900;color:var(--green);letter-spacing:1px}
+.logo small{display:block;color:var(--muted);font-size:9px;letter-spacing:2px;margin-top:6px}
+.side-title{font-size:10px;color:#587466;letter-spacing:2px;margin:27px 9px 10px}
+.nav-list{display:grid;gap:4px}
+.nav{
+ display:block;padding:11px 10px;border-radius:7px;
+ color:#a9c0b3;text-decoration:none;font-size:12px;
+ border:1px solid transparent;
 }
-
-.logo {
-  font-size:21px;
-  font-weight:800;
-  color:var(--green);
-  letter-spacing:1px;
-  margin-bottom:8px;
+.nav:hover,.nav.active{background:#10251a;border-color:#1c5238;color:var(--green)}
+.sidebar-note{
+ margin-top:25px;padding:12px;border:1px solid var(--border);
+ border-radius:8px;color:var(--muted);font-size:10px;line-height:1.9
 }
-
-.logo small {
-  display:block;
-  font-size:10px;
-  color:var(--muted);
-  letter-spacing:2px;
-  margin-top:6px;
+.main{flex:1;min-width:0;padding:22px;max-width:1800px;margin:auto;width:100%}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:18px}
+.page-title{font-size:23px;font-weight:900}
+.page-subtitle{font-size:11px;color:var(--muted);margin-top:7px}
+.top-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.live-indicator{font-size:10px;color:var(--green);border:1px solid #17613f;padding:8px 11px;border-radius:20px}
+button{
+ background:#0c2a1c;color:var(--green);border:1px solid #1a6944;
+ border-radius:7px;padding:9px 13px;cursor:pointer;font-weight:700;font-size:11px
 }
-
-.side-title {
-  color:#587466;
-  font-size:10px;
-  letter-spacing:2px;
-  margin:30px 10px 12px;
+button:disabled{opacity:.5;cursor:wait}
+.panel{
+ background:linear-gradient(145deg,#0c1511,#080e0b);
+ border:1px solid var(--border);border-radius:10px;
+ padding:17px;margin-bottom:17px;min-width:0
 }
-
-.nav {
-  display:block;
-  padding:12px;
-  margin:5px 0;
-  border-radius:7px;
-  color:#a9c0b3;
-  text-decoration:none;
-  font-size:13px;
-  border:1px solid transparent;
+.panel-heading,.section-heading{
+ display:flex;justify-content:space-between;align-items:center;
+ gap:10px;flex-wrap:wrap;margin-bottom:14px
 }
-
-.nav:hover,
-.nav.active {
-  background:#10251a;
-  border-color:#1c5238;
-  color:var(--green);
+.panel-heading h2,.section-heading h2{font-size:15px;margin:0}
+.label{font-size:9px;color:var(--muted);letter-spacing:1px}
+.section-heading{margin:27px 0 13px}
+.section-heading h2{font-size:16px}
+.section-heading span{font-size:10px;color:var(--muted)}
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.grid.two{grid-template-columns:repeat(2,minmax(0,1fr))}
+.grid.three{grid-template-columns:repeat(3,minmax(0,1fr))}
+.metric{
+ background:linear-gradient(145deg,#0d1712,#080e0b);
+ border:1px solid var(--border);border-radius:9px;
+ padding:14px;min-width:0;position:relative;overflow:hidden
 }
-
-.sidebar-note {
-  margin-top:35px;
-  padding:12px;
-  border:1px solid var(--border);
-  border-radius:8px;
-  color:var(--muted);
-  font-size:11px;
-  line-height:1.8;
+.metric:before{content:"";position:absolute;left:0;top:0;width:3px;height:100%;background:var(--green2)}
+.metric.warning:before{background:var(--yellow)}
+.metric.danger:before{background:var(--red)}
+.metric.unavailable:before{background:#66736b}
+.metric-head{display:flex;justify-content:space-between;gap:7px;align-items:flex-start}
+.metric-title{font-size:11px;font-weight:700;line-height:1.5}
+.metric-value{font-size:23px;font-weight:900;color:var(--green);margin:13px 0 4px;overflow-wrap:anywhere}
+.metric-value.neutral{color:var(--yellow)}
+.metric-value.missing{font-size:15px;color:#9aa79f}
+.metric-unit{font-size:10px;color:var(--muted);line-height:1.5}
+.badge{font-size:9px;padding:5px 7px;border-radius:5px;background:#123222;color:var(--green);white-space:nowrap}
+.badge.warning{background:#342a13;color:var(--yellow)}
+.badge.danger{background:#35151b;color:var(--red)}
+.badge.unavailable{background:#202722;color:#a2ada6}
+.metric-details{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:12px}
+.detail{background:#101b15;padding:8px;border-radius:5px;min-width:0}
+.detail span{display:block;color:var(--muted);font-size:9px;margin-bottom:5px}
+.detail strong{font-size:11px;overflow-wrap:anywhere}
+.metric-note{font-size:10px;color:#aabdb1;line-height:1.7;border-top:1px solid #1b3025;padding-top:9px;margin-top:10px}
+.metric-action{font-size:10px;color:var(--green);line-height:1.7;margin-top:8px}
+.metric-source{font-size:9px;color:#71877a;line-height:1.7;margin-top:9px;overflow-wrap:anywhere}
+.error-panel{
+ display:none;border:1px solid #75303a;background:#241014;color:#ff9aa5;
+ padding:12px;border-radius:8px;margin-bottom:14px;font-size:11px;line-height:1.7
 }
-
-.main {
-  flex:1;
-  min-width:0;
-  padding:24px;
+.kpi{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.kpi .metric-value{font-size:22px}
+.chart-frame{height:470px;overflow:hidden;border:1px solid var(--border);border-radius:8px;background:#080e0b}
+.chart-frame iframe{width:100%;height:100%;border:0}
+.chart-note{font-size:10px;color:var(--muted);line-height:1.7;margin-top:9px}
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:520px;font-size:11px}
+th,td{padding:10px 9px;border-bottom:1px solid #1b3025;text-align:left}
+th{color:var(--muted);font-size:9px;letter-spacing:.6px}
+td{color:#d5e6db}
+.good{color:var(--green)!important}.bad{color:var(--red)!important}.warn{color:var(--yellow)!important}
+.decision-box{
+ border:1px solid var(--border);border-radius:9px;padding:17px;
+ background:linear-gradient(140deg,#102018,#09100c)
 }
-
-.topbar {
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:15px;
-  flex-wrap:wrap;
-  margin-bottom:24px;
-}
-
-.page-title {
-  font-size:23px;
-  font-weight:800;
-}
-
-.page-subtitle {
-  color:var(--muted);
-  font-size:12px;
-  margin-top:7px;
-}
-
-.top-actions {
-  display:flex;
-  align-items:center;
-  gap:10px;
-  flex-wrap:wrap;
-}
-
-.live-indicator {
-  color:var(--green);
-  font-size:11px;
-  border:1px solid #17613f;
-  padding:8px 12px;
-  border-radius:20px;
-}
-
-button {
-  background:#0c2a1c;
-  color:var(--green);
-  border:1px solid #1a6944;
-  border-radius:7px;
-  padding:10px 15px;
-  cursor:pointer;
-  font-weight:700;
-}
-
-button:disabled {
-  opacity:.5;
-  cursor:wait;
-}
-
-.panel {
-  background:linear-gradient(145deg,#0c1511,#080e0b);
-  border:1px solid var(--border);
-  border-radius:10px;
-  padding:19px;
-  margin-bottom:20px;
-}
-
-.panel-heading {
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:10px;
-  flex-wrap:wrap;
-  margin-bottom:15px;
-}
-
-.panel-heading h2 {
-  font-size:15px;
-  margin:0;
-}
-
-.label {
-  color:var(--muted);
-  font-size:10px;
-  letter-spacing:1px;
-}
-
-.etf-layout {
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:15px;
-}
-
-.etf-status {
-  background:#101b15;
-  border:1px solid var(--border);
-  border-radius:8px;
-  padding:20px;
-}
-
-.etf-status strong {
-  display:block;
-  color:var(--yellow);
-  font-size:19px;
-  margin:10px 0;
-}
-
-.etf-status p {
-  font-size:12px;
-  color:var(--muted);
-  line-height:1.8;
-  margin-bottom:0;
-}
-
-.etf-placeholder {
-  min-height:125px;
-  border:1px dashed #28523d;
-  border-radius:8px;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  text-align:center;
-  padding:15px;
-  color:var(--muted);
-  font-size:12px;
-  line-height:1.8;
-}
-
-.section-heading {
-  margin:28px 0 14px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:10px;
-  flex-wrap:wrap;
-}
-
-.section-heading h2 {
-  font-size:17px;
-  margin:0;
-}
-
-.section-heading span {
-  font-size:11px;
-  color:var(--muted);
-}
-
-.signal-grid {
-  display:grid;
-  grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:15px;
-}
-
-.signal-card {
-  background:linear-gradient(145deg,#0d1712,#080e0b);
-  border:1px solid var(--border);
-  border-radius:10px;
-  padding:17px;
-  min-width:0;
-  position:relative;
-  overflow:hidden;
-}
-
-.signal-card::before {
-  content:"";
-  position:absolute;
-  top:0;
-  left:0;
-  width:3px;
-  height:100%;
-  background:var(--green2);
-}
-
-.signal-card.warning::before {background:var(--yellow)}
-.signal-card.danger::before {background:var(--red)}
-.signal-card.unavailable::before {background:#66736b}
-
-.card-top {
-  display:flex;
-  justify-content:space-between;
-  gap:10px;
-  align-items:flex-start;
-  margin-bottom:17px;
-}
-
-.card-title {
-  font-size:14px;
-  font-weight:700;
-}
-
-.card-number {
-  color:var(--muted);
-  font-size:10px;
-  margin-top:5px;
-}
-
-.status {
-  display:inline-block;
-  font-size:10px;
-  font-weight:700;
-  padding:6px 9px;
-  border-radius:5px;
-  background:#123222;
-  color:var(--green);
-  white-space:nowrap;
-}
-
-.status.warning {
-  background:#342a13;
-  color:var(--yellow);
-}
-
-.status.danger {
-  background:#35151b;
-  color:var(--red);
-}
-
-.status.unavailable {
-  background:#202722;
-  color:#a2ada6;
-}
-
-.metric-main {
-  font-size:25px;
-  font-weight:800;
-  color:var(--green);
-  margin:12px 0 5px;
-  overflow-wrap:anywhere;
-}
-
-.metric-main.neutral {color:var(--yellow)}
-
-.metric-main.missing {
-  color:#9aa79f;
-  font-size:18px;
-}
-
-.metric-unit {
-  color:var(--muted);
-  font-size:11px;
-  line-height:1.6;
-}
-
-.details {
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:9px;
-  margin:16px 0;
-}
-
-.detail {
-  background:#101b15;
-  padding:10px;
-  border-radius:6px;
-  min-width:0;
-}
-
-.detail span {
-  display:block;
-  color:var(--muted);
-  font-size:10px;
-  margin-bottom:6px;
-}
-
-.detail strong {
-  font-size:12px;
-  overflow-wrap:anywhere;
-}
-
-.explanation {
-  border-top:1px solid #1b3025;
-  padding-top:12px;
-  color:#b1c4b8;
-  font-size:12px;
-  line-height:1.8;
-}
-
-.action {
-  margin-top:9px;
-  color:var(--green);
-  font-size:12px;
-  line-height:1.8;
-}
-
-.source {
-  color:#71877a;
-  font-size:10px;
-  margin-top:12px;
-  line-height:1.8;
-  overflow-wrap:anywhere;
-}
-
-.api-error {
-  color:var(--red);
-  margin-top:8px;
-  font-size:11px;
-  line-height:1.7;
-  overflow-wrap:anywhere;
-}
-
-.error-panel {
-  display:none;
-  border:1px solid #75303a;
-  background:#241014;
-  color:#ff9aa5;
-  padding:14px;
-  border-radius:8px;
-  margin-bottom:18px;
-  font-size:12px;
-  line-height:1.8;
-}
-
-.footer {
-  text-align:center;
-  color:#61766a;
-  font-size:10px;
-  padding:25px 10px;
-  line-height:1.8;
-}
-
-@media(max-width:850px) {
-  .sidebar {width:190px}
-  .main {padding:18px}
-}
-
-@media(max-width:650px) {
-  .app {display:block}
-
-  .sidebar {
-    width:100%;
-    padding:13px;
-    border-right:0;
-    border-bottom:1px solid var(--border);
-  }
-
-  .logo {
-    font-size:18px;
-    margin-bottom:12px;
-  }
-
-  .side-title,.sidebar-note {display:none}
-
-  .nav-list {
-    display:flex;
-    overflow-x:auto;
-    gap:5px;
-  }
-
-  .nav {
-    white-space:nowrap;
-    margin:0;
-    padding:9px 11px;
-    font-size:11px;
-  }
-
-  .main {padding:14px}
-  .page-title {font-size:19px}
-
-  .signal-grid,.etf-layout {
-    grid-template-columns:1fr;
-  }
-
-  .panel {padding:14px}
-  .metric-main {font-size:23px}
+.decision-main{font-size:29px;font-weight:900;color:var(--yellow);margin:10px 0}
+.decision-text{font-size:12px;color:#b5c9bd;line-height:1.8}
+.list{margin:8px 0;padding-left:18px;color:#b5c9bd;font-size:11px;line-height:1.9}
+.status-line{display:flex;gap:8px;align-items:center;font-size:10px;color:var(--muted);flex-wrap:wrap}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--green);display:inline-block}
+.dot.red{background:var(--red)}.dot.yellow{background:var(--yellow)}
+.progress{height:7px;background:#1b3025;border-radius:10px;overflow:hidden;margin-top:9px}
+.progress>span{height:100%;display:block;background:var(--green);width:0}
+.empty{padding:18px;border:1px dashed #28523d;border-radius:8px;text-align:center;color:var(--muted);font-size:11px;line-height:1.8}
+.footer{text-align:center;color:#61766a;font-size:10px;padding:25px 10px;line-height:1.9}
+.hidden{display:none!important}
+@media(max-width:1100px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.sidebar{width:205px}}
+@media(max-width:650px){
+ .app{display:block}
+ .sidebar{position:relative;width:100%;height:auto;padding:12px;border-right:0;border-bottom:1px solid var(--border)}
+ .logo{font-size:18px}.side-title,.sidebar-note{display:none}
+ .nav-list{display:flex;overflow-x:auto;gap:5px;margin-top:12px}
+ .nav{white-space:nowrap;padding:9px 10px;font-size:10px}
+ .main{padding:12px}
+ .page-title{font-size:18px}
+ .grid,.grid.two,.grid.three{grid-template-columns:1fr}
+ .chart-frame{height:390px}
+ .panel{padding:13px}
+ .metric-value{font-size:22px}
 }
 </style>
 </head>
 
 <body>
 <div class="app">
-
 <aside class="sidebar">
-  <div class="logo">
-    CRYPTO DADA
-    <small>LIVE MARKET SIGNALS</small>
-  </div>
-
-  <div class="side-title">DASHBOARD</div>
-
-  <div class="nav-list">
-    <a class="nav active" href="#overview">Overview</a>
-    <a class="nav" href="#etf">ETF Flows</a>
-    <a class="nav" href="#signals">8 Signals</a>
-    <a class="nav" href="#data-info">Data Status</a>
-  </div>
-
-  <div class="sidebar-note">
-    MARKET INTELLIGENCE<br>
-    BTC • ETF • FUTURES<br>
-    ON-CHAIN • SENTIMENT<br><br>
-    এই Dashboard বাজারের তথ্য বিশ্লেষণ করে। এটি স্বয়ংক্রিয় BUY/SELL নির্দেশ নয়।
-  </div>
+ <div class="logo">CRYPTO DADA<small>ADVANCED MARKET INTELLIGENCE</small></div>
+ <div class="side-title">MARKET DASHBOARD</div>
+ <nav class="nav-list">
+  <a class="nav active" href="#overview">01 · Overview</a>
+  <a class="nav" href="#btc">02 · BTC Technical</a>
+  <a class="nav" href="#institutional">03 · ETF & Flow</a>
+  <a class="nav" href="#derivatives">04 · Futures & Spot</a>
+  <a class="nav" href="#onchain">05 · On-chain</a>
+  <a class="nav" href="#macro">06 · Macro Economy</a>
+  <a class="nav" href="#altcoins">07 · Altcoin Market</a>
+  <a class="nav" href="#sentiment">08 · Sentiment & Risk</a>
+  <a class="nav" href="#decision">09 · Final Decision</a>
+  <a class="nav" href="#system">Data & System Status</a>
+ </nav>
+ <div class="sidebar-note">
+  MARKET INTELLIGENCE<br>
+  SPOT MARKET CONTEXT<br>
+  BTC · ETF · MACRO · ON-CHAIN<br><br>
+  Futures তথ্য কেবল বাজারের ঝুঁকি বোঝাতে ব্যবহৃত হবে। এটি Futures ট্রেডিং নির্দেশ নয়।
+ </div>
 </aside>
 
 <main class="main">
-
 <header class="topbar" id="overview">
-  <div>
-    <div class="page-title">CRYPTO MARKET INTELLIGENCE</div>
-    <div class="page-subtitle">
-      BTC Market Structure & Live Signals Analysis
-    </div>
-  </div>
-
-  <div class="top-actions">
-    <span class="live-indicator" id="connection">● DATA CHECKING</span>
-    <button id="refreshButton" onclick="loadDashboard()">↻ Refresh</button>
-  </div>
+ <div>
+  <div class="page-title">CRYPTO MARKET INTELLIGENCE</div>
+  <div class="page-subtitle">Global Market · Institutional Flow · Macro · On-chain · Spot Decision</div>
+ </div>
+ <div class="top-actions">
+  <span class="live-indicator" id="connection">● CONNECTING</span>
+  <button id="refreshButton" onclick="loadDashboard()">↻ Refresh Data</button>
+ </div>
 </header>
 
 <div class="error-panel" id="errorPanel"></div>
 
-<section class="panel" id="etf">
-  <div class="panel-heading">
-    <h2>ETF FLOW & INSTITUTIONAL ACCUMULATION</h2>
-    <span class="label">INSTITUTIONAL DATA</span>
-  </div>
+<div class="section-heading"><h2>GLOBAL MARKET OVERVIEW</h2><span id="marketUpdated">DATA LOADING</span></div>
+<div class="grid" id="globalGrid"></div>
 
-  <div class="etf-layout">
-    <div class="etf-status">
-      <div class="label">CURRENT ETF CONDITION</div>
-      <strong id="etfStatus">UNAVAILABLE</strong>
-      <p id="etfExplanation">
-        ETF Flow Provider সংযুক্ত নয়। Accumulation বা Distribution নিশ্চিত করা যাচ্ছে না।
-      </p>
-    </div>
+<div class="section-heading" id="btc"><h2>BTC & ETH TECHNICAL STRUCTURE</h2><span>SPOT MARKET · CLOSED CANDLES</span></div>
+<section class="panel">
+ <div class="panel-heading"><h2>BITCOIN LIVE CHART</h2><span class="label">TRADINGVIEW</span></div>
+ <div class="chart-frame">
+  <iframe title="Bitcoin TradingView Chart" loading="lazy"
+   src="https://s.tradingview.com/widgetembed/?frameElementId=tradingview_btc&symbol=BINANCE%3ABTCUSDT&interval=D&hidesidetoolbar=0&symboledit=1&saveimage=0&toolbarbg=080e0b&theme=dark&style=1&timezone=Asia%2FDhaka&withdateranges=1&hideideas=1&studies=MASimple%40tv-basicstudies%1FRSI%40tv-basicstudies">
+  </iframe>
+ </div>
+ <div class="chart-note">চার্টটি TradingView থেকে সরাসরি লোড হয়। এটি তোমার GitHub JSON-এর অংশ নয়। চার্ট লোড না হলে TradingView বা নেটওয়ার্ক সীমাবদ্ধতা হতে পারে।</div>
+</section>
+<div class="grid two" id="technicalGrid"></div>
 
-    <div class="etf-placeholder" id="etfChart">
-      ETF FLOW DATA পাওয়া যায়নি।<br>
-      Provider যুক্ত হলে প্রকৃত তথ্য দেখানো হবে।
-    </div>
-  </div>
+<div class="section-heading" id="institutional"><h2>ETF & INSTITUTIONAL MONEY FLOW</h2><span>CAPITAL FLOW</span></div>
+<div class="grid three" id="etfGrid"></div>
+<section class="panel">
+ <div class="panel-heading"><h2>ETF FLOW DATA</h2><span class="label">VERIFIED PROVIDER DATA ONLY</span></div>
+ <div class="empty" id="etfHistory">ঐতিহাসিক ETF Flow Series পাওয়া যায়নি। প্রকৃত Historical Data ছাড়া কোনো চার্ট তৈরি করা হবে না।</div>
 </section>
 
-<div class="section-heading" id="signals">
-  <h2>8 KEY MARKET SIGNALS</h2>
-  <span>SPOT MARKET CONTEXT</span>
-</div>
+<div class="section-heading" id="derivatives"><h2>FUTURES, DERIVATIVES & SPOT ACTIVITY</h2><span>RISK CONTEXT · NOT A FUTURES SIGNAL</span></div>
+<div class="grid" id="derivativeGrid"></div>
+<div class="section-heading"><h2>SPOT ORDER BOOK & TAKER ACTIVITY</h2><span>BINANCE SPOT</span></div>
+<div class="grid two" id="spotGrid"></div>
+<div class="section-heading"><h2>SPOT MARKET BREADTH</h2><span>ADVANCING VS DECLINING</span></div>
+<div class="grid two" id="breadthGrid"></div>
 
-<div class="signal-grid" id="signalGrid">
-  <article class="signal-card unavailable">
-    <div class="card-title">ডেটা লোড হচ্ছে...</div>
-  </article>
-</div>
+<div class="section-heading" id="onchain"><h2>ON-CHAIN ANALYTICS</h2><span>BITCOIN NETWORK VALUATION</span></div>
+<div class="grid three" id="onchainGrid"></div>
 
-<section class="panel" id="data-info">
-  <div class="panel-heading">
-    <h2>DATA QUALITY & SYSTEM STATUS</h2>
-    <span class="label">SYSTEM MONITOR</span>
-  </div>
+<div class="section-heading" id="macro"><h2>GLOBAL MACRO ECONOMY</h2><span>FED · INFLATION · BONDS · DOLLAR · RISK</span></div>
+<div class="grid" id="macroGrid"></div>
+<div class="section-heading"><h2>MACRO LIQUIDITY & YIELD CURVE</h2><span>PROVIDER OBSERVATIONS</span></div>
+<div class="grid two" id="liquidityGrid"></div>
+<div class="section-heading"><h2>MACRO REPORTS</h2><span>DATA → ANALYSIS → DECISION → ACTION → RISK</span></div>
+<div class="grid two" id="macroReports"></div>
 
-  <div class="details">
-    <div class="detail">
-      <span>Dashboard Connection</span>
-      <strong id="systemConnection">Checking...</strong>
-    </div>
+<div class="section-heading" id="altcoins"><h2>ALTCOIN MARKET & MARKET BREADTH</h2><span>ALTCOIN SEASON CONTEXT</span></div>
+<div class="grid" id="altcoinGrid"></div>
 
-    <div class="detail">
-      <span>Engine Version</span>
-      <strong id="engineVersion">N/A</strong>
-    </div>
+<div class="section-heading" id="sentiment"><h2>SENTIMENT & MARKET RISK</h2><span>RISK MONITOR</span></div>
+<div class="grid three" id="sentimentGrid"></div>
 
-    <div class="detail">
-      <span>Last Data Fetch</span>
-      <strong id="lastFetch">N/A</strong>
-    </div>
+<div class="section-heading" id="decision"><h2>FINAL MARKET DECISION ENGINE</h2><span>SPOT ONLY</span></div>
+<section class="panel">
+ <div class="decision-box" id="decisionBox">
+  <div class="label">OVERALL MARKET DECISION</div>
+  <div class="decision-main">WAITING FOR DATA</div>
+  <div class="decision-text">Decision JSON লোড হচ্ছে।</div>
+ </div>
+ <div class="grid three" id="decisionGrid" style="margin-top:13px"></div>
+ <div class="section-heading"><h2>DECISION REASONS</h2></div>
+ <div class="grid two">
+  <div class="metric"><div class="metric-title">কারণ ও প্রমাণ</div><ul class="list" id="decisionReasons"><li>তথ্য লোড হচ্ছে</li></ul></div>
+  <div class="metric"><div class="metric-title">করণীয় ও ঝুঁকি</div><ul class="list" id="decisionActions"><li>তথ্য লোড হচ্ছে</li></ul></div>
+ </div>
+</section>
 
-    <div class="detail">
-      <span>Data File</span>
-      <strong>data/live_signals.json</strong>
-    </div>
-  </div>
-
-  <div class="explanation">
-    গুরুত্বপূর্ণ: Funding Rate, Open Interest ও Futures Premium Futures Market-এর তথ্য। এগুলো একা Spot BUY বা SELL সিদ্ধান্ত দেয় না।
-    ETF, MVRV ও NUPL-এর তথ্য না থাকলে Dashboard অনুমান করে কোনো সংখ্যা দেখাবে না।
-  </div>
+<div class="section-heading" id="system"><h2>DATA QUALITY & SYSTEM STATUS</h2><span>FILE MONITOR</span></div>
+<div class="grid" id="systemGrid"></div>
+<section class="panel">
+ <div class="panel-heading"><h2>DATA LIMITATIONS & WARNINGS</h2><span class="label">TRANSPARENCY</span></div>
+ <ul class="list" id="limitations"><li>ডেটা যাচাই হচ্ছে...</li></ul>
 </section>
 
 <footer class="footer">
-  CRYPTO DADA INSPIRED LIVE SIGNALS DASHBOARD<br>
-  Independent dashboard • Not affiliated with any YouTube channel<br>
-  Market data may be delayed or unavailable. Always verify before making decisions.
+ CRYPTO DADA INSPIRED · ADVANCED MARKET INTELLIGENCE DASHBOARD<br>
+ Independent dashboard · Not affiliated with any YouTube channel<br>
+ Data may be delayed, incomplete or unavailable. This is not personalized financial advice.
 </footer>
-
 </main>
 </div>
 
 <script>
 "use strict";
 
-const DATA_URL = "./data/live_signals.json";
-
-const STATUS_TEXT = {
-  OK:"তথ্য পাওয়া গেছে",
-  PARTIAL:"আংশিক তথ্য",
-  PROXY_ONLY:"Proxy তথ্য",
-  UNAVAILABLE:"তথ্য পাওয়া যায়নি",
-  ERROR:"তথ্য সংগ্রহে সমস্যা"
+/* Data files: existing repository outputs */
+const FILES={
+ market:"./data/market_data.json",
+ macro:"./data/macro_data.json",
+ advanced:"./data/advanced_data.json",
+ decision:"./data/decision_data.json",
+ zone:"./data/market_zone_data.json",
+ live:"./data/live_signals.json"
 };
+const $=id=>document.getElementById(id);
+const cache={};
 
-function get(obj,path) {
-  return path.split(".").reduce((value,key) => {
-    return value && value[key] !== undefined ? value[key] : null;
-  },obj);
+function obj(v){return v&&typeof v==="object"&&!Array.isArray(v)?v:{}}
+function path(o,p){return p.split(".").reduce((a,k)=>a==null?null:a[k],o)}
+function pick(o,paths){
+ for(const p of paths){const v=path(o,p);if(v!==null&&v!==undefined)return v}
+ return null;
+}
+function val(v){
+ if(v===null||v===undefined||v==="")return null;
+ if(typeof v==="object")return pick(v,["value","current","price","last"]);
+ const n=Number(v);return Number.isFinite(n)?n:null;
+}
+function fmt(v,d=2){
+ const n=val(v);return n===null?"N/A":n.toLocaleString("en-US",{maximumFractionDigits:d});
+}
+function money(v){
+ const n=val(v);return n===null?"N/A":"$"+n.toLocaleString("en-US",{maximumFractionDigits:2});
+}
+function compact(v){
+ const n=val(v);if(n===null)return "N/A";
+ const a=Math.abs(n);
+ if(a>=1e12)return "$"+(n/1e12).toFixed(2)+"T";
+ if(a>=1e9)return "$"+(n/1e9).toFixed(2)+"B";
+ if(a>=1e6)return "$"+(n/1e6).toFixed(2)+"M";
+ if(a>=1e3)return n.toLocaleString("en-US",{maximumFractionDigits:1});
+ return fmt(n,3);
+}
+function pct(v,d=2){const n=val(v);return n===null?"N/A":n.toFixed(d)+"%"}
+function date(v){
+ if(!v)return "N/A";
+ const d=new Date(v);if(Number.isNaN(d.getTime()))return String(v);
+ return d.toLocaleString("en-GB",{day:"2-digit",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit",timeZone:"Asia/Dhaka"})+" BDT";
+}
+function esc(v){
+ return String(v??"N/A").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
+}
+function statusOf(m){
+ if(!m)return "UNAVAILABLE";
+ let s=m.status||m.quality||"";
+ if(s==="FRESH")s="OK";
+ if(s==="STALE"||s==="TIME_UNKNOWN")return s;
+ if(["OK","PARTIAL","PROXY_ONLY","UNAVAILABLE","ERROR"].includes(s))return s;
+ if(val(m)!==null)return "OK";
+ return "UNAVAILABLE";
+}
+function cls(s){
+ if(s==="OK"||s==="FRESH")return "";
+ if(s==="PARTIAL"||s==="PROXY_ONLY"||s==="STALE"||s==="TIME_UNKNOWN")return "warning";
+ if(s==="ERROR"||s==="INVALID")return "danger";
+ return "unavailable";
+}
+function label(s){
+ return ({OK:"তথ্য পাওয়া গেছে",FRESH:"তথ্য সতেজ",PARTIAL:"আংশিক তথ্য",PROXY_ONLY:"Proxy তথ্য",STALE:"পুরোনো তথ্য",TIME_UNKNOWN:"সময় যাচাই হয়নি",ERROR:"API সমস্যা",INVALID:"অকার্যকর",UNAVAILABLE:"তথ্য নেই"})[s]||"অজানা";
+}
+function metricCard(title,value,unit="",status="UNAVAILABLE",details=[],note="",action="",meta={}){
+ const c=cls(status),missing=["UNAVAILABLE","ERROR","INVALID"].includes(status);
+ const main=missing?"তথ্য পাওয়া যায়নি":(value===null||value===undefined?"N/A":value);
+ const detailHTML=details.map(x=>`<div class="detail"><span>${esc(x[0])}</span><strong>${esc(x[1])}</strong></div>`).join("");
+ return `<article class="metric ${c}">
+ <div class="metric-head"><div class="metric-title">${esc(title)}</div><span class="badge ${c}">${esc(label(status))}</span></div>
+ <div class="metric-value ${missing?"missing":c==="warning"?"neutral":""}">${esc(main)}</div>
+ <div class="metric-unit">${esc(unit)}</div>
+ ${detailHTML?`<div class="metric-details">${detailHTML}</div>`:""}
+ ${note?`<div class="metric-note">${esc(note)}</div>`:""}
+ ${action?`<div class="metric-action">করণীয়: ${esc(action)}</div>`:""}
+ <div class="metric-source">Source: ${esc(meta.source||"N/A")}<br>Source Updated: ${esc(date(meta.source_updated_at||meta.observation_date||meta.observed_at))}<br>Fetched: ${esc(date(meta.fetched_at))}</div>
+ ${meta.error?`<div class="metric-source bad">Error: ${esc(meta.error)}</div>`:""}
+ </article>`;
+}
+function rawMetric(m,d=2,unitOverride=null){
+ m=obj(m);
+ return {value:val(m),status:statusOf(m),unit:unitOverride||m.unit||"",meta:m};
+}
+function render(id,html,empty="তথ্য পাওয়া যায়নি"){
+ $(id).innerHTML=html||`<div class="empty">${esc(empty)}</div>`;
+}
+function cardFrom(title,m,options={}){
+ const x=rawMetric(m);
+ let v=x.value===null?null:(options.format?options.format(x.value):fmt(x.value,options.digits??2));
+ return metricCard(title,v,options.unit||x.unit,x.status,options.details||[],options.note||m?.note||"",options.action||"",x.meta);
+}
+function arrayList(a){
+ return Array.isArray(a)&&a.length?a.map(x=>`<li>${esc(typeof x==="object"?JSON.stringify(x):x)}</li>`).join(""):"<li>যাচাইকৃত তথ্য পাওয়া যায়নি।</li>";
+}
+async function loadFile(key,url){
+ try{
+  const r=await fetch(url+"?t="+Date.now(),{cache:"no-store"});
+  if(!r.ok)throw new Error("HTTP "+r.status);
+  const j=await r.json();
+  if(!j||typeof j!=="object")throw new Error("Invalid JSON");
+  cache[key]=j;
+  return {data:j,status:"OK",error:null};
+ }catch(e){
+  cache[key]=null;
+  return {data:null,status:"ERROR",error:e.message};
+ }
 }
 
-function first(obj,paths) {
-  for(const path of paths) {
-    const value = get(obj,path);
-    if(value !== null && value !== undefined) return value;
-  }
-  return null;
+/* GLOBAL MARKET */
+function buildGlobal(m){
+ if(!m){render("globalGrid","");return}
+ const g=obj(m.global_market),a=obj(m.major_assets);
+ const b=obj(a.bitcoin),e=obj(a.ethereum);
+ const rows=[
+  cardFrom("TOTAL CRYPTO MARKET CAP",g.total_market_cap_usd,{format:compact,unit:"USD"}),
+  cardFrom("24H TOTAL VOLUME",g.total_volume_24h_usd,{format:compact,unit:"USD"}),
+  cardFrom("BTC DOMINANCE",g.btc_dominance_pct,{format:pct,unit:"Market Share"}),
+  cardFrom("ETH DOMINANCE",g.eth_dominance_pct,{format:pct,unit:"Market Share"}),
+  cardFrom("BTC SPOT PRICE",b.price_usd,{format:money,unit:"USD"}),
+  cardFrom("BTC 24H CHANGE",b.change_24h_pct,{format:pct,unit:"24 Hour"}),
+  cardFrom("ETH SPOT PRICE",e.price_usd,{format:money,unit:"USD"}),
+  cardFrom("ETH 24H CHANGE",e.change_24h_pct,{format:pct,unit:"24 Hour"})
+ ];
+ render("globalGrid",rows.join(""));
+ $("marketUpdated").textContent="Snapshot: "+date(m.generated_at);
 }
 
-function metricValue(obj,paths) {
-  const value = first(obj,paths);
-
-  if(value && typeof value === "object") {
-    return first(value,["value","current","price"]);
-  }
-
-  return value;
+/* BTC / ETH TECHNICALS */
+function technicalCard(symbol,t){
+ if(!t)return metricCard(symbol,"তথ্য পাওয়া যায়নি","","UNAVAILABLE");
+ const i=obj(t.indicators),p=t.price_usdt;
+ const list=[
+  ["MA20",i.ma20],["MA50",i.ma50],["MA200",i.ma200],
+  ["RSI14",i.rsi14],["MACD",i.macd],["MACD Signal",i.macd_signal],
+  ["ADX14",i.adx14],["Volume Ratio",i.volume_ratio_20d],
+  ["Support 20D",i.support_20d],["Resistance 20D",i.resistance_20d],
+  ["Bollinger Upper",i.bollinger_upper],["Bollinger Lower",i.bollinger_lower]
+ ];
+ const details=list.map(x=>[x[0],fmt(x[1],2)]);
+ return metricCard(symbol+" TECHNICAL DATA",money(p),p?.unit||"USDT",statusOf(p),details,
+  "শুধু সম্পূর্ণ বন্ধ Daily Candle-এর সূচক। এটি Tick-by-tick Technical Signal নয়।",
+  "MA20/50/200, RSI, Volume ও Support একসঙ্গে যাচাই করুন।",p||{});
+}
+function buildTechnical(m){
+ const t=obj(m?.technical);
+ render("technicalGrid",[technicalCard("BTC",t.BTC),technicalCard("ETH",t.ETH)].join(""));
 }
 
-function metricObject(obj,paths) {
-  for(const path of paths) {
-    const value = get(obj,path);
-    if(value && typeof value === "object") return value;
-  }
-  return {};
+/* ETF */
+function buildETF(l){
+ const e=obj(l?.etf_flows);
+ const daily=e.daily_net_flow,weekly=e.seven_day_net_flow;
+ const cards=[
+  cardFrom("ETF DAILY NET FLOW",daily===undefined?null:{value:daily,status:e.daily_status,unit:e.daily_unit,source:e.source,source_updated_at:e.source_updated_at,fetched_at:e.fetched_at},{format:compact,unit:e.daily_unit||"USD"}),
+  cardFrom("ETF 7-DAY NET FLOW",weekly===undefined?null:{value:weekly,status:e.status,unit:e.unit,source:e.source,source_updated_at:e.source_updated_at,fetched_at:e.fetched_at},{format:compact,unit:e.unit||"USD"}),
+  cardFrom("ETF FLOW STATUS",e,{format:v=>String(e.classification||e.status||"N/A"),unit:"Provider Classification",note:e.note||"ETF প্রবাহ প্রাতিষ্ঠানিক অর্থের প্রবণতা বোঝায়।"})
+ ];
+ render("etfGrid",cards.join(""));
+ $("etfHistory").textContent=e.history?.length?"Historical series available; chart integration pending.":"ঐতিহাসিক ETF Flow Series পাওয়া যায়নি। প্রকৃত Historical Data ছাড়া কোনো চার্ট তৈরি করা হবে না।";
 }
 
-function meta(metric,container) {
-  metric = metric || {};
-  container = container || {};
-
-  return {
-    source:metric.source || container.source || "N/A",
-    sourceUpdated:metric.source_updated_at || container.source_updated_at || null,
-    fetched:metric.fetched_at || container.fetched_at || null,
-    error:metric.error || container.error || null
-  };
+/* DERIVATIVES */
+function buildDerivatives(a,l){
+ const d=obj(a?.derivatives),b=obj(d.BTCUSDT),e=obj(d.ETHUSDT);
+ const lf=obj(l);
+ const rows=[];
+ for(const [name,x] of [["BTC",b],["ETH",e]]){
+  rows.push(cardFrom(name+" OPEN INTEREST (USD)",x.open_interest_usd,{format:compact,unit:"USD",details:[
+   ["24H OI Change",pct(x.open_interest_change_24h_pct)],
+   ["Exchanges",fmt(x.open_interest_exchange_count,0)]
+  ],note:"Aggregated derivatives provider data; exchange coverage may vary."}));
+  rows.push(cardFrom(name+" FUNDING RATE",x.funding_avg_8h||x.last_funding_rate,{format:v=>fmt(v,6),unit:"Provider-reported funding",details:[
+   ["APR",pct(x.funding_apr_pct)],
+   ["Exchanges",fmt(x.funding_exchange_count,0)]
+  ],note:"Futures market context only; not a spot entry signal."}));
+  rows.push(cardFrom(name+" LONG / SHORT RATIO",x.global_long_short_ratio,{format:v=>fmt(v,3),unit:"Ratio"}));
+ }
+ rows.push(cardFrom("LIVE SIGNALS FUNDING",lf.funding_rate,{format:v=>fmt(v,6),unit:lf.funding_rate?.unit||"Provider unit"}));
+ rows.push(cardFrom("LIVE SIGNALS OPEN INTEREST",lf.open_interest,{format:compact,unit:lf.open_interest?.unit||"Provider unit"}));
+ rows.push(cardFrom("FUTURES BASIS / PREMIUM",lf.futures_premium,{format:v=>fmt(v,5),unit:lf.futures_premium?.unit||"%"}));
+ render("derivativeGrid",rows.join(""));
 }
 
-function number(value,digits=2) {
-  if(value === null || value === undefined || value === "") return "N/A";
+/* SPOT ORDER BOOK + TAKER */
+function buildSpot(a){
+ const book=obj(a?.spot_order_book),taker=obj(a?.spot_taker_activity);
+ const out=[];
+ for(const sym of ["BTCUSDT","ETHUSDT"]){
+  const b=obj(book[sym]),t=obj(taker[sym]);
+  out.push(metricCard(sym+" ORDER BOOK IMBALANCE",pct(b.imbalance_percent),"%",statusOf(b.imbalance_percent),[
+   ["Bid Value",compact(b.bid_value_usdt)],["Ask Value",compact(b.ask_value_usdt)],
+   ["Depth",b.depth_scope||"N/A"],["Snapshot",date(b.snapshot_retrieved_at)]
+  ],b.limitation||"Order book snapshot; not the complete exchange order book.","Bid/Ask imbalance-কে একক BUY/SELL সংকেত হিসেবে ব্যবহার করবেন না.",b.imbalance_percent||{}));
+  out.push(cardFrom(sym+" SPOT TAKER BUY/SELL",t.taker_buy_sell_ratio,{format:v=>fmt(v,3),unit:"Buy / Sell Ratio",details:[
+   ["Buy Volume",compact(t.taker_buy_quote_volume)],
+   ["Sell Volume",compact(t.taker_sell_quote_volume)],
+   ["Candle",t.candle_close_time||"N/A"]
+  ],note:"Last closed 15-minute spot candle; not cumulative market CVD."}));
+ }
+ render("spotGrid",out.join(""));
+ const breadth=obj(a?.spot_market_activity?.breadth);
+ render("breadthGrid",[
+  metricCard("SPOT ADVANCING / DECLINING",fmt(breadth.advancing_pairs,0)+" / "+fmt(breadth.declining_pairs,0),"Pairs",breadth.classification? "OK":"UNAVAILABLE",[
+   ["Measured Pairs",fmt(breadth.measured_pairs,0)],["Advance/Decline",fmt(breadth.advance_decline_ratio,3)],
+   ["Coverage",pct(breadth.coverage_pct)]
+  ],"Binance Spot eligible pairs only; coverage is not the entire crypto market."),
+  metricCard("SPOT MARKET BREADTH",breadth.classification||"তথ্য নেই","Classification",breadth.classification?"OK":"UNAVAILABLE",[
+   ["Unchanged",fmt(breadth.unchanged_pairs,0)],["Excluded Stablecoin",fmt(breadth.excluded_stablecoin_pairs,0)],
+   ["Excluded Leveraged",fmt(breadth.excluded_leveraged_token_pairs,0)]
+  ],"Advancing ও declining pair-এর অনুপাত বাজারের বিস্তৃতি বোঝায়।")
+ ].join(""));
+}
 
-  const n = Number(value);
-  if(!Number.isFinite(n)) return "N/A";
+/* ON-CHAIN */
+function buildOnchain(l,a){
+ const oc=obj(l?.on_chain);
+ const extra=obj(a?.on_chain||a?.onchain);
+ const cards=[
+  cardFrom("MVRV Z-SCORE",oc.mvrv_z_score,{format:v=>fmt(v,4),unit:oc.mvrv_z_score?.unit||"Z-Score",note:oc.mvrv_z_score?.note}),
+  cardFrom("NUPL",oc.nupl,{format:v=>fmt(v,4),unit:oc.nupl?.unit||"Net Unrealized P/L",note:oc.nupl?.note}),
+  cardFrom("EXCHANGE NETFLOW",extra.exchange_netflow||extra.exchange_net_flow,{format:compact,unit:"Provider unit"}),
+  cardFrom("EXCHANGE RESERVES",extra.exchange_reserves,{format:compact,unit:"BTC"}),
+  cardFrom("WHALE ACTIVITY",extra.whale_activity||extra.whale_transactions,{format:v=>fmt(v,0),unit:"Provider metric"}),
+  cardFrom("SOPR",extra.sopr,{format:v=>fmt(v,4),unit:"SOPR"})
+ ];
+ render("onchainGrid",cards.join(""));
+}
 
-  return n.toLocaleString("en-US",{
-    maximumFractionDigits:digits
+/* MACRO */
+function buildMacro(m){
+ const metrics=obj(m?.metrics);
+ const specs=[
+  ["FED FUNDS RATE","fed_funds_rate"],["CPI","cpi"],["CORE CPI","core_cpi"],
+  ["PCE INFLATION","pce"],["CORE PCE","core_pce"],["UNEMPLOYMENT","unemployment"],
+  ["NONFARM PAYROLLS","nonfarm_payrolls"],["US 2Y YIELD","yield_2y"],
+  ["US 10Y YIELD","yield_10y"],["US 30Y YIELD","yield_30y"],
+  ["10Y-2Y YIELD SPREAD","yield_curve_10y_2y"],["VIX","vix"],
+  ["BROAD USD INDEX","usd_broad_index"],["S&P 500","sp500"],["NASDAQ","nasdaq"],
+  ["USD / JPY","usd_jpy"],["WTI OIL","oil"],["GOLD","gold"],
+  ["FED BALANCE SHEET","fed_balance_sheet"],["TREASURY GENERAL ACCOUNT","treasury_general_account"],
+  ["REVERSE REPO","reverse_repo"],["M2 MONEY SUPPLY","m2_money_supply"]
+ ];
+ const cards=specs.map(([title,key])=>{
+  const x=metrics[key];return cardFrom(title,x,{format:v=>fmt(v,3),unit:x?.unit||""});
+ });
+ render("macroGrid",cards.join(""));
+ const li=obj(m?.liquidity),yc=obj(m?.yield_curve);
+ render("liquidityGrid",[
+  metricCard("US NET LIQUIDITY PROXY",li.current===undefined?null:compact(li.current),li.unit||"",li.status||"UNAVAILABLE",[
+   ["7D Change",fmt(li.change_7d,3)],["30D Change",fmt(li.change_30d,3)],
+   ["Trend",li.trend||"N/A"],["Observation",li.observation_date||"N/A"]
+  ],"Formula: WALCL - TGA - RRP. এটি সম্পূর্ণ Global Liquidity Composite নয়."),
+  metricCard("US YIELD CURVE",fmt(yc.spread,3),yc.unit||"",yc.status||"UNAVAILABLE",[
+   ["Inverted",yc.inverted===true?"YES":yc.inverted===false?"NO":"N/A"],
+   ["Trend",yc.trend||"N/A"],["Observation",yc.observation_date||"N/A"]
+  ],"Yield curve recession-risk context; একে একা crypto signal ধরা যাবে না।")
+ ].join(""));
+ const reports=obj(m?.reports);
+ const reportNames=["cpi","core_cpi","pce","core_pce","fed_rate","labor_market","bond_yields","yield_curve","usd_index","vix","equity_market","commodities","yen"];
+ const cards2=reportNames.map(k=>{
+  const r=obj(reports[k]);if(!Object.keys(r).length)return "";
+  const d=r.DATA||{};
+  const text=[
+   "DATA: "+JSON.stringify(d),
+   "ANALYSIS: "+(r.ANALYSIS||"N/A"),
+   "DECISION: "+(r.DECISION||"N/A"),
+   "ACTION: "+(r.ACTION||"N/A"),
+   "RISK: "+(r.RISK||"N/A")
+  ].join(" | ");
+  return metricCard("MACRO REPORT · "+k.toUpperCase(),r.DECISION||"REPORT", "DATA / ANALYSIS / ACTION", "OK",[],text,"Macro report context only.");
+ }).filter(Boolean);
+ render("macroReports",cards2.join(""));
+}
+
+/* ALTCOIN */
+function buildAltcoins(m,a,z){
+ const g=obj(m?.global_market),breadth=obj(a?.spot_market_activity?.breadth);
+ const zc=obj(z);
+ const adv=obj(zc.advanced_context);
+ const cards=[
+  cardFrom("TOTAL ALTCOIN MARKET CAP",g.total_altcoin_market_cap_usd,{format:compact,unit:"USD"}),
+  cardFrom("BTC DOMINANCE",g.btc_dominance_pct,{format:pct,unit:"Market Share"}),
+  cardFrom("ETH DOMINANCE",g.eth_dominance_pct,{format:pct,unit:"Market Share"}),
+  metricCard("ALTCOIN MARKET BREADTH",breadth.classification||"তথ্য নেই","Binance Spot",breadth.classification?"OK":"UNAVAILABLE",[
+   ["Advancing",fmt(breadth.advancing_pairs,0)],["Declining",fmt(breadth.declining_pairs,0)],
+   ["Coverage",pct(breadth.coverage_pct)]
+  ]),
+  metricCard("ADVANCING / DECLINING RATIO",fmt(breadth.advance_decline_ratio,3),"Ratio",val(breadth.advance_decline_ratio)!==null?"OK":"UNAVAILABLE"),
+  metricCard("ALTCOIN SEASON INDEX","তথ্য পাওয়া যায়নি","Verified index required","UNAVAILABLE",[],
+   "যাচাইকৃত Altcoin Season Index এই ডেটা ফাইলে নেই।"),
+  metricCard("ETH / BTC RATIO","তথ্য পাওয়া যায়নি","Live ratio required","UNAVAILABLE"),
+  metricCard("TOTAL3 / TOTAL2","তথ্য পাওয়া যায়নি","Market cap series required","UNAVAILABLE")
+ ];
+ render("altcoinGrid",cards.join(""));
+}
+
+/* SENTIMENT */
+function buildSentiment(m,l,d,z){
+ const fg=m?.fear_greed;
+ const macro=obj(d?.macro_analysis);
+ const zone=obj(z);
+ const cards=[
+  cardFrom("FEAR & GREED INDEX",fg,{format:v=>fmt(v,0)+"/100",unit:fg?.classification||"Sentiment"}),
+  metricCard("MARKET RISK LEVEL",macro.risk_level||zone.risk_level||"UNKNOWN","Macro / Market",macro.risk_level||zone.risk_code?"OK":"UNAVAILABLE",[
+   ["VIX",fmt(macro.vix,2)],["Risk Score",fmt(macro.risk_score,0)]
+  ]),
+  metricCard("RETAIL MANIA PROXY",l?.retail_mania?.classification||"তথ্য নেই",l?.retail_mania?.unit||"Fear & Greed Proxy",statusOf(l?.retail_mania),[
+   ["Index",fmt(l?.retail_mania?.value,0)],["Direct Retail Data","না"]
+  ],"Fear & Greed হলো Sentiment Proxy; সরাসরি Retail activity নয়।"),
+  metricCard("MARKET ZONE",zone.current_zone||"তথ্য নেই","Cycle Assessment",zone.current_zone?"OK":"UNAVAILABLE",[
+   ["Position",zone.market_position||"N/A"],["Confidence Coverage",zone.confidence===undefined?"N/A":fmt(zone.confidence,0)+"%"]
+  ],zone.confidence_note||"Confidence লাভের সম্ভাবনা নয়; তথ্যের coverage score।"),
+  metricCard("BULLISH / BEARISH SCORE",fmt(zone.bullish_score,0)+" / "+fmt(zone.bearish_score,0),"Rule-based score",zone.bullish_score!==undefined?"OK":"UNAVAILABLE"),
+  metricCard("RECESSION RISK","তথ্য সীমিত","Macro context","UNAVAILABLE",[],
+   "যাচাইকৃত recession probability model সংযুক্ত নেই।")
+ ];
+ render("sentimentGrid",cards.join(""));
+}
+
+/* FINAL DECISION */
+function buildDecision(d,z){
+ const f=obj(d?.final_decision),zone=obj(z);
+ const decision=f.decision||zone.spot_action_code||"UNKNOWN";
+ const map={BUY:"BUY",DCA:"DCA",HOLD:"HOLD",WAIT:"WAIT",SELL:"SELL"};
+ const color=decision==="BUY"||decision==="DCA"?"var(--green)":decision==="SELL"?"var(--red)":"var(--yellow)";
+ $("decisionBox").innerHTML=`
+ <div class="label">OVERALL SPOT MARKET DECISION</div>
+ <div class="decision-main" style="color:${color}">${esc(map[decision]||decision)}</div>
+ <div class="decision-text">${esc(zone.reason||"চূড়ান্ত সিদ্ধান্তের ব্যাখ্যা পাওয়া যায়নি।")}</div>
+ <div class="decision-text" style="margin-top:8px"><b>Market Zone:</b> ${esc(zone.current_zone||"N/A")} · <b>Risk:</b> ${esc(zone.risk_level||"N/A")} · <b>BTC Trend:</b> ${esc(zone.btc_trend||"N/A")}</div>
+ <div class="decision-text" style="margin-top:8px"><b>Action:</b> ${esc(zone.action_instruction||"সিদ্ধান্তের বিস্তারিত তথ্য পাওয়া যায়নি।")}</div>
+ `;
+ render("decisionGrid",[
+  metricCard("FINAL DECISION",decision,"Spot",f.decision?"OK":"UNAVAILABLE"),
+  metricCard("DATA QUALITY",d?.data_quality?.status||"UNKNOWN","Engine Status",d?.data_quality?.status?"OK":"UNAVAILABLE"),
+  metricCard("DECISION CONFIDENCE",zone.confidence===undefined?null:fmt(zone.confidence,0)+"%","Coverage Score",zone.confidence===undefined?"UNAVAILABLE":"OK",[],
+   "এটি লাভের সম্ভাবনা বা নিশ্চিততার probability নয়।")
+ ].join(""));
+ $("decisionReasons").innerHTML=arrayList([...(f.reasons||[]),...(zone.reasons||[])]);
+ $("decisionActions").innerHTML=arrayList([...(f.actions||[]),...(f.risk||[]),...(zone.missing_data||[])]);
+}
+
+/* SYSTEM STATUS */
+function buildSystem(results,all){
+ const entries=Object.entries(results);
+ const cards=entries.map(([k,r])=>metricCard(
+  "JSON · "+k.toUpperCase(),
+  r.status==="OK"?"CONNECTED":"UNAVAILABLE",
+  FILES[k],r.status==="OK"?"OK":"ERROR",
+  [["Status",r.status],["Snapshot",date(r.data?.generated_at||r.data?.fetched_at)]],
+  r.error||"File read status."
+ ));
+ const issues=all?.decision?.data_quality?.issues||[];
+ render("systemGrid",cards.join(""));
+ const limitations=[
+  "Dashboard নির্দিষ্ট বিরতিতে তৈরি JSON Snapshot ব্যবহার করে; এটি Tick-by-tick real-time feed নয়।",
+  "TradingView Chart তৃতীয় পক্ষের Embed; GitHub JSON-এর অংশ নয়।",
+  "যাচাইকৃত ETF Historical Series না থাকলে ETF Chart দেখানো হবে না।",
+  "NUPL, Exchange Netflow, Whale Activity বা অন্য On-chain Data না থাকলে অনুমান করা হবে না।",
+  "DTWEXBGS Broad USD Proxy হলে সেটিকে ICE DXY বলা যাবে না।",
+  "FRED Macro Data প্রকাশের সময়সূচি অনুযায়ী বিলম্বিত হতে পারে।",
+  "Spot Market Breadth কেবল উপলব্ধ Binance Spot Pair-এর ওপর নির্ভর করে।",
+  "Open Interest, Funding ও Basis Futures Context; Spot BUY/SELL signal নয়।",
+  "এই Dashboard নির্দিষ্ট Coin-এর Tokenomics, FDV, Unlock বা Fundamentals যাচাই করে না।",
+  ...issues
+ ];
+ $("limitations").innerHTML=arrayList([...new Set(limitations)]);
+}
+
+/* NAV ACTIVE STATE */
+function setupNav(){
+ const links=[...document.querySelectorAll(".nav")];
+ const sections=links.map(a=>document.querySelector(a.getAttribute("href"))).filter(Boolean);
+ if(!("IntersectionObserver" in window))return;
+ const io=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+   if(e.isIntersecting){
+    links.forEach(a=>a.classList.toggle("active",a.getAttribute("href")==="#"+e.target.id));
+   }
   });
+ },{rootMargin:"-15% 0px -70% 0px"});
+ sections.forEach(s=>io.observe(s));
 }
 
-function money(value) {
-  if(value === null || value === undefined || value === "") return "N/A";
+let loading=false;
+async function loadDashboard(){
+ if(loading)return;
+ loading=true;
+ $("refreshButton").disabled=true;
+ $("connection").textContent="● DATA CHECKING";
+ $("connection").style.color="var(--yellow)";
+ $("errorPanel").style.display="none";
 
-  const n = Number(value);
-  if(!Number.isFinite(n)) return "N/A";
+ const results={};
+ await Promise.all(Object.entries(FILES).map(async([k,u])=>{results[k]=await loadFile(k,u)}));
+ const failures=Object.entries(results).filter(([,r])=>r.status!=="OK");
+ const market=cache.market,macro=cache.macro,advanced=cache.advanced;
+ const decision=cache.decision,zone=cache.zone,live=cache.live;
 
-  return "$" + n.toLocaleString("en-US",{
-    maximumFractionDigits:2
-  });
+ buildGlobal(market);
+ buildTechnical(market);
+ buildETF(live);
+ buildDerivatives(advanced,live);
+ buildSpot(advanced);
+ buildOnchain(live,advanced);
+ buildMacro(macro);
+ buildAltcoins(market,advanced,zone);
+ buildSentiment(market,live,decision,zone);
+ buildDecision(decision,zone);
+ buildSystem(results,{decision});
+
+ if(failures.length){
+  $("connection").textContent="● PARTIAL DATA";
+  $("connection").style.color="var(--yellow)";
+  $("errorPanel").style.display="block";
+  $("errorPanel").textContent="কিছু Data File লোড হয়নি: "+failures.map(x=>x[0]+" ("+x[1].error+")").join(" · ");
+ }else{
+  $("connection").textContent="● DATA CONNECTED";
+  $("connection").style.color="var(--green)";
+ }
+ $("lastRefresh")?.remove();
+ $("marketUpdated").title="Last dashboard fetch: "+new Date().toISOString();
+ $("refreshButton").disabled=false;
+ loading=false;
 }
 
-function timestamp(value) {
-  if(!value) return "N/A";
-
-  let date;
-
-  if(typeof value === "number") {
-    date = new Date(value < 1000000000000 ? value*1000 : value);
-  } else {
-    date = new Date(value);
-  }
-
-  if(Number.isNaN(date.getTime())) return String(value);
-
-  return date.toLocaleString("en-GB",{
-    day:"2-digit",
-    month:"short",
-    year:"numeric",
-    hour:"2-digit",
-    minute:"2-digit",
-    timeZone:"Asia/Dhaka"
-  }) + " BDT";
-}
-
-function safeText(value) {
-  return String(value ?? "N/A").replace(/[&<>"']/g,char => ({
-    "&":"&amp;",
-    "<":"&lt;",
-    ">":"&gt;",
-    '"':"&quot;",
-    "'":"&#039;"
-  })[char]);
-}
-
-function statusClass(status) {
-  if(status === "OK") return "";
-  if(status === "PARTIAL" || status === "PROXY_ONLY") return "warning";
-  if(status === "ERROR") return "danger";
-  return "unavailable";
-}
-
-function statusLabel(status) {
-  return STATUS_TEXT[status] || "অজানা অবস্থা";
-}
-
-function makeCard(config) {
-  const status = config.status || "UNAVAILABLE";
-  const cls = statusClass(status);
-
-  const unavailable =
-    status === "UNAVAILABLE" || status === "ERROR";
-
-  const mainValue = unavailable
-    ? "তথ্য পাওয়া যায়নি"
-    : config.value ?? "N/A";
-
-  const mainClass = unavailable
-    ? "metric-main missing"
-    : "metric-main" + (cls === "warning" ? " neutral" : "");
-
-  const details = (config.details || []).map(item => `
-    <div class="detail">
-      <span>${safeText(item.label)}</span>
-      <strong>${safeText(item.value)}</strong>
-    </div>
-  `).join("");
-
-  const errorHTML = config.error
-    ? `<div class="api-error">API Error: ${safeText(config.error)}</div>`
-    : "";
-
-  return `
-    <article class="signal-card ${cls}">
-      <div class="card-top">
-        <div>
-          <div class="card-title">${safeText(config.title)}</div>
-          <div class="card-number">${safeText(config.number)}</div>
-        </div>
-        <span class="status ${cls}">${safeText(statusLabel(status))}</span>
-      </div>
-
-      <div class="${mainClass}">${safeText(mainValue)}</div>
-      <div class="metric-unit">${safeText(config.unit || "")}</div>
-
-      <div class="details">${details}</div>
-
-      <div class="explanation">
-        ${safeText(config.explanation)}
-      </div>
-
-      <div class="action">
-        করণীয়: ${safeText(config.action)}
-      </div>
-
-      <div class="source">
-        Source: ${safeText(config.source)}<br>
-        Source Updated: ${safeText(timestamp(config.sourceUpdated))}<br>
-        Data Fetched: ${safeText(timestamp(config.fetched))}
-      </div>
-
-      ${errorHTML}
-    </article>
-  `;
-}
-
-function buildSignals(data) {
-  const p = metricObject(data,["price_structure"]);
-  const funding = metricObject(data,["funding_rate"]);
-  const oi = metricObject(data,["open_interest"]);
-  const premium = metricObject(data,["futures_premium"]);
-  const etf = metricObject(data,["etf_flows"]);
-  const onchain = metricObject(data,["on_chain"]);
-  const mvrv = metricObject(onchain,["mvrv_z_score"]);
-  const nupl = metricObject(onchain,["nupl"]);
-  const retail = metricObject(data,["retail_mania"]);
-
-  const priceMetric = metricObject(p,["price"]);
-  const supportMetric = metricObject(p,["support"]);
-  const resistanceMetric = metricObject(p,["resistance"]);
-  const ma20Metric = metricObject(p,["ma20"]);
-  const ma50Metric = metricObject(p,["ma50"]);
-  const ma200Metric = metricObject(p,["ma200"]);
-  const rsiMetric = metricObject(p,["rsi14"]);
-
-  const price = metricValue(p,["price"]);
-  const support = metricValue(p,["support"]);
-  const resistance = metricValue(p,["resistance"]);
-  const ma20 = metricValue(p,["ma20"]);
-  const ma50 = metricValue(p,["ma50"]);
-  const ma200 = metricValue(p,["ma200"]);
-  const rsi = metricValue(p,["rsi14"]);
-
-  const priceMeta = meta(priceMetric,p);
-  const fundingMeta = meta(funding);
-  const oiMeta = meta(oi);
-  const premiumMeta = meta(premium);
-  const etfMeta = meta(etf);
-  const mvrvMeta = meta(mvrv);
-  const nuplMeta = meta(nupl);
-  const retailMeta = meta(retail);
-
-  const signals = [
-    {
-      number:"SIGNAL 01",
-      title:"BTC PRICE STRUCTURE",
-      value:money(price),
-      unit:"Binance Spot Ticker Price (USDT)",
-      status:priceMetric.status || p.status || "UNAVAILABLE",
-      details:[
-        {label:"Support",value:money(support)},
-        {label:"Resistance",value:money(resistance)},
-        {label:"MA20 / MA50",value:number(ma20)+" / "+number(ma50)},
-        {label:"MA200 / RSI14",value:number(ma200)+" / "+number(rsi)}
-      ],
-      explanation:"BTC-এর বর্তমান Spot Ticker Price এবং Daily Candle-ভিত্তিক Moving Average, Support ও Resistance দিয়ে বাজারের কাঠামো বোঝা হয়।",
-      action:"MA20, MA50 ও MA200-এর অবস্থান এবং গুরুত্বপূর্ণ Support পর্যবেক্ষণ করুন। শুধু RSI দেখে BUY করবেন না।",
-      ...priceMeta,
-      error:priceMeta.error
-    },
-    {
-      number:"SIGNAL 02",
-      title:"ETF FLOWS",
-      value:metricValue(etf,["value"]),
-      unit:etf.unit || "ETF Net Flow",
-      status:etf.status || "UNAVAILABLE",
-      details:[
-        {label:"Flow",value:etf.value === null ? "N/A" : String(etf.value)},
-        {label:"Classification",value:first(etf,["classification","signal"]) || "N/A"}
-      ],
-      explanation:"ETF-এ প্রকৃত অর্থের প্রবাহ Institutional Demand বা Distribution বুঝতে সাহায্য করে।",
-      action:"যাচাইকৃত ETF Flow Data ছাড়া Accumulation বা Distribution ধরে নেবেন না।",
-      ...etfMeta
-    },
-    {
-      number:"SIGNAL 03",
-      title:"FUNDING RATE",
-      value:metricValue(funding,["value"]),
-      unit:funding.unit || "Funding Rate",
-      status:funding.status || "UNAVAILABLE",
-      details:[
-        {label:"Current Rate",value:number(funding.value,6)},
-        {label:"Market Context",value:"Futures Only"}
-      ],
-      explanation:"Funding Rate Futures Market-এ Long ও Short Position-এর ভারসাম্য সম্পর্কে ধারণা দেয়।",
-      action:"অস্বাভাবিক Funding Rate-কে অতিরিক্ত জল্পনার সতর্কতা হিসেবে দেখুন। এটি একা Spot Sell Signal নয়।",
-      ...fundingMeta
-    },
-    {
-      number:"SIGNAL 04",
-      title:"OPEN INTEREST",
-      value:number(oi.value,4),
-      unit:oi.unit || "BTC (USD নয়)",
-      status:oi.status || "UNAVAILABLE",
-      details:[
-        {label:"Open Interest",value:number(oi.value,4)},
-        {label:"Unit",value:oi.unit || "BTC"}
-      ],
-      explanation:"Open Interest Futures Contract-এর মোট খোলা অবস্থান বোঝায়। আপনার Engine-এর এই Data BTC পরিমাণে হওয়ার কথা, USD নয়।",
-      action:"দাম ও Open Interest একসঙ্গে পর্যবেক্ষণ করুন। শুধু OI বাড়লেই BUY করবেন না।",
-      ...oiMeta
-    },
-    {
-      number:"SIGNAL 05",
-      title:"FUTURES PREMIUM",
-      value:number(premium.value,5),
-      unit:premium.unit || "Futures Premium",
-      status:premium.status || "UNAVAILABLE",
-      details:[
-        {label:"Premium",value:number(premium.value,5)},
-        {label:"Market",value:"Futures vs Index"}
-      ],
-      explanation:"Mark Price ও Index Price-এর পার্থক্য Futures Premium বোঝাতে ব্যবহার করা হয়।",
-      action:"Premium অস্বাভাবিক হলে বাজারের জল্পনা ও ঝুঁকি পর্যবেক্ষণ করুন। এটি একা Spot সিদ্ধান্ত নয়।",
-      ...premiumMeta
-    },
-    {
-      number:"SIGNAL 06",
-      title:"MVRV Z-SCORE",
-      value:metricValue(mvrv,["value"]),
-      unit:mvrv.unit || "On-chain Valuation",
-      status:mvrv.status || "UNAVAILABLE",
-      details:[
-        {label:"Z-Score",value:number(mvrv.value,3)},
-        {label:"Provider",value:mvrv.source || "Not Connected"}
-      ],
-      explanation:"MVRV Z-Score বাজারমূল্য ও Realized Value তুলনা করে দীর্ঘমেয়াদি Valuation বুঝতে সাহায্য করে।",
-      action:"যাচাইকৃত On-chain Data না আসা পর্যন্ত এই সূচক দিয়ে সিদ্ধান্ত নেবেন না।",
-      ...mvrvMeta
-    },
-    {
-      number:"SIGNAL 07",
-      title:"NUPL",
-      value:metricValue(nupl,["value"]),
-      unit:nupl.unit || "Net Unrealized Profit/Loss",
-      status:nupl.status || "UNAVAILABLE",
-      details:[
-        {label:"NUPL",value:number(nupl.value,4)},
-        {label:"Provider",value:nupl.source || "Not Connected"}
-      ],
-      explanation:"NUPL বিনিয়োগকারীদের সামগ্রিক Unrealized Profit ও Loss-এর অবস্থা বুঝতে সাহায্য করে।",
-      action:"সঠিক On-chain Data ছাড়া বাজারের অতিরিক্ত লোভ বা আতঙ্কের সিদ্ধান্ত নেবেন না।",
-      ...nuplMeta
-    },
-    {
-      number:"SIGNAL 08",
-      title:"RETAIL MANIA / SENTIMENT PROXY",
-      value:metricValue(retail,["value"]),
-      unit:retail.unit || "Fear & Greed Index Proxy",
-      status:retail.status || "UNAVAILABLE",
-      details:[
-        {label:"Sentiment",value:retail.classification || "N/A"},
-        {label:"Index",value:number(retail.value,0)+" / 100"}
-      ],
-      explanation:"এটি Fear & Greed Index-ভিত্তিক বাজার Sentiment Proxy। সরাসরি Retail Buying বা Selling মাপে না।",
-      action:"Sentiment অতিরিক্ত উত্তপ্ত হলেও BTC Trend, Volume ও Support যাচাই করুন।",
-      ...retailMeta
-    }
-  ];
-
-  document.getElementById("signalGrid").innerHTML =
-    signals.map(makeCard).join("");
-
-  updateETF(etf);
-}
-
-function updateETF(etf) {
-  const status = etf.status || "UNAVAILABLE";
-  const classification = first(etf,["classification","signal","label"]);
-
-  const usable =
-    (status === "OK" || status === "PARTIAL") &&
-    classification !== null;
-
-  if(usable) {
-    document.getElementById("etfStatus").textContent =
-      classification;
-
-    document.getElementById("etfExplanation").textContent =
-      "ETF Provider-এর তথ্য পাওয়া গেছে। প্রবাহের সময়সীমা ও মান যাচাই করুন।";
-
-    document.getElementById("etfChart").textContent =
-      "ETF Flow Chart-এর জন্য প্রকৃত Historical Flow Data প্রয়োজন।";
-  } else {
-    document.getElementById("etfStatus").textContent =
-      "UNAVAILABLE";
-
-    document.getElementById("etfExplanation").textContent =
-      "ETF Flow Provider সংযুক্ত নয়। Accumulation বা Distribution নিশ্চিত করা যাচ্ছে না।";
-
-    document.getElementById("etfChart").innerHTML =
-      "ETF FLOW DATA পাওয়া যায়নি।<br>Provider যুক্ত হলে প্রকৃত তথ্য দেখানো হবে।";
-  }
-}
-
-async function loadDashboard() {
-  const connection = document.getElementById("connection");
-  const errorPanel = document.getElementById("errorPanel");
-  const refreshButton = document.getElementById("refreshButton");
-
-  connection.textContent = "● DATA CHECKING";
-  connection.style.color = "var(--yellow)";
-  refreshButton.disabled = true;
-  errorPanel.style.display = "none";
-
-  try {
-    const response = await fetch(
-      DATA_URL + "?t=" + Date.now(),
-      {cache:"no-store"}
-    );
-
-    if(!response.ok) {
-      throw new Error("JSON file পাওয়া যায়নি। HTTP " + response.status);
-    }
-
-    const data = await response.json();
-
-    if(!data || typeof data !== "object") {
-      throw new Error("JSON Data সঠিক নয়।");
-    }
-
-    buildSignals(data);
-
-    connection.textContent = "● DATA CONNECTED";
-    connection.style.color = "var(--green)";
-
-    document.getElementById("systemConnection").textContent =
-      "Connected";
-
-    document.getElementById("engineVersion").textContent =
-      data.engine_version || "N/A";
-
-    document.getElementById("lastFetch").textContent =
-      timestamp(data.fetched_at);
-
-  } catch(error) {
-    connection.textContent = "● DATA ERROR";
-    connection.style.color = "var(--red)";
-
-    document.getElementById("systemConnection").textContent =
-      "Connection Error";
-
-    errorPanel.style.display = "block";
-    errorPanel.textContent =
-      "ডেটা লোড করা যায়নি: " + error.message +
-      "। data/live_signals.json ফাইল এবং GitHub Pages প্রকাশনা যাচাই করুন।";
-  } finally {
-    refreshButton.disabled = false;
-  }
-}
-
+setupNav();
 loadDashboard();
-
 setInterval(loadDashboard,5*60*1000);
 </script>
 </body>
