@@ -1,23 +1,24 @@
 {
   "engine": "CRYPTO FINAL DECISION ENGINE",
-  "version": "2.1.0",
-  "generated_at": "2026-11-25T06:34:30.903968+00:00",
+  "version": "2.2.0",
+  "generated_at": "2026-11-25T07:50:20.436405+00:00",
   "data_quality": {
-    "status": "GOOD",
+    "status": "PARTIAL",
     "market_snapshot": {
       "status": "FRESH",
       "age_hours": 0.02,
-      "timestamp": "2026-11-25T06:33:35Z"
+      "timestamp": "2026-11-25T07:48:59Z"
     },
     "macro_snapshot": {
       "status": "FRESH",
-      "age_hours": 0.0,
-      "timestamp": "2026-11-25T06:34:30Z"
+      "age_hours": 0.01,
+      "timestamp": "2026-11-25T07:49:46Z"
     },
     "btc_technical": "FRESH",
     "eth_technical": "FRESH",
     "issues": [
       "বাজারের ডেটা নির্দিষ্ট বিরতিতে নেওয়া Snapshot; এটি Tick-by-tick Live নয়।",
+      "VIX, 10Y Yield, Broad USD অথবা Macro Decision সম্পূর্ণভাবে যাচাই হয়নি।",
       "DTWEXBGS is a broad trade-weighted USD proxy, not ICE DXY.",
       "FRED observations are released with delays.",
       "Freshness limits are series-specific.",
@@ -35,57 +36,63 @@
     ]
   },
   "macro_analysis": {
-    "quality": "GOOD",
-    "decision": "UNKNOWN",
+    "quality": "PARTIAL",
+    "decision": "WAIT — INSUFFICIENT DATA",
     "risk_level": "UNKNOWN",
-    "risk_score": 1,
-    "risk_flags": [
-      "VIX উচ্চ"
+    "risk_score": 0,
+    "support_score": null,
+    "risk_flags": [],
+    "supportive_flags": [],
+    "missing_calculations": [
+      "cpi_inflation_history"
     ],
+    "analysis": "Core Macro calculation incomplete বা stale.",
+    "action": "Core Macro data সম্পূর্ণ না হওয়া পর্যন্ত Risk-On/Risk-Off সিদ্ধান্ত স্থগিত রাখুন।",
+    "risk_note": "অসম্পূর্ণ data থেকে ভুল market assessment হতে পারে।",
     "vix": 26.62,
     "yield_10y": 4.92,
-    "broad_usd": 123.5978,
+    "broad_usd": null,
     "critical_checks": {
       "vix": true,
       "10y": true,
-      "broad_usd": true
+      "broad_usd": false
     }
   },
   "crypto_market": {
     "global_market": {
       "total_market_cap_usd": {
-        "value": 2056121329617.8796,
+        "value": 2047779837479.2876,
         "unit": "USD",
         "source": "CoinGecko API",
-        "source_updated_at": "2026-11-25T06:25:18Z",
-        "fetched_at": "2026-11-25T06:33:35Z",
+        "source_updated_at": "2026-11-25T07:45:31Z",
+        "fetched_at": "2026-11-25T07:48:59Z",
         "status": "OK",
         "error": null
       },
       "total_volume_24h_usd": {
-        "value": 68023307828.41973,
+        "value": 69126384858.23608,
         "unit": "USD",
         "source": "CoinGecko API",
-        "source_updated_at": "2026-11-25T06:25:18Z",
-        "fetched_at": "2026-11-25T06:33:35Z",
+        "source_updated_at": "2026-11-25T07:45:31Z",
+        "fetched_at": "2026-11-25T07:48:59Z",
         "status": "OK",
         "error": null
       },
       "btc_dominance_pct": {
-        "value": 57.703482196689734,
+        "value": 57.68374813778634,
         "unit": "%",
         "source": "CoinGecko API",
-        "source_updated_at": "2026-11-25T06:25:18Z",
-        "fetched_at": "2026-11-25T06:33:35Z",
+        "source_updated_at": "2026-11-25T07:45:31Z",
+        "fetched_at": "2026-11-25T07:48:59Z",
         "status": "OK",
         "error": null
       },
       "eth_dominance_pct": {
-        "value": 9.825912777318623,
+        "value": 9.777481874681337,
         "unit": "%",
         "source": "CoinGecko API",
-        "source_updated_at": "2026-11-25T06:25:18Z",
-        "fetched_at": "2026-11-25T06:33:35Z",
+        "source_updated_at": "2026-11-25T07:45:31Z",
+        "fetched_at": "2026-11-25T07:48:59Z",
         "status": "OK",
         "error": null
       },
@@ -93,17 +100,17 @@
         "value": 21266.0,
         "unit": "count",
         "source": "CoinGecko API",
-        "source_updated_at": "2026-11-25T06:25:18Z",
-        "fetched_at": "2026-11-25T06:33:35Z",
+        "source_updated_at": "2026-11-25T07:45:31Z",
+        "fetched_at": "2026-11-25T07:48:59Z",
         "status": "OK",
         "error": null
       },
       "markets_count": {
-        "value": 1528.0,
+        "value": 1527.0,
         "unit": "count",
         "source": "CoinGecko API",
-        "source_updated_at": "2026-11-25T06:25:18Z",
-        "fetched_at": "2026-11-25T06:33:35Z",
+        "source_updated_at": "2026-11-25T07:45:31Z",
+        "fetched_at": "2026-11-25T07:48:59Z",
         "status": "OK",
         "error": null
       }
@@ -114,7 +121,7 @@
       "unit": "/100",
       "source": "Alternative.me Fear & Greed API",
       "source_updated_at": "2026-11-25T00:00:00Z",
-      "fetched_at": "2026-11-25T06:33:36Z",
+      "fetched_at": "2026-11-25T07:49:00Z",
       "status": "OK",
       "error": null
     },
@@ -163,13 +170,16 @@
     "decision": "WAIT",
     "market_status": "WAIT",
     "reasons": [
-      "BTC-এর Daily Trend Bearish।"
+      "প্রয়োজনীয় বাজার, Macro অথবা BTC Technical Data সম্পূর্ণভাবে যাচাই হয়নি।"
     ],
     "actions": [
-      "নতুন Spot BUY/DCA বন্ধ রাখুন; Trend উন্নতির নিশ্চিত সংকেতের অপেক্ষা করুন।"
+      "নতুন Spot BUY/DCA করবেন না। ডেটা ঠিক ও হালনাগাদ না হওয়া পর্যন্ত অপেক্ষা করুন।"
     ],
-    "risk": [],
-    "data_ready": true,
+    "risk": [
+      "অসম্পূর্ণ বা পুরোনো ডেটা ভুল সিদ্ধান্ত তৈরি করতে পারে।",
+      "Macro-এর অসম্পূর্ণ হিসাব: cpi_inflation_history"
+    ],
+    "data_ready": false,
     "decision_scope": "BROAD_CRYPTO_MARKET_SPOT",
     "not_coin_specific": true
   },
@@ -178,6 +188,7 @@
     "Scheduled Snapshot সম্পূর্ণ Real-time নয়।",
     "FRED Macro তথ্য প্রকাশে বিলম্ব হয়।",
     "শুধু RSI বা Support warning দিয়ে SELL সিদ্ধান্ত দেওয়া হয় না।",
-    "Futures/Margin সংকেত তৈরি করা হয় না।"
+    "Futures/Margin সংকেত তৈরি করা হয় না।",
+    "Macro Risk Score একটি rule-based score; এটি calibrated probability নয়।"
   ]
 }
