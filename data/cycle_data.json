@@ -2,16 +2,16 @@
   "schema_version": 1,
   "engine": "Crypto Market Cycle & Bull Run Tracker",
   "engine_version": "1.0.0",
-  "generated_at": "2026-11-26T17:41:43Z",
+  "generated_at": "2026-11-26T18:39:53Z",
   "update_mode": "scheduled_snapshot_not_realtime",
-  "data_quality": "GOOD",
+  "data_quality": "PARTIAL",
   "data_policy": "Existing engines are read-only. Missing, stale or timestamp-unknown data is never fabricated.",
   "current_market_cycle": {
     "zone_code": "BEARISH_RECOVERY_RISK",
     "zone": "Bearish Recovery Risk",
     "bull_run_status": "UNCONFIRMED",
     "bull_run_label": "Recovery চলছে, Bull Run নিশ্চিত নয়",
-    "confidence_score": 100,
+    "confidence_score": 86,
     "bullish_evidence": [
       "Daily MA50, MA200-এর উপরে"
     ],
@@ -26,7 +26,7 @@
   "bull_run_tracker": {
     "status": "UNCONFIRMED",
     "label": "Recovery চলছে, Bull Run নিশ্চিত নয়",
-    "confidence_score": 100,
+    "confidence_score": 86,
     "start_date": "2026-11-25",
     "days_in_current_phase": 2,
     "confidence_note": "Coverage Score; not statistical probability."
@@ -51,64 +51,64 @@
     "window_days": 90,
     "source": "BlockchainCenter Altcoin Season Index API",
     "source_updated_at": "2026-11-26T00:00:00Z",
-    "fetched_at": "2026-11-26T17:41:42Z",
-    "status": "OK",
+    "fetched_at": "2026-11-26T18:38:53Z",
+    "status": "STALE",
     "definition": "90-day performance comparison of eligible Top 50 altcoins against Bitcoin. 75 or above indicates Altcoin Season.",
-    "reason": null
+    "reason": "Refresh failed; previous observation retained: <urlopen error timed out>"
   },
   "eth_btc_ratio": {
-    "value": 0.028,
+    "value": 0.02804,
     "unit": "BTC per ETH",
     "status": "TIME_UNKNOWN",
     "source": "Binance Spot ETHBTC",
     "source_updated_at": null,
-    "fetched_at": "2026-11-26T17:41:42Z",
+    "fetched_at": "2026-11-26T18:39:53Z",
     "reason": "Binance ticker endpoint does not provide a verified exchange observation timestamp."
   },
   "altcoin_market_caps": {
     "total_altcoin_market_cap_ex_btc": {
-      "value": 880906464001.866,
+      "value": 886391858813.7661,
       "unit": "USD",
       "status": "OK",
       "source": "CoinGecko Global API - Derived",
-      "source_updated_at": "2026-11-26T17:30:56Z",
-      "fetched_at": "2026-11-26T17:41:43Z",
+      "source_updated_at": "2026-11-26T18:31:04Z",
+      "fetched_at": "2026-11-26T18:39:53Z",
       "calculation": "Total market cap less BTC market cap."
     },
     "total2": {
-      "value": 880906464001.866,
+      "value": 886391858813.7661,
       "unit": "USD",
       "status": "OK",
       "source": "CoinGecko Global API - Derived",
-      "source_updated_at": "2026-11-26T17:30:56Z",
-      "fetched_at": "2026-11-26T17:41:43Z",
+      "source_updated_at": "2026-11-26T18:31:04Z",
+      "fetched_at": "2026-11-26T18:39:53Z",
       "calculation": "Total Crypto Market Cap - BTC Market Cap."
     },
     "total3": {
-      "value": 674581386119.7754,
+      "value": 678491684292.5726,
       "unit": "USD",
       "status": "OK",
       "source": "CoinGecko Global API - Derived",
-      "source_updated_at": "2026-11-26T17:30:56Z",
-      "fetched_at": "2026-11-26T17:41:43Z",
+      "source_updated_at": "2026-11-26T18:31:04Z",
+      "fetched_at": "2026-11-26T18:39:53Z",
       "calculation": "Total Crypto Market Cap - BTC - ETH."
     },
     "btc_market_cap": {
-      "value": 1213251197047.1,
+      "value": 1221109119650.2332,
       "unit": "USD",
       "status": "OK",
       "source": "CoinGecko Global API - Derived",
-      "source_updated_at": "2026-11-26T17:30:56Z",
-      "fetched_at": "2026-11-26T17:41:43Z",
+      "source_updated_at": "2026-11-26T18:31:04Z",
+      "fetched_at": "2026-11-26T18:39:53Z",
       "calculation": "Total market cap multiplied by BTC dominance."
     },
     "eth_market_cap": {
-      "value": 206325077882.09055,
+      "value": 207900174521.1935,
       "unit": "USD",
       "status": "OK",
       "source": "CoinGecko Global API - Derived",
-      "source_updated_at": "2026-11-26T17:30:56Z",
-      "fetched_at": "2026-11-26T17:41:43Z",
+      "source_updated_at": "2026-11-26T18:31:04Z",
+      "fetched_at": "2026-11-26T18:39:53Z",
       "calculation": "Total market cap multiplied by ETH dominance."
     }
   },
@@ -135,7 +135,7 @@
       "source": "Coin Metrics Community API",
       "source_updated_at": "2026-11-25T00:00:00.000000000Z",
       "observed_at": "2026-11-25T00:00:00.000000000Z",
-      "fetched_at": "2026-11-26T17:41:28Z",
+      "fetched_at": "2026-11-26T18:38:42Z",
       "error": null,
       "observation_date": "2026-11-25T00:00:00.000000000Z"
     },
@@ -144,7 +144,7 @@
       "status": "UNAVAILABLE",
       "source": "Advanced Engine",
       "source_updated_at": null,
-      "fetched_at": "2026-11-26T17:41:43Z",
+      "fetched_at": "2026-11-26T18:39:53Z",
       "reason": "Verified NUPL provider not configured."
     },
     "sopr": {
@@ -152,7 +152,7 @@
       "status": "UNAVAILABLE",
       "source": "Advanced Engine",
       "source_updated_at": null,
-      "fetched_at": "2026-11-26T17:41:43Z",
+      "fetched_at": "2026-11-26T18:39:53Z",
       "reason": "Verified SOPR provider not configured."
     },
     "exchange_netflow": {
@@ -160,7 +160,7 @@
       "status": "UNAVAILABLE",
       "source": "Advanced Engine",
       "source_updated_at": null,
-      "fetched_at": "2026-11-26T17:41:43Z",
+      "fetched_at": "2026-11-26T18:39:53Z",
       "reason": "Verified exchange netflow provider not configured."
     },
     "exchange_reserves": {
@@ -168,7 +168,7 @@
       "status": "UNAVAILABLE",
       "source": "Advanced Engine",
       "source_updated_at": null,
-      "fetched_at": "2026-11-26T17:41:43Z",
+      "fetched_at": "2026-11-26T18:39:53Z",
       "reason": "Verified exchange reserve provider not configured."
     },
     "whale_activity": {
@@ -176,7 +176,7 @@
       "status": "UNAVAILABLE",
       "source": "Advanced Engine",
       "source_updated_at": null,
-      "fetched_at": "2026-11-26T17:41:43Z",
+      "fetched_at": "2026-11-26T18:39:53Z",
       "reason": "Verified entity-labelled whale provider not configured."
     }
   },
@@ -187,7 +187,7 @@
     "confidence": 65,
     "spot_action": "অপেক্ষা করুন",
     "risk_level": "উচ্চ",
-    "generated_at": "2026-11-26T17:41:41.583683+00:00"
+    "generated_at": "2026-11-26T18:38:53.843560+00:00"
   },
   "cycle_history": [
     {
@@ -204,9 +204,9 @@
       "zone_code": "BEARISH_RECOVERY_RISK",
       "bull_run_status": "UNCONFIRMED",
       "btc_price": 60458.01,
-      "eth_btc": 0.028,
-      "total2": 880906464001.866,
-      "total3": 674581386119.7754
+      "eth_btc": 0.02804,
+      "total2": 886391858813.7661,
+      "total3": 678491684292.5726
     }
   ],
   "methodology": {
