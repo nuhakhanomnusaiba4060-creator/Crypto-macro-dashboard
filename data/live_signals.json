@@ -4,17 +4,17 @@
   "engine_version": "1.3.3",
   "symbol": "BTCUSDT",
   "market": "Binance Spot",
-  "fetched_at": "2026-11-27T08:51:13+00:00",
-  "run_started_at": "2026-11-27T08:51:10+00:00",
-  "run_completed_at": "2026-11-27T08:51:13+00:00",
+  "fetched_at": "2026-11-27T10:00:54+00:00",
+  "run_started_at": "2026-11-27T10:00:50+00:00",
+  "run_completed_at": "2026-11-27T10:00:54+00:00",
   "price_structure": {
     "price": {
-      "value": 61767.21,
+      "value": 61639.56,
       "unit": "USDT",
       "status": "TIME_UNKNOWN",
       "source": "Binance Spot BTCUSDT Ticker",
       "source_updated_at": null,
-      "fetched_at": "2026-11-27T08:51:11+00:00",
+      "fetched_at": "2026-11-27T10:00:52+00:00",
       "data_age_hours": null,
       "note": "Binance public spot ticker. This endpoint does not provide an observation timestamp. Fetch time is recorded separately."
     },
@@ -24,8 +24,8 @@
       "status": "OK",
       "source": "Binance Spot Daily Candles",
       "source_updated_at": "2026-11-26T23:59:59+00:00",
-      "fetched_at": "2026-11-27T08:51:11+00:00",
-      "data_age_hours": 8.85,
+      "fetched_at": "2026-11-27T10:00:52+00:00",
+      "data_age_hours": 10.01,
       "note": "Lowest Low of the previous 20 completed daily candles.",
       "lookback": "20 completed daily candles",
       "method": "lowest low"
@@ -36,8 +36,8 @@
       "status": "OK",
       "source": "Binance Spot Daily Candles",
       "source_updated_at": "2026-11-26T23:59:59+00:00",
-      "fetched_at": "2026-11-27T08:51:11+00:00",
-      "data_age_hours": 8.85,
+      "fetched_at": "2026-11-27T10:00:52+00:00",
+      "data_age_hours": 10.01,
       "note": "Highest High of the previous 20 completed daily candles.",
       "lookback": "20 completed daily candles",
       "method": "highest high"
@@ -48,8 +48,8 @@
       "status": "OK",
       "source": "Binance Spot Daily Candles",
       "source_updated_at": "2026-11-26T23:59:59+00:00",
-      "fetched_at": "2026-11-27T08:51:11+00:00",
-      "data_age_hours": 8.85,
+      "fetched_at": "2026-11-27T10:00:52+00:00",
+      "data_age_hours": 10.01,
       "note": "20-day simple moving average."
     },
     "ma50": {
@@ -58,8 +58,8 @@
       "status": "OK",
       "source": "Binance Spot Daily Candles",
       "source_updated_at": "2026-11-26T23:59:59+00:00",
-      "fetched_at": "2026-11-27T08:51:11+00:00",
-      "data_age_hours": 8.85,
+      "fetched_at": "2026-11-27T10:00:52+00:00",
+      "data_age_hours": 10.01,
       "note": "50-day simple moving average."
     },
     "ma200": {
@@ -68,8 +68,8 @@
       "status": "OK",
       "source": "Binance Spot Daily Candles",
       "source_updated_at": "2026-11-26T23:59:59+00:00",
-      "fetched_at": "2026-11-27T08:51:11+00:00",
-      "data_age_hours": 8.85,
+      "fetched_at": "2026-11-27T10:00:52+00:00",
+      "data_age_hours": 10.01,
       "note": "200-day simple moving average."
     },
     "rsi14": {
@@ -78,8 +78,8 @@
       "status": "OK",
       "source": "Binance Spot Daily Candles",
       "source_updated_at": "2026-11-26T23:59:59+00:00",
-      "fetched_at": "2026-11-27T08:51:11+00:00",
-      "data_age_hours": 8.85,
+      "fetched_at": "2026-11-27T10:00:52+00:00",
+      "data_age_hours": 10.01,
       "note": "14-period RSI calculated from completed daily candle closes."
     },
     "candle_updated_at": "2026-11-26T23:59:59+00:00"
@@ -90,9 +90,9 @@
     "status": "STALE",
     "source": "CoinBoss Public ETF API",
     "source_updated_at": "2026-11-25T00:00:00+00:00",
-    "fetched_at": "2026-11-27T08:51:11+00:00",
-    "data_age_hours": 56.85,
-    "note": "Latest reported daily net ETF flow. Zero is preserved only when the provider actually reports zero. Source data is 56.9 hours old; freshness limit is 48 hours.",
+    "fetched_at": "2026-11-27T10:00:52+00:00",
+    "data_age_hours": 58.01,
+    "note": "Latest reported daily net ETF flow. Zero is preserved only when the provider actually reports zero. Source data is 58.0 hours old; freshness limit is 48 hours.",
     "daily_net_flow": -453.0,
     "daily_unit": "million USD",
     "daily_status": "OK",
@@ -107,35 +107,35 @@
     "update_frequency": "Daily"
   },
   "funding_rate": {
-    "value": 0.002190655500538731,
+    "value": 0.001878564254449249,
     "unit": "% per 8h",
     "status": "TIME_UNKNOWN",
     "source": "CoinBoss Public Funding API",
     "source_updated_at": null,
-    "fetched_at": "2026-11-27T08:51:11+00:00",
+    "fetched_at": "2026-11-27T10:00:52+00:00",
     "data_age_hours": null,
     "note": "Open-interest-weighted 8-hour funding rate. Provider fraction converted to percentage. Provider did not expose a verified observation timestamp. Fetch time is recorded separately.",
     "method": "oi_weighted_8h",
-    "raw_fraction": 2.1906555005387307e-05
+    "raw_fraction": 1.878564254449249e-05
   },
   "open_interest": {
-    "value": 32677133023.770004,
+    "value": 32673463300.385002,
     "unit": "USD",
     "status": "OK",
     "source": "CoinBoss Public Open Interest API",
-    "source_updated_at": "2026-11-27T08:50:57+00:00",
-    "fetched_at": "2026-11-27T08:51:12+00:00",
+    "source_updated_at": "2026-11-27T10:00:42+00:00",
+    "fetched_at": "2026-11-27T10:00:53+00:00",
     "data_age_hours": 0.0,
     "note": "Total BTC open interest in USD. Adjusted single-sided value is preferred.",
     "method": "total_usd_single_adjusted"
   },
   "futures_premium": {
-    "value": -0.04557,
+    "value": -0.04657,
     "unit": "%",
     "status": "OK",
     "source": "CoinBoss Public Futures Basis API",
-    "source_updated_at": "2026-11-27T08:50:35+00:00",
-    "fetched_at": "2026-11-27T08:51:12+00:00",
+    "source_updated_at": "2026-11-27T10:00:35+00:00",
+    "fetched_at": "2026-11-27T10:00:53+00:00",
     "data_age_hours": 0.01,
     "note": "Perpetual futures mark/index basis percentage. This is not a pure spot-versus-perpetual premium.",
     "method": "perp.aggregate.oi_weighted_pct",
@@ -151,8 +151,8 @@
       "status": "OK",
       "source": "Explore21 Bitcoin MVRV Z-Score",
       "source_updated_at": "2026-11-26T00:00:00+00:00",
-      "fetched_at": "2026-11-27T08:51:12+00:00",
-      "data_age_hours": 32.85,
+      "fetched_at": "2026-11-27T10:00:54+00:00",
+      "data_age_hours": 34.02,
       "note": "On-chain MVRV Z-Score. Stale values are retained for reference."
     },
     "nupl": {
@@ -161,7 +161,7 @@
       "status": "UNAVAILABLE",
       "source": "Explore21",
       "source_updated_at": null,
-      "fetched_at": "2026-11-27T08:51:12+00:00",
+      "fetched_at": "2026-11-27T10:00:54+00:00",
       "data_age_hours": null,
       "note": "NUPL is not currently available from the verified free provider used by this engine. No unverified value is substituted."
     }
@@ -172,8 +172,8 @@
     "status": "PROXY_ONLY",
     "source": "Alternative.me Fear & Greed Index",
     "source_updated_at": "2026-11-27T00:00:00+00:00",
-    "fetched_at": "2026-11-27T08:51:13+00:00",
-    "data_age_hours": 8.85,
+    "fetched_at": "2026-11-27T10:00:54+00:00",
+    "data_age_hours": 10.02,
     "note": "Sentiment proxy only. It does not directly measure retail trading activity or positioning.",
     "classification": "Extreme Fear",
     "proxy_only": true
