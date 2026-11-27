@@ -1,18 +1,18 @@
 {
   "engine": "CRYPTO FINAL DECISION ENGINE",
   "version": "2.2.0",
-  "generated_at": "2026-11-27T14:40:16.293573+00:00",
+  "generated_at": "2026-11-27T15:32:52.726311+00:00",
   "data_quality": {
     "status": "PARTIAL",
     "market_snapshot": {
       "status": "FRESH",
-      "age_hours": 0.0,
-      "timestamp": "2026-11-27T14:40:03Z"
+      "age_hours": 0.01,
+      "timestamp": "2026-11-27T15:32:05Z"
     },
     "macro_snapshot": {
       "status": "FRESH",
-      "age_hours": 0.18,
-      "timestamp": "2026-11-27T14:29:25Z"
+      "age_hours": 0.0,
+      "timestamp": "2026-11-27T15:32:36Z"
     },
     "btc_technical": "FRESH",
     "eth_technical": "FRESH",
@@ -36,7 +36,7 @@
     ]
   },
   "macro_analysis": {
-    "quality": "POOR",
+    "quality": "PARTIAL",
     "decision": "WAIT — INSUFFICIENT DATA",
     "risk_level": "UNKNOWN",
     "risk_score": 0,
@@ -49,11 +49,11 @@
     "analysis": "Core Macro calculation incomplete বা stale.",
     "action": "Core Macro data সম্পূর্ণ না হওয়া পর্যন্ত Risk-On/Risk-Off সিদ্ধান্ত স্থগিত রাখুন।",
     "risk_note": "অসম্পূর্ণ data থেকে ভুল market assessment হতে পারে।",
-    "vix": null,
+    "vix": 26.8,
     "yield_10y": null,
     "broad_usd": null,
     "critical_checks": {
-      "vix": false,
+      "vix": true,
       "10y": false,
       "broad_usd": false
     }
@@ -61,38 +61,38 @@
   "crypto_market": {
     "global_market": {
       "total_market_cap_usd": {
-        "value": 2105712718446.9685,
+        "value": 2070293472981.336,
         "unit": "USD",
         "source": "CoinGecko API",
-        "source_updated_at": "2026-11-27T14:33:57Z",
-        "fetched_at": "2026-11-27T14:40:06Z",
+        "source_updated_at": "2026-11-27T15:24:07Z",
+        "fetched_at": "2026-11-27T15:32:05Z",
         "status": "OK",
         "error": null
       },
       "total_volume_24h_usd": {
-        "value": 59638374663.50387,
+        "value": 66247698967.65517,
         "unit": "USD",
         "source": "CoinGecko API",
-        "source_updated_at": "2026-11-27T14:33:57Z",
-        "fetched_at": "2026-11-27T14:40:06Z",
+        "source_updated_at": "2026-11-27T15:24:07Z",
+        "fetched_at": "2026-11-27T15:32:05Z",
         "status": "OK",
         "error": null
       },
       "btc_dominance_pct": {
-        "value": 57.939835609801605,
+        "value": 57.66005667582219,
         "unit": "%",
         "source": "CoinGecko API",
-        "source_updated_at": "2026-11-27T14:33:57Z",
-        "fetched_at": "2026-11-27T14:40:06Z",
+        "source_updated_at": "2026-11-27T15:24:07Z",
+        "fetched_at": "2026-11-27T15:32:05Z",
         "status": "OK",
         "error": null
       },
       "eth_dominance_pct": {
-        "value": 9.868657052806913,
+        "value": 9.775603787395688,
         "unit": "%",
         "source": "CoinGecko API",
-        "source_updated_at": "2026-11-27T14:33:57Z",
-        "fetched_at": "2026-11-27T14:40:06Z",
+        "source_updated_at": "2026-11-27T15:24:07Z",
+        "fetched_at": "2026-11-27T15:32:05Z",
         "status": "OK",
         "error": null
       },
@@ -100,8 +100,8 @@
         "value": 21218.0,
         "unit": "count",
         "source": "CoinGecko API",
-        "source_updated_at": "2026-11-27T14:33:57Z",
-        "fetched_at": "2026-11-27T14:40:06Z",
+        "source_updated_at": "2026-11-27T15:24:07Z",
+        "fetched_at": "2026-11-27T15:32:05Z",
         "status": "OK",
         "error": null
       },
@@ -109,8 +109,8 @@
         "value": 1525.0,
         "unit": "count",
         "source": "CoinGecko API",
-        "source_updated_at": "2026-11-27T14:33:57Z",
-        "fetched_at": "2026-11-27T14:40:06Z",
+        "source_updated_at": "2026-11-27T15:24:07Z",
+        "fetched_at": "2026-11-27T15:32:05Z",
         "status": "OK",
         "error": null
       }
@@ -121,7 +121,7 @@
       "unit": "/100",
       "source": "Alternative.me Fear & Greed API",
       "source_updated_at": "2026-11-27T00:00:00Z",
-      "fetched_at": "2026-11-27T14:40:06Z",
+      "fetched_at": "2026-11-27T15:32:05Z",
       "status": "OK",
       "error": null
     },
