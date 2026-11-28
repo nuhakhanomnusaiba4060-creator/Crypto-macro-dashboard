@@ -1,18 +1,18 @@
 {
   "engine": "CRYPTO FINAL DECISION ENGINE",
   "version": "2.2.0",
-  "generated_at": "2026-11-28T05:28:24.595741+00:00",
+  "generated_at": "2026-11-28T05:47:15.220585+00:00",
   "data_quality": {
     "status": "PARTIAL",
     "market_snapshot": {
       "status": "FRESH",
-      "age_hours": 0.0,
-      "timestamp": "2026-11-28T05:28:11Z"
+      "age_hours": 0.07,
+      "timestamp": "2026-11-28T05:43:01Z"
     },
     "macro_snapshot": {
       "status": "FRESH",
-      "age_hours": 0.71,
-      "timestamp": "2026-11-28T04:45:49Z"
+      "age_hours": 0.0,
+      "timestamp": "2026-11-28T05:47:02Z"
     },
     "btc_technical": "FRESH",
     "eth_technical": "FRESH",
@@ -36,7 +36,7 @@
     ]
   },
   "macro_analysis": {
-    "quality": "PARTIAL",
+    "quality": "POOR",
     "decision": "WAIT — INSUFFICIENT DATA",
     "risk_level": "UNKNOWN",
     "risk_score": 0,
@@ -44,16 +44,30 @@
     "risk_flags": [],
     "supportive_flags": [],
     "missing_calculations": [
-      "cpi_inflation_history"
+      "consecutive_month_nfp_change",
+      "core_pce",
+      "core_pce_inflation_history",
+      "cpi",
+      "cpi_inflation_history",
+      "nasdaq",
+      "net_liquidity",
+      "net_liquidity_30d_history",
+      "sp500",
+      "unemployment",
+      "usd_broad_index",
+      "vix",
+      "yield_10y",
+      "yield_curve",
+      "yield_curve_30d_history"
     ],
     "analysis": "Core Macro calculation incomplete বা stale.",
     "action": "Core Macro data সম্পূর্ণ না হওয়া পর্যন্ত Risk-On/Risk-Off সিদ্ধান্ত স্থগিত রাখুন।",
     "risk_note": "অসম্পূর্ণ data থেকে ভুল market assessment হতে পারে।",
-    "vix": 26.8,
+    "vix": null,
     "yield_10y": null,
     "broad_usd": null,
     "critical_checks": {
-      "vix": true,
+      "vix": false,
       "10y": false,
       "broad_usd": false
     }
@@ -61,38 +75,38 @@
   "crypto_market": {
     "global_market": {
       "total_market_cap_usd": {
-        "value": 2078305395139.759,
+        "value": 2075660813380.8726,
         "unit": "USD",
         "source": "CoinGecko API",
-        "source_updated_at": "2026-11-28T05:26:13Z",
-        "fetched_at": "2026-11-28T05:28:11Z",
+        "source_updated_at": "2026-11-28T05:36:14Z",
+        "fetched_at": "2026-11-28T05:43:01Z",
         "status": "OK",
         "error": null
       },
       "total_volume_24h_usd": {
-        "value": 66973581493.507385,
+        "value": 66560404704.47432,
         "unit": "USD",
         "source": "CoinGecko API",
-        "source_updated_at": "2026-11-28T05:26:13Z",
-        "fetched_at": "2026-11-28T05:28:11Z",
+        "source_updated_at": "2026-11-28T05:36:14Z",
+        "fetched_at": "2026-11-28T05:43:01Z",
         "status": "OK",
         "error": null
       },
       "btc_dominance_pct": {
-        "value": 57.813779882680336,
+        "value": 57.80735670489641,
         "unit": "%",
         "source": "CoinGecko API",
-        "source_updated_at": "2026-11-28T05:26:13Z",
-        "fetched_at": "2026-11-28T05:28:11Z",
+        "source_updated_at": "2026-11-28T05:36:14Z",
+        "fetched_at": "2026-11-28T05:43:01Z",
         "status": "OK",
         "error": null
       },
       "eth_dominance_pct": {
-        "value": 9.73899383927197,
+        "value": 9.738166803687626,
         "unit": "%",
         "source": "CoinGecko API",
-        "source_updated_at": "2026-11-28T05:26:13Z",
-        "fetched_at": "2026-11-28T05:28:11Z",
+        "source_updated_at": "2026-11-28T05:36:14Z",
+        "fetched_at": "2026-11-28T05:43:01Z",
         "status": "OK",
         "error": null
       },
@@ -100,8 +114,8 @@
         "value": 21218.0,
         "unit": "count",
         "source": "CoinGecko API",
-        "source_updated_at": "2026-11-28T05:26:13Z",
-        "fetched_at": "2026-11-28T05:28:11Z",
+        "source_updated_at": "2026-11-28T05:36:14Z",
+        "fetched_at": "2026-11-28T05:43:01Z",
         "status": "OK",
         "error": null
       },
@@ -109,8 +123,8 @@
         "value": 1525.0,
         "unit": "count",
         "source": "CoinGecko API",
-        "source_updated_at": "2026-11-28T05:26:13Z",
-        "fetched_at": "2026-11-28T05:28:11Z",
+        "source_updated_at": "2026-11-28T05:36:14Z",
+        "fetched_at": "2026-11-28T05:43:01Z",
         "status": "OK",
         "error": null
       }
@@ -121,7 +135,7 @@
       "unit": "/100",
       "source": "Alternative.me Fear & Greed API",
       "source_updated_at": "2026-11-28T00:00:00Z",
-      "fetched_at": "2026-11-28T05:28:11Z",
+      "fetched_at": "2026-11-28T05:43:02Z",
       "status": "OK",
       "error": null
     },
@@ -177,7 +191,7 @@
     ],
     "risk": [
       "অসম্পূর্ণ বা পুরোনো ডেটা ভুল সিদ্ধান্ত তৈরি করতে পারে।",
-      "Macro-এর অসম্পূর্ণ হিসাব: cpi_inflation_history"
+      "Macro-এর অসম্পূর্ণ হিসাব: consecutive_month_nfp_change, core_pce, core_pce_inflation_history, cpi, cpi_inflation_history, nasdaq, net_liquidity, net_liquidity_30d_history, sp500, unemployment, usd_broad_index, vix, yield_10y, yield_curve, yield_curve_30d_history"
     ],
     "data_ready": false,
     "decision_scope": "BROAD_CRYPTO_MARKET_SPOT",

@@ -2,7 +2,7 @@
   "schema_version": 3,
   "engine": "Crypto Market Zone Engine",
   "engine_version": "3.0.0",
-  "generated_at": "2026-11-28T05:28:24.636017+00:00",
+  "generated_at": "2026-11-28T05:47:15.273782+00:00",
   "data_quality": "PARTIAL",
   "current_zone": "বিয়ারিশ পুনরুদ্ধার ঝুঁকি",
   "zone_code": "BEARISH_RECOVERY_RISK",
@@ -14,22 +14,22 @@
   "spot_action_code": "WAIT",
   "risk_level": "উচ্চ",
   "risk_code": "HIGH",
-  "reason": "Macro Engine-এর সিদ্ধান্ত: WAIT — INSUFFICIENT DATA। তাই নতুন BUY/DCA অনুমোদিত নয়।",
-  "action_instruction": "নতুন Spot BUY/DCA করবেন না। Macro Engine-এর প্রয়োজনীয় তথ্য সম্পূর্ণ ও যাচাই হওয়া পর্যন্ত অপেক্ষা করুন।",
+  "reason": "Macro তথ্য পুরোনো অথবা অসম্পূর্ণ।",
+  "action_instruction": "Macro তথ্য যাচাই না হওয়া পর্যন্ত নতুন Spot BUY/DCA স্থগিত রাখুন।",
   "btc_trend": "BEARISH",
   "btc_trend_bn": "বিয়ারিশ",
   "macro_risk": {
-    "score": 1,
-    "level": "MODERATE",
-    "reasons": [
-      "VIX ২৫ বা তার বেশি। বাজারে সতর্কতা প্রয়োজন।",
-      "Broad USD সূচকের তথ্য পাওয়া গেছে। শুধু বর্তমান মান দিয়ে ডলারের শক্তি বাড়ছে না কমছে তা নিশ্চিত করা যায় না।",
-      "যুক্তরাষ্ট্রের ১০ বছর মেয়াদি বন্ডের সুদ ৫%-এর নিচে।"
-    ],
-    "missing": []
+    "score": 0,
+    "level": "LOW_OR_UNKNOWN",
+    "reasons": [],
+    "missing": [
+      "VIX",
+      "Broad USD",
+      "US 10Y yield"
+    ]
   },
   "macro_decision": "WAIT — INSUFFICIENT DATA",
-  "macro_data_quality": "GOOD_WITH_OPTIONAL_GAPS",
+  "macro_data_quality": "POOR",
   "final_engine_decision": "WAIT",
   "btc_technical": {
     "price": 59923.1,
@@ -44,12 +44,12 @@
     "resistance_20d": 76249.99
   },
   "fear_greed": 10.0,
-  "btc_dominance": 57.813779882680336,
+  "btc_dominance": 57.80735670489641,
   "advanced_context": {
     "mvrv_ratio": null,
-    "breadth_ratio": 0.248,
-    "advancing": 102.0,
-    "declining": 411.0
+    "breadth_ratio": 0.155,
+    "advancing": 69.0,
+    "declining": 444.0
   },
   "bullish_score": 3,
   "bearish_score": 6,
@@ -65,6 +65,9 @@
     "Binance Spot মার্কেটে কমতে থাকা কয়েনের সংখ্যা বেশি।"
   ],
   "missing_data": [
+    "Macro vix: মান অনুপস্থিত, অবৈধ অথবা provider unavailable।",
+    "Macro usd_broad: মান অনুপস্থিত, অবৈধ অথবা provider unavailable।",
+    "Macro yield_10y: মান অনুপস্থিত, অবৈধ অথবা provider unavailable।",
     "Advanced mvrv: তথ্য পাওয়া যায়নি অথবা যাচাই করা যায়নি।",
     "সতর্কতা: Macro Engine-এর সিদ্ধান্ত নতুন BUY/DCA অনুমোদন করছে না।",
     "সতর্কতা: Final Decision Engine-এর সিদ্ধান্ত নতুন BUY/DCA সীমিত করছে।"
@@ -73,26 +76,26 @@
   "verified_inputs": {
     "market": {
       "status": "FRESH",
-      "age_hours": 0.0,
-      "timestamp": "2026-11-28T05:28:11Z",
+      "age_hours": 0.07,
+      "timestamp": "2026-11-28T05:43:01Z",
       "reason": null
     },
     "macro": {
       "status": "FRESH",
-      "age_hours": 0.71,
-      "timestamp": "2026-11-28T04:45:49Z",
+      "age_hours": 0.0,
+      "timestamp": "2026-11-28T05:47:02Z",
       "reason": null
     },
     "advanced": {
       "status": "FRESH",
       "age_hours": 0.0,
-      "timestamp": "2026-11-28T05:28:14Z",
+      "timestamp": "2026-11-28T05:47:02Z",
       "reason": null
     },
     "decision": {
       "status": "FRESH",
       "age_hours": 0.0,
-      "timestamp": "2026-11-28T05:28:24.595741+00:00",
+      "timestamp": "2026-11-28T05:47:15.220585+00:00",
       "reason": null
     },
     "btc_technical": {
@@ -105,70 +108,70 @@
           "valid": true,
           "status": "FRESH",
           "timestamp": "2026-11-27T23:59:59Z",
-          "age_hours": 5.47,
+          "age_hours": 5.79,
           "reason": null
         },
         "ma20": {
           "valid": true,
           "status": "FRESH",
           "timestamp": "2026-11-27T23:59:59Z",
-          "age_hours": 5.47,
+          "age_hours": 5.79,
           "reason": null
         },
         "ma50": {
           "valid": true,
           "status": "FRESH",
           "timestamp": "2026-11-27T23:59:59Z",
-          "age_hours": 5.47,
+          "age_hours": 5.79,
           "reason": null
         },
         "ma200": {
           "valid": true,
           "status": "FRESH",
           "timestamp": "2026-11-27T23:59:59Z",
-          "age_hours": 5.47,
+          "age_hours": 5.79,
           "reason": null
         },
         "rsi14": {
           "valid": true,
           "status": "FRESH",
           "timestamp": "2026-11-27T23:59:59Z",
-          "age_hours": 5.47,
+          "age_hours": 5.79,
           "reason": null
         },
         "macd": {
           "valid": true,
           "status": "FRESH",
           "timestamp": "2026-11-27T23:59:59Z",
-          "age_hours": 5.47,
+          "age_hours": 5.79,
           "reason": null
         },
         "macd_signal": {
           "valid": true,
           "status": "FRESH",
           "timestamp": "2026-11-27T23:59:59Z",
-          "age_hours": 5.47,
+          "age_hours": 5.79,
           "reason": null
         },
         "volume_ratio": {
           "valid": true,
           "status": "FRESH",
           "timestamp": "2026-11-27T23:59:59Z",
-          "age_hours": 5.47,
+          "age_hours": 5.79,
           "reason": null
         },
         "support_20d": {
           "valid": true,
           "status": "FRESH",
           "timestamp": "2026-11-27T23:59:59Z",
-          "age_hours": 5.47,
+          "age_hours": 5.79,
           "reason": null
         },
         "resistance_20d": {
           "valid": true,
           "status": "FRESH",
           "timestamp": "2026-11-27T23:59:59Z",
-          "age_hours": 5.47,
+          "age_hours": 5.79,
           "reason": null
         }
       }
@@ -177,37 +180,37 @@
       "valid": true,
       "status": "FRESH",
       "timestamp": "2026-11-28T00:00:00Z",
-      "age_hours": 5.47,
+      "age_hours": 5.79,
       "reason": null
     },
     "btc_dominance": {
       "valid": true,
       "status": "FRESH",
-      "timestamp": "2026-11-28T05:26:13Z",
-      "age_hours": 0.04,
+      "timestamp": "2026-11-28T05:36:14Z",
+      "age_hours": 0.18,
       "reason": null
     },
     "macro_metrics": {
       "vix": {
-        "valid": true,
-        "status": "FRESH",
-        "timestamp": "2026-11-28T04:45:22Z",
-        "age_hours": 0.72,
-        "reason": null
+        "valid": false,
+        "status": "UNAVAILABLE",
+        "timestamp": "2026-11-28T05:45:43Z",
+        "age_hours": 0.03,
+        "reason": "মান অনুপস্থিত, অবৈধ অথবা provider unavailable।"
       },
       "usd_broad": {
-        "valid": true,
-        "status": "FRESH",
-        "timestamp": "2026-11-28T04:45:21Z",
-        "age_hours": 0.72,
-        "reason": null
+        "valid": false,
+        "status": "UNAVAILABLE",
+        "timestamp": "2026-11-28T05:45:43Z",
+        "age_hours": 0.03,
+        "reason": "মান অনুপস্থিত, অবৈধ অথবা provider unavailable।"
       },
       "yield_10y": {
-        "valid": true,
-        "status": "FRESH",
-        "timestamp": "2026-11-28T04:45:23Z",
-        "age_hours": 0.72,
-        "reason": null
+        "valid": false,
+        "status": "UNAVAILABLE",
+        "timestamp": "2026-11-28T05:45:43Z",
+        "age_hours": 0.03,
+        "reason": "মান অনুপস্থিত, অবৈধ অথবা provider unavailable।"
       }
     },
     "advanced_metrics": {
@@ -215,34 +218,34 @@
         "valid": false,
         "status": "STALE",
         "timestamp": "2026-11-27T00:00:00.000000000Z",
-        "age_hours": 29.47,
-        "reason": "Metric 29.5 ঘণ্টা পুরোনো।"
+        "age_hours": 29.79,
+        "reason": "Metric 29.8 ঘণ্টা পুরোনো।"
       },
       "breadth_ratio": {
         "valid": true,
         "status": "FRESH",
-        "timestamp": "2026-11-28T05:28:14Z",
+        "timestamp": "2026-11-28T05:47:02Z",
         "age_hours": 0.0,
         "reason": null
       },
       "advancing": {
         "valid": true,
         "status": "FRESH",
-        "timestamp": "2026-11-28T05:28:14Z",
+        "timestamp": "2026-11-28T05:47:02Z",
         "age_hours": 0.0,
         "reason": null
       },
       "declining": {
         "valid": true,
         "status": "FRESH",
-        "timestamp": "2026-11-28T05:28:14Z",
+        "timestamp": "2026-11-28T05:47:02Z",
         "age_hours": 0.0,
         "reason": null
       }
     },
     "policy_checks": {
       "market_quality_ok": true,
-      "macro_quality_ok": true,
+      "macro_quality_ok": false,
       "advanced_quality_ok": false,
       "decision_quality_ok": true,
       "macro_decision_restrictive": true,
